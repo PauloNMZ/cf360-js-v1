@@ -11,7 +11,7 @@ import {
   Folder, 
   FileSearch, 
   Database, 
-  Transmit, 
+  Radio, 
   Repeat, 
   FileText, 
   Search, 
@@ -36,7 +36,7 @@ const Index = () => {
           <NavButton icon={<Folder size={24} />} label="Importar Arquivo" />
           <NavButton icon={<FileSearch size={24} />} label="Verificar Erros" />
           <NavButton icon={<Database size={24} />} label="Processar Arquivos" />
-          <NavButton icon={<Transmit size={24} />} label="Transmissões" />
+          <NavButton icon={<Radio size={24} />} label="Transmissões" />
           <NavButton icon={<Repeat size={24} />} label="Processar Retornos" />
           <NavButton icon={<FileText size={24} />} label="Relatórios" />
           <NavButton icon={<Search size={24} />} label="Consultas" />
