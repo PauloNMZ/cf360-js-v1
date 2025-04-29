@@ -31,8 +31,10 @@ const Index = () => {
         {/* Ícones de navegação */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-10 gap-4 mb-12">
           <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-            <DialogTrigger>
-              <NavButton icon={<Home size={24} />} label="Convenente" />
+            <DialogTrigger asChild>
+              <div className="w-full h-full">
+                <NavButton icon={<Home size={24} />} label="Convenente" />
+              </div>
             </DialogTrigger>
             <DialogContent className="max-w-4xl">
               <DialogHeader>
@@ -74,7 +76,7 @@ const Index = () => {
 // Componente auxiliar para os botões de navegação
 const NavButton = ({ icon, label }) => {
   return (
-    <button className="flex flex-col items-center justify-center bg-white hover:bg-blue-50 p-4 rounded-lg shadow-md transition-all hover:shadow-lg border border-blue-100">
+    <button className="w-full h-full flex flex-col items-center justify-center bg-white hover:bg-blue-50 p-4 rounded-lg shadow-md transition-all hover:shadow-lg border border-blue-100">
       <div className="p-2 bg-blue-100 rounded-full text-blue-700 mb-2">
         {icon}
       </div>
