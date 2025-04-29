@@ -31,10 +31,8 @@ const Index = () => {
         {/* Ícones de navegação */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-10 gap-4 mb-12">
           <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-            <DialogTrigger asChild>
-              <div>
-                <NavButton icon={<Home size={24} />} label="Convenente" />
-              </div>
+            <DialogTrigger>
+              <NavButton icon={<Home size={24} />} label="Convenente" />
             </DialogTrigger>
             <DialogContent className="max-w-4xl">
               <DialogHeader>
