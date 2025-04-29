@@ -1,18 +1,7 @@
 
 import { useState } from "react";
 import FormularioModerno from "@/components/FormularioModerno";
-import FormularioProfissional from "@/components/FormularioProfissional";
-import FormularioElegante from "@/components/FormularioElegante";
-import FormularioCorporativo from "@/components/FormularioCorporativo";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { 
   Home, 
   Folder, 
@@ -27,10 +16,10 @@ import {
 } from "lucide-react";
 
 const Index = () => {
-  const [formType, setFormType] = useState("moderno");
+  const [modalOpen, setModalOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex flex-col">
       {/* Header com gradiente azul */}
       <header className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-4 px-6 shadow-md">
         <div className="max-w-7xl mx-auto">
@@ -38,10 +27,10 @@ const Index = () => {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 flex-grow">
         {/* Ícones de navegação */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-10 gap-4 mb-12">
-          <Dialog>
+          <Dialog open={modalOpen} onOpenChange={setModalOpen}>
             <DialogTrigger asChild>
               <div>
                 <NavButton icon={<Home size={24} />} label="Convenente" />
@@ -52,32 +41,7 @@ const Index = () => {
                 <DialogTitle className="text-2xl font-bold text-center mb-6">Cadastro de Convenente</DialogTitle>
               </DialogHeader>
               <div className="py-4">
-                <Tabs value={formType} onValueChange={setFormType} className="w-full">
-                  <div className="flex justify-center mb-6">
-                    <TabsList className="bg-blue-100">
-                      <TabsTrigger value="moderno" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Moderno</TabsTrigger>
-                      <TabsTrigger value="profissional" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Profissional</TabsTrigger>
-                      <TabsTrigger value="elegante" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Elegante</TabsTrigger>
-                      <TabsTrigger value="corporativo" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Corporativo</TabsTrigger>
-                    </TabsList>
-                  </div>
-                  
-                  <TabsContent value="moderno">
-                    <FormularioModerno />
-                  </TabsContent>
-                  
-                  <TabsContent value="profissional">
-                    <FormularioProfissional />
-                  </TabsContent>
-                  
-                  <TabsContent value="elegante">
-                    <FormularioElegante />
-                  </TabsContent>
-                  
-                  <TabsContent value="corporativo">
-                    <FormularioCorporativo />
-                  </TabsContent>
-                </Tabs>
+                <FormularioModerno />
               </div>
             </DialogContent>
           </Dialog>
@@ -91,17 +55,17 @@ const Index = () => {
           <NavButton icon={<Settings size={24} />} label="Configurações" />
           <NavButton icon={<LogOut size={24} />} label="Sair" />
         </div>
-        
-        {/* Status bar */}
-        <div className="mt-12 p-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-md shadow-md">
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-2xl font-bold">Terça-Feira</h2>
-              <p>29 de Abril de 2025</p>
-            </div>
-            <div className="text-right">
-              <p className="text-sm opacity-80">Sistema Online</p>
-            </div>
+      </div>
+      
+      {/* Status bar - Now at the bottom of the page */}
+      <div className="mt-auto p-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <div>
+            <h2 className="text-2xl font-bold">Terça-Feira</h2>
+            <p>29 de Abril de 2025</p>
+          </div>
+          <div className="text-right">
+            <p className="text-sm opacity-80">Sistema Online</p>
           </div>
         </div>
       </div>
