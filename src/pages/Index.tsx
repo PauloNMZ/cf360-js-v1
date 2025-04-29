@@ -6,6 +6,13 @@ import FormularioElegante from "@/components/FormularioElegante";
 import FormularioCorporativo from "@/components/FormularioCorporativo";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { 
   Home, 
   Folder, 
@@ -20,6 +27,8 @@ import {
 } from "lucide-react";
 
 const Index = () => {
+  const [formType, setFormType] = useState("moderno");
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
       {/* Header com gradiente azul */}
@@ -32,7 +41,46 @@ const Index = () => {
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {/* Ícones de navegação */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-10 gap-4 mb-12">
-          <NavButton icon={<Home size={24} />} label="Convenente" />
+          <Dialog>
+            <DialogTrigger asChild>
+              <div>
+                <NavButton icon={<Home size={24} />} label="Convenente" />
+              </div>
+            </DialogTrigger>
+            <DialogContent className="max-w-4xl">
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-bold text-center mb-6">Cadastro de Convenente</DialogTitle>
+              </DialogHeader>
+              <div className="py-4">
+                <Tabs value={formType} onValueChange={setFormType} className="w-full">
+                  <div className="flex justify-center mb-6">
+                    <TabsList className="bg-blue-100">
+                      <TabsTrigger value="moderno" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Moderno</TabsTrigger>
+                      <TabsTrigger value="profissional" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Profissional</TabsTrigger>
+                      <TabsTrigger value="elegante" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Elegante</TabsTrigger>
+                      <TabsTrigger value="corporativo" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Corporativo</TabsTrigger>
+                    </TabsList>
+                  </div>
+                  
+                  <TabsContent value="moderno">
+                    <FormularioModerno />
+                  </TabsContent>
+                  
+                  <TabsContent value="profissional">
+                    <FormularioProfissional />
+                  </TabsContent>
+                  
+                  <TabsContent value="elegante">
+                    <FormularioElegante />
+                  </TabsContent>
+                  
+                  <TabsContent value="corporativo">
+                    <FormularioCorporativo />
+                  </TabsContent>
+                </Tabs>
+              </div>
+            </DialogContent>
+          </Dialog>
           <NavButton icon={<Folder size={24} />} label="Importar Arquivo" />
           <NavButton icon={<FileSearch size={24} />} label="Verificar Erros" />
           <NavButton icon={<Database size={24} />} label="Processar Arquivos" />
@@ -43,43 +91,6 @@ const Index = () => {
           <NavButton icon={<Settings size={24} />} label="Configurações" />
           <NavButton icon={<LogOut size={24} />} label="Sair" />
         </div>
-        
-        {/* Componentes de formulário dentro do card */}
-        <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Variações de Design para Formulário de Cadastro</h2>
-          <p className="text-lg text-gray-600">
-            Diferentes estilos visuais para o formulário de cadastro de convenentes
-          </p>
-        </div>
-        
-        <Tabs defaultValue="moderno" className="w-full">
-          <div className="flex justify-center mb-6">
-            <TabsList className="bg-blue-100">
-              <TabsTrigger value="moderno" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Moderno</TabsTrigger>
-              <TabsTrigger value="profissional" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Profissional</TabsTrigger>
-              <TabsTrigger value="elegante" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Elegante</TabsTrigger>
-              <TabsTrigger value="corporativo" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">Corporativo</TabsTrigger>
-            </TabsList>
-          </div>
-          
-          <Card className="border border-blue-200 shadow-lg overflow-hidden">
-            <TabsContent value="moderno">
-              <FormularioModerno />
-            </TabsContent>
-            
-            <TabsContent value="profissional">
-              <FormularioProfissional />
-            </TabsContent>
-            
-            <TabsContent value="elegante">
-              <FormularioElegante />
-            </TabsContent>
-            
-            <TabsContent value="corporativo">
-              <FormularioCorporativo />
-            </TabsContent>
-          </Card>
-        </Tabs>
         
         {/* Status bar */}
         <div className="mt-12 p-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-md shadow-md">
