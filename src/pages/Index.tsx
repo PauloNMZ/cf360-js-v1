@@ -18,7 +18,8 @@ import {
   Plus,
   Edit,
   TrashIcon,
-  Save
+  Save,
+  LayoutDashboard
 } from "lucide-react";
 
 const Index = () => {
@@ -116,6 +117,11 @@ const Index = () => {
           <NavButton 
             icon={<Search size={24} />} 
             label="Consultas" 
+            onClick={() => {}} 
+          />
+          <NavButton 
+            icon={<LayoutDashboard size={24} />} 
+            label="Dashboard" 
             onClick={() => {}} 
           />
           <NavButton 
