@@ -18,6 +18,11 @@ import {
 const Index = () => {
   const [modalOpen, setModalOpen] = useState(false);
 
+  const handleConvenenteClick = () => {
+    console.log("Convenente button clicked");
+    setModalOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex flex-col">
       {/* Header com gradiente azul */}
@@ -30,19 +35,11 @@ const Index = () => {
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 flex-grow">
         {/* Ícones de navegação em uma única linha */}
         <div className="flex overflow-x-auto pb-4 mb-12 gap-2">
-          <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-            <DialogTrigger asChild>
-              <NavButton icon={<Home size={24} />} label="Convenente" />
-            </DialogTrigger>
-            <DialogContent className="max-w-4xl">
-              <DialogHeader>
-                <DialogTitle className="text-2xl font-bold text-center mb-6">Cadastro de Convenente</DialogTitle>
-              </DialogHeader>
-              <div className="py-4">
-                <FormularioModerno />
-              </div>
-            </DialogContent>
-          </Dialog>
+          <NavButton 
+            icon={<Home size={24} />} 
+            label="Convenente" 
+            onClick={handleConvenenteClick} 
+          />
           <NavButton icon={<Folder size={24} />} label="Importar Arquivo" />
           <NavButton icon={<FileSearch size={24} />} label="Verificar Erros" />
           <NavButton icon={<Database size={24} />} label="Processar Arquivos" />
@@ -54,6 +51,18 @@ const Index = () => {
           <NavButton icon={<LogOut size={24} />} label="Sair" />
         </div>
       </div>
+      
+      {/* Modal de Cadastro de Convenente */}
+      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-center mb-6">Cadastro de Convenente</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <FormularioModerno />
+          </div>
+        </DialogContent>
+      </Dialog>
       
       {/* Status bar - Fixed at the bottom */}
       <footer className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-3 px-6 mt-auto">
@@ -72,9 +81,12 @@ const Index = () => {
 };
 
 // Componente auxiliar para os botões de navegação
-const NavButton = ({ icon, label }) => {
+const NavButton = ({ icon, label, onClick }) => {
   return (
-    <button className="flex-shrink-0 w-24 h-24 bg-white hover:bg-blue-50 rounded-lg shadow-md transition-all hover:shadow-lg border border-blue-100 flex flex-col items-center justify-center p-3">
+    <button 
+      className="flex-shrink-0 w-24 h-24 bg-white hover:bg-blue-50 rounded-lg shadow-md transition-all hover:shadow-lg border border-blue-100 flex flex-col items-center justify-center p-3"
+      onClick={onClick}
+    >
       <div className="p-2 bg-blue-100 rounded-full text-blue-700 mb-1">
         {icon}
       </div>
