@@ -1,7 +1,8 @@
-
 import { useState } from "react";
 import FormularioModerno from "@/components/FormularioModerno";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
 import { 
   Home, 
   FileUp, 
@@ -13,12 +14,17 @@ import {
   Search, 
   Settings, 
   LogOut,
-  Shield 
+  Shield,
+  Plus,
+  Edit,
+  TrashIcon,
+  Save
 } from "lucide-react";
 
 const Index = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [adminPanelOpen, setAdminPanelOpen] = useState(false);
+  const [formMode, setFormMode] = useState('view'); // view, create, edit
 
   const handleConvenenteClick = () => {
     console.log("Convenente button clicked");
@@ -36,12 +42,36 @@ const Index = () => {
     setAdminPanelOpen(true);
   };
 
+  const handleCreateNew = () => {
+    setFormMode('create');
+    console.log("Create new convenente");
+  };
+
+  const handleEdit = () => {
+    setFormMode('edit');
+    console.log("Edit convenente");
+  };
+
+  const handleDelete = () => {
+    console.log("Delete convenente");
+    // In a real application, this would show a confirmation dialog
+    if (confirm("Deseja realmente excluir este convenente?")) {
+      console.log("Convenente deleted");
+    }
+  };
+
+  const handleSave = () => {
+    console.log("Save convenente");
+    setFormMode('view');
+    // In a real application, this would save the data
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex flex-col">
       {/* Header com gradiente azul */}
       <header className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-4 px-6 shadow-md">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl font-bold">GERADOR DE PAGAMENTOS V1.01</h1>
+          <h1 className="text-2xl font-bold">GERADOR DE PAGAMENTOS</h1>
         </div>
       </header>
 
@@ -112,10 +142,48 @@ const Index = () => {
         <DialogContent className="max-w-4xl">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-center mb-6">Cadastro de Convenente</DialogTitle>
+            <div className="flex justify-between">
+              <div className="flex space-x-2">
+                <Button
+                  onClick={handleCreateNew}
+                  variant="outline"
+                  className="flex items-center gap-1"
+                  disabled={formMode === 'create'}
+                >
+                  <Plus size={16} /> Novo
+                </Button>
+                <Button
+                  onClick={handleEdit}
+                  variant="outline"
+                  className="flex items-center gap-1"
+                  disabled={formMode === 'edit'}
+                >
+                  <Edit size={16} /> Editar
+                </Button>
+                <Button
+                  onClick={handleDelete}
+                  variant="outline"
+                  className="flex items-center gap-1 text-red-600 border-red-200 hover:bg-red-50"
+                >
+                  <TrashIcon size={16} /> Excluir
+                </Button>
+              </div>
+              {(formMode === 'create' || formMode === 'edit') && (
+                <Button
+                  onClick={handleSave}
+                  variant="default"
+                  className="flex items-center gap-1 bg-green-600 hover:bg-green-700"
+                >
+                  <Save size={16} /> Salvar
+                </Button>
+              )}
+            </div>
           </DialogHeader>
-          <div className="py-4">
-            <FormularioModerno />
-          </div>
+          <ScrollArea className="h-[70vh] pr-4">
+            <div className="py-4">
+              <FormularioModerno />
+            </div>
+          </ScrollArea>
         </DialogContent>
       </Dialog>
 
@@ -139,7 +207,7 @@ const Index = () => {
             <p className="text-sm">29 de Abril de 2025</p>
           </div>
           <div className="text-right">
-            <p className="text-sm">Sistema Online</p>
+            <p className="text-sm">GeraPag 1.01</p>
           </div>
         </div>
       </footer>
