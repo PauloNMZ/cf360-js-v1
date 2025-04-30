@@ -4,10 +4,10 @@ import FormularioModerno from "@/components/FormularioModerno";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { 
   Home, 
-  Folder, 
+  FileUp, 
   FileSearch, 
-  Database, 
-  Wifi, 
+  Package, 
+  Send, 
   RefreshCw, 
   FileText, 
   Search, 
@@ -40,15 +40,51 @@ const Index = () => {
             label="Convenente" 
             onClick={handleConvenenteClick} 
           />
-          <NavButton icon={<Folder size={24} />} label="Importar Arquivo" onClick={() => {}} />
-          <NavButton icon={<FileSearch size={24} />} label="Verificar Erros" onClick={() => {}} />
-          <NavButton icon={<Database size={24} />} label="Processar Arquivos" onClick={() => {}} />
-          <NavButton icon={<Wifi size={24} />} label="Transmissões" onClick={() => {}} />
-          <NavButton icon={<RefreshCw size={24} />} label="Processar Retornos" onClick={() => {}} />
-          <NavButton icon={<FileText size={24} />} label="Relatórios" onClick={() => {}} />
-          <NavButton icon={<Search size={24} />} label="Consultas" onClick={() => {}} />
-          <NavButton icon={<Settings size={24} />} label="Configurações" onClick={() => {}} />
-          <NavButton icon={<LogOut size={24} />} label="Sair" onClick={() => {}} />
+          <NavButton 
+            icon={<FileUp size={24} />} 
+            label="Importar Planilha" 
+            onClick={() => {}} 
+          />
+          <NavButton 
+            icon={<FileSearch size={24} />} 
+            label="Verificar Erros" 
+            onClick={() => {}} 
+          />
+          <NavButton 
+            icon={<Package size={24} />} 
+            label="Gerar Remessa" 
+            onClick={() => {}} 
+          />
+          <NavButton 
+            icon={<Send size={24} />} 
+            label="Enviar ao Banco" 
+            onClick={() => {}} 
+          />
+          <NavButton 
+            icon={<RefreshCw size={24} />} 
+            label="Processar Retornos" 
+            onClick={() => {}} 
+          />
+          <NavButton 
+            icon={<FileText size={24} />} 
+            label="Comprovantes" 
+            onClick={() => {}} 
+          />
+          <NavButton 
+            icon={<Search size={24} />} 
+            label="Consultas" 
+            onClick={() => {}} 
+          />
+          <NavButton 
+            icon={<Settings size={24} />} 
+            label="Configurações" 
+            onClick={() => {}} 
+          />
+          <NavButton 
+            icon={<LogOut size={24} />} 
+            label="Sair" 
+            onClick={() => {}} 
+          />
         </div>
       </div>
       
