@@ -12,15 +12,28 @@ import {
   FileText, 
   Search, 
   Settings, 
-  LogOut 
+  LogOut,
+  Shield 
 } from "lucide-react";
 
 const Index = () => {
   const [modalOpen, setModalOpen] = useState(false);
+  const [adminPanelOpen, setAdminPanelOpen] = useState(false);
 
   const handleConvenenteClick = () => {
     console.log("Convenente button clicked");
     setModalOpen(true);
+  };
+
+  const handleLogoutClick = () => {
+    console.log("Logout button clicked");
+    // In a real application, this would handle the logout process
+    alert("Saindo do sistema...");
+  };
+
+  const handleAdminPanelClick = () => {
+    console.log("Admin Panel button clicked");
+    setAdminPanelOpen(true);
   };
 
   return (
@@ -81,9 +94,15 @@ const Index = () => {
             onClick={() => {}} 
           />
           <NavButton 
+            icon={<Shield size={24} />} 
+            label="Administração" 
+            onClick={handleAdminPanelClick} 
+          />
+          <NavButton 
             icon={<LogOut size={24} />} 
             label="Sair" 
-            onClick={() => {}} 
+            onClick={handleLogoutClick} 
+            className="bg-red-50 hover:bg-red-100 border-red-200"
           />
         </div>
       </div>
@@ -96,6 +115,18 @@ const Index = () => {
           </DialogHeader>
           <div className="py-4">
             <FormularioModerno />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal do Painel de Administração */}
+      <Dialog open={adminPanelOpen} onOpenChange={setAdminPanelOpen}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-center mb-6">Painel de Administração</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <AdminPanel />
           </div>
         </DialogContent>
       </Dialog>
@@ -117,10 +148,10 @@ const Index = () => {
 };
 
 // Componente auxiliar para os botões de navegação
-const NavButton = ({ icon, label, onClick }) => {
+const NavButton = ({ icon, label, onClick, className = "" }) => {
   return (
     <button 
-      className="flex-shrink-0 w-24 h-24 bg-white hover:bg-blue-50 rounded-lg shadow-md transition-all hover:shadow-lg border border-blue-100 flex flex-col items-center justify-center p-3"
+      className={`flex-shrink-0 w-24 h-24 bg-white hover:bg-blue-50 rounded-lg shadow-md transition-all hover:shadow-lg border border-blue-100 flex flex-col items-center justify-center p-3 ${className}`}
       onClick={onClick}
     >
       <div className="p-2 bg-blue-100 rounded-full text-blue-700 mb-1">
@@ -128,6 +159,52 @@ const NavButton = ({ icon, label, onClick }) => {
       </div>
       <span className="text-xs text-gray-800 text-center mt-1">{label}</span>
     </button>
+  );
+};
+
+// Componente para o Painel de Administração
+const AdminPanel = () => {
+  return (
+    <div className="space-y-6">
+      <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+        <h3 className="text-lg font-medium text-blue-800 mb-2">Gestão de Usuários</h3>
+        <p className="text-sm text-gray-600 mb-3">Gerencie usuários e permissões do sistema</p>
+        <div className="flex gap-2">
+          <button className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
+            Adicionar Usuário
+          </button>
+          <button className="px-3 py-1 bg-white border border-blue-300 text-blue-600 text-sm rounded hover:bg-blue-50">
+            Listar Usuários
+          </button>
+        </div>
+      </div>
+
+      <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+        <h3 className="text-lg font-medium text-blue-800 mb-2">Configurações do Sistema</h3>
+        <p className="text-sm text-gray-600 mb-3">Ajuste configurações globais e parâmetros operacionais</p>
+        <div className="flex gap-2">
+          <button className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
+            Parâmetros Globais
+          </button>
+          <button className="px-3 py-1 bg-white border border-blue-300 text-blue-600 text-sm rounded hover:bg-blue-50">
+            Conexões Bancárias
+          </button>
+        </div>
+      </div>
+
+      <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+        <h3 className="text-lg font-medium text-blue-800 mb-2">Auditoria</h3>
+        <p className="text-sm text-gray-600 mb-3">Visualize logs e histórico de operações</p>
+        <div className="flex gap-2">
+          <button className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
+            Logs do Sistema
+          </button>
+          <button className="px-3 py-1 bg-white border border-blue-300 text-blue-600 text-sm rounded hover:bg-blue-50">
+            Histórico de Transações
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 
