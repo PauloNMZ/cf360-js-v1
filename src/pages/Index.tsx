@@ -12,7 +12,6 @@ import {
   RefreshCw, 
   FileText, 
   Search, 
-  Settings, 
   LogOut,
   Shield,
   Plus,
@@ -125,13 +124,8 @@ const Index = () => {
             onClick={() => {}} 
           />
           <NavButton 
-            icon={<Settings size={24} />} 
-            label="Configurações" 
-            onClick={() => {}} 
-          />
-          <NavButton 
             icon={<Shield size={24} />} 
-            label="Administração" 
+            label="Setup" 
             onClick={handleAdminPanelClick} 
           />
           <NavButton 
@@ -197,7 +191,7 @@ const Index = () => {
       <Dialog open={adminPanelOpen} onOpenChange={setAdminPanelOpen}>
         <DialogContent className="max-w-4xl">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-center mb-6">Painel de Administração</DialogTitle>
+            <DialogTitle className="text-2xl font-bold text-center mb-6">Painel de Setup</DialogTitle>
           </DialogHeader>
           <div className="py-4">
             <AdminPanel />
