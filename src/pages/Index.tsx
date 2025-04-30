@@ -40,15 +40,15 @@ const Index = () => {
             label="Convenente" 
             onClick={handleConvenenteClick} 
           />
-          <NavButton icon={<Folder size={24} />} label="Importar Arquivo" />
-          <NavButton icon={<FileSearch size={24} />} label="Verificar Erros" />
-          <NavButton icon={<Database size={24} />} label="Processar Arquivos" />
-          <NavButton icon={<Wifi size={24} />} label="Transmissões" />
-          <NavButton icon={<RefreshCw size={24} />} label="Processar Retornos" />
-          <NavButton icon={<FileText size={24} />} label="Relatórios" />
-          <NavButton icon={<Search size={24} />} label="Consultas" />
-          <NavButton icon={<Settings size={24} />} label="Configurações" />
-          <NavButton icon={<LogOut size={24} />} label="Sair" />
+          <NavButton icon={<Folder size={24} />} label="Importar Arquivo" onClick={() => {}} />
+          <NavButton icon={<FileSearch size={24} />} label="Verificar Erros" onClick={() => {}} />
+          <NavButton icon={<Database size={24} />} label="Processar Arquivos" onClick={() => {}} />
+          <NavButton icon={<Wifi size={24} />} label="Transmissões" onClick={() => {}} />
+          <NavButton icon={<RefreshCw size={24} />} label="Processar Retornos" onClick={() => {}} />
+          <NavButton icon={<FileText size={24} />} label="Relatórios" onClick={() => {}} />
+          <NavButton icon={<Search size={24} />} label="Consultas" onClick={() => {}} />
+          <NavButton icon={<Settings size={24} />} label="Configurações" onClick={() => {}} />
+          <NavButton icon={<LogOut size={24} />} label="Sair" onClick={() => {}} />
         </div>
       </div>
       

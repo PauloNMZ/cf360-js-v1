@@ -12,8 +12,8 @@ const FormularioModerno = () => {
 
       {/* Informações Cadastrais da Empresa */}
       <div className="mb-8">
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">Informações Cadastrais da Empresa</h1>
+        <div className="mb-6">
+          <h2 className="text-xl font-bold text-blue-700 border-b-2 border-blue-200 pb-2 text-left">Informações Cadastrais da Empresa</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -77,8 +77,8 @@ const FormularioModerno = () => {
       
       {/* Informações de Contato */}
       <div className="mb-8">
-        <div className="text-center mb-6">
-          <h2 className="text-xl font-bold text-blue-700 border-b-2 border-blue-200 pb-2">Informações de Contato</h2>
+        <div className="mb-6">
+          <h2 className="text-xl font-bold text-blue-700 border-b-2 border-blue-200 pb-2 text-left">Informações de Contato</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -130,25 +130,13 @@ const FormularioModerno = () => {
             </label>
             <Input placeholder="exemplo@email.com" className="border-blue-200 focus:border-blue-500 bg-blue-50" />
           </div>
-          
-          <div className="flex flex-col space-y-1">
-            <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-              <span className="bg-blue-100 p-1 rounded">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-              </span>
-              Convênio Pag
-            </label>
-            <Input placeholder="Convênio" className="border-blue-200 focus:border-blue-500 bg-blue-50" />
-          </div>
         </div>
       </div>
 
       {/* Dados Bancários */}
       <div className="mb-8">
-        <div className="text-center mb-6">
-          <h2 className="text-xl font-bold text-blue-700 border-b-2 border-blue-200 pb-2">Dados Bancários</h2>
+        <div className="mb-6">
+          <h2 className="text-xl font-bold text-blue-700 border-b-2 border-blue-200 pb-2 text-left">Dados Bancários</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -213,13 +201,25 @@ const FormularioModerno = () => {
             </label>
             <Input placeholder="Chave Pix" className="border-blue-200 focus:border-blue-500 bg-blue-50" />
           </div>
+          
+          <div className="flex flex-col space-y-1">
+            <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+              <span className="bg-blue-100 p-1 rounded">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </span>
+              Convênio Pag
+            </label>
+            <Input placeholder="Convênio" className="border-blue-200 focus:border-blue-500 bg-blue-50" />
+          </div>
         </div>
       </div>
 
       {/* Outros Dados */}
       <div className="mb-8">
-        <div className="text-center mb-6">
-          <h2 className="text-xl font-bold text-blue-700 border-b-2 border-blue-200 pb-2">Outros Dados</h2>
+        <div className="mb-6">
+          <h2 className="text-xl font-bold text-blue-700 border-b-2 border-blue-200 pb-2 text-left">Outros Dados</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
