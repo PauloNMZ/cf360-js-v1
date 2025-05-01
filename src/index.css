@@ -60,7 +60,7 @@
   }
 }
 
-/* Title bars font styling */
+/* Title bars font styling - ensure no text-transform is applied */
 header h1, 
 .dialog-title, 
 .dialog-header h2, 
@@ -79,6 +79,7 @@ div[role="dialog"] h2,
 .DialogHeader h3,
 button.NavButton span {
   font-family: 'Ubuntu', sans-serif !important;
+  text-transform: none !important;
 }
 
 /* Apply Ubuntu font to dialog titles */
@@ -86,5 +87,5 @@ button.NavButton span {
 [data-radix-popper-content-wrapper] h3,
 [data-radix-popper-content-wrapper] .text-2xl {
   font-family: 'Ubuntu', sans-serif !important;
+  text-transform: none !important;
 }
-
