@@ -216,39 +216,6 @@ const FormularioModerno = () => {
         </div>
       </div>
 
-      {/* Outros Dados */}
-      <div className="mb-8">
-        <div className="mb-6">
-          <h2 className="text-xl font-bold text-blue-700 border-b-2 border-blue-200 pb-2 text-left">Outros Dados</h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div className="flex flex-col space-y-1">
-            <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-              <span className="bg-blue-100 p-1 rounded">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                </svg>
-              </span>
-              dev app key
-            </label>
-            <Input placeholder="dev app key" className="border-blue-200 focus:border-blue-500 bg-blue-50" />
-          </div>
-          
-          <div className="flex flex-col space-y-1">
-            <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-              <span className="bg-blue-100 p-1 rounded">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-                </svg>
-              </span>
-              Basic
-            </label>
-            <Input placeholder="Basic" className="border-blue-200 focus:border-blue-500 bg-blue-50" />
-          </div>
-        </div>
-      </div>
-
       <div className="flex justify-end space-x-4 mt-8">
         <Button variant="destructive">Cancelar</Button>
         <Button className="bg-green-600 hover:bg-green-700">Salvar</Button>

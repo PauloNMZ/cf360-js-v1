@@ -20,6 +20,16 @@ import {
   Save,
   LayoutDashboard
 } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 const Index = () => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -232,46 +242,344 @@ const NavButton = ({ icon, label, onClick, className = "" }) => {
 
 // Componente para o Painel de Administração
 const AdminPanel = () => {
+  const [showBankConnections, setShowBankConnections] = useState(false);
+  const [bankConnections, setBankConnections] = useState([
+    { 
+      id: 1, 
+      appKey: 'app_key_123', 
+      clientId: 'client_123', 
+      clientSecret: 'secret_123',
+      registrarToken: 'token_123',
+      basic: 'basic_auth_123',
+      userBBsia: 'user123',
+      passwordBBsia: '********'
+    }
+  ]);
+  const [editConnection, setEditConnection] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [connectionToDelete, setConnectionToDelete] = useState(null);
+
+  // Form fields for creating/editing
+  const [formValues, setFormValues] = useState({
+    appKey: '',
+    clientId: '',
+    clientSecret: '',
+    registrarToken: '',
+    basic: '',
+    userBBsia: '',
+    passwordBBsia: ''
+  });
+
+  const handleBankConnectionsClick = () => {
+    setShowBankConnections(true);
+  };
+
+  const handleBackToMenu = () => {
+    setShowBankConnections(false);
+    setIsEditing(false);
+    setIsCreating(false);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormValues(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleCreateNew = () => {
+    setFormValues({
+      appKey: '',
+      clientId: '',
+      clientSecret: '',
+      registrarToken: '',
+      basic: '',
+      userBBsia: '',
+      passwordBBsia: ''
+    });
+    setIsCreating(true);
+  };
+
+  const handleSave = () => {
+    if (isEditing) {
+      // Update existing connection
+      setBankConnections(prev => prev.map(conn => 
+        conn.id === editConnection.id ? { ...formValues, id: conn.id } : conn
+      ));
+    } else {
+      // Create new connection
+      const newId = bankConnections.length > 0 
+        ? Math.max(...bankConnections.map(c => c.id)) + 1 
+        : 1;
+      setBankConnections(prev => [...prev, { ...formValues, id: newId }]);
+    }
+    
+    setIsEditing(false);
+    setIsCreating(false);
+  };
+
+  const handleEdit = (connection) => {
+    setEditConnection(connection);
+    setFormValues({
+      appKey: connection.appKey,
+      clientId: connection.clientId,
+      clientSecret: connection.clientSecret,
+      registrarToken: connection.registrarToken,
+      basic: connection.basic,
+      userBBsia: connection.userBBsia,
+      passwordBBsia: connection.passwordBBsia
+    });
+    setIsEditing(true);
+  };
+
+  const handleDelete = (connection) => {
+    setConnectionToDelete(connection);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDelete = () => {
+    setBankConnections(prev => prev.filter(conn => conn.id !== connectionToDelete.id));
+    setShowDeleteDialog(false);
+    setConnectionToDelete(null);
+  };
+
   return (
     <div className="space-y-6">
-      <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-        <h3 className="text-lg font-medium text-blue-800 mb-2">Gestão de Usuários</h3>
-        <p className="text-sm text-gray-600 mb-3">Gerencie usuários e permissões do sistema</p>
-        <div className="flex gap-2">
-          <button className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
-            Adicionar Usuário
-          </button>
-          <button className="px-3 py-1 bg-white border border-blue-300 text-blue-600 text-sm rounded hover:bg-blue-50">
-            Listar Usuários
-          </button>
-        </div>
-      </div>
+      {!showBankConnections && !isEditing && !isCreating ? (
+        <>
+          <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+            <h3 className="text-lg font-medium text-blue-800 mb-2">Gestão de Usuários</h3>
+            <p className="text-sm text-gray-600 mb-3">Gerencie usuários e permissões do sistema</p>
+            <div className="flex gap-2">
+              <button className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
+                Adicionar Usuário
+              </button>
+              <button className="px-3 py-1 bg-white border border-blue-300 text-blue-600 text-sm rounded hover:bg-blue-50">
+                Listar Usuários
+              </button>
+            </div>
+          </div>
 
-      <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-        <h3 className="text-lg font-medium text-blue-800 mb-2">Configurações do Sistema</h3>
-        <p className="text-sm text-gray-600 mb-3">Ajuste configurações globais e parâmetros operacionais</p>
-        <div className="flex gap-2">
-          <button className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
-            Parâmetros Globais
-          </button>
-          <button className="px-3 py-1 bg-white border border-blue-300 text-blue-600 text-sm rounded hover:bg-blue-50">
-            Conexões Bancárias
-          </button>
-        </div>
-      </div>
+          <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+            <h3 className="text-lg font-medium text-blue-800 mb-2">Configurações do Sistema</h3>
+            <p className="text-sm text-gray-600 mb-3">Ajuste configurações globais e parâmetros operacionais</p>
+            <div className="flex gap-2">
+              <button className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
+                Parâmetros Globais
+              </button>
+              <button 
+                className="px-3 py-1 bg-white border border-blue-300 text-blue-600 text-sm rounded hover:bg-blue-50"
+                onClick={handleBankConnectionsClick}
+              >
+                Conexões Bancárias
+              </button>
+            </div>
+          </div>
 
-      <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-        <h3 className="text-lg font-medium text-blue-800 mb-2">Auditoria</h3>
-        <p className="text-sm text-gray-600 mb-3">Visualize logs e histórico de operações</p>
-        <div className="flex gap-2">
-          <button className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
-            Logs do Sistema
-          </button>
-          <button className="px-3 py-1 bg-white border border-blue-300 text-blue-600 text-sm rounded hover:bg-blue-50">
-            Histórico de Transações
-          </button>
+          <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+            <h3 className="text-lg font-medium text-blue-800 mb-2">Auditoria</h3>
+            <p className="text-sm text-gray-600 mb-3">Visualize logs e histórico de operações</p>
+            <div className="flex gap-2">
+              <button className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
+                Logs do Sistema
+              </button>
+              <button className="px-3 py-1 bg-white border border-blue-300 text-blue-600 text-sm rounded hover:bg-blue-50">
+                Histórico de Transações
+              </button>
+            </div>
+          </div>
+        </>
+      ) : showBankConnections && !isEditing && !isCreating ? (
+        <div className="bg-white p-6 rounded-lg shadow-sm">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-bold text-blue-800">Conexões Bancárias</h3>
+            <div className="flex space-x-2">
+              <Button 
+                onClick={handleBackToMenu}
+                variant="outline"
+                className="text-sm"
+              >
+                Voltar
+              </Button>
+              <Button 
+                onClick={handleCreateNew}
+                className="bg-green-600 hover:bg-green-700 text-sm flex items-center gap-1"
+              >
+                <Plus size={14} /> Nova Conexão
+              </Button>
+            </div>
+          </div>
+
+          <div className="rounded-lg border overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>App Key</TableHead>
+                  <TableHead>Client ID</TableHead>
+                  <TableHead>Usuário BBsia</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {bankConnections.map((connection) => (
+                  <TableRow key={connection.id}>
+                    <TableCell className="font-medium">{connection.appKey}</TableCell>
+                    <TableCell>{connection.clientId}</TableCell>
+                    <TableCell>{connection.userBBsia}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button 
+                          onClick={() => handleEdit(connection)} 
+                          variant="outline" 
+                          size="sm"
+                          className="flex items-center gap-1 h-8 px-2"
+                        >
+                          <Edit size={14} /> Editar
+                        </Button>
+                        <Button 
+                          onClick={() => handleDelete(connection)} 
+                          variant="outline" 
+                          size="sm"
+                          className="flex items-center gap-1 h-8 px-2 text-red-600 border-red-200 hover:bg-red-50"
+                        >
+                          <TrashIcon size={14} /> Excluir
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {bankConnections.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center py-6 text-gray-500">
+                      Nenhuma conexão bancária cadastrada
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="bg-white p-6 rounded-lg shadow-sm">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-bold text-blue-800">
+              {isCreating ? 'Nova Conexão Bancária' : 'Editar Conexão Bancária'}
+            </h3>
+            <Button 
+              onClick={handleBackToMenu}
+              variant="outline"
+              className="text-sm"
+            >
+              Cancelar
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+            <div className="flex flex-col space-y-1">
+              <label className="text-sm font-medium text-gray-700">App Key</label>
+              <Input 
+                name="appKey" 
+                value={formValues.appKey} 
+                onChange={handleInputChange} 
+                className="border-blue-200 focus:border-blue-500 bg-blue-50" 
+              />
+            </div>
+            
+            <div className="flex flex-col space-y-1">
+              <label className="text-sm font-medium text-gray-700">Client ID</label>
+              <Input 
+                name="clientId" 
+                value={formValues.clientId} 
+                onChange={handleInputChange} 
+                className="border-blue-200 focus:border-blue-500 bg-blue-50" 
+              />
+            </div>
+            
+            <div className="flex flex-col space-y-1">
+              <label className="text-sm font-medium text-gray-700">Client Secret</label>
+              <Input 
+                name="clientSecret" 
+                value={formValues.clientSecret} 
+                onChange={handleInputChange} 
+                type="password"
+                className="border-blue-200 focus:border-blue-500 bg-blue-50" 
+              />
+            </div>
+            
+            <div className="flex flex-col space-y-1">
+              <label className="text-sm font-medium text-gray-700">Registrar Token</label>
+              <Input 
+                name="registrarToken" 
+                value={formValues.registrarToken} 
+                onChange={handleInputChange} 
+                className="border-blue-200 focus:border-blue-500 bg-blue-50" 
+              />
+            </div>
+            
+            <div className="flex flex-col space-y-1">
+              <label className="text-sm font-medium text-gray-700">Basic</label>
+              <Input 
+                name="basic" 
+                value={formValues.basic} 
+                onChange={handleInputChange} 
+                className="border-blue-200 focus:border-blue-500 bg-blue-50" 
+              />
+            </div>
+            
+            <div className="flex flex-col space-y-1">
+              <label className="text-sm font-medium text-gray-700">Usuário BBsia</label>
+              <Input 
+                name="userBBsia" 
+                value={formValues.userBBsia} 
+                onChange={handleInputChange} 
+                className="border-blue-200 focus:border-blue-500 bg-blue-50" 
+              />
+            </div>
+            
+            <div className="flex flex-col space-y-1">
+              <label className="text-sm font-medium text-gray-700">Senha BBsia</label>
+              <Input 
+                name="passwordBBsia" 
+                value={formValues.passwordBBsia} 
+                onChange={handleInputChange} 
+                type="password"
+                className="border-blue-200 focus:border-blue-500 bg-blue-50" 
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end mt-6">
+            <Button 
+              onClick={handleSave}
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded flex items-center gap-2"
+            >
+              <Save size={16} /> Salvar
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation dialog for deletion */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir esta conexão bancária?
+              Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
