@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { FileUpload } from '@/components/ui/file-upload';
 import { Button } from '@/components/ui/button';
@@ -10,7 +9,7 @@ import {
   AlertTriangle, 
   Trash2, 
   Upload, 
-  Code, 
+  QrCode, 
   CreditCard, 
   Calendar as CalendarIcon, 
   ChevronRight, 
@@ -535,7 +534,7 @@ const ImportarPlanilha = () => {
               <div className="flex items-center space-x-3 space-y-0 border rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
                 <RadioGroupItem value="api" id="api" />
                 <Label htmlFor="api" className="flex flex-1 items-center space-x-3 cursor-pointer">
-                  <Code className="h-5 w-5 text-purple-600" />
+                  <QrCode className="h-5 w-5 text-purple-600" />
                   <div className="space-y-1">
                     <p className="font-medium leading-none">API REST</p>
                     <p className="text-sm text-gray-500">Enviar pagamentos diretamente via API do banco</p>
@@ -800,17 +799,4 @@ const ImportarPlanilha = () => {
               ) : (
                 <Button 
                   onClick={handleSubmitWorkflow}
-                  className="bg-green-600 hover:bg-green-700"
-                >
-                  Enviar
-                </Button>
-              )}
-            </div>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </ScrollArea>
-  );
-};
-
-export default ImportarPlanilha;
+                  className="bg-green-6
