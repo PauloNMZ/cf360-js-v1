@@ -296,64 +296,66 @@ const Index = () => {
       {/* Conteúdo principal com rolagem controlada e altura reduzida */}
       <div className="flex-grow overflow-auto" style={contentContainerStyle}>
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          {/* Ícones de navegação em uma única linha */}
-          <div className="flex overflow-x-auto pb-3 mb-8 gap-2">
-            <NavButton 
-              icon={<Home size={24} />} 
-              label="Convenente" 
-              onClick={handleConvenenteClick} 
-            />
-            <NavButton 
-              icon={<FileUp size={24} />} 
-              label="Importar Planilha" 
-              onClick={handleImportarPlanilhaClick} 
-            />
-            <NavButton 
-              icon={<FileSearch size={24} />} 
-              label="Verificar Erros" 
-              onClick={() => {}} 
-            />
-            <NavButton 
-              icon={<Package size={24} />} 
-              label="Gerar Remessa" 
-              onClick={() => {}} 
-            />
-            <NavButton 
-              icon={<Send size={24} />} 
-              label="Enviar ao Banco" 
-              onClick={() => {}} 
-            />
-            <NavButton 
-              icon={<RefreshCw size={24} />} 
-              label="Processar Retornos" 
-              onClick={() => {}} 
-            />
-            <NavButton 
-              icon={<FileText size={24} />} 
-              label="Comprovantes" 
-              onClick={() => {}} 
-            />
-            <NavButton 
-              icon={<Search size={24} />} 
-              label="Consultas" 
-              onClick={() => {}} 
-            />
-            <NavButton 
-              icon={<LayoutDashboard size={24} />} 
-              label="Dashboard" 
-              onClick={() => {}} 
-            />
-            <NavButton 
-              icon={<Shield size={24} />} 
-              label="Setup" 
-              onClick={handleAdminPanelClick} 
-            />
-            <NavButton 
-              icon={<LogOut size={24} />} 
-              label="Sair" 
-              onClick={handleLogoutClick} 
-              className="bg-red-50 dark:bg-red-950 hover:bg-red-100 dark:hover:bg-red-900 border-red-200 dark:border-red-800"
-            />
+          {/* Ícones de navegação com centralização aprimorada */}
+          <div className="flex justify-center mb-8">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-11 gap-2 max-w-5xl mx-auto">
+              <NavButton 
+                icon={<Home size={24} />} 
+                label="Convenente" 
+                onClick={handleConvenenteClick} 
+              />
+              <NavButton 
+                icon={<FileUp size={24} />} 
+                label="Importar Planilha" 
+                onClick={handleImportarPlanilhaClick} 
+              />
+              <NavButton 
+                icon={<FileSearch size={24} />} 
+                label="Verificar Erros" 
+                onClick={() => {}} 
+              />
+              <NavButton 
+                icon={<Package size={24} />} 
+                label="Gerar Remessa" 
+                onClick={() => {}} 
+              />
+              <NavButton 
+                icon={<Send size={24} />} 
+                label="Enviar ao Banco" 
+                onClick={() => {}} 
+              />
+              <NavButton 
+                icon={<RefreshCw size={24} />} 
+                label="Processar Retornos" 
+                onClick={() => {}} 
+              />
+              <NavButton 
+                icon={<FileText size={24} />} 
+                label="Comprovantes" 
+                onClick={() => {}} 
+              />
+              <NavButton 
+                icon={<Search size={24} />} 
+                label="Consultas" 
+                onClick={() => {}} 
+              />
+              <NavButton 
+                icon={<LayoutDashboard size={24} />} 
+                label="Dashboard" 
+                onClick={() => {}} 
+              />
+              <NavButton 
+                icon={<Shield size={24} />} 
+                label="Setup" 
+                onClick={handleAdminPanelClick} 
+              />
+              <NavButton 
+                icon={<LogOut size={24} />} 
+                label="Sair" 
+                onClick={handleLogoutClick} 
+                className="bg-red-50 dark:bg-red-950 hover:bg-red-100 dark:hover:bg-red-900 border-red-200 dark:border-red-800"
+              />
+            </div>
           </div>
         </div>
       </div>
