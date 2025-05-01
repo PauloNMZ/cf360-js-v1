@@ -13,6 +13,13 @@ import {
   validatePhone 
 } from "@/utils/formValidation";
 import { ConvenenteData, emptyConvenente } from "@/types/convenente";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type FormErrors = {
   cnpj?: string;
@@ -30,6 +37,8 @@ type FormularioModernoProps = {
   initialData?: Partial<ConvenenteData>;
 };
 
+type PixKeyType = 'CNPJ' | 'email' | 'telefone' | 'aleatoria';
+
 const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: FormularioModernoProps) => {
   const { toast } = useToast();
   const [cnpjInput, setCnpjInput] = useState("");
@@ -37,6 +46,7 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
   const [errors, setErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [pixKeyType, setPixKeyType] = useState<PixKeyType>('CNPJ');
 
   useEffect(() => {
     // Initialize form with provided data, if any
@@ -204,8 +214,32 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
     validateForm();
   };
 
+  const handlePixKeyTypeChange = (value: PixKeyType) => {
+    setPixKeyType(value);
+    // Clear the PIX key field when changing type
+    setFormData(prev => ({
+      ...prev,
+      chavePix: ""
+    }));
+  };
+
+  const getPixKeyPlaceholder = () => {
+    switch (pixKeyType) {
+      case 'CNPJ':
+        return "00.000.000/0000-00";
+      case 'email':
+        return "exemplo@email.com";
+      case 'telefone':
+        return "+55 (00) 00000-0000";
+      case 'aleatoria':
+        return "Chave aleatória";
+      default:
+        return "Chave Pix";
+    }
+  };
+
   return (
-    <div className="bg-white p-6 rounded-lg">
+    <div className="bg-white p-6 rounded-lg dark:bg-background dark:text-foreground">
       <div className="flex items-center justify-between bg-gradient-to-r from-blue-600 to-blue-800 p-4 rounded-lg mb-6">
         <h2 className="text-xl text-white font-medium">CADASTRO DE CONVENENTE</h2>
         <button className="text-white opacity-80 hover:opacity-100">✕</button>
@@ -214,7 +248,7 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
       {/* Informações Cadastrais da Empresa */}
       <div className="mb-8">
         <div className="mb-6">
-          <h2 className="text-xl font-bold text-blue-700 border-b-2 border-blue-200 pb-2 text-left">Informações Cadastrais da Empresa</h2>
+          <h2 className="text-xl font-bold text-blue-700 border-b-2 border-blue-200 pb-2 text-left dark:text-blue-400 dark:border-blue-800">Informações Cadastrais da Empresa</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -355,14 +389,14 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
       {/* Informações de Contato */}
       <div className="mb-8">
         <div className="mb-6">
-          <h2 className="text-xl font-bold text-blue-700 border-b-2 border-blue-200 pb-2 text-left">Informações de Contato</h2>
+          <h2 className="text-xl font-bold text-blue-700 border-b-2 border-blue-200 pb-2 text-left dark:text-blue-400 dark:border-blue-800">Informações de Contato</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div className="flex flex-col space-y-1">
-            <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-              <span className="bg-blue-100 p-1 rounded">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <label className="text-sm font-medium text-gray-700 flex items-center gap-2 dark:text-gray-300">
+              <span className="bg-blue-100 p-1 rounded dark:bg-blue-900">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               </span>
@@ -370,7 +404,7 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
             </label>
             <Input 
               placeholder="Nome" 
-              className="border-blue-200 focus:border-blue-500 bg-blue-50" 
+              className="border-blue-200 focus:border-blue-500 bg-blue-50 dark:bg-blue-950 dark:border-blue-800" 
               name="contato"
               value={formData.contato}
               onChange={handleInputChange}
@@ -380,9 +414,9 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
 
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col space-y-1">
-              <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <span className="bg-blue-100 p-1 rounded">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <label className="text-sm font-medium text-gray-700 flex items-center gap-2 dark:text-gray-300">
+                <span className="bg-blue-100 p-1 rounded dark:bg-blue-900">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
                 </span>
@@ -391,7 +425,7 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
               <div className="flex flex-col">
                 <Input 
                   placeholder="(00) 0000-0000" 
-                  className={`border-blue-200 focus:border-blue-500 bg-blue-50 ${errors.fone ? 'border-red-500' : ''}`}
+                  className={`border-blue-200 focus:border-blue-500 bg-blue-50 dark:bg-blue-950 dark:border-blue-800 ${errors.fone ? 'border-red-500' : ''}`}
                   name="fone"
                   value={formData.fone}
                   onChange={handleInputChange}
@@ -402,9 +436,9 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
               </div>
             </div>
             <div className="flex flex-col space-y-1">
-              <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <span className="bg-blue-100 p-1 rounded">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <label className="text-sm font-medium text-gray-700 flex items-center gap-2 dark:text-gray-300">
+                <span className="bg-blue-100 p-1 rounded dark:bg-blue-900">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                   </svg>
                 </span>
@@ -413,7 +447,7 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
               <div className="flex flex-col">
                 <Input 
                   placeholder="(00) 00000-0000" 
-                  className={`border-blue-200 focus:border-blue-500 bg-blue-50 ${errors.celular ? 'border-red-500' : ''}`}
+                  className={`border-blue-200 focus:border-blue-500 bg-blue-50 dark:bg-blue-950 dark:border-blue-800 ${errors.celular ? 'border-red-500' : ''}`}
                   name="celular"
                   value={formData.celular}
                   onChange={handleInputChange}
@@ -426,9 +460,9 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
           </div>
 
           <div className="flex flex-col space-y-1">
-            <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-              <span className="bg-blue-100 p-1 rounded">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <label className="text-sm font-medium text-gray-700 flex items-center gap-2 dark:text-gray-300">
+              <span className="bg-blue-100 p-1 rounded dark:bg-blue-900">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
               </span>
@@ -437,7 +471,7 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
             <div className="flex flex-col">
               <Input 
                 placeholder="exemplo@email.com" 
-                className={`border-blue-200 focus:border-blue-500 bg-blue-50 ${errors.email ? 'border-red-500' : ''}`}
+                className={`border-blue-200 focus:border-blue-500 bg-blue-50 dark:bg-blue-950 dark:border-blue-800 ${errors.email ? 'border-red-500' : ''}`}
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
@@ -453,15 +487,15 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
       {/* Dados Bancários */}
       <div className="mb-8">
         <div className="mb-6">
-          <h2 className="text-xl font-bold text-blue-700 border-b-2 border-blue-200 pb-2 text-left">Dados Bancários</h2>
+          <h2 className="text-xl font-bold text-blue-700 border-b-2 border-blue-200 pb-2 text-left dark:text-blue-400 dark:border-blue-800">Dados Bancários</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col space-y-1">
-              <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <span className="bg-blue-100 p-1 rounded">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <label className="text-sm font-medium text-gray-700 flex items-center gap-2 dark:text-gray-300">
+                <span className="bg-blue-100 p-1 rounded dark:bg-blue-900">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
                   </svg>
                 </span>
@@ -469,7 +503,7 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
               </label>
               <Input 
                 placeholder="0000" 
-                className="border-blue-200 focus:border-blue-500 bg-blue-50" 
+                className="border-blue-200 focus:border-blue-500 bg-blue-50 dark:bg-blue-950 dark:border-blue-800" 
                 name="agencia"
                 value={formData.agencia}
                 onChange={handleInputChange}
@@ -477,9 +511,9 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
               />
             </div>
             <div className="flex flex-col space-y-1">
-              <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <span className="bg-blue-100 p-1 rounded">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <label className="text-sm font-medium text-gray-700 flex items-center gap-2 dark:text-gray-300">
+                <span className="bg-blue-100 p-1 rounded dark:bg-blue-900">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                   </svg>
                 </span>
@@ -487,7 +521,7 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
               </label>
               <Input 
                 placeholder="00000-0" 
-                className="border-blue-200 focus:border-blue-500 bg-blue-50" 
+                className="border-blue-200 focus:border-blue-500 bg-blue-50 dark:bg-blue-950 dark:border-blue-800" 
                 name="conta"
                 value={formData.conta}
                 onChange={handleInputChange}
@@ -497,28 +531,49 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
           </div>
 
           <div className="flex flex-col space-y-1">
-            <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-              <span className="bg-blue-100 p-1 rounded">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <label className="text-sm font-medium text-gray-700 flex items-center gap-2 dark:text-gray-300">
+              <span className="bg-blue-100 p-1 rounded dark:bg-blue-900">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                 </svg>
               </span>
               Chave Pix
             </label>
-            <Input 
-              placeholder="Chave Pix" 
-              className="border-blue-200 focus:border-blue-500 bg-blue-50" 
-              name="chavePix"
-              value={formData.chavePix}
-              onChange={handleInputChange}
-              disabled={formMode === 'view'}
-            />
+            <div className="grid grid-cols-4 gap-2">
+              <div className="col-span-1">
+                <Select 
+                  value={pixKeyType} 
+                  onValueChange={(value) => handlePixKeyTypeChange(value as PixKeyType)}
+                  disabled={formMode === 'view'}
+                >
+                  <SelectTrigger className="border-blue-200 focus:border-blue-500 bg-blue-50 dark:bg-blue-950 dark:border-blue-800">
+                    <SelectValue placeholder="Tipo" />
+                  </SelectTrigger>
+                  <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+                    <SelectItem value="CNPJ">CNPJ</SelectItem>
+                    <SelectItem value="email">E-mail</SelectItem>
+                    <SelectItem value="telefone">Telefone</SelectItem>
+                    <SelectItem value="aleatoria">Aleatória</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="col-span-3">
+                <Input 
+                  placeholder={getPixKeyPlaceholder()}
+                  className="border-blue-200 focus:border-blue-500 bg-blue-50 dark:bg-blue-950 dark:border-blue-800" 
+                  name="chavePix"
+                  value={formData.chavePix}
+                  onChange={handleInputChange}
+                  disabled={formMode === 'view'}
+                />
+              </div>
+            </div>
           </div>
           
           <div className="flex flex-col space-y-1">
-            <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-              <span className="bg-blue-100 p-1 rounded">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <label className="text-sm font-medium text-gray-700 flex items-center gap-2 dark:text-gray-300">
+              <span className="bg-blue-100 p-1 rounded dark:bg-blue-900">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               </span>
@@ -526,7 +581,7 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
             </label>
             <Input 
               placeholder="Convênio" 
-              className="border-blue-200 focus:border-blue-500 bg-blue-50" 
+              className="border-blue-200 focus:border-blue-500 bg-blue-50 dark:bg-blue-950 dark:border-blue-800" 
               name="convenioPag"
               value={formData.convenioPag}
               onChange={handleInputChange}
@@ -536,11 +591,7 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
         </div>
       </div>
 
-      <div className="text-right text-sm text-gray-500 italic">
+      <div className="text-right text-sm text-gray-500 italic dark:text-gray-400">
         * Campos obrigatórios
       </div>
     </div>
-  );
-};
-
-export default FormularioModerno;
