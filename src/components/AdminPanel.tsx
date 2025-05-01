@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +20,7 @@ import {
   AlertDialogHeader, 
   AlertDialogTitle 
 } from "@/components/ui/alert-dialog";
-import { Edit, TrashIcon, Upload } from "lucide-react";
+import { Edit, TrashIcon, Upload, WalletCards } from "lucide-react";
 import { getCompanySettings, saveCompanySettings } from "@/services/companySettings";
 import { useToast } from "@/components/ui/use-toast";
 
