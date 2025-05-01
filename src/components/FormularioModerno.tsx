@@ -165,31 +165,6 @@ const FormularioModerno = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex flex-col space-y-1">
-              <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <span className="bg-blue-100 p-1 rounded">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </span>
-                Usuário BBsia
-              </label>
-              <Input placeholder="Usuário" className="border-blue-200 focus:border-blue-500 bg-blue-50" />
-            </div>
-            <div className="flex flex-col space-y-1">
-              <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <span className="bg-blue-100 p-1 rounded">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
-                </span>
-                Senha
-              </label>
-              <Input type="password" placeholder="******" className="border-blue-200 focus:border-blue-500 bg-blue-50" />
-            </div>
-          </div>
-
           <div className="flex flex-col space-y-1">
             <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
               <span className="bg-blue-100 p-1 rounded">
