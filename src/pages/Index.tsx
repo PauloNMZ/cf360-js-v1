@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import FormularioModerno from "@/components/FormularioModerno";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -41,6 +40,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { saveConvenente, getConvenentes, updateConvenente, deleteConvenente } from "@/services/storage";
 import { formatCNPJ } from "@/utils/formValidation";
 import { ConvenenteData, emptyConvenente } from "@/types/convenente";
+import { getContentContainerStyle } from "@/utils/viewportUtils";
 
 const Index = () => {
   const { toast } = useToast();
@@ -55,6 +55,13 @@ const Index = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredConvenentes, setFilteredConvenentes] = useState<Array<ConvenenteData & { id: string }>>([]);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  // Define header and footer heights (approximate values, adjust as needed)
+  const HEADER_HEIGHT = 80;
+  const FOOTER_HEIGHT = 60;
+  
+  // Get content container style
+  const contentContainerStyle = getContentContainerStyle(HEADER_HEIGHT, FOOTER_HEIGHT);
 
   // Load convenentes from localStorage on start
   useEffect(() => {
@@ -263,8 +270,8 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Conteúdo principal com rolagem */}
-      <div className="flex-grow overflow-auto">
+      {/* Conteúdo principal com rolagem controlada */}
+      <div className="flex-grow overflow-auto" style={contentContainerStyle}>
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           {/* Ícones de navegação em uma única linha */}
           <div className="flex overflow-x-auto pb-4 mb-12 gap-2">
