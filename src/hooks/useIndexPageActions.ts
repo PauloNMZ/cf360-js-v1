@@ -50,6 +50,9 @@ export const useIndexPageActions = (
     
     setFormMode('edit');
     setFormValid(true); // Assume the existing data is valid when editing
+    
+    // Note: We're no longer making an API call here
+    // The data should already be available in the form
   };
 
   const handleDelete = () => {

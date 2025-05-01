@@ -123,10 +123,16 @@ export const useIndexPage = () => {
     
     try {
       setIsLoading(true);
-      // Get complete convenente from database
-      const completeConvenente = await getConvenenteById(convenente.id);
-      if (completeConvenente) {
-        setFormData(completeConvenente);
+      // Get complete convenente from database only if not in edit mode
+      // For edit mode, use the data we already have
+      setFormData(convenente);
+      
+      // Only fetch if additional data is needed and not in edit mode
+      if (formMode !== 'edit') {
+        const completeConvenente = await getConvenenteById(convenente.id);
+        if (completeConvenente) {
+          setFormData(completeConvenente);
+        }
       }
     } catch (error) {
       console.error("Erro ao carregar detalhes do convenente:", error);
@@ -138,7 +144,7 @@ export const useIndexPage = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [toast]);
+  }, [toast, formMode]);
 
   const handleFormDataChange = useCallback((data: ConvenenteData) => {
     console.log("Form data changing:", data.cnpj); // Debugging

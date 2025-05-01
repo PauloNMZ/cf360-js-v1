@@ -1,5 +1,5 @@
 
-import React, { useEffect } from "react";
+import React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -48,9 +48,6 @@ const ConvenenteModal = ({
   onSave,
   onFormDataChange,
 }: ConvenenteModalProps) => {
-  // We'll remove this useEffect that was causing the infinite loop
-  // and handle form resets in the parent component instead
-  
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-6xl">
