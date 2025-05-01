@@ -1,7 +1,8 @@
 
 import { useState } from 'react';
+import { validateCNPJ } from '@/utils/formValidation';
 
-type CNPJData = {
+export type CNPJData = {
   cnpj: string;
   razao_social: string;
   nome_fantasia: string;
@@ -28,13 +29,33 @@ type UseCNPJQueryProps = {
   onError?: (error: string) => void;
 };
 
-export const useCNPJQuery = ({ onSuccess, onError }: UseCNPJQueryProps) => {
+export const useCNPJQuery = ({ onSuccess, onError }: UseCNPJQueryProps = {}) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [data, setData] = useState<CNPJData | null>(null);
+
+  const validateAndCleanCNPJ = (cnpj: string): { isValid: boolean; cleanCNPJ: string } => {
+    const cleanCNPJ = cnpj.replace(/\D/g, '');
+    const isValid = validateCNPJ(cleanCNPJ);
+    return { isValid, cleanCNPJ };
+  };
 
   const fetchCNPJ = async (cnpj: string) => {
+    setError(null);
+    
+    const { isValid, cleanCNPJ } = validateAndCleanCNPJ(cnpj);
+    
+    if (!isValid) {
+      const errorMessage = 'CNPJ inválido. Verifique os dígitos informados.';
+      setError(errorMessage);
+      if (onError) onError(errorMessage);
+      return { success: false, error: errorMessage };
+    }
+    
     setIsLoading(true);
+    
     try {
-      const response = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${cnpj}`);
+      const response = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${cleanCNPJ}`);
       
       if (!response.ok) {
         const errorData = await response.json();
@@ -42,21 +63,25 @@ export const useCNPJQuery = ({ onSuccess, onError }: UseCNPJQueryProps) => {
       }
       
       const data: CNPJData = await response.json();
+      setData(data);
       
       if (onSuccess) {
         onSuccess(data);
       }
       
-      return data;
+      return { success: true, data };
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+      setError(errorMessage);
       if (onError) {
-        onError(error instanceof Error ? error.message : 'Erro desconhecido');
+        onError(errorMessage);
       }
       console.error("Erro na consulta de CNPJ:", error);
+      return { success: false, error: errorMessage };
     } finally {
       setIsLoading(false);
     }
   };
 
-  return { fetchCNPJ, isLoading };
+  return { fetchCNPJ, isLoading, error, data };
 };
