@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import FormularioModerno from "@/components/FormularioModerno";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -628,4 +629,185 @@ const AdminPanel = () => {
               </Button>
               <Button 
                 onClick={handleCreateNew}
-                className="bg-green-600
+                className="bg-green-600 hover:bg-green-700"
+              >
+                Nova Conexão
+              </Button>
+            </div>
+          </div>
+          
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>ID</TableHead>
+                  <TableHead>App Key</TableHead>
+                  <TableHead>Client ID</TableHead>
+                  <TableHead>Usuário BBSIA</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {bankConnections.map((connection) => (
+                  <TableRow key={connection.id}>
+                    <TableCell className="font-medium">{connection.id}</TableCell>
+                    <TableCell>{connection.appKey.substring(0, 8)}...</TableCell>
+                    <TableCell>{connection.clientId.substring(0, 8)}...</TableCell>
+                    <TableCell>{connection.userBBsia || 'N/A'}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleEdit(connection)}
+                        >
+                          <Edit size={14} className="mr-1" /> Editar
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="text-red-600 border-red-200 hover:bg-red-50"
+                          onClick={() => handleDelete(connection)}
+                        >
+                          <TrashIcon size={14} className="mr-1" /> Excluir
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-white p-6 rounded-lg shadow-sm">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-bold text-blue-800">
+              {isEditing ? 'Editar Conexão' : 'Nova Conexão'}
+            </h3>
+            <Button 
+              onClick={handleBackToMenu}
+              variant="outline"
+              className="text-sm"
+            >
+              Cancelar
+            </Button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                App Key
+              </label>
+              <Input 
+                name="appKey"
+                value={formValues.appKey}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Client ID
+              </label>
+              <Input 
+                name="clientId"
+                value={formValues.clientId}
+                onChange={handleInputChange}
+              />
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Client Secret
+              </label>
+              <Input 
+                name="clientSecret"
+                value={formValues.clientSecret}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Registrar Token
+              </label>
+              <Input 
+                name="registrarToken"
+                value={formValues.registrarToken}
+                onChange={handleInputChange}
+              />
+            </div>
+          </div>
+          
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Basic Authentication
+            </label>
+            <Input 
+              name="basic"
+              value={formValues.basic}
+              onChange={handleInputChange}
+            />
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Usuário BBSIA
+              </label>
+              <Input 
+                name="userBBsia"
+                value={formValues.userBBsia}
+                onChange={handleInputChange}
+                placeholder="Usuário para autenticação BBSIA"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Senha BBSIA
+              </label>
+              <Input 
+                name="passwordBBsia"
+                type="password"
+                value={formValues.passwordBBsia}
+                onChange={handleInputChange}
+                placeholder="Senha para autenticação BBSIA"
+              />
+            </div>
+          </div>
+          
+          <div className="flex justify-end">
+            <Button 
+              onClick={handleSave}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              {isEditing ? 'Atualizar' : 'Salvar'}
+            </Button>
+          </div>
+        </div>
+      )}
+      
+      {/* Diálogo de confirmação para exclusão de conexão */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir esta conexão?
+              Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+};
+
+export default Index;
