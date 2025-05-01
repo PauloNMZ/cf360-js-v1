@@ -5,6 +5,7 @@ import { useFormValidation } from "./convenente-form/useFormValidation";
 import { useCNPJSearch } from "./convenente-form/useCNPJSearch";
 import { usePixKeyType } from "./convenente-form/usePixKeyType";
 import { UseConvenenteFormProps, FormErrors, PixKeyType } from "./convenente-form/types";
+import { formatCNPJ } from "@/utils/formValidation";
 
 // Re-export the types
 export type { FormErrors, PixKeyType };
@@ -49,7 +50,6 @@ export const useConvenenteForm = ({
 
       // Ensure CNPJ input field is populated for editing
       if (initialData.cnpj) {
-        const { formatCNPJ } = require("@/utils/formValidation");
         setCnpjInput(formatCNPJ(initialData.cnpj));
       }
       
