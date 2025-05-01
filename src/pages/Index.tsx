@@ -288,7 +288,7 @@ const Index = () => {
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
             <AppLogo size={28} customLogoUrl={companySettings.logoUrl} />
-            <h1 className="text-2xl font-bold">{companySettings.companyName}</h1>
+            <h1 className="text-2xl font-bold">Gerador de Pagamentos</h1>
           </div>
           <ThemeToggle />
         </div>
