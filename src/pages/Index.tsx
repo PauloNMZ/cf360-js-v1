@@ -36,6 +36,8 @@ const Index = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [adminPanelOpen, setAdminPanelOpen] = useState(false);
   const [formMode, setFormMode] = useState('view'); // view, create, edit
+  const [formData, setFormData] = useState({});
+  const [formValid, setFormValid] = useState(false);
 
   const handleConvenenteClick = () => {
     console.log("Convenente button clicked");
@@ -55,11 +57,13 @@ const Index = () => {
 
   const handleCreateNew = () => {
     setFormMode('create');
+    setFormValid(false); // Reset form validity when creating new
     console.log("Create new convenente");
   };
 
   const handleEdit = () => {
     setFormMode('edit');
+    setFormValid(true); // Assume the existing data is valid when editing
     console.log("Edit convenente");
   };
 
@@ -75,6 +79,14 @@ const Index = () => {
     console.log("Save convenente");
     setFormMode('view');
     // In a real application, this would save the data
+  };
+
+  const handleFormDataChange = (data) => {
+    setFormData(data);
+    // Verifica se os campos obrigatórios estão preenchidos
+    const requiredFields = ['cnpj', 'razaoSocial'];
+    const hasRequiredFields = requiredFields.every(field => data[field] && data[field].trim() !== '');
+    setFormValid(hasRequiredFields);
   };
 
   return (
@@ -184,6 +196,7 @@ const Index = () => {
                   onClick={handleSave}
                   variant="default"
                   className="flex items-center gap-1 bg-green-600 hover:bg-green-700"
+                  disabled={!formValid}
                 >
                   <Save size={16} /> Salvar
                 </Button>
@@ -192,7 +205,7 @@ const Index = () => {
           </DialogHeader>
           <ScrollArea className="h-[70vh] pr-4">
             <div className="py-4">
-              <FormularioModerno />
+              <FormularioModerno onFormDataChange={handleFormDataChange} formMode={formMode} />
             </div>
           </ScrollArea>
         </DialogContent>

@@ -1,12 +1,11 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useCNPJQuery } from "@/hooks/useCNPJQuery";
 import { useToast } from "@/components/ui/use-toast";
 
-const FormularioModerno = () => {
+const FormularioModerno = ({ onFormDataChange, formMode }) => {
   const { toast } = useToast();
   const [cnpjInput, setCnpjInput] = useState("");
   const [formData, setFormData] = useState({
@@ -26,6 +25,37 @@ const FormularioModerno = () => {
     chavePix: "",
     convenioPag: ""
   });
+
+  useEffect(() => {
+    // Se formMode for 'create', limpa o formulário
+    if (formMode === 'create') {
+      setFormData({
+        cnpj: "",
+        razaoSocial: "",
+        endereco: "",
+        numero: "",
+        complemento: "",
+        uf: "",
+        cidade: "",
+        contato: "",
+        fone: "",
+        celular: "",
+        email: "",
+        agencia: "",
+        conta: "",
+        chavePix: "",
+        convenioPag: ""
+      });
+      setCnpjInput("");
+    }
+  }, [formMode]);
+
+  useEffect(() => {
+    // Notifica o componente pai sobre mudanças nos dados do formulário
+    if (onFormDataChange) {
+      onFormDataChange(formData);
+    }
+  }, [formData, onFormDataChange]);
 
   const { fetchCNPJ, isLoading } = useCNPJQuery({
     onSuccess: (data) => {
@@ -131,10 +161,11 @@ const FormularioModerno = () => {
                 className="border-blue-200 focus:border-blue-500 bg-blue-50 rounded-r-none" 
                 value={cnpjInput}
                 onChange={handleCNPJChange}
+                disabled={formMode === 'view'}
               />
               <Button 
                 onClick={handleCNPJSearch} 
-                disabled={isLoading} 
+                disabled={isLoading || formMode === 'view'} 
                 className="rounded-l-none bg-blue-600 hover:bg-blue-700"
               >
                 {isLoading ? (
@@ -161,6 +192,7 @@ const FormularioModerno = () => {
               name="razaoSocial"
               value={formData.razaoSocial}
               onChange={handleInputChange}
+              disabled={formMode === 'view'}
             />
           </div>
 
@@ -179,6 +211,7 @@ const FormularioModerno = () => {
               name="endereco"
               value={formData.endereco}
               onChange={handleInputChange}
+              disabled={formMode === 'view'}
             />
           </div>
           
@@ -191,6 +224,7 @@ const FormularioModerno = () => {
                 name="numero"
                 value={formData.numero}
                 onChange={handleInputChange}
+                disabled={formMode === 'view'}
               />
             </div>
             <div className="flex flex-col space-y-1">
@@ -201,6 +235,7 @@ const FormularioModerno = () => {
                 name="complemento"
                 value={formData.complemento}
                 onChange={handleInputChange}
+                disabled={formMode === 'view'}
               />
             </div>
             <div className="flex flex-col space-y-1">
@@ -211,6 +246,7 @@ const FormularioModerno = () => {
                 name="uf"
                 value={formData.uf}
                 onChange={handleInputChange}
+                disabled={formMode === 'view'}
               />
             </div>
           </div>
@@ -223,6 +259,7 @@ const FormularioModerno = () => {
               name="cidade"
               value={formData.cidade}
               onChange={handleInputChange}
+              disabled={formMode === 'view'}
             />
           </div>
         </div>
@@ -250,6 +287,7 @@ const FormularioModerno = () => {
               name="contato"
               value={formData.contato}
               onChange={handleInputChange}
+              disabled={formMode === 'view'}
             />
           </div>
 
@@ -269,6 +307,7 @@ const FormularioModerno = () => {
                 name="fone"
                 value={formData.fone}
                 onChange={handleInputChange}
+                disabled={formMode === 'view'}
               />
             </div>
             <div className="flex flex-col space-y-1">
@@ -286,6 +325,7 @@ const FormularioModerno = () => {
                 name="celular"
                 value={formData.celular}
                 onChange={handleInputChange}
+                disabled={formMode === 'view'}
               />
             </div>
           </div>
@@ -305,6 +345,7 @@ const FormularioModerno = () => {
               name="email"
               value={formData.email}
               onChange={handleInputChange}
+              disabled={formMode === 'view'}
             />
           </div>
         </div>
@@ -333,6 +374,7 @@ const FormularioModerno = () => {
                 name="agencia"
                 value={formData.agencia}
                 onChange={handleInputChange}
+                disabled={formMode === 'view'}
               />
             </div>
             <div className="flex flex-col space-y-1">
@@ -350,6 +392,7 @@ const FormularioModerno = () => {
                 name="conta"
                 value={formData.conta}
                 onChange={handleInputChange}
+                disabled={formMode === 'view'}
               />
             </div>
           </div>
@@ -369,6 +412,7 @@ const FormularioModerno = () => {
               name="chavePix"
               value={formData.chavePix}
               onChange={handleInputChange}
+              disabled={formMode === 'view'}
             />
           </div>
           
@@ -387,6 +431,7 @@ const FormularioModerno = () => {
               name="convenioPag"
               value={formData.convenioPag}
               onChange={handleInputChange}
+              disabled={formMode === 'view'}
             />
           </div>
         </div>
