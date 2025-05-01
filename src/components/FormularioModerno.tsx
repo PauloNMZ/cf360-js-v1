@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -575,23 +576,27 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
               <span className="bg-blue-100 p-1 rounded dark:bg-blue-900">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-              </span>
-              Convênio Pag
-            </label>
-            <Input 
-              placeholder="Convênio" 
-              className="border-blue-200 focus:border-blue-500 bg-blue-50 dark:bg-blue-950 dark:border-blue-800" 
-              name="convenioPag"
-              value={formData.convenioPag}
-              onChange={handleInputChange}
-              disabled={formMode === 'view'}
-            />
+                  </svg>
+                </span>
+                Convênio Pag
+              </label>
+              <Input 
+                placeholder="Convênio" 
+                className="border-blue-200 focus:border-blue-500 bg-blue-50 dark:bg-blue-950 dark:border-blue-800" 
+                name="convenioPag"
+                value={formData.convenioPag}
+                onChange={handleInputChange}
+                disabled={formMode === 'view'}
+              />
+            </div>
           </div>
         </div>
-      </div>
 
       <div className="text-right text-sm text-gray-500 italic dark:text-gray-400">
         * Campos obrigatórios
       </div>
     </div>
+  );
+};
+
+export default FormularioModerno;
