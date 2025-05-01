@@ -5,14 +5,9 @@ import { WalletCards } from 'lucide-react';
 interface AppLogoProps {
   size?: number;
   customLogoUrl?: string;
-  companyName?: string;
 }
 
-export const AppLogo: React.FC<AppLogoProps> = ({ 
-  size = 32, 
-  customLogoUrl,
-  companyName 
-}) => {
+export const AppLogo: React.FC<AppLogoProps> = ({ size = 32, customLogoUrl }) => {
   return (
     <div className="flex items-center">
       <div className="relative">
@@ -30,9 +25,6 @@ export const AppLogo: React.FC<AppLogoProps> = ({
           )}
         </div>
       </div>
-      {companyName && (
-        <span className="ml-2 font-medium">{companyName}</span>
-      )}
     </div>
   );
 };
