@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import FormularioModerno from "@/components/FormularioModerno";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -69,16 +68,23 @@ const Index = () => {
       const searchLower = searchTerm.toLowerCase().trim();
       const searchCNPJ = searchTerm.replace(/\D/g, '');
       
+      console.log("Searching for:", searchLower);
+      
       const filtered = convenentes.filter(conv => {
+        if (!conv) return false;
+        
+        // Safe access to properties
+        const razaoSocial = conv.razaoSocial || '';
+        const cnpj = conv.cnpj || '';
+        
         // Search by company name - convert to lowercase for comparison
-        const nameMatch = conv.razaoSocial && 
-                          conv.razaoSocial.toLowerCase().includes(searchLower);
+        const nameMatch = razaoSocial.toLowerCase().includes(searchLower);
         
         // Search by CNPJ - remove formatting before comparing
-        const cnpjClean = conv.cnpj ? conv.cnpj.replace(/\D/g, '') : '';
+        const cnpjClean = cnpj.replace(/\D/g, '');
         const cnpjMatch = cnpjClean.includes(searchCNPJ);
         
-        console.log(`Checking company: ${conv.razaoSocial}, Name match: ${nameMatch}, CNPJ match: ${cnpjMatch}`);
+        console.log(`Checking company: ${razaoSocial}, Name match: ${nameMatch}, CNPJ match: ${cnpjMatch}, Search term: "${searchLower}"`);
         
         return nameMatch || cnpjMatch;
       });
