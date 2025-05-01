@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -191,10 +190,7 @@ const FormularioModerno = () => {
         </div>
       </div>
 
-      <div className="flex justify-end space-x-4 mt-8">
-        <Button variant="destructive">Cancelar</Button>
-        <Button className="bg-green-600 hover:bg-green-700">Salvar</Button>
-      </div>
+      {/* Removing the Cancel and Save buttons */}
     </div>
   );
 };
