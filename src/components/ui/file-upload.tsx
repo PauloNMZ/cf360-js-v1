@@ -12,6 +12,8 @@ interface FileUploadProps {
   onChange?: (files: File[]) => void;
   onRemove?: (file: File) => void;
   disabled?: boolean;
+  onDrop?: (event: React.DragEvent<HTMLDivElement>) => void;
+  showDropZone?: boolean;
 }
 
 export const FileUpload: React.FC<FileUploadProps> = ({ 
@@ -22,10 +24,13 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   onChange,
   onRemove,
   disabled = false,
+  onDrop,
+  showDropZone = false,
 }) => {
   const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   
   const handleButtonClick = () => {
@@ -35,7 +40,10 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setError(null);
     const selectedFiles = e.target.files;
-    
+    processFiles(selectedFiles);
+  };
+  
+  const processFiles = (selectedFiles: FileList | null) => {
     if (!selectedFiles || selectedFiles.length === 0) return;
     
     // Check if max files limit is reached
@@ -65,10 +73,11 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       return;
     }
     
-    setFiles(prev => [...prev, ...newFiles]);
+    const updatedFiles = [...files, ...newFiles];
+    setFiles(updatedFiles);
     
     if (onChange) {
-      onChange([...files, ...newFiles]);
+      onChange(updatedFiles);
     }
     
     // Clear input value to allow selecting the same file again
@@ -99,21 +108,59 @@ export const FileUpload: React.FC<FileUploadProps> = ({
     toast.info(`Arquivo "${removedFile.name}" removido.`);
   };
   
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+  
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+  
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+  
+  const handleDropCustom = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    
+    if (onDrop) {
+      onDrop(e);
+    } else {
+      const droppedFiles = e.dataTransfer.files;
+      processFiles(droppedFiles);
+    }
+  };
+  
   return (
     <div className="space-y-4">
-      <div className="flex flex-col">
-        <span className="text-sm font-medium text-gray-700 mb-1">{label}</span>
-        <div className="flex gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleButtonClick}
-            disabled={disabled || loading || files.length >= maxFiles}
-            className="flex items-center gap-2 border-blue-200 hover:bg-blue-50"
-          >
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-            {files.length >= maxFiles ? 'Limite atingido' : 'Anexar arquivo'}
-          </Button>
+      {showDropZone ? (
+        <div 
+          className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
+            isDragging ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300 hover:border-blue-400'
+          }`}
+          onDragOver={handleDragOver}
+          onDragEnter={handleDragEnter}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDropCustom}
+          onClick={handleButtonClick}
+        >
+          <div className="flex flex-col items-center justify-center space-y-2">
+            <Upload className="h-10 w-10 text-blue-500" />
+            <p className="text-base font-medium">
+              Arraste e solte seu arquivo aqui, ou clique para selecionar
+            </p>
+            <p className="text-sm text-gray-500">
+              Formatos aceitos: {accept.split(',').join(', ')}. Tamanho máximo: {maxSize}MB
+            </p>
+          </div>
           <input
             type="file"
             ref={inputRef}
@@ -124,10 +171,35 @@ export const FileUpload: React.FC<FileUploadProps> = ({
             disabled={disabled}
           />
         </div>
-        <p className="text-xs text-gray-500 mt-1">
-          Formatos aceitos: {accept.split(',').join(', ')}. Tamanho máximo: {maxSize}MB.
-        </p>
-      </div>
+      ) : (
+        <div className="flex flex-col">
+          <span className="text-sm font-medium text-gray-700 mb-1">{label}</span>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleButtonClick}
+              disabled={disabled || loading || files.length >= maxFiles}
+              className="flex items-center gap-2 border-blue-200 hover:bg-blue-50"
+            >
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+              {files.length >= maxFiles ? 'Limite atingido' : 'Anexar arquivo'}
+            </Button>
+            <input
+              type="file"
+              ref={inputRef}
+              accept={accept}
+              multiple={maxFiles > 1}
+              onChange={handleFileChange}
+              className="hidden"
+              disabled={disabled}
+            />
+          </div>
+          <p className="text-xs text-gray-500 mt-1">
+            Formatos aceitos: {accept.split(',').join(', ')}. Tamanho máximo: {maxSize}MB.
+          </p>
+        </div>
+      )}
       
       {error && (
         <div className="flex items-center gap-2 text-sm text-red-500">

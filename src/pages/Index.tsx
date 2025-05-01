@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import FormularioModerno from "@/components/FormularioModerno";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -6,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { NavButton } from "@/components/ui/NavButton";
 import AdminPanel from "@/components/AdminPanel";
+import ImportarPlanilha from "@/components/ImportarPlanilha";
 import { 
   Home, 
   FileUp, 
@@ -43,6 +45,7 @@ import { ConvenenteData, emptyConvenente } from "@/types/convenente";
 const Index = () => {
   const { toast } = useToast();
   const [modalOpen, setModalOpen] = useState(false);
+  const [importModalOpen, setImportModalOpen] = useState(false);
   const [adminPanelOpen, setAdminPanelOpen] = useState(false);
   const [formMode, setFormMode] = useState<'view' | 'create' | 'edit'>('view');
   const [formData, setFormData] = useState<ConvenenteData>({...emptyConvenente});
@@ -105,6 +108,11 @@ const Index = () => {
   const handleConvenenteClick = () => {
     console.log("Convenente button clicked");
     setModalOpen(true);
+  };
+
+  const handleImportarPlanilhaClick = () => {
+    console.log("Importar Planilha button clicked");
+    setImportModalOpen(true);
   };
 
   const handleLogoutClick = () => {
@@ -266,7 +274,7 @@ const Index = () => {
           <NavButton 
             icon={<FileUp size={24} />} 
             label="Importar Planilha" 
-            onClick={() => {}} 
+            onClick={handleImportarPlanilhaClick} 
           />
           <NavButton 
             icon={<FileSearch size={24} />} 
@@ -423,6 +431,18 @@ const Index = () => {
                 </div>
               </ScrollArea>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de Importação de Planilha */}
+      <Dialog open={importModalOpen} onOpenChange={setImportModalOpen}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-center mb-6">Importação de Planilha</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <ImportarPlanilha />
           </div>
         </DialogContent>
       </Dialog>
