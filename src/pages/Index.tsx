@@ -39,8 +39,8 @@ import {
   AlertDialogTitle
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
-import { saveConvenente, getConvenentes, updateConvenente, deleteConvenente } from "@/services/storage";
+import { useToast } from "@/hooks/use-toast";
+import { saveConvenente, getConvenentes, updateConvenente, deleteConvenente, getConvenenteById } from "@/services/convenenteService";
 import { getCompanySettings } from "@/services/companySettings";
 import { formatCNPJ } from "@/utils/formValidation";
 import { ConvenenteData, emptyConvenente } from "@/types/convenente";
@@ -64,6 +64,7 @@ const Index = () => {
     logoUrl: '',
     companyName: 'Gerador de Pagamentos'
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   // Define header and footer heights (approximate values, adjust as needed)
   const HEADER_HEIGHT = 80;
@@ -73,18 +74,36 @@ const Index = () => {
   // Get content container style with height reduction
   const contentContainerStyle = getContentContainerStyle(HEADER_HEIGHT, FOOTER_HEIGHT, 0, HEIGHT_REDUCTION);
 
-  // Load convenentes from localStorage on start
+  // Carregar convenentes do Supabase ao iniciar
   useEffect(() => {
-    const loadedConvenentes = getConvenentes();
-    setConvenentes(loadedConvenentes);
-    setFilteredConvenentes(loadedConvenentes);
+    const loadConvenentes = async () => {
+      setIsLoading(true);
+      try {
+        const loadedConvenentes = await getConvenentes();
+        setConvenentes(loadedConvenentes);
+        setFilteredConvenentes(loadedConvenentes);
+      } catch (error) {
+        console.error("Erro ao carregar convenentes:", error);
+        toast({
+          title: "Erro ao carregar dados",
+          description: "Ocorreu um erro ao buscar os convenentes.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    // Load company settings
+    // Carregar configurações da empresa
     const settings = getCompanySettings();
     setCompanySettings(settings);
-  }, []);
+    
+    if (modalOpen) {
+      loadConvenentes();
+    }
+  }, [modalOpen, toast]);
 
-  // Load company settings when admin panel is closed (to update logo if changed)
+  // Carregar configurações da empresa quando o painel de administração é fechado
   useEffect(() => {
     if (!adminPanelOpen) {
       const settings = getCompanySettings();
@@ -92,15 +111,13 @@ const Index = () => {
     }
   }, [adminPanelOpen]);
 
-  // Filter convenentes when search term changes
+  // Filtrar convenentes quando o termo de pesquisa muda
   useEffect(() => {
     if (!searchTerm.trim()) {
       setFilteredConvenentes(convenentes);
     } else {
       const searchLower = searchTerm.toLowerCase().trim();
       const searchCNPJ = searchTerm.replace(/\D/g, '');
-      
-      console.log("Searching for:", searchLower);
       
       const filtered = convenentes.filter(conv => {
         if (!conv) return false;
@@ -116,41 +133,31 @@ const Index = () => {
         const cnpjClean = cnpj.replace(/\D/g, '');
         const cnpjMatch = cnpjClean.includes(searchCNPJ);
         
-        console.log(`Checking company: ${razaoSocial}, Name match: ${nameMatch}, CNPJ match: ${cnpjMatch}, Search term: "${searchLower}"`);
-        
         return nameMatch || cnpjMatch;
       });
       
-      console.log("Search term:", searchTerm);
-      console.log("Search term (lowercase):", searchLower);
-      console.log("Filtered convenentes:", filtered);
       setFilteredConvenentes(filtered);
     }
   }, [searchTerm, convenentes]);
 
   const handleSearchChange = (e) => {
     const value = e.target.value;
-    console.log("Search value:", value);
     setSearchTerm(value);
   };
 
   const handleConvenenteClick = () => {
-    console.log("Convenente button clicked");
     setModalOpen(true);
   };
 
   const handleImportarPlanilhaClick = () => {
-    console.log("Importar Planilha button clicked");
     setImportModalOpen(true);
   };
 
   const handleLogoutClick = async () => {
-    console.log("Logout button clicked");
     await signOut();
   };
 
   const handleAdminPanelClick = () => {
-    console.log("Admin Panel button clicked");
     setAdminPanelOpen(true);
   };
 
@@ -159,7 +166,6 @@ const Index = () => {
     setFormValid(false); // Reset form validity when creating new
     setCurrentConvenenteId(null);
     setFormData({...emptyConvenente});
-    console.log("Create new convenente");
   };
 
   const handleEdit = () => {
@@ -174,7 +180,6 @@ const Index = () => {
     
     setFormMode('edit');
     setFormValid(true); // Assume the existing data is valid when editing
-    console.log("Edit convenente", currentConvenenteId);
   };
 
   const handleDelete = () => {
@@ -190,50 +195,58 @@ const Index = () => {
     setShowDeleteDialog(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (currentConvenenteId) {
-      const result = deleteConvenente(currentConvenenteId);
-      
-      if (result) {
+      setIsLoading(true);
+      try {
+        await deleteConvenente(currentConvenenteId);
+        
         toast({
           title: "Convenente excluído",
           description: "O convenente foi excluído com sucesso.",
         });
         
         // Update list and close dialog
-        setConvenentes(getConvenentes());
+        const updatedConvenentes = await getConvenentes();
+        setConvenentes(updatedConvenentes);
         setCurrentConvenenteId(null);
         setFormData({...emptyConvenente});
         setFormMode('view');
-      } else {
+      } catch (error) {
+        console.error("Erro ao excluir:", error);
         toast({
           title: "Erro ao excluir",
           description: "Não foi possível excluir o convenente.",
           variant: "destructive",
         });
+      } finally {
+        setIsLoading(false);
       }
     }
     
     setShowDeleteDialog(false);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     try {
+      setIsLoading(true);
+      
       if (formMode === 'create') {
-        // Save new convenente
-        const newConvenente = saveConvenente(formData);
+        // Salvar novo convenente
+        const newConvenente = await saveConvenente(formData);
         
         toast({
           title: "Convenente salvo",
           description: `${formData.razaoSocial} foi cadastrado com sucesso.`,
         });
         
-        // Update list and select new convenente
-        setConvenentes(getConvenentes());
+        // Atualizar lista e selecionar novo convenente
+        const updatedConvenentes = await getConvenentes();
+        setConvenentes(updatedConvenentes);
         setCurrentConvenenteId(newConvenente.id);
       } else if (formMode === 'edit' && currentConvenenteId) {
-        // Update existing convenente
-        const updatedConvenente = updateConvenente(currentConvenenteId, formData);
+        // Atualizar convenente existente
+        const updatedConvenente = await updateConvenente(currentConvenenteId, formData);
         
         if (updatedConvenente) {
           toast({
@@ -241,8 +254,9 @@ const Index = () => {
             description: `${formData.razaoSocial} foi atualizado com sucesso.`,
           });
           
-          // Update list
-          setConvenentes(getConvenentes());
+          // Atualizar lista
+          const updatedConvenentes = await getConvenentes();
+          setConvenentes(updatedConvenentes);
         } else {
           toast({
             title: "Erro ao atualizar",
@@ -252,7 +266,7 @@ const Index = () => {
         }
       }
       
-      // Return to view mode
+      // Retornar ao modo de visualização
       setFormMode('view');
     } catch (error) {
       console.error('Erro ao salvar convenente:', error);
@@ -261,6 +275,8 @@ const Index = () => {
         description: "Ocorreu um erro ao salvar o convenente.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -272,10 +288,27 @@ const Index = () => {
     setFormValid(hasRequiredFields);
   };
 
-  const handleSelectConvenente = (convenente) => {
+  const handleSelectConvenente = async (convenente) => {
     setCurrentConvenenteId(convenente.id);
-    setFormData(convenente);
-    setFormMode('view');
+    
+    try {
+      setIsLoading(true);
+      // Obter convenente completo do banco de dados
+      const completeConvenente = await getConvenenteById(convenente.id);
+      if (completeConvenente) {
+        setFormData(completeConvenente);
+        setFormMode('view');
+      }
+    } catch (error) {
+      console.error("Erro ao carregar detalhes do convenente:", error);
+      toast({
+        title: "Erro ao carregar detalhes",
+        description: "Não foi possível carregar os detalhes do convenente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -386,7 +419,11 @@ const Index = () => {
               </div>
               
               <div className="h-[500px] overflow-y-auto">
-                {filteredConvenentes.length > 0 ? (
+                {isLoading ? (
+                  <div className="flex items-center justify-center h-full">
+                    Carregando...
+                  </div>
+                ) : filteredConvenentes.length > 0 ? (
                   <ul className="space-y-2">
                     {filteredConvenentes.map((convenente) => (
                       <li 

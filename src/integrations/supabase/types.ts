@@ -9,6 +9,72 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      convenentes: {
+        Row: {
+          agencia: string | null
+          celular: string | null
+          chave_pix: string | null
+          cidade: string | null
+          cnpj: string
+          complemento: string | null
+          conta: string | null
+          contato: string | null
+          convenio_pag: string | null
+          data_atualizacao: string | null
+          data_criacao: string | null
+          email: string | null
+          endereco: string | null
+          fone: string | null
+          id: string
+          numero: string | null
+          razao_social: string
+          uf: string | null
+          user_id: string
+        }
+        Insert: {
+          agencia?: string | null
+          celular?: string | null
+          chave_pix?: string | null
+          cidade?: string | null
+          cnpj: string
+          complemento?: string | null
+          conta?: string | null
+          contato?: string | null
+          convenio_pag?: string | null
+          data_atualizacao?: string | null
+          data_criacao?: string | null
+          email?: string | null
+          endereco?: string | null
+          fone?: string | null
+          id?: string
+          numero?: string | null
+          razao_social: string
+          uf?: string | null
+          user_id: string
+        }
+        Update: {
+          agencia?: string | null
+          celular?: string | null
+          chave_pix?: string | null
+          cidade?: string | null
+          cnpj?: string
+          complemento?: string | null
+          conta?: string | null
+          contato?: string | null
+          convenio_pag?: string | null
+          data_atualizacao?: string | null
+          data_criacao?: string | null
+          email?: string | null
+          endereco?: string | null
+          fone?: string | null
+          id?: string
+          numero?: string | null
+          razao_social?: string
+          uf?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           first_name: string | null
