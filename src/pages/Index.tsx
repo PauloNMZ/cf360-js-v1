@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from "react";
 import FormularioModerno from "@/components/FormularioModerno";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { 
@@ -35,28 +34,29 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useToast } from "@/components/ui/use-toast";
 import { saveConvenente, getConvenentes, updateConvenente, deleteConvenente } from "@/services/storage";
 import { formatCNPJ } from "@/utils/formValidation";
+import { ConvenenteData, emptyConvenente } from "@/types/convenente";
 
 const Index = () => {
   const { toast } = useToast();
   const [modalOpen, setModalOpen] = useState(false);
   const [adminPanelOpen, setAdminPanelOpen] = useState(false);
-  const [formMode, setFormMode] = useState('view'); // view, create, edit
-  const [formData, setFormData] = useState({});
+  const [formMode, setFormMode] = useState<'view' | 'create' | 'edit'>('view');
+  const [formData, setFormData] = useState<ConvenenteData>({...emptyConvenente});
   const [formValid, setFormValid] = useState(false);
-  const [convenentes, setConvenentes] = useState([]);
-  const [currentConvenenteId, setCurrentConvenenteId] = useState(null);
+  const [convenentes, setConvenentes] = useState<Array<ConvenenteData & { id: string }>>([]);
+  const [currentConvenenteId, setCurrentConvenenteId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filteredConvenentes, setFilteredConvenentes] = useState([]);
+  const [filteredConvenentes, setFilteredConvenentes] = useState<Array<ConvenenteData & { id: string }>>([]);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  // Carregar convenentes do localStorage ao iniciar
+  // Load convenentes from localStorage on start
   useEffect(() => {
     const loadedConvenentes = getConvenentes();
     setConvenentes(loadedConvenentes);
     setFilteredConvenentes(loadedConvenentes);
   }, []);
 
-  // Filtrar convenentes quando o termo de busca mudar
+  // Filter convenentes when search term changes
   useEffect(() => {
     if (!searchTerm.trim()) {
       setFilteredConvenentes(convenentes);
@@ -97,6 +97,7 @@ const Index = () => {
     setFormMode('create');
     setFormValid(false); // Reset form validity when creating new
     setCurrentConvenenteId(null);
+    setFormData({...emptyConvenente});
     console.log("Create new convenente");
   };
 
@@ -138,10 +139,10 @@ const Index = () => {
           description: "O convenente foi excluído com sucesso.",
         });
         
-        // Atualiza a lista e fecha o diálogo
+        // Update list and close dialog
         setConvenentes(getConvenentes());
         setCurrentConvenenteId(null);
-        setFormData({});
+        setFormData({...emptyConvenente});
         setFormMode('view');
       } else {
         toast({
@@ -158,7 +159,7 @@ const Index = () => {
   const handleSave = () => {
     try {
       if (formMode === 'create') {
-        // Salvar novo convenente
+        // Save new convenente
         const newConvenente = saveConvenente(formData);
         
         toast({
@@ -166,11 +167,11 @@ const Index = () => {
           description: `${formData.razaoSocial} foi cadastrado com sucesso.`,
         });
         
-        // Atualiza a lista e seleciona o novo convenente
+        // Update list and select new convenente
         setConvenentes(getConvenentes());
         setCurrentConvenenteId(newConvenente.id);
       } else if (formMode === 'edit' && currentConvenenteId) {
-        // Atualizar convenente existente
+        // Update existing convenente
         const updatedConvenente = updateConvenente(currentConvenenteId, formData);
         
         if (updatedConvenente) {
@@ -179,7 +180,7 @@ const Index = () => {
             description: `${formData.razaoSocial} foi atualizado com sucesso.`,
           });
           
-          // Atualiza a lista
+          // Update list
           setConvenentes(getConvenentes());
         } else {
           toast({
@@ -190,7 +191,7 @@ const Index = () => {
         }
       }
       
-      // Volta para o modo de visualização
+      // Return to view mode
       setFormMode('view');
     } catch (error) {
       console.error('Erro ao salvar convenente:', error);
@@ -202,9 +203,9 @@ const Index = () => {
     }
   };
 
-  const handleFormDataChange = (data) => {
+  const handleFormDataChange = (data: ConvenenteData) => {
     setFormData(data);
-    // Verifica se os campos obrigatórios estão preenchidos
+    // Check if required fields are filled
     const requiredFields = ['cnpj', 'razaoSocial'];
     const hasRequiredFields = requiredFields.every(field => data[field] && data[field].toString().trim() !== '');
     setFormValid(hasRequiredFields);
@@ -633,181 +634,4 @@ const AdminPanel = () => {
               </Button>
               <Button 
                 onClick={handleCreateNew}
-                className="bg-green-600 hover:bg-green-700 text-sm flex items-center gap-1"
-              >
-                <Plus size={14} /> Nova Conexão
-              </Button>
-            </div>
-          </div>
-
-          <div className="rounded-lg border overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>App Key</TableHead>
-                  <TableHead>Client ID</TableHead>
-                  <TableHead>Usuário BBsia</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {bankConnections.map((connection) => (
-                  <TableRow key={connection.id}>
-                    <TableCell className="font-medium">{connection.appKey}</TableCell>
-                    <TableCell>{connection.clientId.substring(0, 20)}...</TableCell>
-                    <TableCell>{connection.userBBsia}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button 
-                          onClick={() => handleEdit(connection)} 
-                          variant="outline" 
-                          size="sm"
-                          className="flex items-center gap-1 h-8 px-2"
-                        >
-                          <Edit size={14} /> Editar
-                        </Button>
-                        <Button 
-                          onClick={() => handleDelete(connection)} 
-                          variant="outline" 
-                          size="sm"
-                          className="flex items-center gap-1 h-8 px-2 text-red-600 border-red-200 hover:bg-red-50"
-                        >
-                          <TrashIcon size={14} /> Excluir
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {bankConnections.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={4} className="text-center py-6 text-gray-500">
-                      Nenhuma conexão bancária cadastrada
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </div>
-      ) : (
-        <div className="bg-white p-6 rounded-lg shadow-sm">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-blue-800">
-              {isCreating ? 'Nova Conexão Bancária' : 'Editar Conexão Bancária'}
-            </h3>
-            <Button 
-              onClick={handleBackToMenu}
-              variant="outline"
-              className="text-sm"
-            >
-              Cancelar
-            </Button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
-            <div className="flex flex-col space-y-1">
-              <label className="text-sm font-medium text-gray-700">App Key</label>
-              <Input 
-                name="appKey" 
-                value={formValues.appKey} 
-                onChange={handleInputChange} 
-                className="border-blue-200 focus:border-blue-500 bg-blue-50" 
-              />
-            </div>
-            
-            <div className="flex flex-col space-y-1">
-              <label className="text-sm font-medium text-gray-700">Client ID</label>
-              <Input 
-                name="clientId" 
-                value={formValues.clientId} 
-                onChange={handleInputChange} 
-                className="border-blue-200 focus:border-blue-500 bg-blue-50" 
-              />
-            </div>
-            
-            <div className="flex flex-col space-y-1">
-              <label className="text-sm font-medium text-gray-700">Client Secret</label>
-              <Input 
-                name="clientSecret" 
-                value={formValues.clientSecret} 
-                onChange={handleInputChange} 
-                className="border-blue-200 focus:border-blue-500 bg-blue-50" 
-              />
-            </div>
-            
-            <div className="flex flex-col space-y-1">
-              <label className="text-sm font-medium text-gray-700">Registrar Token</label>
-              <Input 
-                name="registrarToken" 
-                value={formValues.registrarToken} 
-                onChange={handleInputChange} 
-                className="border-blue-200 focus:border-blue-500 bg-blue-50" 
-              />
-            </div>
-            
-            <div className="flex flex-col space-y-1">
-              <label className="text-sm font-medium text-gray-700">Basic</label>
-              <Input 
-                name="basic" 
-                value={formValues.basic} 
-                onChange={handleInputChange} 
-                className="border-blue-200 focus:border-blue-500 bg-blue-50" 
-              />
-            </div>
-            
-            <div className="flex flex-col space-y-1">
-              <label className="text-sm font-medium text-gray-700">Usuário BBsia</label>
-              <Input 
-                name="userBBsia" 
-                value={formValues.userBBsia} 
-                onChange={handleInputChange} 
-                className="border-blue-200 focus:border-blue-500 bg-blue-50" 
-              />
-            </div>
-            
-            <div className="flex flex-col space-y-1">
-              <label className="text-sm font-medium text-gray-700">Senha BBsia</label>
-              <Input 
-                name="passwordBBsia" 
-                value={formValues.passwordBBsia} 
-                onChange={handleInputChange} 
-                type="password"
-                className="border-blue-200 focus:border-blue-500 bg-blue-50" 
-              />
-            </div>
-          </div>
-
-          <div className="flex justify-end mt-6">
-            <Button 
-              onClick={handleSave}
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded flex items-center gap-2"
-            >
-              <Save size={16} /> Salvar
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {/* Confirmation dialog for deletion */}
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
-            <AlertDialogDescription>
-              Tem certeza que deseja excluir esta conexão bancária?
-              Esta ação não pode ser desfeita.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
-              Excluir
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
-  );
-};
-
-export default Index;
+                className="bg-green-600 hover:bg-green-700 text-

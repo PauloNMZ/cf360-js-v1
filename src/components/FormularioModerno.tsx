@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +12,7 @@ import {
   validateEmail, 
   validatePhone 
 } from "@/utils/formValidation";
+import { ConvenenteData, emptyConvenente } from "@/types/convenente";
 
 type FormErrors = {
   cnpj?: string;
@@ -24,32 +24,22 @@ type FormErrors = {
   [key: string]: string | undefined;
 };
 
-const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }) => {
+type FormularioModernoProps = {
+  onFormDataChange: (data: ConvenenteData) => void;
+  formMode: 'view' | 'create' | 'edit';
+  initialData?: Partial<ConvenenteData>;
+};
+
+const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: FormularioModernoProps) => {
   const { toast } = useToast();
   const [cnpjInput, setCnpjInput] = useState("");
-  const [formData, setFormData] = useState({
-    cnpj: "",
-    razaoSocial: "",
-    endereco: "",
-    numero: "",
-    complemento: "",
-    uf: "",
-    cidade: "",
-    contato: "",
-    fone: "",
-    celular: "",
-    email: "",
-    agencia: "",
-    conta: "",
-    chavePix: "",
-    convenioPag: ""
-  });
+  const [formData, setFormData] = useState<ConvenenteData>({...emptyConvenente});
   const [errors, setErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    // Inicializa o formulário com os dados passados, se houver
-    if (Object.keys(initialData).length > 0) {
+    // Initialize form with provided data, if any
+    if (initialData && Object.keys(initialData).length > 0) {
       setFormData(prev => ({
         ...prev,
         ...initialData
@@ -62,25 +52,9 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }) => 
   }, [initialData]);
 
   useEffect(() => {
-    // Se formMode for 'create', limpa o formulário
+    // Reset form if formMode is 'create'
     if (formMode === 'create') {
-      setFormData({
-        cnpj: "",
-        razaoSocial: "",
-        endereco: "",
-        numero: "",
-        complemento: "",
-        uf: "",
-        cidade: "",
-        contato: "",
-        fone: "",
-        celular: "",
-        email: "",
-        agencia: "",
-        conta: "",
-        chavePix: "",
-        convenioPag: ""
-      });
+      setFormData({...emptyConvenente});
       setCnpjInput("");
       setErrors({});
       setTouched({});
@@ -88,10 +62,10 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }) => 
   }, [formMode]);
 
   useEffect(() => {
-    // Valida os campos quando são modificados
+    // Validate fields when they change
     validateForm();
     
-    // Notifica o componente pai sobre mudanças nos dados do formulário
+    // Notify parent component about form data changes
     if (onFormDataChange) {
       onFormDataChange(formData);
     }
@@ -100,27 +74,27 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }) => 
   const validateForm = () => {
     const newErrors: FormErrors = {};
     
-    // Valida CNPJ
+    // Validate CNPJ
     if (touched.cnpj && formData.cnpj && !validateCNPJ(formData.cnpj)) {
       newErrors.cnpj = "CNPJ inválido";
     }
     
-    // Valida campos obrigatórios
+    // Validate required fields
     if (touched.razaoSocial && !formData.razaoSocial) {
       newErrors.razaoSocial = "Razão social é obrigatória";
     }
     
-    // Valida email
+    // Validate email
     if (touched.email && formData.email && !validateEmail(formData.email)) {
       newErrors.email = "Email inválido";
     }
     
-    // Valida telefone
+    // Validate phone
     if (touched.fone && formData.fone && !validatePhone(formData.fone)) {
       newErrors.fone = "Telefone inválido";
     }
     
-    // Valida celular
+    // Validate cell phone
     if (touched.celular && formData.celular && !validatePhone(formData.celular)) {
       newErrors.celular = "Celular inválido";
     }
@@ -143,7 +117,7 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }) => 
         fone: data.ddd_telefone_1 ? formatPhone(data.ddd_telefone_1) : "",
         celular: data.ddd_telefone_2 ? formatPhone(data.ddd_telefone_2) : "",
         email: data.email || "",
-        agencia: "",  // API não fornece dados bancários
+        agencia: "",  // API doesn't provide banking data
         conta: "",
         chavePix: "",
         convenioPag: ""
@@ -174,7 +148,7 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }) => 
   });
 
   const handleCNPJSearch = () => {
-    // Remove caracteres não numéricos
+    // Remove non-numeric characters
     const cnpjClean = cnpjInput.replace(/\D/g, '');
     if (cnpjClean.length !== 14) {
       toast({
@@ -192,7 +166,7 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }) => 
     const { name, value } = e.target;
     setTouched(prev => ({ ...prev, [name]: true }));
     
-    // Aplica formatações específicas dependendo do campo
+    // Apply specific formatting depending on the field
     if (name === 'fone' || name === 'celular') {
       setFormData(prev => ({
         ...prev,
