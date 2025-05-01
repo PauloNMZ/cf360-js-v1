@@ -1,0 +1,74 @@
+
+import React from "react";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { AppLogo } from "@/components/ui/AppLogo";
+import { useAuth } from "@/hooks/use-auth";
+import { getContentContainerStyle } from "@/utils/viewportUtils";
+
+type MainLayoutProps = {
+  children: React.ReactNode;
+  companySettings: {
+    logoUrl: string;
+    companyName: string;
+  };
+};
+
+const MainLayout = ({ children, companySettings }: MainLayoutProps) => {
+  const { user } = useAuth();
+  
+  // Define header and footer heights (approximate values, adjust as needed)
+  const HEADER_HEIGHT = 80;
+  const FOOTER_HEIGHT = 60;
+  const HEIGHT_REDUCTION = 100; // Reduce main content height by 100px
+  
+  // Get content container style with height reduction
+  const contentContainerStyle = getContentContainerStyle(HEADER_HEIGHT, FOOTER_HEIGHT, 0, HEIGHT_REDUCTION);
+
+  return (
+    <div className="flex flex-col h-screen bg-gradient-to-br from-blue-50 to-white dark:from-blue-950 dark:to-slate-900 dark:text-white">
+      {/* Header with gradiente azul */}
+      <header className="bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-800 dark:to-blue-950 text-white py-4 px-6 shadow-md">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <AppLogo size={28} customLogoUrl={companySettings.logoUrl} />
+            <h1 className="text-2xl font-bold">{companySettings.companyName}</h1>
+          </div>
+          <div className="flex items-center space-x-4">
+            {user && (
+              <p className="text-sm hidden sm:block">Conectado como: {user.email}</p>
+            )}
+            <ThemeToggle />
+          </div>
+        </div>
+      </header>
+
+      {/* Conteúdo principal com rolagem controlada e altura reduzida */}
+      <div className="flex-grow overflow-auto" style={contentContainerStyle}>
+        {children}
+      </div>
+      
+      {/* Status bar - Fixed at the bottom */}
+      <footer className="bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-800 dark:to-blue-950 text-white py-3 px-6">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <div>
+            <h2 className="text-xl font-bold">
+              {new Date().toLocaleDateString('pt-BR', { weekday: 'long' })}
+            </h2>
+            <p className="text-sm">
+              {new Date().toLocaleDateString('pt-BR', { 
+                day: '2-digit', 
+                month: 'long', 
+                year: 'numeric' 
+              })}
+            </p>
+          </div>
+          <div className="text-right">
+            <p className="text-sm">GeraPag 1.01</p>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default MainLayout;

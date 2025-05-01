@@ -1,57 +1,36 @@
+
 import { useState, useEffect } from "react";
-import FormularioModerno from "@/components/FormularioModerno";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { NavButton } from "@/components/ui/NavButton";
-import { AppLogo } from "@/components/ui/AppLogo";
-import AdminPanel from "@/components/AdminPanel";
-import ImportarPlanilha from "@/components/ImportarPlanilha";
+import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { 
-  Home, 
-  FileUp, 
-  FileSearch, 
-  Package, 
-  Send, 
-  RefreshCw, 
-  FileText, 
-  Search, 
-  LogOut,
-  Shield,
-  Plus,
-  Edit,
-  TrashIcon,
-  Save,
-  LayoutDashboard,
-  AlertCircle,
-  WalletCards
-} from "lucide-react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent, 
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle
-} from "@/components/ui/alert-dialog";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
-import { saveConvenente, getConvenentes, updateConvenente, deleteConvenente, getConvenenteById } from "@/services/convenenteService";
+  saveConvenente, 
+  getConvenentes, 
+  updateConvenente, 
+  deleteConvenente, 
+  getConvenenteById 
+} from "@/services/convenenteService";
 import { getCompanySettings } from "@/services/companySettings";
-import { formatCNPJ } from "@/utils/formValidation";
 import { ConvenenteData, emptyConvenente } from "@/types/convenente";
-import { getContentContainerStyle } from "@/utils/viewportUtils";
+
+// Import our new components
+import MainLayout from "@/components/layout/MainLayout";
+import NavigationMenu from "@/components/navigation/NavigationMenu";
+import ConvenenteModal from "@/components/convenente/ConvenenteModal";
+import DeleteConvenenteDialog from "@/components/convenente/DeleteConvenenteDialog";
+import ImportacaoModal from "@/components/importacao/ImportacaoModal";
+import AdminPanelModal from "@/components/admin/AdminPanelModal";
 
 const Index = () => {
   const { toast } = useToast();
   const { signOut, user } = useAuth();
+  
+  // Modal states
   const [modalOpen, setModalOpen] = useState(false);
   const [importModalOpen, setImportModalOpen] = useState(false);
   const [adminPanelOpen, setAdminPanelOpen] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  
+  // Form and data states
   const [formMode, setFormMode] = useState<'view' | 'create' | 'edit'>('view');
   const [formData, setFormData] = useState<ConvenenteData>({...emptyConvenente});
   const [formValid, setFormValid] = useState(false);
@@ -59,20 +38,11 @@ const Index = () => {
   const [currentConvenenteId, setCurrentConvenenteId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredConvenentes, setFilteredConvenentes] = useState<Array<ConvenenteData & { id: string }>>([]);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [companySettings, setCompanySettings] = useState({
     logoUrl: '',
     companyName: 'Gerador de Pagamentos'
   });
   const [isLoading, setIsLoading] = useState(false);
-
-  // Define header and footer heights (approximate values, adjust as needed)
-  const HEADER_HEIGHT = 80;
-  const FOOTER_HEIGHT = 60;
-  const HEIGHT_REDUCTION = 100; // Reduce main content height by 100px
-  
-  // Get content container style with height reduction
-  const contentContainerStyle = getContentContainerStyle(HEADER_HEIGHT, FOOTER_HEIGHT, 0, HEIGHT_REDUCTION);
 
   // Carregar convenentes do Supabase ao iniciar
   useEffect(() => {
@@ -312,268 +282,53 @@ const Index = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-blue-50 to-white dark:from-blue-950 dark:to-slate-900 dark:text-white">
-      {/* Header com gradiente azul */}
-      <header className="bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-800 dark:to-blue-950 text-white py-4 px-6 shadow-md">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <AppLogo size={28} customLogoUrl={companySettings.logoUrl} />
-            <h1 className="text-2xl font-bold">Gerador de Pagamentos</h1>
-          </div>
-          <div className="flex items-center space-x-4">
-            {user && (
-              <p className="text-sm hidden sm:block">Conectado como: {user.email}</p>
-            )}
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
-
-      {/* Conteúdo principal com rolagem controlada e altura reduzida */}
-      <div className="flex-grow overflow-auto" style={contentContainerStyle}>
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          {/* Ícones de navegação com centralização aprimorada */}
-          <div className="flex justify-center mb-8">
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-11 gap-2 max-w-5xl mx-auto">
-              <NavButton 
-                icon={<Home size={24} />} 
-                label="Convenente" 
-                onClick={handleConvenenteClick} 
-              />
-              <NavButton 
-                icon={<FileUp size={24} />} 
-                label="Importar Planilha" 
-                onClick={handleImportarPlanilhaClick} 
-              />
-              <NavButton 
-                icon={<FileSearch size={24} />} 
-                label="Verificar Erros" 
-                onClick={() => {}} 
-              />
-              <NavButton 
-                icon={<Package size={24} />} 
-                label="Gerar Remessa" 
-                onClick={() => {}} 
-              />
-              <NavButton 
-                icon={<Send size={24} />} 
-                label="Enviar ao Banco" 
-                onClick={() => {}} 
-              />
-              <NavButton 
-                icon={<RefreshCw size={24} />} 
-                label="Processar Retornos" 
-                onClick={() => {}} 
-              />
-              <NavButton 
-                icon={<FileText size={24} />} 
-                label="Comprovantes" 
-                onClick={() => {}} 
-              />
-              <NavButton 
-                icon={<Search size={24} />} 
-                label="Consultas" 
-                onClick={() => {}} 
-              />
-              <NavButton 
-                icon={<LayoutDashboard size={24} />} 
-                label="Dashboard" 
-                onClick={() => {}} 
-              />
-              <NavButton 
-                icon={<Shield size={24} />} 
-                label="Setup" 
-                onClick={handleAdminPanelClick} 
-              />
-              <NavButton 
-                icon={<LogOut size={24} />} 
-                label="Sair" 
-                onClick={handleLogoutClick} 
-                className="bg-red-50 dark:bg-red-950 hover:bg-red-100 dark:hover:bg-red-900 border-red-200 dark:border-red-800"
-              />
-            </div>
-          </div>
-        </div>
+    <MainLayout companySettings={companySettings}>
+      <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <NavigationMenu 
+          onConvenenteClick={handleConvenenteClick}
+          onImportarPlanilhaClick={handleImportarPlanilhaClick}
+          onAdminPanelClick={handleAdminPanelClick}
+          onLogoutClick={handleLogoutClick}
+        />
       </div>
-      
-      {/* Modal de Cadastro de Convenente */}
-      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent className="max-w-6xl">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-center mb-6">Cadastro de Convenente</DialogTitle>
-          </DialogHeader>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            {/* Lista de convenentes */}
-            <div className="bg-white p-4 rounded-lg shadow-sm">
-              <div className="mb-4">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                  <Input 
-                    placeholder="Buscar convenentes..." 
-                    className="pl-10 border-blue-200 focus:border-blue-500"
-                    value={searchTerm}
-                    onChange={handleSearchChange}
-                  />
-                </div>
-              </div>
-              
-              <div className="h-[500px] overflow-y-auto">
-                {isLoading ? (
-                  <div className="flex items-center justify-center h-full">
-                    Carregando...
-                  </div>
-                ) : filteredConvenentes.length > 0 ? (
-                  <ul className="space-y-2">
-                    {filteredConvenentes.map((convenente) => (
-                      <li 
-                        key={convenente.id}
-                        onClick={() => handleSelectConvenente(convenente)}
-                        className={`p-3 rounded-lg cursor-pointer transition-colors ${
-                          currentConvenenteId === convenente.id 
-                            ? 'bg-blue-100 border border-blue-300' 
-                            : 'hover:bg-gray-100 border border-gray-200'
-                        }`}
-                      >
-                        <h3 className="font-medium text-blue-800">{convenente.razaoSocial}</h3>
-                        <p className="text-sm text-gray-500">
-                          CNPJ: {formatCNPJ(convenente.cnpj)}
-                        </p>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <div className="flex flex-col items-center justify-center h-full text-gray-500">
-                    <AlertCircle size={40} className="mb-2 text-blue-400" />
-                    {searchTerm ? (
-                      <p>Nenhum resultado para "{searchTerm}"</p>
-                    ) : (
-                      <p>Nenhum convenente cadastrado</p>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            {/* Formulário */}
-            <div className="lg:col-span-2">
-              <div className="flex justify-between mb-4">
-                <div className="flex space-x-2">
-                  <Button
-                    onClick={handleCreateNew}
-                    variant="outline"
-                    className="flex items-center gap-1"
-                    disabled={formMode === 'create'}
-                  >
-                    <Plus size={16} /> Novo
-                  </Button>
-                  <Button
-                    onClick={handleEdit}
-                    variant="outline"
-                    className="flex items-center gap-1"
-                    disabled={formMode === 'edit' || !currentConvenenteId}
-                  >
-                    <Edit size={16} /> Editar
-                  </Button>
-                  <Button
-                    onClick={handleDelete}
-                    variant="outline"
-                    className="flex items-center gap-1 text-red-600 border-red-200 hover:bg-red-50"
-                    disabled={!currentConvenenteId}
-                  >
-                    <TrashIcon size={16} /> Excluir
-                  </Button>
-                </div>
-                {(formMode === 'create' || formMode === 'edit') && (
-                  <Button
-                    onClick={handleSave}
-                    variant="default"
-                    className="flex items-center gap-1 bg-green-600 hover:bg-green-700"
-                    disabled={!formValid}
-                  >
-                    <Save size={16} /> Salvar
-                  </Button>
-                )}
-              </div>
-              
-              <ScrollArea className="h-[500px] pr-4">
-                <div className="py-4">
-                  <FormularioModerno 
-                    onFormDataChange={handleFormDataChange} 
-                    formMode={formMode}
-                    initialData={formData} 
-                  />
-                </div>
-              </ScrollArea>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
 
-      {/* Modal de Importação de Planilha */}
-      <Dialog open={importModalOpen} onOpenChange={setImportModalOpen}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-center mb-6">Importação de Planilha</DialogTitle>
-          </DialogHeader>
-          <div className="py-4">
-            <ImportarPlanilha />
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Modals */}
+      <ConvenenteModal 
+        isOpen={modalOpen}
+        onOpenChange={setModalOpen}
+        convenentes={convenentes}
+        filteredConvenentes={filteredConvenentes}
+        currentConvenenteId={currentConvenenteId}
+        formData={formData}
+        formMode={formMode}
+        formValid={formValid}
+        isLoading={isLoading}
+        searchTerm={searchTerm}
+        onSearchChange={handleSearchChange}
+        onSelectConvenente={handleSelectConvenente}
+        onCreateNew={handleCreateNew}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onSave={handleSave}
+        onFormDataChange={handleFormDataChange}
+      />
 
-      {/* Modal do Painel de Administração */}
-      <Dialog open={adminPanelOpen} onOpenChange={setAdminPanelOpen}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-center mb-6">Painel de Setup</DialogTitle>
-          </DialogHeader>
-          <div className="py-4">
-            <AdminPanel />
-          </div>
-        </DialogContent>
-      </Dialog>
-      
-      {/* Diálogo de confirmação para exclusão */}
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
-            <AlertDialogDescription>
-              Tem certeza que deseja excluir este convenente?
-              Esta ação não pode ser desfeita.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
-              Excluir
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-      
-      {/* Status bar - Fixed at the bottom */}
-      <footer className="bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-800 dark:to-blue-950 text-white py-3 px-6">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div>
-            <h2 className="text-xl font-bold">
-              {new Date().toLocaleDateString('pt-BR', { weekday: 'long' })}
-            </h2>
-            <p className="text-sm">
-              {new Date().toLocaleDateString('pt-BR', { 
-                day: '2-digit', 
-                month: 'long', 
-                year: 'numeric' 
-              })}
-            </p>
-          </div>
-          <div className="text-right">
-            <p className="text-sm">GeraPag 1.01</p>
-          </div>
-        </div>
-      </footer>
-    </div>
+      <ImportacaoModal 
+        isOpen={importModalOpen}
+        onOpenChange={setImportModalOpen}
+      />
+
+      <AdminPanelModal 
+        isOpen={adminPanelOpen}
+        onOpenChange={setAdminPanelOpen}
+      />
+
+      <DeleteConvenenteDialog 
+        isOpen={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        onDelete={confirmDelete}
+      />
+    </MainLayout>
   );
 };
 
