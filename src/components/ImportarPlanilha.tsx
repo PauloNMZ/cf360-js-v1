@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { FileUpload } from '@/components/ui/file-upload';
 import { Button } from '@/components/ui/button';
@@ -800,17 +799,4 @@ const ImportarPlanilha = () => {
               ) : (
                 <Button 
                   onClick={handleSubmitWorkflow}
-                  className="bg-green-600 hover:bg-green-700"
-                >
-                  Enviar
-                </Button>
-              )}
-            </div>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </ScrollArea>
-  );
-};
-
-export default ImportarPlanilha;
+                  className="bg-green-600 hover
