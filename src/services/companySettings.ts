@@ -16,7 +16,7 @@ export const getCompanySettings = (): CompanySettings => {
       console.error('Error parsing company settings:', e);
     }
   }
-  return { logoUrl: '', companyName: 'GERADOR DE PAGAMENTOS' };
+  return { logoUrl: '', companyName: 'Gerador de Pagamentos' };
 };
 
 // Save company settings to localStorage
