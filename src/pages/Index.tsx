@@ -71,16 +71,20 @@ const Index = () => {
       
       const filtered = convenentes.filter(conv => {
         // Search by company name - convert to lowercase for comparison
-        const nameMatch = conv.razaoSocial.toLowerCase().includes(searchLower);
+        const nameMatch = conv.razaoSocial && 
+                          conv.razaoSocial.toLowerCase().includes(searchLower);
         
         // Search by CNPJ - remove formatting before comparing
-        const cnpjClean = conv.cnpj.replace(/\D/g, '');
+        const cnpjClean = conv.cnpj ? conv.cnpj.replace(/\D/g, '') : '';
         const cnpjMatch = cnpjClean.includes(searchCNPJ);
+        
+        console.log(`Checking company: ${conv.razaoSocial}, Name match: ${nameMatch}, CNPJ match: ${cnpjMatch}`);
         
         return nameMatch || cnpjMatch;
       });
       
       console.log("Search term:", searchTerm);
+      console.log("Search term (lowercase):", searchLower);
       console.log("Filtered convenentes:", filtered);
       setFilteredConvenentes(filtered);
     }
