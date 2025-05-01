@@ -37,6 +37,7 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
   const [formData, setFormData] = useState<ConvenenteData>({...emptyConvenente});
   const [errors, setErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [dataLoaded, setDataLoaded] = useState(false); // Add a flag to track when data has been loaded
 
   useEffect(() => {
     // Initialize form with provided data, if any
@@ -59,6 +60,7 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
       setCnpjInput("");
       setErrors({});
       setTouched({});
+      setDataLoaded(false); // Reset the dataLoaded flag
     }
   }, [formMode]);
 
@@ -66,11 +68,12 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
     // Validate fields when they change
     validateForm();
     
-    // Notify parent component about form data changes
-    if (onFormDataChange) {
+    // Notify parent component about form data changes only if we're not in the middle of loading data
+    // This prevents infinite loops by ensuring we only notify when the user changes data or initial data is loaded
+    if (onFormDataChange && (dataLoaded || Object.keys(touched).length > 0)) {
       onFormDataChange(formData);
     }
-  }, [formData]);
+  }, [formData, dataLoaded]);
 
   const validateForm = () => {
     const newErrors: FormErrors = {};
@@ -125,6 +128,8 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
       };
       
       setFormData(formattedData);
+      setDataLoaded(true); // Set the flag to indicate data has been loaded
+      
       setTouched({
         cnpj: true,
         razaoSocial: true,

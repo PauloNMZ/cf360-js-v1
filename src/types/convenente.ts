@@ -16,8 +16,8 @@ export interface ConvenenteData {
   conta: string;
   chavePix: string;
   convenioPag: string;
-  dataCriacao?: Date;
-  dataAtualizacao?: Date;
+  dataCriacao?: Date | string; // Allow both Date and string types
+  dataAtualizacao?: Date | string; // Allow both Date and string types
 }
 
 export const emptyConvenente: ConvenenteData = {
