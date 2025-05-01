@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import FormularioModerno from "@/components/FormularioModerno";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -254,7 +253,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white dark:from-blue-950 dark:to-slate-900 dark:text-white flex flex-col">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-blue-50 to-white dark:from-blue-950 dark:to-slate-900 dark:text-white">
       {/* Header com gradiente azul */}
       <header className="bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-800 dark:to-blue-950 text-white py-4 px-6 shadow-md">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
@@ -263,65 +262,68 @@ const Index = () => {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 flex-grow">
-        {/* Ícones de navegação em uma única linha */}
-        <div className="flex overflow-x-auto pb-4 mb-12 gap-2">
-          <NavButton 
-            icon={<Home size={24} />} 
-            label="Convenente" 
-            onClick={handleConvenenteClick} 
-          />
-          <NavButton 
-            icon={<FileUp size={24} />} 
-            label="Importar Planilha" 
-            onClick={handleImportarPlanilhaClick} 
-          />
-          <NavButton 
-            icon={<FileSearch size={24} />} 
-            label="Verificar Erros" 
-            onClick={() => {}} 
-          />
-          <NavButton 
-            icon={<Package size={24} />} 
-            label="Gerar Remessa" 
-            onClick={() => {}} 
-          />
-          <NavButton 
-            icon={<Send size={24} />} 
-            label="Enviar ao Banco" 
-            onClick={() => {}} 
-          />
-          <NavButton 
-            icon={<RefreshCw size={24} />} 
-            label="Processar Retornos" 
-            onClick={() => {}} 
-          />
-          <NavButton 
-            icon={<FileText size={24} />} 
-            label="Comprovantes" 
-            onClick={() => {}} 
-          />
-          <NavButton 
-            icon={<Search size={24} />} 
-            label="Consultas" 
-            onClick={() => {}} 
-          />
-          <NavButton 
-            icon={<LayoutDashboard size={24} />} 
-            label="Dashboard" 
-            onClick={() => {}} 
-          />
-          <NavButton 
-            icon={<Shield size={24} />} 
-            label="Setup" 
-            onClick={handleAdminPanelClick} 
-          />
-          <NavButton 
-            icon={<LogOut size={24} />} 
-            label="Sair" 
-            onClick={handleLogoutClick} 
-            className="bg-red-50 dark:bg-red-950 hover:bg-red-100 dark:hover:bg-red-900 border-red-200 dark:border-red-800"
-          />
+      {/* Main content area - with flex-grow to push footer down */}
+      <div className="flex-grow overflow-y-auto">
+        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+          {/* Ícones de navegação em uma única linha */}
+          <div className="flex overflow-x-auto pb-4 mb-12 gap-2">
+            <NavButton 
+              icon={<Home size={24} />} 
+              label="Convenente" 
+              onClick={handleConvenenteClick} 
+            />
+            <NavButton 
+              icon={<FileUp size={24} />} 
+              label="Importar Planilha" 
+              onClick={handleImportarPlanilhaClick} 
+            />
+            <NavButton 
+              icon={<FileSearch size={24} />} 
+              label="Verificar Erros" 
+              onClick={() => {}} 
+            />
+            <NavButton 
+              icon={<Package size={24} />} 
+              label="Gerar Remessa" 
+              onClick={() => {}} 
+            />
+            <NavButton 
+              icon={<Send size={24} />} 
+              label="Enviar ao Banco" 
+              onClick={() => {}} 
+            />
+            <NavButton 
+              icon={<RefreshCw size={24} />} 
+              label="Processar Retornos" 
+              onClick={() => {}} 
+            />
+            <NavButton 
+              icon={<FileText size={24} />} 
+              label="Comprovantes" 
+              onClick={() => {}} 
+            />
+            <NavButton 
+              icon={<Search size={24} />} 
+              label="Consultas" 
+              onClick={() => {}} 
+            />
+            <NavButton 
+              icon={<LayoutDashboard size={24} />} 
+              label="Dashboard" 
+              onClick={() => {}} 
+            />
+            <NavButton 
+              icon={<Shield size={24} />} 
+              label="Setup" 
+              onClick={handleAdminPanelClick} 
+            />
+            <NavButton 
+              icon={<LogOut size={24} />} 
+              label="Sair" 
+              onClick={handleLogoutClick} 
+              className="bg-red-50 dark:bg-red-950 hover:bg-red-100 dark:hover:bg-red-900 border-red-200 dark:border-red-800"
+            />
+          </div>
         </div>
       </div>
       
@@ -478,8 +480,8 @@ const Index = () => {
         </AlertDialogContent>
       </AlertDialog>
       
-      {/* Status bar - Fixed at the bottom */}
-      <footer className="bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-800 dark:to-blue-950 text-white py-3 px-6 mt-auto">
+      {/* Status bar - Now it's outside the scrollable area */}
+      <footer className="bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-800 dark:to-blue-950 text-white py-3 px-6">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div>
             <h2 className="text-xl font-bold">
