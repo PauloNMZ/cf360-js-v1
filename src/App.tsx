@@ -9,7 +9,7 @@ import "./App.css";
 
 function App() {
   return (
-    <ThemeProvider defaultTheme="light">
+    <ThemeProvider defaultTheme="system">
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />

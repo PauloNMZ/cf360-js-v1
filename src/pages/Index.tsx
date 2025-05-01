@@ -1,9 +1,10 @@
-
 import { useState, useEffect } from "react";
 import FormularioModerno from "@/components/FormularioModerno";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { NavButton } from "@/components/ui/NavButton";
 import { 
   Home, 
   FileUp, 
@@ -219,11 +220,12 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white dark:from-blue-950 dark:to-slate-900 dark:text-white flex flex-col">
       {/* Header com gradiente azul */}
-      <header className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-4 px-6 shadow-md">
-        <div className="max-w-7xl mx-auto">
+      <header className="bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-800 dark:to-blue-950 text-white py-4 px-6 shadow-md">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
           <h1 className="text-2xl font-bold">GERADOR DE PAGAMENTOS</h1>
+          <ThemeToggle />
         </div>
       </header>
 
@@ -284,7 +286,7 @@ const Index = () => {
             icon={<LogOut size={24} />} 
             label="Sair" 
             onClick={handleLogoutClick} 
-            className="bg-red-50 hover:bg-red-100 border-red-200"
+            className="bg-red-50 dark:bg-red-950 hover:bg-red-100 dark:hover:bg-red-900 border-red-200 dark:border-red-800"
           />
         </div>
       </div>
@@ -431,7 +433,7 @@ const Index = () => {
       </AlertDialog>
       
       {/* Status bar - Fixed at the bottom */}
-      <footer className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-3 px-6 mt-auto">
+      <footer className="bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-800 dark:to-blue-950 text-white py-3 px-6 mt-auto">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div>
             <h2 className="text-xl font-bold">
@@ -451,21 +453,6 @@ const Index = () => {
         </div>
       </footer>
     </div>
-  );
-};
-
-// Componente auxiliar para os botões de navegação
-const NavButton = ({ icon, label, onClick, className = "" }) => {
-  return (
-    <button 
-      className={`flex-shrink-0 w-24 h-24 bg-white hover:bg-blue-50 rounded-lg shadow-md transition-all hover:shadow-lg border border-blue-100 flex flex-col items-center justify-center p-3 ${className}`}
-      onClick={onClick}
-    >
-      <div className="p-2 bg-blue-100 rounded-full text-blue-700 mb-1">
-        {icon}
-      </div>
-      <span className="text-xs text-gray-800 text-center mt-1">{label}</span>
-    </button>
   );
 };
 
@@ -645,147 +632,4 @@ const AdminPanel = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[100px]">ID</TableHead>
-                <TableHead>App Key</TableHead>
-                <TableHead>Usuário BB SIA</TableHead>
-                <TableHead className="text-right">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {bankConnections.map((connection) => (
-                <TableRow key={connection.id}>
-                  <TableCell className="font-medium">{connection.id}</TableCell>
-                  <TableCell className="max-w-[200px] truncate">{connection.appKey}</TableCell>
-                  <TableCell>{connection.userBBsia || "—"}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        onClick={() => handleEdit(connection)}
-                        variant="ghost"
-                        size="sm"
-                      >
-                        <Edit size={16} />
-                      </Button>
-                      <Button
-                        onClick={() => handleDelete(connection)}
-                        variant="ghost"
-                        size="sm"
-                        className="text-red-600"
-                      >
-                        <TrashIcon size={16} />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          
-          <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Tem certeza que deseja excluir esta conexão bancária?
-                  Esta ação não pode ser desfeita.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
-                  Excluir
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
-      ) : (
-        <div className="bg-white p-6 rounded-lg shadow-sm">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-blue-800">
-              {isEditing ? "Editar Conexão" : "Nova Conexão"}
-            </h3>
-            <Button 
-              onClick={handleBackToMenu}
-              variant="outline"
-              className="text-sm"
-            >
-              Cancelar
-            </Button>
-          </div>
-          
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">App Key</label>
-              <Input 
-                name="appKey"
-                value={formValues.appKey}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Client ID</label>
-              <Input 
-                name="clientId"
-                value={formValues.clientId}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Client Secret</label>
-              <Input 
-                name="clientSecret"
-                value={formValues.clientSecret}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Registrar Token</label>
-              <Input 
-                name="registrarToken"
-                value={formValues.registrarToken}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Basic</label>
-              <Input 
-                name="basic"
-                value={formValues.basic}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Usuário BB SIA</label>
-              <Input 
-                name="userBBsia"
-                value={formValues.userBBsia}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Senha BB SIA</label>
-              <Input 
-                type="password"
-                name="passwordBBsia"
-                value={formValues.passwordBBsia}
-                onChange={handleInputChange}
-              />
-            </div>
-            
-            <div className="flex justify-end mt-6">
-              <Button 
-                onClick={handleSave}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                {isEditing ? "Atualizar" : "Salvar"}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-export default Index;
+                <TableHead className="w-[100px]">ID</Table

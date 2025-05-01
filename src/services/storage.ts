@@ -1,102 +1,79 @@
 
-// Tipos para os dados armazenados
-export type ConvenenteData = {
-  id: string;
-  cnpj: string;
-  razaoSocial: string;
-  endereco: string;
-  numero: string;
-  complemento: string;
-  uf: string;
-  cidade: string;
-  contato: string;
-  fone: string;
-  celular: string;
-  email: string;
-  agencia: string;
-  conta: string;
-  chavePix: string;
-  convenioPag: string;
-  dataCriacao: string;
-  dataAtualizacao: string;
-};
+import { ConvenenteData } from "@/types/convenente";
 
-const STORAGE_KEY = 'gerador-pagamentos-convenentes';
+// Store data in localStorage
+const STORAGE_KEY = 'convenentes';
 
-// Salva um convenente no localStorage
-export const saveConvenente = (data: Omit<ConvenenteData, 'id' | 'dataCriacao' | 'dataAtualizacao'>): ConvenenteData => {
+// Save a new convenente
+export const saveConvenente = (convenente: ConvenenteData): ConvenenteData & { id: string } => {
+  // Get existing convenentes
   const convenentes = getConvenentes();
-  
-  // Gera um ID único
-  const newId = crypto.randomUUID();
-  const now = new Date().toISOString();
-  
-  const newConvenente: ConvenenteData = {
-    ...data,
-    id: newId,
-    dataCriacao: now,
-    dataAtualizacao: now
+
+  // Generate a unique ID
+  const id = Date.now().toString();
+
+  // Add metadata and ID
+  const newConvenente = {
+    ...convenente,
+    id,
+    dataCriacao: new Date().toISOString(),
+    dataAtualizacao: new Date().toISOString()
   };
-  
+
+  // Add to the list
   convenentes.push(newConvenente);
+
+  // Save back to localStorage
   localStorage.setItem(STORAGE_KEY, JSON.stringify(convenentes));
-  
+
   return newConvenente;
 };
 
-// Atualiza um convenente existente
-export const updateConvenente = (id: string, data: Partial<ConvenenteData>): ConvenenteData | null => {
+// Get all convenentes
+export const getConvenentes = (): Array<ConvenenteData & { id: string }> => {
+  const data = localStorage.getItem(STORAGE_KEY);
+  return data ? JSON.parse(data) : [];
+};
+
+// Get a single convenente by ID
+export const getConvenenteById = (id: string): (ConvenenteData & { id: string }) | null => {
+  const convenentes = getConvenentes();
+  return convenentes.find(c => c.id === id) || null;
+};
+
+// Update an existing convenente
+export const updateConvenente = (id: string, updates: Partial<ConvenenteData>): (ConvenenteData & { id: string }) | null => {
   const convenentes = getConvenentes();
   const index = convenentes.findIndex(c => c.id === id);
-  
-  if (index === -1) return null;
-  
-  const updatedConvenente = {
+
+  if (index === -1) {
+    return null;
+  }
+
+  // Update the convenente
+  convenentes[index] = {
     ...convenentes[index],
-    ...data,
+    ...updates,
     dataAtualizacao: new Date().toISOString()
   };
-  
-  convenentes[index] = updatedConvenente;
+
+  // Save back to localStorage
   localStorage.setItem(STORAGE_KEY, JSON.stringify(convenentes));
-  
-  return updatedConvenente;
+
+  return convenentes[index];
 };
 
-// Busca todos os convenentes
-export const getConvenentes = (): ConvenenteData[] => {
-  const data = localStorage.getItem(STORAGE_KEY);
-  if (!data) return [];
-  
-  try {
-    return JSON.parse(data);
-  } catch (error) {
-    console.error('Erro ao carregar convenentes do localStorage:', error);
-    return [];
-  }
-};
-
-// Busca um convenente pelo ID
-export const getConvenenteById = (id: string): ConvenenteData | undefined => {
-  const convenentes = getConvenentes();
-  return convenentes.find(c => c.id === id);
-};
-
-// Busca um convenente pelo CNPJ
-export const getConvenenteByCNPJ = (cnpj: string): ConvenenteData | undefined => {
-  const convenentes = getConvenentes();
-  return convenentes.find(c => c.cnpj.replace(/\D/g, '') === cnpj.replace(/\D/g, ''));
-};
-
-// Remove um convenente
+// Delete a convenente
 export const deleteConvenente = (id: string): boolean => {
   const convenentes = getConvenentes();
-  const filteredConvenentes = convenentes.filter(c => c.id !== id);
+  const newConvenentes = convenentes.filter(c => c.id !== id);
   
-  if (filteredConvenentes.length === convenentes.length) {
-    return false; // Nada foi removido
+  if (newConvenentes.length === convenentes.length) {
+    return false; // Nothing was deleted
   }
   
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(filteredConvenentes));
+  // Save back to localStorage
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(newConvenentes));
+  
   return true;
 };
