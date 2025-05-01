@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import FormularioModerno from "@/components/FormularioModerno";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -5,6 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { NavButton } from "@/components/ui/NavButton";
+import { AppLogo } from "@/components/ui/AppLogo";
 import AdminPanel from "@/components/AdminPanel";
 import ImportarPlanilha from "@/components/ImportarPlanilha";
 import { 
@@ -266,7 +268,10 @@ const Index = () => {
       {/* Header com gradiente azul */}
       <header className="bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-800 dark:to-blue-950 text-white py-4 px-6 shadow-md">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <h1 className="text-2xl font-bold">GERADOR DE PAGAMENTOS</h1>
+          <div className="flex items-center gap-3">
+            <AppLogo size={28} />
+            <h1 className="text-2xl font-bold">GERADOR DE PAGAMENTOS</h1>
+          </div>
           <ThemeToggle />
         </div>
       </header>
