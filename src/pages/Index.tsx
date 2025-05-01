@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import FormularioModerno from "@/components/FormularioModerno";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -634,4 +635,157 @@ const AdminPanel = () => {
               </Button>
               <Button 
                 onClick={handleCreateNew}
-                className="bg-green-600 hover:bg-green-700 text-
+                className="bg-green-600 hover:bg-green-700 text-sm"
+              >
+                Nova Conexão
+              </Button>
+            </div>
+          </div>
+          
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[100px]">ID</TableHead>
+                <TableHead>App Key</TableHead>
+                <TableHead>Usuário BB SIA</TableHead>
+                <TableHead className="text-right">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {bankConnections.map((connection) => (
+                <TableRow key={connection.id}>
+                  <TableCell className="font-medium">{connection.id}</TableCell>
+                  <TableCell className="max-w-[200px] truncate">{connection.appKey}</TableCell>
+                  <TableCell>{connection.userBBsia || "—"}</TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        onClick={() => handleEdit(connection)}
+                        variant="ghost"
+                        size="sm"
+                      >
+                        <Edit size={16} />
+                      </Button>
+                      <Button
+                        onClick={() => handleDelete(connection)}
+                        variant="ghost"
+                        size="sm"
+                        className="text-red-600"
+                      >
+                        <TrashIcon size={16} />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          
+          <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Tem certeza que deseja excluir esta conexão bancária?
+                  Esta ação não pode ser desfeita.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
+                  Excluir
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      ) : (
+        <div className="bg-white p-6 rounded-lg shadow-sm">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-bold text-blue-800">
+              {isEditing ? "Editar Conexão" : "Nova Conexão"}
+            </h3>
+            <Button 
+              onClick={handleBackToMenu}
+              variant="outline"
+              className="text-sm"
+            >
+              Cancelar
+            </Button>
+          </div>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">App Key</label>
+              <Input 
+                name="appKey"
+                value={formValues.appKey}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Client ID</label>
+              <Input 
+                name="clientId"
+                value={formValues.clientId}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Client Secret</label>
+              <Input 
+                name="clientSecret"
+                value={formValues.clientSecret}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Registrar Token</label>
+              <Input 
+                name="registrarToken"
+                value={formValues.registrarToken}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Basic</label>
+              <Input 
+                name="basic"
+                value={formValues.basic}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Usuário BB SIA</label>
+              <Input 
+                name="userBBsia"
+                value={formValues.userBBsia}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Senha BB SIA</label>
+              <Input 
+                type="password"
+                name="passwordBBsia"
+                value={formValues.passwordBBsia}
+                onChange={handleInputChange}
+              />
+            </div>
+            
+            <div className="flex justify-end mt-6">
+              <Button 
+                onClick={handleSave}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                {isEditing ? "Atualizar" : "Salvar"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Index;
