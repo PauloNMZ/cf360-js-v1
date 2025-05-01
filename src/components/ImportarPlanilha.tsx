@@ -1,13 +1,15 @@
-
 import React, { useState, useEffect } from 'react';
 import { FileUpload } from '@/components/ui/file-upload';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/sonner';
-import { AlertCircle, CheckCircle, FileText, AlertTriangle, Trash2 } from 'lucide-react';
+import { AlertCircle, CheckCircle, FileText, AlertTriangle, Trash2, Upload, Database } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 import * as XLSX from 'xlsx';
 
 // Define the expected column headers
@@ -37,6 +39,8 @@ const ImportarPlanilha = () => {
   const [selectAll, setSelectAll] = useState(false);
   const [showTable, setShowTable] = useState(false);
   const [total, setTotal] = useState<number>(0);
+  const [showSendDialog, setShowSendDialog] = useState(false);
+  const [sendMethod, setSendMethod] = useState<string>("cnab");
 
   const handleFileChange = (files: File[]) => {
     if (files.length > 0) {
@@ -195,9 +199,25 @@ const ImportarPlanilha = () => {
       return;
     }
 
-    toast.success(`Processando ${selectedRows.length} registros...`);
-    // Aqui seria implementada a lógica de processamento da planilha
+    // Show dialog to choose sending method
+    setShowSendDialog(true);
+  };
+
+  const handleSendPayments = () => {
+    const selectedRows = tableData.filter(row => row.selected);
+    
+    // Close the dialog
+    setShowSendDialog(false);
+    
+    // Display success message based on selected method
+    if (sendMethod === "cnab") {
+      toast.success(`Enviando ${selectedRows.length} pagamentos via arquivo CNAB...`);
+    } else if (sendMethod === "api") {
+      toast.success(`Enviando ${selectedRows.length} pagamentos via API REST...`);
+    }
+    
     console.log("Dados selecionados para processamento:", selectedRows);
+    console.log("Método de envio selecionado:", sendMethod);
   };
 
   return (
@@ -409,6 +429,57 @@ const ImportarPlanilha = () => {
           </div>
         )}
       </div>
+
+      {/* Dialog para escolher método de envio */}
+      <Dialog open={showSendDialog} onOpenChange={setShowSendDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Método de envio ao banco</DialogTitle>
+          </DialogHeader>
+          
+          <div className="py-6">
+            <RadioGroup value={sendMethod} onValueChange={setSendMethod} className="space-y-4">
+              <div className="flex items-center space-x-3 space-y-0 border rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
+                <RadioGroupItem value="cnab" id="cnab" />
+                <Label htmlFor="cnab" className="flex flex-1 items-center space-x-3 cursor-pointer">
+                  <Upload className="h-5 w-5 text-blue-600" />
+                  <div className="space-y-1">
+                    <p className="font-medium leading-none">Arquivo CNAB</p>
+                    <p className="text-sm text-gray-500">Gerar arquivo no padrão CNAB para envio ao banco</p>
+                  </div>
+                </Label>
+              </div>
+              
+              <div className="flex items-center space-x-3 space-y-0 border rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
+                <RadioGroupItem value="api" id="api" />
+                <Label htmlFor="api" className="flex flex-1 items-center space-x-3 cursor-pointer">
+                  <Database className="h-5 w-5 text-purple-600" />
+                  <div className="space-y-1">
+                    <p className="font-medium leading-none">API REST</p>
+                    <p className="text-sm text-gray-500">Enviar pagamentos diretamente via API do banco</p>
+                  </div>
+                </Label>
+              </div>
+            </RadioGroup>
+          </div>
+          
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowSendDialog(false)}
+              className="mr-2"
+            >
+              Cancelar
+            </Button>
+            <Button 
+              onClick={handleSendPayments}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              Continuar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </ScrollArea>
   );
 };
