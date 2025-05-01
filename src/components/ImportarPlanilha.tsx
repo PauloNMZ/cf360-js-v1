@@ -2,7 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { FileUpload } from '@/components/ui/file-upload';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/sonner';
-import { AlertCircle, CheckCircle, FileText, AlertTriangle, Trash2, Upload, Database } from 'lucide-react';
+import { 
+  AlertCircle, 
+  CheckCircle, 
+  FileText, 
+  AlertTriangle, 
+  Trash2, 
+  Upload, 
+  Code, 
+  CreditCard, 
+  Calendar as CalendarIcon, 
+  ChevronRight, 
+  ChevronLeft,
+  Banknote,
+  PiggyBank,
+  Coins
+} from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -10,11 +25,59 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { format } from 'date-fns';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ConvenenteData } from '@/types/convenente';
 import * as XLSX from 'xlsx';
 
 // Define the expected column headers
 const EXPECTED_HEADERS = [
   'NOME', 'INSCRICAO', 'BANCO', 'AGENCIA', 'CONTA', 'TIPO', 'VALOR'
+];
+
+// Mock data for convenentes - in a real app, this would come from an API or props
+const mockConvenentes: ConvenenteData[] = [
+  {
+    id: '1',
+    cnpj: '12.345.678/0001-90',
+    razaoSocial: 'Empresa ABC Ltda',
+    endereco: 'Rua Principal',
+    numero: '123',
+    complemento: 'Sala 45',
+    uf: 'SP',
+    cidade: 'São Paulo',
+    contato: 'João Silva',
+    fone: '(11) 3333-4444',
+    celular: '(11) 99999-8888',
+    email: 'contato@empresaabc.com.br',
+    agencia: '1234',
+    conta: '56789-0',
+    chavePix: 'empresa@abc.com.br',
+    convenioPag: '12345'
+  },
+  {
+    id: '2',
+    cnpj: '98.765.432/0001-21',
+    razaoSocial: 'Comércio XYZ S.A.',
+    endereco: 'Av. Comercial',
+    numero: '789',
+    complemento: 'Andar 10',
+    uf: 'RJ',
+    cidade: 'Rio de Janeiro',
+    contato: 'Maria Oliveira',
+    fone: '(21) 2222-3333',
+    celular: '(21) 98888-7777',
+    email: 'contato@comercioxyz.com.br',
+    agencia: '5678',
+    conta: '12345-6',
+    chavePix: '98.765.432/0001-21',
+    convenioPag: '67890'
+  }
 ];
 
 interface PlanilhaData {
@@ -30,7 +93,16 @@ interface RowData {
   selected?: boolean;
 }
 
+// Define types for our workflow steps
+interface PaymentWorkflow {
+  paymentDate: Date | undefined;
+  serviceType: string;
+  convenente: ConvenenteData | null;
+  sendMethod: string;
+}
+
 const ImportarPlanilha = () => {
+  // Original state for file handling
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [planilhaData, setPlanilhaData] = useState<PlanilhaData | null>(null);
@@ -39,9 +111,18 @@ const ImportarPlanilha = () => {
   const [selectAll, setSelectAll] = useState(false);
   const [showTable, setShowTable] = useState(false);
   const [total, setTotal] = useState<number>(0);
-  const [showSendDialog, setShowSendDialog] = useState(false);
-  const [sendMethod, setSendMethod] = useState<string>("cnab");
-
+  
+  // New state for multi-step workflow
+  const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
+  const [currentStep, setCurrentStep] = useState<number>(1);
+  const [workflow, setWorkflow] = useState<PaymentWorkflow>({
+    paymentDate: undefined,
+    serviceType: "Pagamentos Diversos",
+    convenente: null,
+    sendMethod: "cnab"
+  });
+  
+  // Original file handling functions
   const handleFileChange = (files: File[]) => {
     if (files.length > 0) {
       setFile(files[0]);
@@ -191,6 +272,7 @@ const ImportarPlanilha = () => {
     toast.success(`Mostrando ${tableData.length} registros.`);
   };
 
+  // New function to handle selected records
   const handleProcessSelected = () => {
     const selectedRows = tableData.filter(row => row.selected);
     
@@ -199,25 +281,273 @@ const ImportarPlanilha = () => {
       return;
     }
 
-    // Show dialog to choose sending method
-    setShowSendDialog(true);
+    // Reset workflow steps and open dialog
+    setWorkflow({
+      paymentDate: undefined,
+      serviceType: "Pagamentos Diversos",
+      convenente: null,
+      sendMethod: "cnab"
+    });
+    setCurrentStep(1);
+    setShowWorkflowDialog(true);
   };
 
-  const handleSendPayments = () => {
+  // Workflow navigation functions
+  const goToNextStep = () => {
+    setCurrentStep(prev => Math.min(prev + 1, 4));
+  };
+
+  const goToPreviousStep = () => {
+    setCurrentStep(prev => Math.max(prev - 1, 1));
+  };
+
+  // Final submission handler
+  const handleSubmitWorkflow = () => {
     const selectedRows = tableData.filter(row => row.selected);
+    setShowWorkflowDialog(false);
     
-    // Close the dialog
-    setShowSendDialog(false);
+    toast.success(`Enviando ${selectedRows.length} pagamentos via ${workflow.sendMethod === 'cnab' ? 'arquivo CNAB' : 'API REST'}...`);
     
-    // Display success message based on selected method
-    if (sendMethod === "cnab") {
-      toast.success(`Enviando ${selectedRows.length} pagamentos via arquivo CNAB...`);
-    } else if (sendMethod === "api") {
-      toast.success(`Enviando ${selectedRows.length} pagamentos via API REST...`);
+    console.log("Dados completos do processamento:", {
+      registros: selectedRows,
+      dataPagamento: workflow.paymentDate,
+      tipoServico: workflow.serviceType,
+      convenente: workflow.convenente,
+      metodoEnvio: workflow.sendMethod
+    });
+  };
+
+  // Function to update workflow data
+  const updateWorkflow = (field: keyof PaymentWorkflow, value: any) => {
+    setWorkflow(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  // Function to check if the current step is valid
+  const isCurrentStepValid = () => {
+    switch (currentStep) {
+      case 1: // Date selection
+        return workflow.paymentDate !== undefined;
+      case 2: // Service type
+        return workflow.serviceType !== "";
+      case 3: // Convenente
+        return workflow.convenente !== null;
+      case 4: // Send method
+        return workflow.sendMethod !== "";
+      default:
+        return false;
     }
-    
-    console.log("Dados selecionados para processamento:", selectedRows);
-    console.log("Método de envio selecionado:", sendMethod);
+  };
+
+  // Get step title
+  const getStepTitle = () => {
+    switch (currentStep) {
+      case 1:
+        return "Data de Pagamento";
+      case 2:
+        return "Tipo de Serviço";
+      case 3:
+        return "Selecionar Convenente";
+      case 4:
+        return "Método de Envio";
+      default:
+        return "";
+    }
+  };
+
+  // Render step content
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <div className="py-6 space-y-4">
+            <p className="text-sm text-gray-500">
+              Selecione a data em que os pagamentos serão processados.
+            </p>
+            <div className="flex flex-col items-center space-y-4">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !workflow.paymentDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {workflow.paymentDate ? (
+                      format(workflow.paymentDate, "dd/MM/yyyy")
+                    ) : (
+                      <span>Selecione uma data</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="center">
+                  <Calendar
+                    mode="single"
+                    selected={workflow.paymentDate}
+                    onSelect={(date) => updateWorkflow("paymentDate", date)}
+                    disabled={(date) => date < new Date()}
+                    initialFocus
+                    className={cn("p-3 pointer-events-auto")}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+        );
+
+      case 2:
+        return (
+          <div className="py-6">
+            <p className="text-sm text-gray-500 mb-4">
+              Selecione o tipo de serviço para estes pagamentos.
+            </p>
+            <RadioGroup 
+              value={workflow.serviceType} 
+              onValueChange={(value) => updateWorkflow("serviceType", value)} 
+              className="space-y-3"
+            >
+              <div className="flex items-center space-x-3 space-y-0 border rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
+                <RadioGroupItem value="Pagamentos Diversos" id="diversos" />
+                <Label htmlFor="diversos" className="flex flex-1 items-center space-x-3 cursor-pointer">
+                  <Banknote className="h-5 w-5 text-blue-600" />
+                  <div className="space-y-0.5">
+                    <p className="font-medium leading-none">Pagamentos Diversos</p>
+                    <p className="text-sm text-gray-500">Pagamentos para qualquer finalidade</p>
+                  </div>
+                </Label>
+              </div>
+              
+              <div className="flex items-center space-x-3 space-y-0 border rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
+                <RadioGroupItem value="Pagamentos de Salarios" id="salarios" />
+                <Label htmlFor="salarios" className="flex flex-1 items-center space-x-3 cursor-pointer">
+                  <CreditCard className="h-5 w-5 text-green-600" />
+                  <div className="space-y-0.5">
+                    <p className="font-medium leading-none">Pagamentos de Salários</p>
+                    <p className="text-sm text-gray-500">Folha de pagamento e benefícios</p>
+                  </div>
+                </Label>
+              </div>
+              
+              <div className="flex items-center space-x-3 space-y-0 border rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
+                <RadioGroupItem value="Pagamento de Fornecedores" id="fornecedores" />
+                <Label htmlFor="fornecedores" className="flex flex-1 items-center space-x-3 cursor-pointer">
+                  <Coins className="h-5 w-5 text-orange-600" />
+                  <div className="space-y-0.5">
+                    <p className="font-medium leading-none">Pagamento de Fornecedores</p>
+                    <p className="text-sm text-gray-500">Pagamentos para fornecedores e prestadores</p>
+                  </div>
+                </Label>
+              </div>
+              
+              <div className="flex items-center space-x-3 space-y-0 border rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
+                <RadioGroupItem value="Pix Transferências" id="pix" />
+                <Label htmlFor="pix" className="flex flex-1 items-center space-x-3 cursor-pointer">
+                  <PiggyBank className="h-5 w-5 text-purple-600" />
+                  <div className="space-y-0.5">
+                    <p className="font-medium leading-none">Pix Transferências</p>
+                    <p className="text-sm text-gray-500">Transferências via Pix</p>
+                  </div>
+                </Label>
+              </div>
+            </RadioGroup>
+          </div>
+        );
+
+      case 3:
+        return (
+          <div className="py-6 space-y-4">
+            <p className="text-sm text-gray-500 mb-4">
+              Selecione o convenente responsável pelos pagamentos.
+            </p>
+            
+            <Select
+              value={workflow.convenente?.id || ""}
+              onValueChange={(value) => {
+                const selected = mockConvenentes.find(c => c.id === value) || null;
+                updateWorkflow("convenente", selected);
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione um convenente" />
+              </SelectTrigger>
+              <SelectContent>
+                {mockConvenentes.map((convenente) => (
+                  <SelectItem key={convenente.id} value={convenente.id || ""}>
+                    {convenente.razaoSocial}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            {workflow.convenente && (
+              <Card className="mt-4">
+                <CardHeader className="py-3">
+                  <CardTitle className="text-md">Detalhes do Convenente</CardTitle>
+                </CardHeader>
+                <CardContent className="py-2">
+                  <dl className="text-sm divide-y">
+                    <div className="grid grid-cols-3 py-2">
+                      <dt className="font-medium text-gray-500">CNPJ:</dt>
+                      <dd className="col-span-2">{workflow.convenente.cnpj}</dd>
+                    </div>
+                    <div className="grid grid-cols-3 py-2">
+                      <dt className="font-medium text-gray-500">Razão Social:</dt>
+                      <dd className="col-span-2">{workflow.convenente.razaoSocial}</dd>
+                    </div>
+                    <div className="grid grid-cols-3 py-2">
+                      <dt className="font-medium text-gray-500">Banco:</dt>
+                      <dd className="col-span-2">Ag {workflow.convenente.agencia} - Conta {workflow.convenente.conta}</dd>
+                    </div>
+                    <div className="grid grid-cols-3 py-2">
+                      <dt className="font-medium text-gray-500">Convênio:</dt>
+                      <dd className="col-span-2">{workflow.convenente.convenioPag}</dd>
+                    </div>
+                  </dl>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        );
+
+      case 4:
+        return (
+          <div className="py-6">
+            <p className="text-sm text-gray-500 mb-4">
+              Selecione o método para enviar estes pagamentos ao banco.
+            </p>
+            <RadioGroup value={workflow.sendMethod} onValueChange={(value) => updateWorkflow("sendMethod", value)} className="space-y-4">
+              <div className="flex items-center space-x-3 space-y-0 border rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
+                <RadioGroupItem value="cnab" id="cnab" />
+                <Label htmlFor="cnab" className="flex flex-1 items-center space-x-3 cursor-pointer">
+                  <Upload className="h-5 w-5 text-blue-600" />
+                  <div className="space-y-1">
+                    <p className="font-medium leading-none">Arquivo CNAB</p>
+                    <p className="text-sm text-gray-500">Gerar arquivo no padrão CNAB para envio ao banco</p>
+                  </div>
+                </Label>
+              </div>
+              
+              <div className="flex items-center space-x-3 space-y-0 border rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
+                <RadioGroupItem value="api" id="api" />
+                <Label htmlFor="api" className="flex flex-1 items-center space-x-3 cursor-pointer">
+                  <Code className="h-5 w-5 text-purple-600" />
+                  <div className="space-y-1">
+                    <p className="font-medium leading-none">API REST</p>
+                    <p className="text-sm text-gray-500">Enviar pagamentos diretamente via API do banco</p>
+                  </div>
+                </Label>
+              </div>
+            </RadioGroup>
+          </div>
+        );
+
+      default:
+        return null;
+    }
   };
 
   return (
@@ -430,58 +760,43 @@ const ImportarPlanilha = () => {
         )}
       </div>
 
-      {/* Dialog para escolher método de envio */}
-      <Dialog open={showSendDialog} onOpenChange={setShowSendDialog}>
+      {/* Multi-step workflow dialog */}
+      <Dialog open={showWorkflowDialog} onOpenChange={setShowWorkflowDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Método de envio ao banco</DialogTitle>
+            <DialogTitle>{getStepTitle()}</DialogTitle>
           </DialogHeader>
           
-          <div className="py-6">
-            <RadioGroup value={sendMethod} onValueChange={setSendMethod} className="space-y-4">
-              <div className="flex items-center space-x-3 space-y-0 border rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
-                <RadioGroupItem value="cnab" id="cnab" />
-                <Label htmlFor="cnab" className="flex flex-1 items-center space-x-3 cursor-pointer">
-                  <Upload className="h-5 w-5 text-blue-600" />
-                  <div className="space-y-1">
-                    <p className="font-medium leading-none">Arquivo CNAB</p>
-                    <p className="text-sm text-gray-500">Gerar arquivo no padrão CNAB para envio ao banco</p>
-                  </div>
-                </Label>
-              </div>
-              
-              <div className="flex items-center space-x-3 space-y-0 border rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
-                <RadioGroupItem value="api" id="api" />
-                <Label htmlFor="api" className="flex flex-1 items-center space-x-3 cursor-pointer">
-                  <Database className="h-5 w-5 text-purple-600" />
-                  <div className="space-y-1">
-                    <p className="font-medium leading-none">API REST</p>
-                    <p className="text-sm text-gray-500">Enviar pagamentos diretamente via API do banco</p>
-                  </div>
-                </Label>
-              </div>
-            </RadioGroup>
-          </div>
+          {/* Step Content */}
+          {renderStepContent()}
           
-          <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={() => setShowSendDialog(false)}
-              className="mr-2"
-            >
-              Cancelar
-            </Button>
-            <Button 
-              onClick={handleSendPayments}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              Continuar
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </ScrollArea>
-  );
-};
-
-export default ImportarPlanilha;
+          {/* Step Navigation */}
+          <DialogFooter className="flex justify-between items-center">
+            <div className="flex items-center text-sm text-gray-500">
+              Passo {currentStep} de 4
+            </div>
+            <div className="space-x-2">
+              {currentStep > 1 && (
+                <Button 
+                  variant="outline" 
+                  onClick={goToPreviousStep}
+                  className="flex items-center"
+                >
+                  <ChevronLeft className="mr-1 h-4 w-4" />
+                  Voltar
+                </Button>
+              )}
+              
+              {currentStep < 4 ? (
+                <Button 
+                  onClick={goToNextStep}
+                  disabled={!isCurrentStepValid()}
+                  className="flex items-center"
+                >
+                  Avançar
+                  <ChevronRight className="ml-1 h-4 w-4" />
+                </Button>
+              ) : (
+                <Button 
+                  onClick={handleSubmitWorkflow}
+                  className="bg-green-600 hover:bg
