@@ -113,7 +113,10 @@ export const useIndexPageActions = (
         // Update list and select new convenente
         const updatedConvenentes = await getConvenentes();
         setConvenentes(updatedConvenentes);
-        setCurrentConvenenteId(newConvenente.id);
+        
+        // Limpar os campos e voltar para modo de visualização
+        setFormData({...emptyConvenente});
+        setCurrentConvenenteId(null);
       } else {
         // Update existing convenente
         const updatedConvenente = await updateConvenente(currentConvenenteId, formData);
@@ -127,6 +130,10 @@ export const useIndexPageActions = (
           // Update list
           const updatedConvenentes = await getConvenentes();
           setConvenentes(updatedConvenentes);
+          
+          // Limpar os campos
+          setFormData({...emptyConvenente});
+          setCurrentConvenenteId(null);
         } else {
           toast({
             title: "Erro ao atualizar",

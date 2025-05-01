@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { 
   getConvenentes, 
@@ -30,36 +30,47 @@ export const useIndexPage = () => {
     companyName: 'Gerador de Pagamentos'
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [dataLoaded, setDataLoaded] = useState(false);
 
-  // Load convenentes when modal is opened
+  // Load convenentes when modal is opened only once
   useEffect(() => {
     const loadConvenentes = async () => {
-      setIsLoading(true);
-      try {
-        const loadedConvenentes = await getConvenentes();
-        setConvenentes(loadedConvenentes);
-        setFilteredConvenentes(loadedConvenentes);
-      } catch (error) {
-        console.error("Erro ao carregar convenentes:", error);
-        toast({
-          title: "Erro ao carregar dados",
-          description: "Ocorreu um erro ao buscar os convenentes.",
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
+      if (modalOpen && !dataLoaded) {
+        setIsLoading(true);
+        try {
+          const loadedConvenentes = await getConvenentes();
+          setConvenentes(loadedConvenentes);
+          setFilteredConvenentes(loadedConvenentes);
+          setDataLoaded(true);
+        } catch (error) {
+          console.error("Erro ao carregar convenentes:", error);
+          toast({
+            title: "Erro ao carregar dados",
+            description: "Ocorreu um erro ao buscar os convenentes.",
+            variant: "destructive",
+          });
+        } finally {
+          setIsLoading(false);
+        }
       }
     };
 
-    // Load company settings
+    loadConvenentes();
+  }, [modalOpen, toast, dataLoaded]);
+
+  // Reset data loaded when modal is closed
+  useEffect(() => {
+    if (!modalOpen) {
+      setDataLoaded(false);
+    }
+  }, [modalOpen]);
+
+  // Load company settings
+  useEffect(() => {
     const settings = getCompanySettings();
     setCompanySettings(settings);
-    
-    if (modalOpen) {
-      loadConvenentes();
-    }
-  }, [modalOpen, toast]);
-
+  }, []);
+  
   // Reload company settings when admin panel is closed
   useEffect(() => {
     if (!adminPanelOpen) {
@@ -101,7 +112,7 @@ export const useIndexPage = () => {
     setSearchTerm(e.target.value);
   };
 
-  const handleSelectConvenente = async (convenente: ConvenenteData & { id: string }) => {
+  const handleSelectConvenente = useCallback(async (convenente: ConvenenteData & { id: string }) => {
     setCurrentConvenenteId(convenente.id);
     
     try {
@@ -122,7 +133,7 @@ export const useIndexPage = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [toast]);
 
   const handleFormDataChange = (data: ConvenenteData) => {
     setFormData(data);
@@ -146,7 +157,7 @@ export const useIndexPage = () => {
     formData,
     setFormData,
     formValid,
-    setFormValid, // Explicitly returning this now
+    setFormValid,
     convenentes,
     setConvenentes,
     currentConvenenteId,

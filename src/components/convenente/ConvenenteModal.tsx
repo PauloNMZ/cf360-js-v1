@@ -1,12 +1,12 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AlertCircle, Edit, Plus, Save, Search, TrashIcon } from "lucide-react";
 import FormularioModerno from "@/components/FormularioModerno";
-import { ConvenenteData } from "@/types/convenente";
+import { ConvenenteData, emptyConvenente } from "@/types/convenente";
 import { formatCNPJ } from "@/utils/formValidation";
 
 type ConvenenteModalProps = {
@@ -48,6 +48,13 @@ const ConvenenteModal = ({
   onSave,
   onFormDataChange,
 }: ConvenenteModalProps) => {
+  // Reset form data when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      onFormDataChange({...emptyConvenente});
+    }
+  }, [isOpen, onFormDataChange]);
+  
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-6xl">

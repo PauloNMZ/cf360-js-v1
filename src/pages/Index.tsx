@@ -11,6 +11,7 @@ import ConvenenteModal from "@/components/convenente/ConvenenteModal";
 import DeleteConvenenteDialog from "@/components/convenente/DeleteConvenenteDialog";
 import ImportacaoModal from "@/components/importacao/ImportacaoModal";
 import AdminPanelModal from "@/components/admin/AdminPanelModal";
+import { emptyConvenente } from "@/types/convenente";
 
 const Index = () => {
   const { signOut } = useAuth();
@@ -29,7 +30,7 @@ const Index = () => {
     formData,
     setFormData,
     formValid,
-    setFormValid, // Make sure this is properly destructured from useIndexPage
+    setFormValid,
     convenentes,
     setConvenentes,
     currentConvenenteId,
@@ -70,10 +71,23 @@ const Index = () => {
 
   const handleLogoutClick = async () => {
     await signOut();
+    // Limpar todos os dados após logout
+    setFormData({...emptyConvenente});
+    setCurrentConvenenteId(null);
   };
 
   const handleAdminPanelClick = () => {
     setAdminPanelOpen(true);
+  };
+
+  // Limpa os dados quando o modal de convenente é fechado
+  const handleConvenenteModalOpenChange = (open: boolean) => {
+    setModalOpen(open);
+    if (!open) {
+      setFormData({...emptyConvenente});
+      setCurrentConvenenteId(null);
+      setFormMode('view');
+    }
   };
 
   return (
@@ -90,7 +104,7 @@ const Index = () => {
       {/* Modals */}
       <ConvenenteModal 
         isOpen={modalOpen}
-        onOpenChange={setModalOpen}
+        onOpenChange={handleConvenenteModalOpenChange}
         convenentes={convenentes}
         filteredConvenentes={filteredConvenentes}
         currentConvenenteId={currentConvenenteId}
