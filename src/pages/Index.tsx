@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import FormularioModerno from "@/components/FormularioModerno";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -9,6 +8,7 @@ import { NavButton } from "@/components/ui/NavButton";
 import { AppLogo } from "@/components/ui/AppLogo";
 import AdminPanel from "@/components/AdminPanel";
 import ImportarPlanilha from "@/components/ImportarPlanilha";
+import { useAuth } from "@/hooks/use-auth";
 import { 
   Home, 
   FileUp, 
@@ -48,6 +48,7 @@ import { getContentContainerStyle } from "@/utils/viewportUtils";
 
 const Index = () => {
   const { toast } = useToast();
+  const { signOut, user } = useAuth();
   const [modalOpen, setModalOpen] = useState(false);
   const [importModalOpen, setImportModalOpen] = useState(false);
   const [adminPanelOpen, setAdminPanelOpen] = useState(false);
@@ -143,13 +144,9 @@ const Index = () => {
     setImportModalOpen(true);
   };
 
-  const handleLogoutClick = () => {
+  const handleLogoutClick = async () => {
     console.log("Logout button clicked");
-    // In a real application, this would handle the logout process
-    toast({
-      title: "Até logo!",
-      description: "Você foi desconectado do sistema com sucesso.",
-    });
+    await signOut();
   };
 
   const handleAdminPanelClick = () => {
@@ -290,7 +287,12 @@ const Index = () => {
             <AppLogo size={28} customLogoUrl={companySettings.logoUrl} />
             <h1 className="text-2xl font-bold">Gerador de Pagamentos</h1>
           </div>
-          <ThemeToggle />
+          <div className="flex items-center space-x-4">
+            {user && (
+              <p className="text-sm hidden sm:block">Conectado como: {user.email}</p>
+            )}
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 
