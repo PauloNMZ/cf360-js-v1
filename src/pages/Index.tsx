@@ -68,10 +68,17 @@ const Index = () => {
     } else {
       const searchLower = searchTerm.toLowerCase();
       const filtered = convenentes.filter(
-        conv => 
-          conv.razaoSocial.toLowerCase().includes(searchLower) || 
-          // Remove formatting from CNPJ before comparing
-          conv.cnpj.replace(/\D/g, '').includes(searchTerm.replace(/\D/g, ''))
+        conv => {
+          // Procura pelo nome (razaoSocial) - converter para minúsculas para comparar
+          const nameMatch = conv.razaoSocial.toLowerCase().includes(searchLower);
+          
+          // Procura pelo CNPJ - remover formatação antes de comparar
+          const cnpjClean = conv.cnpj.replace(/\D/g, '');
+          const searchTermClean = searchTerm.replace(/\D/g, '');
+          const cnpjMatch = cnpjClean.includes(searchTermClean);
+          
+          return nameMatch || cnpjMatch;
+        }
       );
       console.log("Search term:", searchTerm);
       console.log("Filtered convenentes:", filtered);
