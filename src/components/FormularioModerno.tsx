@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,7 +36,7 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
   const [formData, setFormData] = useState<ConvenenteData>({...emptyConvenente});
   const [errors, setErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
-  const [dataLoaded, setDataLoaded] = useState(false); // Add a flag to track when data has been loaded
+  const [dataLoaded, setDataLoaded] = useState(false);
 
   useEffect(() => {
     // Initialize form with provided data, if any
@@ -128,7 +127,7 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
       };
       
       setFormData(formattedData);
-      setDataLoaded(true); // Set the flag to indicate data has been loaded
+      setDataLoaded(true);
       
       setTouched({
         cnpj: true,
@@ -156,10 +155,13 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
   const handleCNPJSearch = () => {
     // Remove non-numeric characters
     const cnpjClean = cnpjInput.replace(/\D/g, '');
-    if (cnpjClean.length !== 14) {
+    
+    // Removed CNPJ validation check, passing directly to the API
+    // Just check if the CNPJ has some input
+    if (!cnpjClean) {
       toast({
-        title: "CNPJ inválido",
-        description: "Digite um CNPJ válido com 14 dígitos.",
+        title: "Campo vazio",
+        description: "Digite um CNPJ para pesquisar.",
         variant: "destructive",
       });
       return;

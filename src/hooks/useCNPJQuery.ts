@@ -34,28 +34,22 @@ export const useCNPJQuery = ({ onSuccess, onError }: UseCNPJQueryProps = {}) => 
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<CNPJData | null>(null);
 
-  const validateAndCleanCNPJ = (cnpj: string): { isValid: boolean; cleanCNPJ: string } => {
-    const cleanCNPJ = cnpj.replace(/\D/g, '');
-    const isValid = validateCNPJ(cleanCNPJ);
-    return { isValid, cleanCNPJ };
+  const cleanCNPJ = (cnpj: string): string => {
+    return cnpj.replace(/\D/g, '');
   };
 
   const fetchCNPJ = async (cnpj: string) => {
     setError(null);
     
-    const { isValid, cleanCNPJ } = validateAndCleanCNPJ(cnpj);
+    const cleanedCNPJ = cleanCNPJ(cnpj);
     
-    if (!isValid) {
-      const errorMessage = 'CNPJ inválido. Verifique os dígitos informados.';
-      setError(errorMessage);
-      if (onError) onError(errorMessage);
-      return { success: false, error: errorMessage };
-    }
+    // Removed CNPJ validation check as requested
+    // The API will handle invalid CNPJs with appropriate errors
     
     setIsLoading(true);
     
     try {
-      const response = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${cleanCNPJ}`);
+      const response = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${cleanedCNPJ}`);
       
       if (!response.ok) {
         const errorData = await response.json();
