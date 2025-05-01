@@ -2,6 +2,51 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { ConvenenteData } from "@/types/convenente";
 
+// Função para converter de camelCase para snake_case
+const mapToSnakeCase = (convenente: ConvenenteData): any => {
+  return {
+    cnpj: convenente.cnpj,
+    razao_social: convenente.razaoSocial,
+    endereco: convenente.endereco,
+    numero: convenente.numero,
+    complemento: convenente.complemento,
+    uf: convenente.uf,
+    cidade: convenente.cidade,
+    contato: convenente.contato,
+    fone: convenente.fone,
+    celular: convenente.celular,
+    email: convenente.email,
+    agencia: convenente.agencia,
+    conta: convenente.conta,
+    chave_pix: convenente.chavePix,
+    convenio_pag: convenente.convenioPag
+  };
+};
+
+// Função para converter de snake_case para camelCase
+const mapToCamelCase = (data: any): ConvenenteData & { id: string } => {
+  return {
+    id: data.id,
+    cnpj: data.cnpj,
+    razaoSocial: data.razao_social,
+    endereco: data.endereco || "",
+    numero: data.numero || "",
+    complemento: data.complemento || "",
+    uf: data.uf || "",
+    cidade: data.cidade || "",
+    contato: data.contato || "",
+    fone: data.fone || "",
+    celular: data.celular || "",
+    email: data.email || "",
+    agencia: data.agencia || "",
+    conta: data.conta || "",
+    chavePix: data.chave_pix || "",
+    convenioPag: data.convenio_pag || "",
+    dataCriacao: data.data_criacao,
+    dataAtualizacao: data.data_atualizacao
+  };
+};
+
 // Salvar um novo convenente
 export const saveConvenente = async (convenente: ConvenenteData): Promise<ConvenenteData & { id: string }> => {
   // Obter o usuário atual
@@ -13,7 +58,7 @@ export const saveConvenente = async (convenente: ConvenenteData): Promise<Conven
 
   // Adicionar metadata e ID
   const convenenteToSave = {
-    ...convenente,
+    ...mapToSnakeCase(convenente),
     user_id: user.id,
     data_criacao: new Date().toISOString(),
     data_atualizacao: new Date().toISOString()
@@ -31,7 +76,7 @@ export const saveConvenente = async (convenente: ConvenenteData): Promise<Conven
     throw new Error(error.message || "Erro ao salvar convenente");
   }
 
-  return data;
+  return mapToCamelCase(data);
 };
 
 // Obter todos os convenentes do usuário atual
@@ -53,7 +98,7 @@ export const getConvenentes = async (): Promise<Array<ConvenenteData & { id: str
     throw new Error(error.message || "Erro ao buscar convenentes");
   }
 
-  return data || [];
+  return (data || []).map(item => mapToCamelCase(item));
 };
 
 // Obter um convenente pelo ID
@@ -80,7 +125,7 @@ export const getConvenenteById = async (id: string): Promise<(ConvenenteData & {
     throw new Error(error.message || "Erro ao buscar convenente");
   }
 
-  return data;
+  return mapToCamelCase(data);
 };
 
 // Atualizar um convenente existente
@@ -93,7 +138,7 @@ export const updateConvenente = async (id: string, updates: Partial<ConvenenteDa
 
   // Preparar dados para atualização
   const updateData = {
-    ...updates,
+    ...mapToSnakeCase(updates as ConvenenteData),
     data_atualizacao: new Date().toISOString()
   };
 
@@ -111,7 +156,7 @@ export const updateConvenente = async (id: string, updates: Partial<ConvenenteDa
     throw new Error(error.message || "Erro ao atualizar convenente");
   }
 
-  return data;
+  return mapToCamelCase(data);
 };
 
 // Excluir um convenente
