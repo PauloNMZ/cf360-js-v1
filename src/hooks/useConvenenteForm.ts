@@ -33,6 +33,7 @@ export const useConvenenteForm = ({
 
   const {
     cnpjInput,
+    setCnpjInput,
     isLoading,
     handleCNPJSearch,
     handleCNPJChange
@@ -45,6 +46,12 @@ export const useConvenenteForm = ({
         ...prev,
         ...initialData
       }));
+
+      // Ensure CNPJ input field is populated for editing
+      if (initialData.cnpj) {
+        const { formatCNPJ } = require("@/utils/formValidation");
+        setCnpjInput(formatCNPJ(initialData.cnpj));
+      }
       
       // Mark fields as touched when there's initial data
       if (initialData.razaoSocial) {
@@ -53,8 +60,10 @@ export const useConvenenteForm = ({
           razaoSocial: true
         }));
       }
+
+      setDataLoaded(true);
     }
-  }, [initialData]);
+  }, [initialData, setTouched]);
 
   // Reset form if formMode is 'create'
   useEffect(() => {
@@ -62,6 +71,7 @@ export const useConvenenteForm = ({
       setFormData({...emptyConvenente});
       setTouched({});
       setDataLoaded(false);
+      setCnpjInput('');
     }
   }, [formMode]);
 
@@ -72,7 +82,7 @@ export const useConvenenteForm = ({
     if (onFormDataChange && (dataLoaded || Object.keys(touched).length > 0)) {
       onFormDataChange(formData);
     }
-  }, [formData, dataLoaded, onFormDataChange]);
+  }, [formData, dataLoaded, onFormDataChange, validateForm, touched]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

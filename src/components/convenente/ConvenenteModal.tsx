@@ -48,12 +48,8 @@ const ConvenenteModal = ({
   onSave,
   onFormDataChange,
 }: ConvenenteModalProps) => {
-  // Reset form data when modal closes
-  useEffect(() => {
-    if (!isOpen) {
-      onFormDataChange({...emptyConvenente});
-    }
-  }, [isOpen, onFormDataChange]);
+  // We'll remove this useEffect that was causing the infinite loop
+  // and handle form resets in the parent component instead
   
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>

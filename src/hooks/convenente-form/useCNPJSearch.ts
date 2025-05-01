@@ -101,6 +101,7 @@ export const useCNPJSearch = (
 
   return {
     cnpjInput,
+    setCnpjInput,
     isLoading,
     handleCNPJSearch,
     handleCNPJChange

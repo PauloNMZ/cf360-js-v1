@@ -80,14 +80,22 @@ const Index = () => {
     setAdminPanelOpen(true);
   };
 
-  // Limpa os dados quando o modal de convenente é fechado
+  // Gerencia a abertura/fechamento do modal do convenente
   const handleConvenenteModalOpenChange = (open: boolean) => {
     setModalOpen(open);
+    
+    // Ao fechar o modal, reseta os dados do formulário
     if (!open) {
       setFormData({...emptyConvenente});
       setCurrentConvenenteId(null);
       setFormMode('view');
+      setFormValid(false);
     }
+  };
+
+  // Função para salvar que passa os dados atuais
+  const handleSaveClick = () => {
+    handleSave(formData);
   };
 
   return (
@@ -118,7 +126,7 @@ const Index = () => {
         onCreateNew={handleCreateNew}
         onEdit={handleEdit}
         onDelete={handleDelete}
-        onSave={() => handleSave(formData)}
+        onSave={handleSaveClick}
         onFormDataChange={handleFormDataChange}
       />
 

@@ -62,6 +62,10 @@ export const useIndexPage = () => {
   useEffect(() => {
     if (!modalOpen) {
       setDataLoaded(false);
+      // Reset the form data when modal closes
+      setFormData({...emptyConvenente});
+      setCurrentConvenenteId(null);
+      setFormMode('view');
     }
   }, [modalOpen]);
 
@@ -113,6 +117,8 @@ export const useIndexPage = () => {
   };
 
   const handleSelectConvenente = useCallback(async (convenente: ConvenenteData & { id: string }) => {
+    // First set the mode back to view
+    setFormMode('view');
     setCurrentConvenenteId(convenente.id);
     
     try {
@@ -121,7 +127,6 @@ export const useIndexPage = () => {
       const completeConvenente = await getConvenenteById(convenente.id);
       if (completeConvenente) {
         setFormData(completeConvenente);
-        setFormMode('view');
       }
     } catch (error) {
       console.error("Erro ao carregar detalhes do convenente:", error);
@@ -135,13 +140,15 @@ export const useIndexPage = () => {
     }
   }, [toast]);
 
-  const handleFormDataChange = (data: ConvenenteData) => {
+  const handleFormDataChange = useCallback((data: ConvenenteData) => {
+    console.log("Form data changing:", data.cnpj); // Debugging
     setFormData(data);
+    
     // Check if required fields are filled
     const requiredFields = ['cnpj', 'razaoSocial'];
     const hasRequiredFields = requiredFields.every(field => data[field] && data[field].toString().trim() !== '');
     setFormValid(hasRequiredFields);
-  };
+  }, []);
 
   return {
     modalOpen,
