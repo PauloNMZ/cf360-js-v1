@@ -260,10 +260,10 @@ const ImportarPlanilha = () => {
           {planilhaData && (
             <div className="mt-6">
               <h3 className="text-lg font-semibold mb-2">Prévia dos dados</h3>
-              <ScrollArea className="h-[300px] rounded-lg border border-gray-200 dark:border-gray-800">
+              <div className="rounded-lg border border-gray-200 dark:border-gray-800">
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0 z-10">
+                    <thead className="bg-gray-50 dark:bg-gray-800">
                       <tr>
                         {planilhaData.headers
                           .filter(header => EXPECTED_HEADERS.includes(header))
@@ -295,7 +295,7 @@ const ImportarPlanilha = () => {
                     </tbody>
                   </table>
                 </div>
-              </ScrollArea>
+              </div>
               {planilhaData.rows.length > 5 && (
                 <p className="text-sm text-gray-500 mt-2">
                   Mostrando 5 de {planilhaData.rows.length} registros
