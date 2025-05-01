@@ -1,7 +1,107 @@
+
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
+import { useCNPJQuery } from "@/hooks/useCNPJQuery";
+import { useToast } from "@/components/ui/use-toast";
 
 const FormularioModerno = () => {
+  const { toast } = useToast();
+  const [cnpjInput, setCnpjInput] = useState("");
+  const [formData, setFormData] = useState({
+    cnpj: "",
+    razaoSocial: "",
+    endereco: "",
+    numero: "",
+    complemento: "",
+    uf: "",
+    cidade: "",
+    contato: "",
+    fone: "",
+    celular: "",
+    email: "",
+    agencia: "",
+    conta: "",
+    chavePix: "",
+    convenioPag: ""
+  });
+
+  const { fetchCNPJ, isLoading } = useCNPJQuery({
+    onSuccess: (data) => {
+      setFormData({
+        cnpj: data.cnpj || "",
+        razaoSocial: data.razao_social || "",
+        endereco: data.logradouro || "",
+        numero: data.numero || "",
+        complemento: data.complemento || "",
+        uf: data.uf || "",
+        cidade: data.municipio || "",
+        contato: data.qsa && data.qsa.length > 0 ? data.qsa[0].nome_socio || "" : "",
+        fone: data.ddd_telefone_1 || "",
+        celular: data.ddd_telefone_2 || "",
+        email: data.email || "",
+        agencia: "",  // API não fornece dados bancários
+        conta: "",
+        chavePix: "",
+        convenioPag: ""
+      });
+      toast({
+        title: "Dados encontrados",
+        description: `CNPJ ${data.cnpj} carregado com sucesso.`,
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao consultar CNPJ",
+        description: `${error}`,
+        variant: "destructive",
+      });
+    }
+  });
+
+  const handleCNPJSearch = () => {
+    // Remove caracteres não numéricos
+    const cnpjClean = cnpjInput.replace(/\D/g, '');
+    if (cnpjClean.length !== 14) {
+      toast({
+        title: "CNPJ inválido",
+        description: "Digite um CNPJ válido com 14 dígitos.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    fetchCNPJ(cnpjClean);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Formatação do CNPJ para exibição
+  const formatCNPJ = (value) => {
+    const cnpjClean = value.replace(/\D/g, '');
+    if (cnpjClean.length <= 14) {
+      return cnpjClean
+        .replace(/(\d{2})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d)/, '$1/$2')
+        .replace(/(\d{4})(\d)/, '$1-$2')
+        .replace(/(-\d{2})\d+?$/, '$1');
+    }
+    return cnpjClean.substring(0, 14);
+  };
+
+  const handleCNPJChange = (e) => {
+    const value = e.target.value;
+    setCnpjInput(formatCNPJ(value));
+  };
+
   return (
     <div className="bg-white p-6 rounded-lg">
       <div className="flex items-center justify-between bg-gradient-to-r from-blue-600 to-blue-800 p-4 rounded-lg mb-6">
@@ -25,7 +125,25 @@ const FormularioModerno = () => {
               </span>
               CNPJ
             </label>
-            <Input placeholder="00.000.000/0000-00" className="border-blue-200 focus:border-blue-500 bg-blue-50" />
+            <div className="flex">
+              <Input 
+                placeholder="00.000.000/0000-00" 
+                className="border-blue-200 focus:border-blue-500 bg-blue-50 rounded-r-none" 
+                value={cnpjInput}
+                onChange={handleCNPJChange}
+              />
+              <Button 
+                onClick={handleCNPJSearch} 
+                disabled={isLoading} 
+                className="rounded-l-none bg-blue-600 hover:bg-blue-700"
+              >
+                {isLoading ? (
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                ) : (
+                  <Search className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
           </div>
           
           <div className="flex flex-col space-y-1 md:col-span-1">
@@ -37,7 +155,13 @@ const FormularioModerno = () => {
               </span>
               Razão Social
             </label>
-            <Input placeholder="Nome da empresa" className="border-blue-200 focus:border-blue-500 bg-blue-50" />
+            <Input 
+              placeholder="Nome da empresa" 
+              className="border-blue-200 focus:border-blue-500 bg-blue-50" 
+              name="razaoSocial"
+              value={formData.razaoSocial}
+              onChange={handleInputChange}
+            />
           </div>
 
           <div className="flex flex-col space-y-1">
@@ -49,27 +173,57 @@ const FormularioModerno = () => {
               </span>
               Nome da Rua, Av, Pça, Travessa, etc.
             </label>
-            <Input placeholder="Endereço" className="border-blue-200 focus:border-blue-500 bg-blue-50" />
+            <Input 
+              placeholder="Endereço" 
+              className="border-blue-200 focus:border-blue-500 bg-blue-50" 
+              name="endereco"
+              value={formData.endereco}
+              onChange={handleInputChange}
+            />
           </div>
           
           <div className="grid grid-cols-3 gap-3">
             <div className="flex flex-col space-y-1">
               <label className="text-sm font-medium text-gray-700">Nr</label>
-              <Input placeholder="000" className="border-blue-200 focus:border-blue-500 bg-blue-50" />
+              <Input 
+                placeholder="000" 
+                className="border-blue-200 focus:border-blue-500 bg-blue-50" 
+                name="numero"
+                value={formData.numero}
+                onChange={handleInputChange}
+              />
             </div>
             <div className="flex flex-col space-y-1">
               <label className="text-sm font-medium text-gray-700">Compl./Bairro</label>
-              <Input placeholder="Bairro" className="border-blue-200 focus:border-blue-500 bg-blue-50" />
+              <Input 
+                placeholder="Bairro" 
+                className="border-blue-200 focus:border-blue-500 bg-blue-50" 
+                name="complemento"
+                value={formData.complemento}
+                onChange={handleInputChange}
+              />
             </div>
             <div className="flex flex-col space-y-1">
               <label className="text-sm font-medium text-gray-700">UF</label>
-              <Input placeholder="UF" className="border-blue-200 focus:border-blue-500 bg-blue-50" />
+              <Input 
+                placeholder="UF" 
+                className="border-blue-200 focus:border-blue-500 bg-blue-50" 
+                name="uf"
+                value={formData.uf}
+                onChange={handleInputChange}
+              />
             </div>
           </div>
 
           <div className="flex flex-col space-y-1">
             <label className="text-sm font-medium text-gray-700">Cidade</label>
-            <Input placeholder="Cidade" className="border-blue-200 focus:border-blue-500 bg-blue-50" />
+            <Input 
+              placeholder="Cidade" 
+              className="border-blue-200 focus:border-blue-500 bg-blue-50" 
+              name="cidade"
+              value={formData.cidade}
+              onChange={handleInputChange}
+            />
           </div>
         </div>
       </div>
@@ -90,7 +244,13 @@ const FormularioModerno = () => {
               </span>
               Nome de Contato
             </label>
-            <Input placeholder="Nome" className="border-blue-200 focus:border-blue-500 bg-blue-50" />
+            <Input 
+              placeholder="Nome" 
+              className="border-blue-200 focus:border-blue-500 bg-blue-50" 
+              name="contato"
+              value={formData.contato}
+              onChange={handleInputChange}
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -103,7 +263,13 @@ const FormularioModerno = () => {
                 </span>
                 Fone
               </label>
-              <Input placeholder="(00) 0000-0000" className="border-blue-200 focus:border-blue-500 bg-blue-50" />
+              <Input 
+                placeholder="(00) 0000-0000" 
+                className="border-blue-200 focus:border-blue-500 bg-blue-50" 
+                name="fone"
+                value={formData.fone}
+                onChange={handleInputChange}
+              />
             </div>
             <div className="flex flex-col space-y-1">
               <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
@@ -114,7 +280,13 @@ const FormularioModerno = () => {
                 </span>
                 Celular/WhatsApp
               </label>
-              <Input placeholder="(00) 00000-0000" className="border-blue-200 focus:border-blue-500 bg-blue-50" />
+              <Input 
+                placeholder="(00) 00000-0000" 
+                className="border-blue-200 focus:border-blue-500 bg-blue-50" 
+                name="celular"
+                value={formData.celular}
+                onChange={handleInputChange}
+              />
             </div>
           </div>
 
@@ -127,7 +299,13 @@ const FormularioModerno = () => {
               </span>
               E-mail
             </label>
-            <Input placeholder="exemplo@email.com" className="border-blue-200 focus:border-blue-500 bg-blue-50" />
+            <Input 
+              placeholder="exemplo@email.com" 
+              className="border-blue-200 focus:border-blue-500 bg-blue-50" 
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+            />
           </div>
         </div>
       </div>
@@ -149,7 +327,13 @@ const FormularioModerno = () => {
                 </span>
                 Agência
               </label>
-              <Input placeholder="0000" className="border-blue-200 focus:border-blue-500 bg-blue-50" />
+              <Input 
+                placeholder="0000" 
+                className="border-blue-200 focus:border-blue-500 bg-blue-50" 
+                name="agencia"
+                value={formData.agencia}
+                onChange={handleInputChange}
+              />
             </div>
             <div className="flex flex-col space-y-1">
               <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
@@ -160,7 +344,13 @@ const FormularioModerno = () => {
                 </span>
                 Conta
               </label>
-              <Input placeholder="00000-0" className="border-blue-200 focus:border-blue-500 bg-blue-50" />
+              <Input 
+                placeholder="00000-0" 
+                className="border-blue-200 focus:border-blue-500 bg-blue-50" 
+                name="conta"
+                value={formData.conta}
+                onChange={handleInputChange}
+              />
             </div>
           </div>
 
@@ -173,7 +363,13 @@ const FormularioModerno = () => {
               </span>
               Chave Pix
             </label>
-            <Input placeholder="Chave Pix" className="border-blue-200 focus:border-blue-500 bg-blue-50" />
+            <Input 
+              placeholder="Chave Pix" 
+              className="border-blue-200 focus:border-blue-500 bg-blue-50" 
+              name="chavePix"
+              value={formData.chavePix}
+              onChange={handleInputChange}
+            />
           </div>
           
           <div className="flex flex-col space-y-1">
@@ -185,12 +381,16 @@ const FormularioModerno = () => {
               </span>
               Convênio Pag
             </label>
-            <Input placeholder="Convênio" className="border-blue-200 focus:border-blue-500 bg-blue-50" />
+            <Input 
+              placeholder="Convênio" 
+              className="border-blue-200 focus:border-blue-500 bg-blue-50" 
+              name="convenioPag"
+              value={formData.convenioPag}
+              onChange={handleInputChange}
+            />
           </div>
         </div>
       </div>
-
-      {/* Removing the Cancel and Save buttons */}
     </div>
   );
 };
