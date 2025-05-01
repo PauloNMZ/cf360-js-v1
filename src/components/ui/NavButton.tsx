@@ -17,11 +17,9 @@ export const NavButton = ({ icon, label, onClick, className = "" }: NavButtonPro
       onClick={onClick}
     >
       <div className="flex items-center justify-center w-10 h-10 bg-blue-100 dark:bg-blue-900/50 rounded-full text-blue-700 dark:text-blue-300">
-        <div className="flex items-center justify-center">
-          {icon}
-        </div>
+        {icon}
       </div>
-      <span className="text-xs text-gray-800 dark:text-gray-200 text-center mt-2">{label}</span>
+      <span className="text-xs text-gray-800 dark:text-gray-200 text-center mt-2 font-ubuntu">{label}</span>
     </button>
   );
 };

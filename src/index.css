@@ -59,3 +59,32 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
+
+/* Title bars font styling */
+header h1, 
+.dialog-title, 
+.dialog-header h2, 
+.dialog-header h3,
+.dialog-title, 
+.drawer-title,
+.sheet-title, 
+div[role="dialog"] h3, 
+div[role="dialog"] h2, 
+.bg-blue-600 h1, 
+.bg-blue-600 h2, 
+.bg-gradient-to-r h1, 
+.bg-gradient-to-r h2,
+.DialogTitle,
+.DialogHeader .text-2xl,
+.DialogHeader h3,
+button.NavButton span {
+  font-family: 'Ubuntu', sans-serif !important;
+}
+
+/* Apply Ubuntu font to dialog titles */
+[data-radix-popper-content-wrapper] h2,
+[data-radix-popper-content-wrapper] h3,
+[data-radix-popper-content-wrapper] .text-2xl {
+  font-family: 'Ubuntu', sans-serif !important;
+}
+
