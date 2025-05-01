@@ -29,6 +29,7 @@ const Index = () => {
     formData,
     setFormData,
     formValid,
+    setFormValid, // Make sure this is properly destructured from useIndexPage
     convenentes,
     setConvenentes,
     currentConvenenteId,

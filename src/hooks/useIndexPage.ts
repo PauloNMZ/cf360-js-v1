@@ -146,6 +146,7 @@ export const useIndexPage = () => {
     formData,
     setFormData,
     formValid,
+    setFormValid, // Explicitly returning this now
     convenentes,
     setConvenentes,
     currentConvenenteId,
