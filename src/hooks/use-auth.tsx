@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (error) {
         toast({
-          title: "Login Failed",
+          title: "Falha no Login",
           description: error.message,
           variant: "destructive",
         });
@@ -60,15 +60,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       toast({
-        title: "Login Successful",
-        description: "You have been logged in successfully.",
+        title: "Login Realizado",
+        description: "Você foi conectado com sucesso.",
       });
 
       return { error: null };
     } catch (error: any) {
       toast({
-        title: "Login Failed",
-        description: error.message || "An unexpected error occurred",
+        title: "Falha no Login",
+        description: error.message || "Ocorreu um erro inesperado",
         variant: "destructive",
       });
       return { error };
@@ -84,7 +84,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (error) {
         toast({
-          title: "Registration Failed",
+          title: "Falha no Cadastro",
           description: error.message,
           variant: "destructive",
         });
@@ -92,15 +92,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       toast({
-        title: "Registration Successful",
-        description: "Please check your email for the confirmation link.",
+        title: "Cadastro Realizado",
+        description: "Verifique seu email para confirmar o cadastro.",
       });
 
       return { error: null };
     } catch (error: any) {
       toast({
-        title: "Registration Failed",
-        description: error.message || "An unexpected error occurred",
+        title: "Falha no Cadastro",
+        description: error.message || "Ocorreu um erro inesperado",
         variant: "destructive",
       });
       return { error };
@@ -110,8 +110,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signOut = async () => {
     await supabase.auth.signOut();
     toast({
-      title: "Logged Out",
-      description: "You have been logged out successfully.",
+      title: "Desconectado",
+      description: "Você foi desconectado com sucesso.",
     });
   };
 
@@ -130,7 +130,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
   }
   return context;
 };

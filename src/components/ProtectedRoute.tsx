@@ -7,7 +7,7 @@ export const ProtectedRoute = () => {
   
   if (isLoading) {
     // You could show a loading spinner here
-    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+    return <div className="flex items-center justify-center h-screen">Carregando...</div>;
   }
   
   return user ? <Outlet /> : <Navigate to="/auth" />;

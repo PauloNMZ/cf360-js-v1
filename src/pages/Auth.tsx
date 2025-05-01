@@ -35,7 +35,7 @@ const Auth = () => {
         if (error) setError(error.message);
       }
     } catch (err: any) {
-      setError(err.message || "An error occurred during authentication");
+      setError(err.message || "Ocorreu um erro durante a autenticação");
     } finally {
       setIsLoading(false);
     }
@@ -57,19 +57,19 @@ const Auth = () => {
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-bold text-center">
-              {mode === "login" ? "Login to your account" : "Create an account"}
+              {mode === "login" ? "Acessar sua conta" : "Criar uma conta"}
             </CardTitle>
             <CardDescription className="text-center">
               {mode === "login" 
-                ? "Enter your email and password to login" 
-                : "Enter your email and password to register"}
+                ? "Digite seu email e senha para entrar" 
+                : "Digite seu email e senha para se cadastrar"}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs value={mode} onValueChange={(v) => setMode(v as "login" | "register")}>
               <TabsList className="grid w-full grid-cols-2 mb-8">
-                <TabsTrigger value="login">Login</TabsTrigger>
-                <TabsTrigger value="register">Register</TabsTrigger>
+                <TabsTrigger value="login">Entrar</TabsTrigger>
+                <TabsTrigger value="register">Cadastrar</TabsTrigger>
               </TabsList>
               <TabsContent value="login">
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -78,14 +78,14 @@ const Auth = () => {
                     <Input 
                       id="email" 
                       type="email" 
-                      placeholder="name@example.com" 
+                      placeholder="nome@exemplo.com" 
                       required 
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password">Senha</Label>
                     <Input 
                       id="password" 
                       type="password" 
@@ -100,7 +100,7 @@ const Auth = () => {
                     className="w-full"
                     disabled={isLoading}
                   >
-                    {isLoading ? "Logging in..." : "Login"}
+                    {isLoading ? "Entrando..." : "Entrar"}
                   </Button>
                 </form>
               </TabsContent>
@@ -112,14 +112,14 @@ const Auth = () => {
                     <Input 
                       id="email" 
                       type="email" 
-                      placeholder="name@example.com" 
+                      placeholder="nome@exemplo.com" 
                       required 
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password">Senha</Label>
                     <Input 
                       id="password" 
                       type="password" 
@@ -134,7 +134,7 @@ const Auth = () => {
                     className="w-full"
                     disabled={isLoading}
                   >
-                    {isLoading ? "Creating account..." : "Create account"}
+                    {isLoading ? "Criando conta..." : "Criar conta"}
                   </Button>
                 </form>
               </TabsContent>
@@ -143,8 +143,8 @@ const Auth = () => {
           <CardFooter className="flex justify-center">
             <p className="text-sm text-muted-foreground">
               {mode === "login" 
-                ? "Don't have an account? Switch to Register" 
-                : "Already have an account? Switch to Login"}
+                ? "Não tem uma conta? Clique em Cadastrar" 
+                : "Já tem uma conta? Clique em Entrar"}
             </p>
           </CardFooter>
         </Card>
