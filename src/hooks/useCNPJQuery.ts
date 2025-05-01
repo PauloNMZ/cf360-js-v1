@@ -56,14 +56,20 @@ export const useCNPJQuery = ({ onSuccess, onError }: UseCNPJQueryProps = {}) => 
         throw new Error(errorData.message || 'Erro ao consultar CNPJ');
       }
       
-      const data: CNPJData = await response.json();
-      setData(data);
+      const responseData: CNPJData = await response.json();
       
-      if (onSuccess) {
-        onSuccess(data);
+      // Verificar se a razão social foi recebida
+      if (!responseData.razao_social || responseData.razao_social.trim() === '') {
+        throw new Error('CNPJ encontrado, mas sem razão social definida');
       }
       
-      return { success: true, data };
+      setData(responseData);
+      
+      if (onSuccess) {
+        onSuccess(responseData);
+      }
+      
+      return { success: true, data: responseData };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
       setError(errorMessage);

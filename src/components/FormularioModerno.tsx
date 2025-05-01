@@ -60,6 +60,14 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
       if (initialData.cnpj) {
         setCnpjInput(formatCNPJ(initialData.cnpj));
       }
+      
+      // Marcar os campos como tocados quando houver dados iniciais
+      if (initialData.razaoSocial) {
+        setTouched(prev => ({
+          ...prev,
+          razaoSocial: true
+        }));
+      }
     }
   }, [initialData]);
 
@@ -94,7 +102,7 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
     }
     
     // Validate required fields
-    if (touched.razaoSocial && !formData.razaoSocial) {
+    if (touched.razaoSocial && (!formData.razaoSocial || formData.razaoSocial.trim() === '')) {
       newErrors.razaoSocial = "Razão social é obrigatória";
     }
     
@@ -119,6 +127,16 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
 
   const { fetchCNPJ, isLoading } = useCNPJQuery({
     onSuccess: (data) => {
+      // Certifique-se de que a razão social foi recebida
+      if (!data.razao_social || data.razao_social.trim() === '') {
+        toast({
+          title: "Dados incompletos",
+          description: "A consulta não retornou uma razão social válida.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
       const formattedData = {
         cnpj: data.cnpj || "",
         razaoSocial: data.razao_social || "",
@@ -131,22 +149,25 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
         fone: data.ddd_telefone_1 ? formatPhone(data.ddd_telefone_1) : "",
         celular: data.ddd_telefone_2 ? formatPhone(data.ddd_telefone_2) : "",
         email: data.email || "",
-        agencia: "",  // API doesn't provide banking data
-        conta: "",
-        chavePix: "",
-        convenioPag: ""
+        agencia: formData.agencia || "",  // Preservar campos que não vêm da API
+        conta: formData.conta || "",
+        chavePix: formData.chavePix || "",
+        convenioPag: formData.convenioPag || ""
       };
+      
+      console.log("Dados formatados da API:", formattedData);
       
       setFormData(formattedData);
       setDataLoaded(true);
       
+      // Marcar os campos preenchidos como tocados
       setTouched({
         cnpj: true,
         razaoSocial: true,
-        endereco: true,
-        email: true,
-        fone: true,
-        celular: true
+        endereco: Boolean(formattedData.endereco),
+        email: Boolean(formattedData.email),
+        fone: Boolean(formattedData.fone),
+        celular: Boolean(formattedData.celular)
       });
       
       toast({
@@ -167,8 +188,7 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
     // Remove non-numeric characters
     const cnpjClean = cnpjInput.replace(/\D/g, '');
     
-    // Removed CNPJ validation check, passing directly to the API
-    // Just check if the CNPJ has some input
+    // Verificar se há entrada antes de consultar
     if (!cnpjClean) {
       toast({
         title: "Campo vazio",
@@ -197,6 +217,9 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
         [name]: value
       }));
     }
+    
+    // Log para depuração
+    console.log(`Campo ${name} alterado para: ${value}`);
   };
 
   const handleCNPJChange = (e) => {
