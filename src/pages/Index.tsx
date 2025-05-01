@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import FormularioModerno from "@/components/FormularioModerno";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -60,7 +61,7 @@ const Index = () => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [companySettings, setCompanySettings] = useState({
     logoUrl: '',
-    companyName: 'GERADOR DE PAGAMENTOS'
+    companyName: 'Gerador de Pagamentos'
   });
 
   // Define header and footer heights (approximate values, adjust as needed)
