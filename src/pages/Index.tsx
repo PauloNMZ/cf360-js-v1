@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import FormularioModerno from "@/components/FormularioModerno";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -25,7 +24,8 @@ import {
   TrashIcon,
   Save,
   LayoutDashboard,
-  AlertCircle
+  AlertCircle,
+  WalletCards
 } from "lucide-react";
 import {
   AlertDialog,
@@ -40,6 +40,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { saveConvenente, getConvenentes, updateConvenente, deleteConvenente } from "@/services/storage";
+import { getCompanySettings } from "@/services/companySettings";
 import { formatCNPJ } from "@/utils/formValidation";
 import { ConvenenteData, emptyConvenente } from "@/types/convenente";
 import { getContentContainerStyle } from "@/utils/viewportUtils";
@@ -57,6 +58,10 @@ const Index = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredConvenentes, setFilteredConvenentes] = useState<Array<ConvenenteData & { id: string }>>([]);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [companySettings, setCompanySettings] = useState({
+    logoUrl: '',
+    companyName: 'GERADOR DE PAGAMENTOS'
+  });
 
   // Define header and footer heights (approximate values, adjust as needed)
   const HEADER_HEIGHT = 80;
@@ -71,7 +76,19 @@ const Index = () => {
     const loadedConvenentes = getConvenentes();
     setConvenentes(loadedConvenentes);
     setFilteredConvenentes(loadedConvenentes);
+
+    // Load company settings
+    const settings = getCompanySettings();
+    setCompanySettings(settings);
   }, []);
+
+  // Load company settings when admin panel is closed (to update logo if changed)
+  useEffect(() => {
+    if (!adminPanelOpen) {
+      const settings = getCompanySettings();
+      setCompanySettings(settings);
+    }
+  }, [adminPanelOpen]);
 
   // Filter convenentes when search term changes
   useEffect(() => {
@@ -269,8 +286,8 @@ const Index = () => {
       <header className="bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-800 dark:to-blue-950 text-white py-4 px-6 shadow-md">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <AppLogo size={28} />
-            <h1 className="text-2xl font-bold">GERADOR DE PAGAMENTOS</h1>
+            <AppLogo size={28} customLogoUrl={companySettings.logoUrl} />
+            <h1 className="text-2xl font-bold">{companySettings.companyName}</h1>
           </div>
           <ThemeToggle />
         </div>
