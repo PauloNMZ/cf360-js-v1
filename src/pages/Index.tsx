@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import FormularioModerno from "@/components/FormularioModerno";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -64,17 +63,23 @@ const Index = () => {
     if (!searchTerm.trim()) {
       setFilteredConvenentes(convenentes);
     } else {
+      const searchLower = searchTerm.toLowerCase();
       const filtered = convenentes.filter(
         conv => 
-          conv.razaoSocial.toLowerCase().includes(searchTerm.toLowerCase()) || 
-          conv.cnpj.includes(searchTerm.replace(/\D/g, ''))
+          conv.razaoSocial.toLowerCase().includes(searchLower) || 
+          // Remove formatting from CNPJ before comparing
+          conv.cnpj.replace(/\D/g, '').includes(searchTerm.replace(/\D/g, ''))
       );
+      console.log("Search term:", searchTerm);
+      console.log("Filtered convenentes:", filtered);
       setFilteredConvenentes(filtered);
     }
   }, [searchTerm, convenentes]);
 
   const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
+    const value = e.target.value;
+    console.log("Search value:", value);
+    setSearchTerm(value);
   };
 
   const handleConvenenteClick = () => {
@@ -623,167 +628,4 @@ const AdminPanel = () => {
               </Button>
               <Button 
                 onClick={handleCreateNew}
-                className="bg-green-600 hover:bg-green-700 text-sm"
-              >
-                Nova Conexão
-              </Button>
-            </div>
-          </div>
-          
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[100px]">ID</TableHead>
-                <TableHead className="w-[200px]">API Key</TableHead>
-                <TableHead>Client ID</TableHead>
-                <TableHead className="text-right">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {bankConnections.map((connection) => (
-                <TableRow key={connection.id}>
-                  <TableCell className="font-medium">{connection.id}</TableCell>
-                  <TableCell>{connection.appKey.substring(0, 8)}...</TableCell>
-                  <TableCell>{connection.clientId.substring(0, 12)}...</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button 
-                        onClick={() => handleEdit(connection)} 
-                        variant="ghost" 
-                        size="sm"
-                      >
-                        Editar
-                      </Button>
-                      <Button 
-                        onClick={() => handleDelete(connection)} 
-                        variant="ghost" 
-                        size="sm"
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        Excluir
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      ) : (
-        <div className="bg-white p-6 rounded-lg shadow-sm">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-blue-800">
-              {isCreating ? "Nova Conexão Bancária" : "Editar Conexão Bancária"}
-            </h3>
-            <Button 
-              onClick={handleBackToMenu}
-              variant="outline"
-              className="text-sm"
-            >
-              Voltar
-            </Button>
-          </div>
-          
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">API Key</label>
-                <Input 
-                  name="appKey"
-                  value={formValues.appKey}
-                  onChange={handleInputChange}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Client ID</label>
-                <Input 
-                  name="clientId"
-                  value={formValues.clientId}
-                  onChange={handleInputChange}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Client Secret</label>
-                <Input 
-                  name="clientSecret"
-                  value={formValues.clientSecret}
-                  onChange={handleInputChange}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Registrar Token</label>
-                <Input 
-                  name="registrarToken"
-                  value={formValues.registrarToken}
-                  onChange={handleInputChange}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Chave Basic</label>
-                <Input 
-                  name="basic"
-                  value={formValues.basic}
-                  onChange={handleInputChange}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Usuário BB (SIA)</label>
-                <Input 
-                  name="userBBsia"
-                  value={formValues.userBBsia}
-                  onChange={handleInputChange}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Senha BB (SIA)</label>
-                <Input 
-                  type="password"
-                  name="passwordBBsia"
-                  value={formValues.passwordBBsia}
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div>
-            
-            <div className="pt-4 flex justify-end">
-              <Button 
-                onClick={handleSave}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                Salvar
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-      
-      {/* Diálogo de confirmação para exclusão */}
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
-            <AlertDialogDescription>
-              Tem certeza que deseja excluir esta conexão bancária?
-              Esta ação não pode ser desfeita.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
-              Excluir
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
-  );
-};
-
-export default Index;
-
+                className="bg-green-600
