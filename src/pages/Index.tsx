@@ -66,20 +66,20 @@ const Index = () => {
     if (!searchTerm.trim()) {
       setFilteredConvenentes(convenentes);
     } else {
-      const searchLower = searchTerm.toLowerCase();
-      const filtered = convenentes.filter(
-        conv => {
-          // Procura pelo nome (razaoSocial) - converter para minúsculas para comparar
-          const nameMatch = conv.razaoSocial.toLowerCase().includes(searchLower);
-          
-          // Procura pelo CNPJ - remover formatação antes de comparar
-          const cnpjClean = conv.cnpj.replace(/\D/g, '');
-          const searchTermClean = searchTerm.replace(/\D/g, '');
-          const cnpjMatch = cnpjClean.includes(searchTermClean);
-          
-          return nameMatch || cnpjMatch;
-        }
-      );
+      const searchLower = searchTerm.toLowerCase().trim();
+      const searchCNPJ = searchTerm.replace(/\D/g, '');
+      
+      const filtered = convenentes.filter(conv => {
+        // Search by company name - convert to lowercase for comparison
+        const nameMatch = conv.razaoSocial.toLowerCase().includes(searchLower);
+        
+        // Search by CNPJ - remove formatting before comparing
+        const cnpjClean = conv.cnpj.replace(/\D/g, '');
+        const cnpjMatch = cnpjClean.includes(searchCNPJ);
+        
+        return nameMatch || cnpjMatch;
+      });
+      
       console.log("Search term:", searchTerm);
       console.log("Filtered convenentes:", filtered);
       setFilteredConvenentes(filtered);
