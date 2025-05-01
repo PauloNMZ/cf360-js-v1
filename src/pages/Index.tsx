@@ -59,9 +59,10 @@ const Index = () => {
   // Define header and footer heights (approximate values, adjust as needed)
   const HEADER_HEIGHT = 80;
   const FOOTER_HEIGHT = 60;
+  const HEIGHT_REDUCTION = 100; // Reduce main content height by 100px
   
-  // Get content container style
-  const contentContainerStyle = getContentContainerStyle(HEADER_HEIGHT, FOOTER_HEIGHT);
+  // Get content container style with height reduction
+  const contentContainerStyle = getContentContainerStyle(HEADER_HEIGHT, FOOTER_HEIGHT, 0, HEIGHT_REDUCTION);
 
   // Load convenentes from localStorage on start
   useEffect(() => {
@@ -270,11 +271,11 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Conteúdo principal com rolagem controlada */}
+      {/* Conteúdo principal com rolagem controlada e altura reduzida */}
       <div className="flex-grow overflow-auto" style={contentContainerStyle}>
-        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
           {/* Ícones de navegação em uma única linha */}
-          <div className="flex overflow-x-auto pb-4 mb-12 gap-2">
+          <div className="flex overflow-x-auto pb-3 mb-8 gap-2">
             <NavButton 
               icon={<Home size={24} />} 
               label="Convenente" 
