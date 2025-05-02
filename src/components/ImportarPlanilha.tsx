@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { FileUpload } from '@/components/ui/file-upload';
 import { Button } from '@/components/ui/button';
@@ -16,7 +17,10 @@ import {
   ChevronLeft,
   Banknote,
   PiggyBank,
-  Coins
+  Coins,
+  Download,
+  Folder,
+  Settings
 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -35,6 +39,8 @@ import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ConvenenteData } from '@/types/convenente';
 import { getConvenentes } from '@/services/convenenteService';
+import { CNABWorkflowData, Favorecido } from '@/types/cnab240';
+import { downloadCNABFile } from '@/services/cnab240Service';
 import * as XLSX from 'xlsx';
 
 // Define the expected column headers
@@ -55,14 +61,6 @@ interface RowData {
   selected?: boolean;
 }
 
-// Define types for our workflow steps
-interface PaymentWorkflow {
-  paymentDate: Date | undefined;
-  serviceType: string;
-  convenente: ConvenenteData | null;
-  sendMethod: string;
-}
-
 const ImportarPlanilha = () => {
   // Original state for file handling
   const [file, setFile] = useState<File | null>(null);
@@ -76,12 +74,14 @@ const ImportarPlanilha = () => {
   
   // New state for multi-step workflow
   const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
+  const [showDirectoryDialog, setShowDirectoryDialog] = useState(false);
   const [currentStep, setCurrentStep] = useState<number>(1);
-  const [workflow, setWorkflow] = useState<PaymentWorkflow>({
+  const [workflow, setWorkflow] = useState<CNABWorkflowData>({
     paymentDate: undefined,
     serviceType: "Pagamentos Diversos",
     convenente: null,
-    sendMethod: "cnab"
+    sendMethod: "cnab",
+    outputDirectory: ''
   });
 
   // Estado para armazenar os convenentes reais do banco de dados
@@ -271,7 +271,8 @@ const ImportarPlanilha = () => {
       paymentDate: undefined,
       serviceType: "Pagamentos Diversos",
       convenente: null,
-      sendMethod: "cnab"
+      sendMethod: "cnab",
+      outputDirectory: workflow.outputDirectory // Preserve directory setting
     });
     setCurrentStep(1);
     setShowWorkflowDialog(true);
@@ -286,24 +287,72 @@ const ImportarPlanilha = () => {
     setCurrentStep(prev => Math.max(prev - 1, 1));
   };
 
+  // Function to open directory settings dialog
+  const handleOpenDirectorySettings = () => {
+    setShowDirectoryDialog(true);
+  };
+
+  // Function to save directory settings
+  const handleSaveDirectorySettings = () => {
+    localStorage.setItem('cnab240OutputDirectory', workflow.outputDirectory || '');
+    setShowDirectoryDialog(false);
+    toast.success("Configurações de diretório salvas com sucesso!");
+  };
+
+  // Load directory settings on component mount
+  useEffect(() => {
+    const savedDirectory = localStorage.getItem('cnab240OutputDirectory') || '';
+    setWorkflow(prev => ({
+      ...prev,
+      outputDirectory: savedDirectory
+    }));
+  }, []);
+
   // Final submission handler
-  const handleSubmitWorkflow = () => {
+  const handleSubmitWorkflow = async () => {
     const selectedRows = tableData.filter(row => row.selected);
-    setShowWorkflowDialog(false);
     
-    toast.success(`Enviando ${selectedRows.length} pagamentos via ${workflow.sendMethod === 'cnab' ? 'arquivo CNAB' : 'API REST'}...`);
-    
-    console.log("Dados completos do processamento:", {
-      registros: selectedRows,
-      dataPagamento: workflow.paymentDate,
-      tipoServico: workflow.serviceType,
-      convenente: workflow.convenente,
-      metodoEnvio: workflow.sendMethod
-    });
+    try {
+      setShowWorkflowDialog(false);
+      
+      // If "API REST" method is selected, we would handle that differently
+      if (workflow.sendMethod === 'api') {
+        toast.success(`Enviando ${selectedRows.length} pagamentos via API REST...`);
+        // This would call an API integration - not implemented yet
+        return;
+      }
+      
+      // For CNAB file generation
+      const favorecidos: Favorecido[] = selectedRows.map(row => ({
+        nome: row.NOME,
+        inscricao: row.INSCRICAO,
+        banco: row.BANCO,
+        agencia: row.AGENCIA,
+        conta: row.CONTA,
+        tipo: row.TIPO,
+        valor: parseFloat(row.VALOR.toString().replace(/[^\d.,]/g, '').replace(',', '.'))
+      }));
+      
+      // Generate and download the CNAB file
+      await downloadCNABFile(workflow, favorecidos);
+      
+      console.log("Dados completos do processamento:", {
+        registros: selectedRows,
+        dataPagamento: workflow.paymentDate,
+        tipoServico: workflow.serviceType,
+        convenente: workflow.convenente,
+        metodoEnvio: workflow.sendMethod,
+        diretorioSaida: workflow.outputDirectory
+      });
+      
+    } catch (error) {
+      console.error("Erro ao processar arquivo:", error);
+      toast.error("Ocorreu um erro ao processar o arquivo CNAB");
+    }
   };
 
   // Function to update workflow data
-  const updateWorkflow = (field: keyof PaymentWorkflow, value: any) => {
+  const updateWorkflow = (field: keyof CNABWorkflowData, value: any) => {
     setWorkflow(prev => ({
       ...prev,
       [field]: value
@@ -376,7 +425,7 @@ const ImportarPlanilha = () => {
                     onSelect={(date) => updateWorkflow("paymentDate", date)}
                     disabled={(date) => date < new Date()}
                     initialFocus
-                    className={cn("p-3 pointer-events-auto")}
+                    locale={ptBR}
                   />
                 </PopoverContent>
               </Popover>
@@ -520,7 +569,7 @@ const ImportarPlanilha = () => {
               <div className="flex items-center space-x-3 space-y-0 border rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
                 <RadioGroupItem value="cnab" id="cnab" />
                 <Label htmlFor="cnab" className="flex flex-1 items-center space-x-3 cursor-pointer">
-                  <Upload className="h-5 w-5 text-blue-600" />
+                  <Download className="h-5 w-5 text-blue-600" />
                   <div className="space-y-1">
                     <p className="font-medium leading-none">Arquivo CNAB</p>
                     <p className="text-sm text-gray-500">Gerar arquivo no padrão CNAB para envio ao banco</p>
@@ -539,6 +588,17 @@ const ImportarPlanilha = () => {
                 </Label>
               </div>
             </RadioGroup>
+            
+            <div className="mt-6">
+              <Button 
+                variant="outline" 
+                onClick={handleOpenDirectorySettings} 
+                className="w-full flex items-center justify-center"
+              >
+                <Settings className="mr-2 h-4 w-4" />
+                Configurar Diretório de Saída
+              </Button>
+            </div>
           </div>
         );
 
@@ -802,6 +862,53 @@ const ImportarPlanilha = () => {
                 </Button>
               )}
             </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Directory configuration dialog */}
+      <Dialog open={showDirectoryDialog} onOpenChange={setShowDirectoryDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Configurar Diretório de Saída</DialogTitle>
+          </DialogHeader>
+          
+          <div className="py-4 space-y-4">
+            <p className="text-sm text-gray-500">
+              Configure o diretório onde os arquivos CNAB serão salvos (opcional).
+              No navegador, os arquivos serão baixados diretamente.
+            </p>
+            
+            <div className="flex items-center space-x-2">
+              <Folder className="h-4 w-4 text-gray-400" />
+              <Input 
+                placeholder="Caminho do diretório (ex: C:/Remessa)"
+                value={workflow.outputDirectory || ''}
+                onChange={(e) => updateWorkflow("outputDirectory", e.target.value)}
+              />
+            </div>
+            
+            <div className="text-sm text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-md border border-yellow-200 dark:border-yellow-800">
+              <p className="flex items-center">
+                <AlertTriangle className="h-4 w-4 mr-2" />
+                Ao usar a aplicação web, os arquivos serão sempre baixados, independente do diretório configurado.
+              </p>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowDirectoryDialog(false)}
+            >
+              Cancelar
+            </Button>
+            <Button 
+              onClick={handleSaveDirectorySettings}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              Salvar Configurações
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
