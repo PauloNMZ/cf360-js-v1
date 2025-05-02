@@ -143,7 +143,7 @@ export const useImportacao = () => {
             obj[headers[idx]] = cell;
           }
         });
-        return obj;
+        return obj as RowData;
       });
 
       setPlanilhaData({
@@ -155,7 +155,7 @@ export const useImportacao = () => {
       });
 
       // Initialize tableData with selected property for each row
-      setTableData(rows.map(row => ({ ...row, selected: false })));
+      setTableData(rows);
 
       if (isValid) {
         toast.success("Planilha validada com sucesso!");
