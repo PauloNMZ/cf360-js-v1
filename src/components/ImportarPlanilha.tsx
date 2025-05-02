@@ -1,917 +1,111 @@
 
-import React, { useState, useEffect } from 'react';
-import { FileUpload } from '@/components/ui/file-upload';
-import { Button } from '@/components/ui/button';
-import { toast } from '@/components/ui/sonner';
-import { 
-  AlertCircle, 
-  CheckCircle, 
-  FileText, 
-  AlertTriangle, 
-  Trash2, 
-  Upload, 
-  QrCode, 
-  CreditCard, 
-  Calendar as CalendarIcon, 
-  ChevronRight, 
-  ChevronLeft,
-  Banknote,
-  PiggyBank,
-  Coins,
-  Download,
-  Folder,
-  Settings
-} from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import React, { useEffect } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { cn } from '@/lib/utils';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ConvenenteData } from '@/types/convenente';
-import { getConvenentes } from '@/services/convenenteService';
-import { CNABWorkflowData, Favorecido } from '@/types/cnab240';
-import { downloadCNABFile } from '@/services/cnab240Service';
-import * as XLSX from 'xlsx';
+import { useImportacao } from '@/hooks/useImportacao';
 
-// Define the expected column headers
-const EXPECTED_HEADERS = [
-  'NOME', 'INSCRICAO', 'BANCO', 'AGENCIA', 'CONTA', 'TIPO', 'VALOR'
-];
-
-interface PlanilhaData {
-  headers: string[];
-  rows: any[];
-  isValid: boolean;
-  missingColumns: string[];
-  extraColumns: string[];
-}
-
-interface RowData {
-  [key: string]: any;
-  selected?: boolean;
-}
+// Import refactored components
+import FileUploadView from '@/components/importacao/FileUploadView';
+import TableView from '@/components/importacao/TableView';
+import WorkflowDialog from '@/components/importacao/WorkflowDialog';
+import DirectoryDialog from '@/components/importacao/DirectoryDialog';
 
 const ImportarPlanilha = () => {
-  // Original state for file handling
-  const [file, setFile] = useState<File | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [planilhaData, setPlanilhaData] = useState<PlanilhaData | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [tableData, setTableData] = useState<RowData[]>([]);
-  const [selectAll, setSelectAll] = useState(false);
-  const [showTable, setShowTable] = useState(false);
-  const [total, setTotal] = useState<number>(0);
-  
-  // New state for multi-step workflow
-  const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
-  const [showDirectoryDialog, setShowDirectoryDialog] = useState(false);
-  const [currentStep, setCurrentStep] = useState<number>(1);
-  const [workflow, setWorkflow] = useState<CNABWorkflowData>({
-    paymentDate: undefined,
-    serviceType: "Pagamentos Diversos",
-    convenente: null,
-    sendMethod: "cnab",
-    outputDirectory: ''
-  });
+  const {
+    file,
+    loading,
+    planilhaData,
+    errorMessage,
+    tableData,
+    selectAll,
+    showTable,
+    setShowTable,
+    total,
+    showWorkflowDialog,
+    setShowWorkflowDialog,
+    showDirectoryDialog,
+    setShowDirectoryDialog,
+    currentStep,
+    workflow,
+    convenentes,
+    carregandoConvenentes,
+    handleFileChange,
+    handleSelectAll,
+    handleSelectRow,
+    handleDeleteRow,
+    handleProcessar,
+    handleProcessSelected,
+    goToNextStep,
+    goToPreviousStep,
+    handleOpenDirectorySettings,
+    handleSaveDirectorySettings,
+    handleSubmitWorkflow,
+    updateWorkflow,
+    isCurrentStepValid
+  } = useImportacao();
 
-  // Estado para armazenar os convenentes reais do banco de dados
-  const [convenentes, setConvenentes] = useState<Array<ConvenenteData & { id: string }>>([]);
-  const [carregandoConvenentes, setCarregandoConvenentes] = useState(false);
-  
-  // Carregar convenentes do banco de dados
+  // Listen for custom events from the StepFour component
   useEffect(() => {
-    const loadConvenentes = async () => {
-      try {
-        setCarregandoConvenentes(true);
-        const data = await getConvenentes();
-        console.log("Convenentes carregados:", data);
-        setConvenentes(data);
-      } catch (error) {
-        console.error("Erro ao carregar convenentes:", error);
-        toast.error("Erro ao carregar convenentes");
-      } finally {
-        setCarregandoConvenentes(false);
-      }
+    const handleOpenSettings = () => {
+      handleOpenDirectorySettings();
     };
+
+    document.addEventListener('openDirectorySettings', handleOpenSettings);
     
-    loadConvenentes();
+    return () => {
+      document.removeEventListener('openDirectorySettings', handleOpenSettings);
+    };
   }, []);
-  
-  // Original file handling functions
-  const handleFileChange = (files: File[]) => {
-    if (files.length > 0) {
-      setFile(files[0]);
-      setErrorMessage(null);
-      validateFile(files[0]);
-    } else {
-      setFile(null);
-      setPlanilhaData(null);
-    }
-  };
-
-  const validateFile = async (file: File) => {
-    setLoading(true);
-    try {
-      const arrayBuffer = await file.arrayBuffer();
-      const workbook = XLSX.read(arrayBuffer);
-      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false });
-
-      // Check if there's data and headers
-      if (jsonData.length === 0) {
-        setErrorMessage("A planilha está vazia.");
-        setPlanilhaData(null);
-        setLoading(false);
-        return;
-      }
-
-      // Get the headers from the first row
-      const headers = (jsonData[0] as string[]).map(header => 
-        header ? header.toString().trim().toUpperCase() : ''
-      );
-
-      // Validate headers against expected headers
-      const missingColumns = EXPECTED_HEADERS.filter(
-        header => !headers.includes(header)
-      );
-      
-      const extraColumns = headers.filter(
-        header => header && !EXPECTED_HEADERS.includes(header)
-      );
-
-      const isValid = missingColumns.length === 0;
-
-      if (!isValid) {
-        setErrorMessage(`A planilha não contém todas as colunas necessárias. Faltando: ${missingColumns.join(', ')}`);
-      } else {
-        setErrorMessage(null);
-      }
-
-      // Get the data rows (skip the header row)
-      const rows = jsonData.slice(1).map((row, index) => {
-        const obj: Record<string, any> = { id: index, selected: false };
-        (row as any[]).forEach((cell, idx) => {
-          if (headers[idx]) {
-            obj[headers[idx]] = cell;
-          }
-        });
-        return obj;
-      });
-
-      setPlanilhaData({
-        headers,
-        rows,
-        isValid,
-        missingColumns,
-        extraColumns
-      });
-
-      // Initialize tableData with selected property for each row
-      setTableData(rows.map(row => ({ ...row, selected: false })));
-
-      if (isValid) {
-        toast.success("Planilha validada com sucesso!");
-      }
-    } catch (error) {
-      console.error("Erro ao processar planilha:", error);
-      setErrorMessage("Erro ao processar a planilha. Verifique se o arquivo está em um formato válido (XLSX, XLS, CSV).");
-      setPlanilhaData(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Handle selection of all rows
-  const handleSelectAll = (checked: boolean) => {
-    setSelectAll(checked);
-    setTableData(prevData => 
-      prevData.map(row => ({ ...row, selected: checked }))
-    );
-  };
-
-  // Handle selection of a single row
-  const handleSelectRow = (id: number, checked: boolean) => {
-    setTableData(prevData => {
-      const newData = prevData.map(row => 
-        row.id === id ? { ...row, selected: checked } : row
-      );
-      
-      // Check if all rows are now selected
-      const allSelected = newData.every(row => row.selected);
-      setSelectAll(allSelected);
-      
-      return newData;
-    });
-  };
-
-  // Handle deletion of a row
-  const handleDeleteRow = (id: number) => {
-    setTableData(prevData => {
-      const newData = prevData.filter(row => row.id !== id);
-      return newData;
-    });
-    
-    toast.success("Linha removida com sucesso!");
-  };
-
-  // Calculate total of "VALOR" column for selected rows
-  useEffect(() => {
-    if (tableData.length > 0) {
-      const selectedRows = tableData.filter(row => row.selected);
-      let sum = 0;
-      
-      for (const row of selectedRows) {
-        // Convert string value to number, handle currency format
-        if (row.VALOR) {
-          const valueStr = row.VALOR.toString().replace(/[^\d.,]/g, '').replace(',', '.');
-          const value = parseFloat(valueStr);
-          if (!isNaN(value)) {
-            sum += value;
-          }
-        }
-      }
-      
-      setTotal(sum);
-    } else {
-      setTotal(0);
-    }
-  }, [tableData]);
-
-  const handleProcessar = () => {
-    if (!planilhaData || !planilhaData.isValid) {
-      toast.error("A planilha não é válida para processamento.");
-      return;
-    }
-
-    setShowTable(true);
-    toast.success(`Mostrando ${tableData.length} registros.`);
-  };
-
-  // New function to handle selected records
-  const handleProcessSelected = () => {
-    const selectedRows = tableData.filter(row => row.selected);
-    
-    if (selectedRows.length === 0) {
-      toast.error("Nenhum registro selecionado para processamento.");
-      return;
-    }
-
-    // Reset workflow steps and open dialog
-    setWorkflow({
-      paymentDate: undefined,
-      serviceType: "Pagamentos Diversos",
-      convenente: null,
-      sendMethod: "cnab",
-      outputDirectory: workflow.outputDirectory // Preserve directory setting
-    });
-    setCurrentStep(1);
-    setShowWorkflowDialog(true);
-  };
-
-  // Workflow navigation functions
-  const goToNextStep = () => {
-    setCurrentStep(prev => Math.min(prev + 1, 4));
-  };
-
-  const goToPreviousStep = () => {
-    setCurrentStep(prev => Math.max(prev - 1, 1));
-  };
-
-  // Function to open directory settings dialog
-  const handleOpenDirectorySettings = () => {
-    setShowDirectoryDialog(true);
-  };
-
-  // Function to save directory settings
-  const handleSaveDirectorySettings = () => {
-    localStorage.setItem('cnab240OutputDirectory', workflow.outputDirectory || '');
-    setShowDirectoryDialog(false);
-    toast.success("Configurações de diretório salvas com sucesso!");
-  };
-
-  // Load directory settings on component mount
-  useEffect(() => {
-    const savedDirectory = localStorage.getItem('cnab240OutputDirectory') || '';
-    setWorkflow(prev => ({
-      ...prev,
-      outputDirectory: savedDirectory
-    }));
-  }, []);
-
-  // Final submission handler
-  const handleSubmitWorkflow = async () => {
-    const selectedRows = tableData.filter(row => row.selected);
-    
-    try {
-      setShowWorkflowDialog(false);
-      
-      // If "API REST" method is selected, we would handle that differently
-      if (workflow.sendMethod === 'api') {
-        toast.success(`Enviando ${selectedRows.length} pagamentos via API REST...`);
-        // This would call an API integration - not implemented yet
-        return;
-      }
-      
-      // For CNAB file generation
-      const favorecidos: Favorecido[] = selectedRows.map(row => ({
-        nome: row.NOME,
-        inscricao: row.INSCRICAO,
-        banco: row.BANCO,
-        agencia: row.AGENCIA,
-        conta: row.CONTA,
-        tipo: row.TIPO,
-        valor: parseFloat(row.VALOR.toString().replace(/[^\d.,]/g, '').replace(',', '.'))
-      }));
-      
-      // Generate and download the CNAB file
-      await downloadCNABFile(workflow, favorecidos);
-      
-      console.log("Dados completos do processamento:", {
-        registros: selectedRows,
-        dataPagamento: workflow.paymentDate,
-        tipoServico: workflow.serviceType,
-        convenente: workflow.convenente,
-        metodoEnvio: workflow.sendMethod,
-        diretorioSaida: workflow.outputDirectory
-      });
-      
-    } catch (error) {
-      console.error("Erro ao processar arquivo:", error);
-      toast.error("Ocorreu um erro ao processar o arquivo CNAB");
-    }
-  };
-
-  // Function to update workflow data
-  const updateWorkflow = (field: keyof CNABWorkflowData, value: any) => {
-    setWorkflow(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  // Function to check if the current step is valid
-  const isCurrentStepValid = () => {
-    switch (currentStep) {
-      case 1: // Date selection
-        return workflow.paymentDate !== undefined;
-      case 2: // Service type
-        return workflow.serviceType !== "";
-      case 3: // Convenente
-        return workflow.convenente !== null;
-      case 4: // Send method
-        return workflow.sendMethod !== "";
-      default:
-        return false;
-    }
-  };
-
-  // Get step title
-  const getStepTitle = () => {
-    switch (currentStep) {
-      case 1:
-        return "Data de Pagamento";
-      case 2:
-        return "Tipo de Serviço";
-      case 3:
-        return "Selecionar Convenente";
-      case 4:
-        return "Método de Envio";
-      default:
-        return "";
-    }
-  };
-
-  // Render step content
-  const renderStepContent = () => {
-    switch (currentStep) {
-      case 1:
-        return (
-          <div className="py-6 space-y-4">
-            <p className="text-sm text-gray-500">
-              Selecione a data em que os pagamentos serão processados.
-            </p>
-            <div className="flex flex-col items-center space-y-4">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !workflow.paymentDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {workflow.paymentDate ? (
-                      format(workflow.paymentDate, "dd/MM/yyyy", { locale: ptBR })
-                    ) : (
-                      <span>Selecione uma data</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="center">
-                  <Calendar
-                    mode="single"
-                    selected={workflow.paymentDate}
-                    onSelect={(date) => updateWorkflow("paymentDate", date)}
-                    disabled={(date) => date < new Date()}
-                    initialFocus
-                    locale={ptBR}
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-          </div>
-        );
-
-      case 2:
-        return (
-          <div className="py-6">
-            <p className="text-sm text-gray-500 mb-4">
-              Selecione o tipo de serviço para estes pagamentos.
-            </p>
-            <RadioGroup 
-              value={workflow.serviceType} 
-              onValueChange={(value) => updateWorkflow("serviceType", value)} 
-              className="space-y-3"
-            >
-              <div className="flex items-center space-x-3 space-y-0 border rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
-                <RadioGroupItem value="Pagamentos Diversos" id="diversos" />
-                <Label htmlFor="diversos" className="flex flex-1 items-center space-x-3 cursor-pointer">
-                  <Banknote className="h-5 w-5 text-blue-600" />
-                  <div className="space-y-0.5">
-                    <p className="font-medium leading-none">Pagamentos Diversos</p>
-                    <p className="text-sm text-gray-500">Pagamentos para qualquer finalidade</p>
-                  </div>
-                </Label>
-              </div>
-              
-              <div className="flex items-center space-x-3 space-y-0 border rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
-                <RadioGroupItem value="Pagamentos de Salarios" id="salarios" />
-                <Label htmlFor="salarios" className="flex flex-1 items-center space-x-3 cursor-pointer">
-                  <CreditCard className="h-5 w-5 text-green-600" />
-                  <div className="space-y-0.5">
-                    <p className="font-medium leading-none">Pagamentos de Salários</p>
-                    <p className="text-sm text-gray-500">Folha de pagamento e benefícios</p>
-                  </div>
-                </Label>
-              </div>
-              
-              <div className="flex items-center space-x-3 space-y-0 border rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
-                <RadioGroupItem value="Pagamento de Fornecedores" id="fornecedores" />
-                <Label htmlFor="fornecedores" className="flex flex-1 items-center space-x-3 cursor-pointer">
-                  <Coins className="h-5 w-5 text-orange-600" />
-                  <div className="space-y-0.5">
-                    <p className="font-medium leading-none">Pagamento de Fornecedores</p>
-                    <p className="text-sm text-gray-500">Pagamentos para fornecedores e prestadores</p>
-                  </div>
-                </Label>
-              </div>
-              
-              <div className="flex items-center space-x-3 space-y-0 border rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
-                <RadioGroupItem value="Pix Transferências" id="pix" />
-                <Label htmlFor="pix" className="flex flex-1 items-center space-x-3 cursor-pointer">
-                  <PiggyBank className="h-5 w-5 text-purple-600" />
-                  <div className="space-y-0.5">
-                    <p className="font-medium leading-none">Pix Transferências</p>
-                    <p className="text-sm text-gray-500">Transferências via Pix</p>
-                  </div>
-                </Label>
-              </div>
-            </RadioGroup>
-          </div>
-        );
-
-      case 3:
-        return (
-          <div className="py-6 space-y-4">
-            <p className="text-sm text-gray-500 mb-4">
-              Selecione o convenente responsável pelos pagamentos.
-            </p>
-            
-            {carregandoConvenentes ? (
-              <div className="flex justify-center py-4">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-              </div>
-            ) : (
-              <Select
-                value={workflow.convenente?.id || ""}
-                onValueChange={(value) => {
-                  const selected = convenentes.find(c => c.id === value) || null;
-                  updateWorkflow("convenente", selected);
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione um convenente" />
-                </SelectTrigger>
-                <SelectContent>
-                  {convenentes.length === 0 ? (
-                    <div className="p-2 text-sm text-gray-500">
-                      Nenhum convenente encontrado
-                    </div>
-                  ) : (
-                    convenentes.map((convenente) => (
-                      <SelectItem key={convenente.id} value={convenente.id || ""}>
-                        {convenente.razaoSocial}
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
-            )}
-            
-            {workflow.convenente && (
-              <Card className="mt-4">
-                <CardHeader className="py-3">
-                  <CardTitle className="text-md">Detalhes do Convenente</CardTitle>
-                </CardHeader>
-                <CardContent className="py-2">
-                  <dl className="text-sm divide-y">
-                    <div className="grid grid-cols-3 py-2">
-                      <dt className="font-medium text-gray-500">CNPJ:</dt>
-                      <dd className="col-span-2">{workflow.convenente.cnpj}</dd>
-                    </div>
-                    <div className="grid grid-cols-3 py-2">
-                      <dt className="font-medium text-gray-500">Razão Social:</dt>
-                      <dd className="col-span-2">{workflow.convenente.razaoSocial}</dd>
-                    </div>
-                    <div className="grid grid-cols-3 py-2">
-                      <dt className="font-medium text-gray-500">Banco:</dt>
-                      <dd className="col-span-2">Ag {workflow.convenente.agencia} - Conta {workflow.convenente.conta}</dd>
-                    </div>
-                    <div className="grid grid-cols-3 py-2">
-                      <dt className="font-medium text-gray-500">Convênio:</dt>
-                      <dd className="col-span-2">{workflow.convenente.convenioPag}</dd>
-                    </div>
-                  </dl>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-        );
-
-      case 4:
-        return (
-          <div className="py-6">
-            <p className="text-sm text-gray-500 mb-4">
-              Selecione o método para enviar estes pagamentos ao banco.
-            </p>
-            <RadioGroup value={workflow.sendMethod} onValueChange={(value) => updateWorkflow("sendMethod", value)} className="space-y-4">
-              <div className="flex items-center space-x-3 space-y-0 border rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
-                <RadioGroupItem value="cnab" id="cnab" />
-                <Label htmlFor="cnab" className="flex flex-1 items-center space-x-3 cursor-pointer">
-                  <Download className="h-5 w-5 text-blue-600" />
-                  <div className="space-y-1">
-                    <p className="font-medium leading-none">Arquivo CNAB</p>
-                    <p className="text-sm text-gray-500">Gerar arquivo no padrão CNAB para envio ao banco</p>
-                  </div>
-                </Label>
-              </div>
-              
-              <div className="flex items-center space-x-3 space-y-0 border rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
-                <RadioGroupItem value="api" id="api" />
-                <Label htmlFor="api" className="flex flex-1 items-center space-x-3 cursor-pointer">
-                  <QrCode className="h-5 w-5 text-purple-600" />
-                  <div className="space-y-1">
-                    <p className="font-medium leading-none">API REST</p>
-                    <p className="text-sm text-gray-500">Enviar pagamentos diretamente via API do banco</p>
-                  </div>
-                </Label>
-              </div>
-            </RadioGroup>
-            
-            <div className="mt-6">
-              <Button 
-                variant="outline" 
-                onClick={handleOpenDirectorySettings} 
-                className="w-full flex items-center justify-center"
-              >
-                <Settings className="mr-2 h-4 w-4" />
-                Configurar Diretório de Saída
-              </Button>
-            </div>
-          </div>
-        );
-
-      default:
-        return null;
-    }
-  };
 
   return (
     <ScrollArea className="h-[600px]">
       <div className="space-y-6 pr-4">
         {!showTable ? (
-          <>
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">Importar Planilha</h2>
-              <p className="text-gray-600 dark:text-gray-300">
-                Importe uma planilha com dados para pagamentos. A planilha deve conter as seguintes colunas:
-              </p>
-              <div className="mt-2 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-md">
-                <div className="flex flex-wrap gap-2">
-                  {EXPECTED_HEADERS.map((header) => (
-                    <div key={header} className="px-3 py-1 bg-blue-100 dark:bg-blue-800 rounded-full text-sm text-blue-800 dark:text-blue-100">
-                      {header}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <FileUpload 
-              label="Arraste ou selecione a planilha"
-              accept=".xlsx,.xls,.csv"
-              maxSize={10}
-              maxFiles={1}
-              onChange={handleFileChange}
-              showDropZone={true}
-            />
-
-            {errorMessage && (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Erro na validação</AlertTitle>
-                <AlertDescription>{errorMessage}</AlertDescription>
-              </Alert>
-            )}
-
-            {planilhaData && planilhaData.isValid && (
-              <Alert variant="default" className="bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800">
-                <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
-                <AlertTitle className="text-green-800 dark:text-green-300">Planilha válida</AlertTitle>
-                <AlertDescription className="text-green-700 dark:text-green-400">
-                  A planilha foi validada com sucesso! {planilhaData.rows.length} registros encontrados.
-                </AlertDescription>
-              </Alert>
-            )}
-
-            {planilhaData && planilhaData.extraColumns.length > 0 && (
-              <Alert variant="default" className="bg-yellow-50 dark:bg-yellow-900/30 border-yellow-200 dark:border-yellow-800">
-                <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
-                <AlertTitle className="text-yellow-800 dark:text-yellow-300">Aviso</AlertTitle>
-                <AlertDescription className="text-yellow-700 dark:text-yellow-400">
-                  A planilha contém colunas extras que serão ignoradas: {planilhaData.extraColumns.join(', ')}
-                </AlertDescription>
-              </Alert>
-            )}
-
-            {planilhaData && (
-              <div className="mt-6">
-                <h3 className="text-lg font-semibold mb-2">Prévia dos dados</h3>
-                <div className="rounded-lg border border-gray-200 dark:border-gray-800">
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                      <thead className="bg-gray-50 dark:bg-gray-800">
-                        <tr>
-                          {planilhaData.headers
-                            .filter(header => EXPECTED_HEADERS.includes(header))
-                            .map((header, index) => (
-                              <th 
-                                key={index} 
-                                className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                              >
-                                {header}
-                              </th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
-                        {planilhaData.rows.slice(0, 5).map((row, rowIndex) => (
-                          <tr key={rowIndex} className="hover:bg-gray-50 dark:hover:bg-gray-800/60">
-                            {planilhaData.headers
-                              .filter(header => EXPECTED_HEADERS.includes(header))
-                              .map((header, colIndex) => (
-                                <td 
-                                  key={`${rowIndex}-${colIndex}`} 
-                                  className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300"
-                                >
-                                  {row[header] !== undefined ? row[header] : '—'}
-                                </td>
-                            ))}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-                {planilhaData.rows.length > 5 && (
-                  <p className="text-sm text-gray-500 mt-2">
-                    Mostrando 5 de {planilhaData.rows.length} registros
-                  </p>
-                )}
-              </div>
-            )}
-
-            <div className="flex justify-end">
-              <Button 
-                onClick={handleProcessar} 
-                disabled={!planilhaData || !planilhaData.isValid || loading}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                <FileText className="mr-2 h-4 w-4" />
-                Processar Planilha
-              </Button>
-            </div>
-          </>
+          <FileUploadView
+            file={file}
+            handleFileChange={handleFileChange}
+            errorMessage={errorMessage}
+            planilhaData={planilhaData}
+            loading={loading}
+            handleProcessar={handleProcessar}
+          />
         ) : (
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Dados Importados</h2>
-              <Button 
-                onClick={() => setShowTable(false)}
-                variant="outline"
-              >
-                Voltar
-              </Button>
-            </div>
-            
-            <div className="rounded-lg border border-gray-200 dark:border-gray-800 overflow-hidden">
-              <div className="bg-gray-50 dark:bg-gray-800 px-4 py-3 flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="select-all" 
-                    checked={selectAll} 
-                    onCheckedChange={handleSelectAll}
-                  />
-                  <label htmlFor="select-all" className="text-sm font-medium">
-                    Selecionar todos
-                  </label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm font-medium">
-                    Total selecionado: {tableData.filter(row => row.selected).length} de {tableData.length} registros
-                  </span>
-                </div>
-              </div>
-              
-              <ScrollArea className="h-[400px]">
-                <Table>
-                  <TableHeader className="sticky top-0 z-10 bg-white dark:bg-gray-900">
-                    <TableRow>
-                      <TableHead className="w-12"></TableHead>
-                      {EXPECTED_HEADERS.map((header) => (
-                        <TableHead key={header}>{header}</TableHead>
-                      ))}
-                      <TableHead className="w-12"></TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {tableData.map((row) => (
-                      <TableRow key={row.id} className={row.selected ? "bg-blue-50 dark:bg-blue-900/20" : ""}>
-                        <TableCell>
-                          <Checkbox 
-                            checked={row.selected} 
-                            onCheckedChange={(checked) => handleSelectRow(row.id, checked === true)}
-                          />
-                        </TableCell>
-                        {EXPECTED_HEADERS.map((header) => (
-                          <TableCell key={`${row.id}-${header}`}>
-                            {row[header] !== undefined ? row[header] : '—'}
-                          </TableCell>
-                        ))}
-                        <TableCell>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            onClick={() => handleDeleteRow(row.id)}
-                            className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </ScrollArea>
-            </div>
-            
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 flex justify-between items-center">
-              <span className="font-semibold">
-                Total de valores selecionados: 
-                <span className="ml-2 text-green-600 dark:text-green-400 text-lg">
-                  R$ {total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </span>
-              </span>
-              
-              <Button 
-                onClick={handleProcessSelected}
-                disabled={tableData.filter(row => row.selected).length === 0}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                <FileText className="mr-2 h-4 w-4" />
-                Processar Selecionados
-              </Button>
-            </div>
-          </div>
+          <TableView
+            handleSelectAll={handleSelectAll}
+            selectAll={selectAll}
+            tableData={tableData}
+            handleSelectRow={handleSelectRow}
+            handleDeleteRow={handleDeleteRow}
+            handleProcessSelected={handleProcessSelected}
+            total={total}
+            setShowTable={setShowTable}
+          />
         )}
       </div>
 
       {/* Multi-step workflow dialog */}
-      <Dialog open={showWorkflowDialog} onOpenChange={setShowWorkflowDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>{getStepTitle()}</DialogTitle>
-          </DialogHeader>
-          
-          {/* Step Content */}
-          {renderStepContent()}
-          
-          {/* Step Navigation */}
-          <DialogFooter className="flex justify-between items-center">
-            <div className="flex items-center text-sm text-gray-500">
-              Passo {currentStep} de 4
-            </div>
-            <div className="space-x-2">
-              {currentStep > 1 && (
-                <Button 
-                  variant="outline" 
-                  onClick={goToPreviousStep}
-                  className="flex items-center"
-                >
-                  <ChevronLeft className="mr-1 h-4 w-4" />
-                  Voltar
-                </Button>
-              )}
-              
-              {currentStep < 4 ? (
-                <Button 
-                  onClick={goToNextStep}
-                  disabled={!isCurrentStepValid()}
-                  className="flex items-center"
-                >
-                  Avançar
-                  <ChevronRight className="ml-1 h-4 w-4" />
-                </Button>
-              ) : (
-                <Button 
-                  onClick={handleSubmitWorkflow}
-                  className="bg-green-600 hover:bg-green-700"
-                >
-                  Enviar
-                </Button>
-              )}
-            </div>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <WorkflowDialog 
+        isOpen={showWorkflowDialog}
+        onOpenChange={setShowWorkflowDialog}
+        workflow={workflow}
+        updateWorkflow={updateWorkflow}
+        currentStep={currentStep}
+        totalSteps={4}
+        goToNextStep={goToNextStep}
+        goToPreviousStep={goToPreviousStep}
+        handleSubmit={handleSubmitWorkflow}
+        isCurrentStepValid={isCurrentStepValid}
+        convenentes={convenentes}
+        carregandoConvenentes={carregandoConvenentes}
+      />
 
       {/* Directory configuration dialog */}
-      <Dialog open={showDirectoryDialog} onOpenChange={setShowDirectoryDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Configurar Diretório de Saída</DialogTitle>
-          </DialogHeader>
-          
-          <div className="py-4 space-y-4">
-            <p className="text-sm text-gray-500">
-              Configure o diretório onde os arquivos CNAB serão salvos (opcional).
-              No navegador, os arquivos serão baixados diretamente.
-            </p>
-            
-            <div className="flex items-center space-x-2">
-              <Folder className="h-4 w-4 text-gray-400" />
-              <Input 
-                placeholder="Caminho do diretório (ex: C:/Remessa)"
-                value={workflow.outputDirectory || ''}
-                onChange={(e) => updateWorkflow("outputDirectory", e.target.value)}
-              />
-            </div>
-            
-            <div className="text-sm text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-md border border-yellow-200 dark:border-yellow-800">
-              <p className="flex items-center">
-                <AlertTriangle className="h-4 w-4 mr-2" />
-                Ao usar a aplicação web, os arquivos serão sempre baixados, independente do diretório configurado.
-              </p>
-            </div>
-          </div>
-          
-          <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={() => setShowDirectoryDialog(false)}
-            >
-              Cancelar
-            </Button>
-            <Button 
-              onClick={handleSaveDirectorySettings}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              Salvar Configurações
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DirectoryDialog 
+        isOpen={showDirectoryDialog}
+        onOpenChange={setShowDirectoryDialog}
+        workflow={workflow}
+        updateWorkflow={updateWorkflow}
+        handleSaveSettings={handleSaveDirectorySettings}
+      />
     </ScrollArea>
   );
 };
