@@ -3,9 +3,9 @@ import React, { useEffect } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useImportacao } from '@/hooks/useImportacao';
 
-// Import refactored components
+// Import refactored components - fixing the TableView import to use named import
 import FileUploadView from '@/components/importacao/FileUploadView';
-import TableView from '@/components/importacao/TableView';
+import { TableView } from '@/components/importacao/TableView';
 import WorkflowDialog from '@/components/importacao/WorkflowDialog';
 import DirectoryDialog from '@/components/importacao/DirectoryDialog';
 
