@@ -20,7 +20,8 @@ import {
   formatarNomeFavorecido,
   formatarEnderecoCompleto,
   semAcento,
-  validarCNPJ
+  validarCNPJ,
+  calcularDV
 } from '@/utils/cnabUtils';
 import { gravarSegmentoA } from './segmentos/segmentoA';
 import { gravarSegmentoB } from './segmentos/segmentoB';
@@ -59,10 +60,33 @@ export class GeradorCNAB240 {
     this.config.nomeEmpresa = config.nomeEmpresa || '';
     this.config.cnpj = retirarCHR(config.cnpj || '');
     this.config.endereco = config.endereco || '';
-    this.config.agencia = config.agencia || '';
-    this.config.dvAgencia = config.dvAgencia || '';
-    this.config.conta = config.conta || '';
-    this.config.dvConta = config.dvConta || '';
+    
+    // Process agency: Separate the agency number and its check digit
+    const agenciaCompleta = retirarCHR(config.agencia || '');
+    if (agenciaCompleta.length > 0) {
+      if (agenciaCompleta.length > 1) {
+        // Extract the last character as check digit
+        this.config.dvAgencia = agenciaCompleta.slice(-1);
+        this.config.agencia = agenciaCompleta.slice(0, -1);
+      } else {
+        this.config.agencia = agenciaCompleta;
+        this.config.dvAgencia = calcularDV(agenciaCompleta);
+      }
+    }
+    
+    // Process account: Separate the account number and its check digit
+    const contaCompleta = retirarCHR(config.conta || '');
+    if (contaCompleta.length > 0) {
+      if (contaCompleta.length > 1) {
+        // Extract the last character as check digit
+        this.config.dvConta = contaCompleta.slice(-1);
+        this.config.conta = contaCompleta.slice(0, -1);
+      } else {
+        this.config.conta = contaCompleta;
+        this.config.dvConta = calcularDV(contaCompleta);
+      }
+    }
+    
     this.config.nrConvenio = config.convenioPag || '';
     this.config.codProduto = "0126"; // Fixed for BB payments
     this.config.nrRemessa = "1"; // Could be incremented based on stored value
@@ -87,9 +111,7 @@ export class GeradorCNAB240 {
           cnpj: workflowData.convenente?.cnpj || '',
           endereco: workflowData.convenente?.endereco || '',
           agencia: workflowData.convenente?.agencia || '',
-          dvAgencia: '',  // Should be provided or extracted
           conta: workflowData.convenente?.conta || '',
-          dvConta: '',  // Should be provided or extracted
           convenioPag: workflowData.convenente?.convenioPag || '',
           dataPagamento: workflowData.paymentDate || new Date()
         };
@@ -284,11 +306,12 @@ export class GeradorCNAB240 {
     header += ajustarTamanho(this.config.codProduto, 4);                  // 07.0.BB2 Product code (42-45)
     header += ajustarTamanho("", 7);                                      // 07.0.BB3 Reserved (46-52)
     
+    // Apply correct formatting for agency and account numbers with check digits
     header += ajustarTamanho(this.config.agencia, 5, "0", true);          // 08.0 Agency (53-57)
     header += ajustarTamanho(this.config.dvAgencia, 1);                   // 09.0 Agency check digit (58)
     header += ajustarTamanho(this.config.conta, 12, "0", true);           // 10.0 Account (59-70)
     header += ajustarTamanho(this.config.dvConta, 1);                     // 11.0 Account check digit (71)
-    header += "0";                                                       // 12.0 Agency/Account check digit (72)
+    header += " ";                                                       // 12.0 Agency/Account check digit (72)
     header += ajustarTamanho(formatarNomeFavorecido(this.config.nomeEmpresa), 30); // 13.0 Company name (73-102)
     header += ajustarTamanho(NOME_BB, 30);                                // 14.0 Bank name (103-132)
     header += ajustarTamanho("", 10);                                     // 15.0 FEBRABAN exclusive use (133-142)
@@ -333,11 +356,12 @@ export class GeradorCNAB240 {
     headerLote += ajustarTamanho(this.config.codProduto, 4);              // 11.1.BB2 Product code (42-45)
     headerLote += ajustarTamanho("", 7);                                  // 11.1.BB3 Reserved (46-52)
     
+    // Apply correct formatting for agency and account with separate check digits
     headerLote += ajustarTamanho(this.config.agencia, 5, "0", true);      // 12.1 Agency (53-57)
     headerLote += ajustarTamanho(this.config.dvAgencia, 1);               // 13.1 Agency check digit (58)
     headerLote += ajustarTamanho(this.config.conta, 12, "0", true);       // 14.1 Account (59-70)
     headerLote += ajustarTamanho(this.config.dvConta, 1);                 // 15.1 Account check digit (71)
-    headerLote += "0";                                                   // 16.1 Agency/Account check digit (72)
+    headerLote += " ";                                                   // 16.1 Agency/Account check digit (72)
     headerLote += ajustarTamanho(formatarNomeFavorecido(this.config.nomeEmpresa), 30); // 17.1 Company name (73-102)
     headerLote += ajustarTamanho("", 40);                                 // 18.1 Message (103-142)
     headerLote += ajustarTamanho(this.config.endereco, 30);               // 19.1 Street (143-172)

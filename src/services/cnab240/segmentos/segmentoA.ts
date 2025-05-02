@@ -1,3 +1,4 @@
+
 import {
   ajustarTamanho,
   retirarCHR,
@@ -31,37 +32,30 @@ export const gravarSegmentoA = (
   const agenciaLimpa = retirarCHR(agencia);
   const contaLimpa = retirarCHR(conta);
   
-  // For Banco do Brasil, separate the verification digit
+  // For any bank, separate the verification digit from account/agency
   let agenciaSemDV = agenciaLimpa;
   let dvAgencia = "";
   let contaSemDV = contaLimpa;
   let dvConta = "";
   
-  // If it's Banco do Brasil, extract or calculate the verification digits
-  if (banco === "001") {
-    // For agency, often the last digit is the verification digit
-    if (agenciaLimpa.length > 4) {
-      agenciaSemDV = agenciaLimpa.slice(0, -1);
-      dvAgencia = agenciaLimpa.slice(-1);
-    } else {
-      // If no verification digit is provided, calculate it
-      agenciaSemDV = agenciaLimpa;
-      dvAgencia = calcularDV(agenciaSemDV);
-    }
-    
-    // For account, handle the verification digit
-    if (contaLimpa.length > 1) {
-      contaSemDV = contaLimpa.slice(0, -1);
-      dvConta = contaLimpa.slice(-1);
-    } else {
-      // If no verification digit is provided, calculate it
-      contaSemDV = contaLimpa;
-      dvConta = calcularDV(contaSemDV);
-    }
+  // Extract or calculate the verification digits
+  if (agenciaLimpa.length > 1) {
+    agenciaSemDV = agenciaLimpa.slice(0, -1);
+    dvAgencia = agenciaLimpa.slice(-1);
   } else {
-    // For other banks, keep as provided
+    // If no verification digit is provided, calculate it
     agenciaSemDV = agenciaLimpa;
+    dvAgencia = calcularDV(agenciaSemDV);
+  }
+  
+  // For account, handle the verification digit
+  if (contaLimpa.length > 1) {
+    contaSemDV = contaLimpa.slice(0, -1);
+    dvConta = contaLimpa.slice(-1);
+  } else {
+    // If no verification digit is provided, calculate it
     contaSemDV = contaLimpa;
+    dvConta = calcularDV(contaSemDV);
   }
 
   // Build segment A
@@ -98,7 +92,7 @@ export const gravarSegmentoA = (
   segmentoA += ajustarTamanho(dvAgencia, 1);                   // 11.3A Branch check digit (29)
   segmentoA += ajustarTamanho(contaSemDV, 12, "0", true);      // 12.3A Recipient's account (30-41)
   segmentoA += ajustarTamanho(dvConta, 1);                     // 13.3A Account check digit (42)
-  segmentoA += ajustarTamanho("", 1);                          // 14.3A Agency/Account check digit (43)
+  segmentoA += " ";                                            // 14.3A Agency/Account check digit (43)
   
   // Recipient name - matches positions 44-73
   segmentoA += ajustarTamanho(formatarNomeFavorecido(nomeFavorecido), 30); // 15.3A Recipient name (44-73)
