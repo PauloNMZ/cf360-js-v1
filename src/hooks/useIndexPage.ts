@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { 
@@ -96,27 +95,35 @@ export const useIndexPage = () => {
     console.log("Termo de busca:", searchLower);
     console.log("Convenentes disponíveis:", convenentes.length);
     
+    // For debugging, let's print all available company names before filtering
+    console.log("All available companies:", convenentes.map(c => ({
+      name: String(c.razaoSocial || ''), 
+      nameLower: String(c.razaoSocial || '').toLowerCase()
+    })));
+    
     const filtered = convenentes.filter(conv => {
       if (!conv) return false;
       
-      // Garantir que razaoSocial e cnpj sejam strings e não indefinidos
-      const razaoSocial = String(conv.razaoSocial || '').toLowerCase();
+      // Convert razaoSocial and cnpj to strings and ensure they're not undefined
+      // Important: keep the original value and only convert to lowercase during comparison
+      const razaoSocial = String(conv.razaoSocial || '');
+      const razaoSocialLower = razaoSocial.toLowerCase();
       const cnpj = String(conv.cnpj || '');
-      
-      // Busca por nome da empresa (case insensitive)
-      const nameMatch = razaoSocial.includes(searchLower);
-      
-      // Busca por CNPJ (remove formatação antes de comparar)
       const cnpjClean = cnpj.replace(/\D/g, '');
+      
+      // Check if company name contains search term (case insensitive)
+      const nameMatch = razaoSocialLower.includes(searchLower);
+      
+      // Check if CNPJ contains search digits
       const cnpjMatch = cnpjClean.includes(searchCNPJ);
       
-      console.log(`Verificando: ${razaoSocial} - Nome corresponde: ${nameMatch}, CNPJ corresponde: ${cnpjMatch}`);
+      console.log(`Checking: "${razaoSocial}" (${razaoSocialLower}) - Name matches: ${nameMatch}, CNPJ matches: ${cnpjMatch}`);
       
       return nameMatch || cnpjMatch;
     });
     
-    console.log("Resultados filtrados:", filtered.length);
-    console.log("Empresas encontradas:", filtered.map(c => c.razaoSocial));
+    console.log("Filtered results:", filtered.length);
+    console.log("Companies found:", filtered.map(c => c.razaoSocial));
     
     setFilteredConvenentes(filtered);
   }, [searchTerm, convenentes]);
