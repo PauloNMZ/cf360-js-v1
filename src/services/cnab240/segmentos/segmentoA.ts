@@ -7,7 +7,7 @@ import {
 } from '@/utils/cnabUtils';
 
 /**
- * Generate segment A for CNAB240 file
+ * Generate segment A for CNAB240 file following BB specifications
  */
 export const gravarSegmentoA = (
   codBanco: string,
@@ -26,83 +26,94 @@ export const gravarSegmentoA = (
 ): string => {
   // Define registration type (CPF or CNPJ)
   const tipoInscricao = retirarCHR(inscricaoFavorecido).length <= 11 ? "1" : "2";
+  const dvConta = ""; // Placeholder for account verification digit
+  const dvAgencia = ""; // Placeholder for branch verification digit
 
   // Build segment A
   let segmentoA = "";
   
-  // Control
-  segmentoA += ajustarTamanho(codBanco, 3);                                  // Bank code
-  segmentoA += ajustarTamanho(seqLoteStr, 4, "0", true);                     // Service batch
-  segmentoA += "3";                                                          // Record type
+  // Control header - matches positions 1-8
+  segmentoA += ajustarTamanho(codBanco, 3);                    // 01.3A Bank code (1-3)
+  segmentoA += ajustarTamanho(seqLoteStr, 4, "0", true);       // 02.3A Service batch (4-7)
+  segmentoA += "3";                                            // 03.3A Record type (8)
   
-  // Service
-  segmentoA += ajustarTamanho(seqRegistro.toString(), 5, "0", true);         // Record sequence
-  segmentoA += "A";                                                          // Segment code
-  segmentoA += "0";                                                          // Movement type
-  segmentoA += "00";                                                         // Instruction code for movement
+  // Service data - matches positions 9-17
+  segmentoA += ajustarTamanho(seqRegistro.toString(), 5, "0", true); // 04.3A Record sequence (9-13)
+  segmentoA += "A";                                            // 05.3A Segment code (14)
+  segmentoA += "0";                                            // 06.3A Movement type (15)
+  segmentoA += "00";                                           // 07.3A Instruction code (16-17)
   
-  // Compensation chamber code
-  if (tipoLancamento === "03") {
-    segmentoA += ajustarTamanho(banco, 3, "0", true);                        // Recipient's bank code
-  } else {
-    segmentoA += ajustarTamanho(codBanco, 3);                                // Bank code (BB)
+  // Chamber code - matches positions 18-20
+  let camara = "000";
+  // For TED between different banks
+  if (tipoLancamento === "03" || tipoLancamento === "41" || tipoLancamento === "43") {
+    camara = "018"; // TED (STR, CIP)
   }
+  // For DOC
+  else if (tipoLancamento === "03" && parseFloat(valorPagamento.toString()) <= 4999.99) {
+    camara = "700"; // DOC (COMPE)
+  }
+  segmentoA += ajustarTamanho(camara, 3);                      // 08.3A Chamber code (18-20)
   
-  // Account for credit
-  segmentoA += ajustarTamanho(agencia, 5, "0", true);                        // Recipient's agency
-  segmentoA += ajustarTamanho("", 1);                                        // Agency check digit
-  segmentoA += ajustarTamanho(conta, 12, "0", true);                         // Recipient's account
-  segmentoA += ajustarTamanho("", 1);                                        // Account check digit
-  segmentoA += ajustarTamanho("", 1);                                        // Agency/Account check digit
+  // Recipient bank - matches positions 21-23
+  segmentoA += ajustarTamanho(banco, 3, "0", true);            // 09.3A Recipient's bank code (21-23)
   
-  // Recipient's name
-  segmentoA += ajustarTamanho(formatarNomeFavorecido(nomeFavorecido), 30);
+  // Recipient account - matches positions 24-43
+  segmentoA += ajustarTamanho(agencia, 5, "0", true);          // 10.3A Recipient's branch (24-28)
+  segmentoA += ajustarTamanho(dvAgencia, 1);                   // 11.3A Branch check digit (29)
+  segmentoA += ajustarTamanho(conta, 12, "0", true);           // 12.3A Recipient's account (30-41)
+  segmentoA += ajustarTamanho(dvConta, 1);                     // 13.3A Account check digit (42)
+  segmentoA += ajustarTamanho("", 1);                          // 14.3A Agency/Account check digit (43)
   
-  // Document number assigned by the company
-  segmentoA += ajustarTamanho(nrDocumento, 20);                              // Client document number
+  // Recipient name - matches positions 44-73
+  segmentoA += ajustarTamanho(formatarNomeFavorecido(nomeFavorecido), 30); // 15.3A Recipient name (44-73)
   
-  // Payment date
-  segmentoA += ajustarTamanho(dataPagamento, 8);                             // Payment date
+  // Document number - matches positions 74-93
+  segmentoA += ajustarTamanho(nrDocumento, 20);                // 16.3A Document number (74-93)
   
-  // Currency type
-  segmentoA += ajustarTamanho(moeda, 3);                                     // Currency type (BRL)
+  // Payment date - matches positions 94-101
+  segmentoA += ajustarTamanho(dataPagamento, 8);               // 17.3A Payment date (94-101)
   
-  // Currency amount
-  segmentoA += ajustarTamanho("0", 15, "0", true);                           // Currency amount
+  // Currency type - matches positions 102-104
+  segmentoA += ajustarTamanho(moeda, 3);                       // 18.3A Currency type (102-104)
   
-  // Payment value
-  segmentoA += ajustarTamanho(formatarValorCNABPreciso(valorPagamento), 15, "0", true);
+  // Currency amount - matches positions 105-119
+  segmentoA += ajustarTamanho("0", 15, "0", true);             // 19.3A Currency amount (105-119)
   
-  // Document number assigned by the bank
-  segmentoA += ajustarTamanho("", 20);                                       // Our number - Doc number assigned by bank
+  // Payment value - matches positions 120-134
+  segmentoA += ajustarTamanho(formatarValorCNABPreciso(valorPagamento), 15, "0", true); // 20.3A Payment value (120-134)
   
-  // Effective date
-  segmentoA += ajustarTamanho("0", 8, "0", true);                            // Effective payment date
+  // Our number - matches positions 135-154
+  segmentoA += ajustarTamanho("", 20);                         // 21.3A Our number (135-154)
   
-  // Effective value
-  segmentoA += ajustarTamanho("0", 15, "0", true);                           // Effective payment value
+  // Effective date - matches positions 155-162
+  segmentoA += ajustarTamanho("0", 8, "0", true);              // 22.3A Effective date (155-162)
   
-  // Information 2
+  // Effective value - matches positions 163-177
+  segmentoA += ajustarTamanho("0", 15, "0", true);             // 23.3A Effective value (163-177)
+  
+  // Additional information - matches positions 178-217
+  // For savings accounts (type 05), we need specific information
   if (tipoLancamento === "05") {
-    segmentoA += "11";                                                       // Variation for savings
-    segmentoA += ajustarTamanho("0", 38, "0", true);                         // Complement
+    segmentoA += "01";                                         // Savings variation
+    segmentoA += ajustarTamanho("0", 38, "0", true);           // Complement
   } else {
-    segmentoA += ajustarTamanho("0", 40, "0", true);                         // Standard complement
+    segmentoA += ajustarTamanho("", 40);                       // 24.3A Other information (178-217)
   }
   
-  // Purpose
-  segmentoA += ajustarTamanho("", 2);                                        // DOC Purpose Code
-  segmentoA += ajustarTamanho("", 5);                                        // TED Purpose Code
-  segmentoA += ajustarTamanho("", 2);                                        // Free use - Payment Purpose Complement
+  // TED purpose - matches positions 218-226
+  segmentoA += ajustarTamanho("", 2);                          // 25.3A Service type complement (218-219)
+  segmentoA += ajustarTamanho("", 5);                          // 26.3A TED purpose code (220-224)
+  segmentoA += ajustarTamanho("", 2);                          // 27.3A Payment purpose complement (225-226)
   
-  // CNAB
-  segmentoA += ajustarTamanho("", 3);                                        // CNAB Febraban Exclusive Use
+  // FEBRABAN - matches positions 227-229
+  segmentoA += ajustarTamanho("", 3);                          // 28.3A FEBRABAN exclusive use (227-229)
   
-  // Notice
-  segmentoA += "0";                                                          // Notice
+  // Notice - matches position 230
+  segmentoA += "0";                                            // 29.3A Notice (230)
   
-  // Occurrences
-  segmentoA += ajustarTamanho("0", 10, "0");                                 // Final complement
+  // Occurrences - matches positions 231-240
+  segmentoA += ajustarTamanho("0", 10, "0");                   // 30.3A Occurrences (231-240)
   
   // Ensure record has exactly 240 characters
   return ajustarTamanho(segmentoA, 240);

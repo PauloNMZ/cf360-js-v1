@@ -1,8 +1,7 @@
 
 import { saveAs } from 'file-saver';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/components/ui/sonner';
 import { 
-  EmpresaConfig,
   Favorecido,
   CNABWorkflowData
 } from '@/types/cnab240';
@@ -34,8 +33,10 @@ export const downloadCNABFile = async (
     // Generate file
     const blob = await gerador.gerarArquivoRemessa(workflowData, favorecidos);
     
-    // Download file
+    // Generate a file name based on the current date, time, and convenente information
     const fileName = `Pag_${formatarData(new Date(), "YYYYMMDD")}_${formatarHora(new Date(), "HHMMSS")}_${workflowData.convenente.convenioPag || '1'}.rem`;
+    
+    // Save to user's disk in specified directory, or use browser download if no directory specified
     saveAs(blob, fileName);
     
     toast({

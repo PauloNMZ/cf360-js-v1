@@ -47,7 +47,7 @@ export class GeradorCNAB240 {
       conta: "",
       dvConta: "",
       nrConvenio: "",
-      codProduto: "0126",
+      codProduto: "0126", // Fixed product code for BB
       nrRemessa: "",
       dataPagamento: "",
       nrDocumento: ""
@@ -64,7 +64,7 @@ export class GeradorCNAB240 {
     this.config.conta = config.conta || '';
     this.config.dvConta = config.dvConta || '';
     this.config.nrConvenio = config.convenioPag || '';
-    this.config.codProduto = "0126";
+    this.config.codProduto = "0126"; // Fixed for BB payments
     this.config.nrRemessa = "1"; // Could be incremented based on stored value
     
     // Format payment date if provided
@@ -208,7 +208,7 @@ export class GeradorCNAB240 {
         // Get payment value
         const valorPagamento = favorecido.valor;
 
-        // Write segment A using imported function
+        // Write segment A
         const segmentoA = gravarSegmentoA(
           COD_BB,
           strZero(this.seqLote.toString(), 4),
@@ -230,7 +230,7 @@ export class GeradorCNAB240 {
         // Increment record sequence
         seqRegistro++;
 
-        // Write segment B using imported function
+        // Write segment B
         const segmentoB = gravarSegmentoB(
           COD_BB,
           strZero(this.seqLote.toString(), 4),
@@ -255,7 +255,7 @@ export class GeradorCNAB240 {
       // Write batch trailer
       this.gravarTrailerLote(
         strZero(this.seqLote.toString(), 4),
-        seqRegistro + 2,
+        seqRegistro + 2,  // Include header and trailer
         somaValores
       );
     } catch (error) {
@@ -263,7 +263,7 @@ export class GeradorCNAB240 {
     }
   }
 
-  // Generate the file header
+  // Generate the file header according to CNAB240 specifications
   private gerarHeaderArquivo(): void {
     // Format current date and time
     const dataAtual = formatarData(new Date(), "DDMMYYYY");
@@ -272,32 +272,35 @@ export class GeradorCNAB240 {
     // Build file header
     let header = "";
     
-    header += ajustarTamanho(COD_BB, 3);                                      // Bank code
-    header += ajustarTamanho("0000", 4);                                      // Service batch
-    header += "0";                                                           // Record type
-    header += ajustarTamanho("", 9);                                          // FEBRABAN exclusive use
-    header += "2";                                                           // Registration type (2=CNPJ)
-    header += ajustarTamanho(this.config.cnpj, 14, "0", true);                // Registration number
-    header += ajustarTamanho(this.config.nrConvenio, 9, "0", true);           // Agreement
-    header += ajustarTamanho(this.config.codProduto, 4);                      // Product code
-    header += ajustarTamanho("", 7);                                          // Reserved
-    header += ajustarTamanho(this.config.agencia, 5, "0", true);              // Agency
-    header += ajustarTamanho(this.config.dvAgencia, 1);                       // Agency check digit
-    header += ajustarTamanho(this.config.conta, 12, "0", true);               // Account
-    header += ajustarTamanho(this.config.dvConta, 1);                         // Account check digit
-    header += "0";                                                           // Agency/Account check digit
-    header += ajustarTamanho(formatarNomeFavorecido(this.config.nomeEmpresa), 30); // Company name
-    header += ajustarTamanho(NOME_BB, 30);                                    // Bank name
-    header += ajustarTamanho("", 10);                                         // FEBRABAN exclusive use
-    header += "1";                                                           // Remittance/return code (1=Remessa)
-    header += ajustarTamanho(dataAtual, 8);                                   // Generation date
-    header += ajustarTamanho(horaAtual, 6);                                   // Generation time
-    header += ajustarTamanho(this.config.nrRemessa, 6, "0", true);            // Sequential number
-    header += ajustarTamanho(LAYOUT_VERSAO, 3);                               // Layout version
-    header += ajustarTamanho("00000", 5);                                     // Density
-    header += ajustarTamanho("", 20);                                         // Bank reserved
-    header += ajustarTamanho("", 20);                                         // Company reserved
-    header += ajustarTamanho("", 29);                                         // FEBRABAN exclusive use
+    header += ajustarTamanho(COD_BB, 3);                                  // 01.0 Bank code (1-3)
+    header += ajustarTamanho("0000", 4);                                  // 02.0 Service batch (4-7)
+    header += "0";                                                       // 03.0 Record type (8)
+    header += ajustarTamanho("", 9);                                      // 04.0 FEBRABAN exclusive use (9-17)
+    header += "2";                                                       // 05.0 Registration type (2=CNPJ) (18)
+    header += ajustarTamanho(this.config.cnpj, 14, "0", true);            // 06.0 Registration number (19-32)
+    
+    // Complex field 07.0 "Convênio no Banco" broken down:
+    header += ajustarTamanho(this.config.nrConvenio, 9, "0", true);       // 07.0.BB1 Agreement (33-41)
+    header += ajustarTamanho(this.config.codProduto, 4);                  // 07.0.BB2 Product code (42-45)
+    header += ajustarTamanho("", 7);                                      // 07.0.BB3 Reserved (46-52)
+    
+    header += ajustarTamanho(this.config.agencia, 5, "0", true);          // 08.0 Agency (53-57)
+    header += ajustarTamanho(this.config.dvAgencia, 1);                   // 09.0 Agency check digit (58)
+    header += ajustarTamanho(this.config.conta, 12, "0", true);           // 10.0 Account (59-70)
+    header += ajustarTamanho(this.config.dvConta, 1);                     // 11.0 Account check digit (71)
+    header += "0";                                                       // 12.0 Agency/Account check digit (72)
+    header += ajustarTamanho(formatarNomeFavorecido(this.config.nomeEmpresa), 30); // 13.0 Company name (73-102)
+    header += ajustarTamanho(NOME_BB, 30);                                // 14.0 Bank name (103-132)
+    header += ajustarTamanho("", 10);                                     // 15.0 FEBRABAN exclusive use (133-142)
+    header += "1";                                                       // 16.0 Remittance/return code (1=Remessa) (143)
+    header += ajustarTamanho(dataAtual, 8);                               // 17.0 Generation date (144-151)
+    header += ajustarTamanho(horaAtual, 6);                               // 18.0 Generation time (152-157)
+    header += ajustarTamanho(this.config.nrRemessa, 6, "0", true);        // 19.0 Sequential number (158-163)
+    header += ajustarTamanho(LAYOUT_VERSAO, 3);                           // 20.0 Layout version (164-166)
+    header += ajustarTamanho("00000", 5);                                 // 21.0 Density (167-171)
+    header += ajustarTamanho("", 20);                                     // 22.0 Bank reserved (172-191)
+    header += ajustarTamanho("", 20);                                     // 23.0 Company reserved (192-211)
+    header += ajustarTamanho("", 29);                                     // 24.0-28.0 FEBRABAN exclusive use (212-240)
 
     // Ensure record has exactly 240 characters
     header = ajustarTamanho(header, 240);
@@ -306,7 +309,7 @@ export class GeradorCNAB240 {
     this.escreverNoArquivo(header);
   }
 
-  // Write batch header
+  // Write batch header according to CNAB240 specifications
   private gravarHeaderLote(seqLoteStr: string, tipoLancamento: string): void {
     // Define service type (default "98" - Various Payments)
     const tipoServico = TIPO_SERVICO_PAGAMENTO;
@@ -314,32 +317,36 @@ export class GeradorCNAB240 {
     // Build batch header
     let headerLote = "";
     
-    headerLote += ajustarTamanho(COD_BB, 3);                                  // Bank code
-    headerLote += ajustarTamanho(seqLoteStr, 4, "0", true);                   // Service batch
-    headerLote += "1";                                                       // Record type
-    headerLote += TIPO_OPERACAO;                                             // Operation type (C=Credit)
-    headerLote += tipoServico;                                               // Service type
-    headerLote += ajustarTamanho(tipoLancamento, 2, "0", true);               // Form of entry
-    headerLote += "000 ";                                                    // Layout version and space
-    headerLote += "2";                                                       // Registration type (2=CNPJ)
-    headerLote += ajustarTamanho(this.config.cnpj, 14, "0", true);            // Registration number
-    headerLote += ajustarTamanho(this.config.nrConvenio, 9, "0", true);       // Agreement
-    headerLote += ajustarTamanho(this.config.codProduto, 4);                  // Product code
-    headerLote += ajustarTamanho("", 7);                                      // Reserved
-    headerLote += ajustarTamanho(this.config.agencia, 5, "0", true);          // Agency
-    headerLote += ajustarTamanho(this.config.dvAgencia, 1);                   // Agency check digit
-    headerLote += ajustarTamanho(this.config.conta, 12, "0", true);           // Account
-    headerLote += ajustarTamanho(this.config.dvConta, 1);                     // Account check digit
-    headerLote += "0";                                                       // Agency/Account check digit
-    headerLote += ajustarTamanho(formatarNomeFavorecido(this.config.nomeEmpresa), 30); // Company name
-    headerLote += ajustarTamanho("", 40);                                     // Message
-    headerLote += ajustarTamanho(this.config.endereco, 30);                   // Street
-    headerLote += ajustarTamanho("0", 5, "0", true);                          // Local number
-    headerLote += ajustarTamanho("", 15);                                     // Complement
-    headerLote += ajustarTamanho("", 20);                                     // City
-    headerLote += ajustarTamanho("00000000", 8);                              // ZIP Code
-    headerLote += ajustarTamanho("", 2);                                      // State
-    headerLote += ajustarTamanho("", 8);                                      // FEBRABAN exclusive use
+    headerLote += ajustarTamanho(COD_BB, 3);                              // 01.1 Bank code (1-3)
+    headerLote += ajustarTamanho(seqLoteStr, 4, "0", true);               // 02.1 Service batch (4-7)
+    headerLote += "1";                                                   // 03.1 Record type (8)
+    headerLote += TIPO_OPERACAO;                                         // 04.1 Operation type (C=Credit) (9)
+    headerLote += tipoServico;                                           // 05.1 Service type (10-11)
+    headerLote += ajustarTamanho(tipoLancamento, 2, "0", true);           // 06.1 Form of entry (12-13)
+    headerLote += ajustarTamanho(LAYOUT_VERSAO, 3);                       // 07.1 Layout version (14-16)
+    headerLote += " ";                                                   // 08.1 FEBRABAN exclusive use (17)
+    headerLote += "2";                                                   // 09.1 Registration type (2=CNPJ) (18)
+    headerLote += ajustarTamanho(this.config.cnpj, 14, "0", true);        // 10.1 Registration number (19-32)
+    
+    // Complex field 11.1 "Convênio no Banco" broken down:
+    headerLote += ajustarTamanho(this.config.nrConvenio, 9, "0", true);   // 11.1.BB1 Agreement (33-41)
+    headerLote += ajustarTamanho(this.config.codProduto, 4);              // 11.1.BB2 Product code (42-45)
+    headerLote += ajustarTamanho("", 7);                                  // 11.1.BB3 Reserved (46-52)
+    
+    headerLote += ajustarTamanho(this.config.agencia, 5, "0", true);      // 12.1 Agency (53-57)
+    headerLote += ajustarTamanho(this.config.dvAgencia, 1);               // 13.1 Agency check digit (58)
+    headerLote += ajustarTamanho(this.config.conta, 12, "0", true);       // 14.1 Account (59-70)
+    headerLote += ajustarTamanho(this.config.dvConta, 1);                 // 15.1 Account check digit (71)
+    headerLote += "0";                                                   // 16.1 Agency/Account check digit (72)
+    headerLote += ajustarTamanho(formatarNomeFavorecido(this.config.nomeEmpresa), 30); // 17.1 Company name (73-102)
+    headerLote += ajustarTamanho("", 40);                                 // 18.1 Message (103-142)
+    headerLote += ajustarTamanho(this.config.endereco, 30);               // 19.1 Street (143-172)
+    headerLote += ajustarTamanho("0", 5, "0", true);                      // 20.1 Local number (173-177)
+    headerLote += ajustarTamanho("", 15);                                 // 21.1 Complement (178-192)
+    headerLote += ajustarTamanho("", 20);                                 // 22.1 City (193-212)
+    headerLote += ajustarTamanho("00000000", 8);                          // 23.1 ZIP Code (213-220)
+    headerLote += ajustarTamanho("", 2);                                  // 24.1 State (221-222)
+    headerLote += ajustarTamanho("", 8);                                  // 25.1-27.1 FEBRABAN exclusive use (223-240)
 
     // Ensure record has exactly 240 characters
     headerLote = ajustarTamanho(headerLote, 240);
@@ -348,7 +355,7 @@ export class GeradorCNAB240 {
     this.escreverNoArquivo(headerLote);
   }
 
-  // Write batch trailer
+  // Write batch trailer according to CNAB240 specifications
   private gravarTrailerLote(
     seqLoteStr: string,
     qtdRegistros: number,
@@ -360,16 +367,16 @@ export class GeradorCNAB240 {
     // Build batch trailer
     let trailerLote = "";
     
-    trailerLote += ajustarTamanho(COD_BB, 3);                                      // Bank code
-    trailerLote += ajustarTamanho(seqLoteStr, 4, "0", true);                       // Service batch
-    trailerLote += "5";                                                           // Record type
-    trailerLote += ajustarTamanho("", 9);                                          // FEBRABAN exclusive use
-    trailerLote += ajustarTamanho(qtdRegistros.toString(), 6, "0", true);          // Number of records
-    trailerLote += valorFormatado;                                                // Sum of values
-    trailerLote += ajustarTamanho("0", 18, "0", true);                             // Sum of currency amounts
-    trailerLote += ajustarTamanho("000000", 6, "0", true);                         // Debit notice number
-    trailerLote += ajustarTamanho("", 165);                                        // FEBRABAN exclusive use
-    trailerLote += ajustarTamanho("0", 10, "0", true);                             // Occurrence codes
+    trailerLote += ajustarTamanho(COD_BB, 3);                                  // 01.5 Bank code (1-3)
+    trailerLote += ajustarTamanho(seqLoteStr, 4, "0", true);                   // 02.5 Service batch (4-7)
+    trailerLote += "5";                                                       // 03.5 Record type (8)
+    trailerLote += ajustarTamanho("", 9);                                      // 04.5 FEBRABAN exclusive use (9-17)
+    trailerLote += ajustarTamanho(qtdRegistros.toString(), 6, "0", true);      // 05.5 Number of records (18-23)
+    trailerLote += valorFormatado;                                            // 06.5 Sum of values (24-41)
+    trailerLote += ajustarTamanho("0", 18, "0", true);                         // 07.5 Sum of currency amounts (42-59)
+    trailerLote += ajustarTamanho("000000", 6, "0", true);                     // 08.5 Debit notice number (60-65)
+    trailerLote += ajustarTamanho("", 165);                                    // 09.5 FEBRABAN exclusive use (66-230)
+    trailerLote += ajustarTamanho("0", 10, "0", true);                         // 10.5 Occurrence codes (231-240)
     
     // Ensure record has exactly 240 characters
     trailerLote = ajustarTamanho(trailerLote, 240);
@@ -378,25 +385,19 @@ export class GeradorCNAB240 {
     this.escreverNoArquivo(trailerLote);
   }
 
-  // Generate the file trailer
+  // Generate the file trailer according to CNAB240 specifications
   private gerarTrailerArquivo(): void {
-    // Calculate total value from all payment types
-    const valorTotal = this.somaValoresBBcc + this.somaValoresBBpoup + this.somaValoresDemais;
-    
-    // Format total value correctly (18 positions)
-    const valorFormatado = ajustarTamanho(formatarValorCNABPreciso(valorTotal), 18, "0", true);
-    
     // Build file trailer
     let trailerArquivo = "";
     
-    trailerArquivo += ajustarTamanho(COD_BB, 3);                                   // Bank code
-    trailerArquivo += ajustarTamanho("9999", 4);                                   // Service batch
-    trailerArquivo += "9";                                                         // Record type
-    trailerArquivo += ajustarTamanho("", 9);                                       // FEBRABAN exclusive use
-    trailerArquivo += ajustarTamanho(this.seqLote.toString(), 6, "0", true);       // Number of batches
-    trailerArquivo += ajustarTamanho(this.totalLinhasArquivo.toString(), 6, "0", true); // Number of records
-    trailerArquivo += ajustarTamanho("0", 6, "0", true);                           // Number of accounts
-    trailerArquivo += ajustarTamanho("", 205);                                     // FEBRABAN exclusive use
+    trailerArquivo += ajustarTamanho(COD_BB, 3);                               // 01.9 Bank code (1-3)
+    trailerArquivo += ajustarTamanho("9999", 4);                               // 02.9 Service batch (4-7)
+    trailerArquivo += "9";                                                     // 03.9 Record type (8)
+    trailerArquivo += ajustarTamanho("", 9);                                   // 04.9 FEBRABAN exclusive use (9-17)
+    trailerArquivo += ajustarTamanho(this.seqLote.toString(), 6, "0", true);   // 05.9 Number of batches (18-23)
+    trailerArquivo += ajustarTamanho(this.totalLinhasArquivo.toString(), 6, "0", true); // 06.9 Number of records (24-29)
+    trailerArquivo += ajustarTamanho("0", 6, "0", true);                       // 07.9 Number of accounts (30-35)
+    trailerArquivo += ajustarTamanho("", 205);                                 // 08.9 FEBRABAN exclusive use (36-240)
     
     // Ensure record has exactly 240 characters
     trailerArquivo = ajustarTamanho(trailerArquivo, 240);

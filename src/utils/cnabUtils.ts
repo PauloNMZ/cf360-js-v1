@@ -10,7 +10,7 @@ export const retirarCHR = (texto: string): string => {
 };
 
 // Format a date to the specified format
-export const formatarData = (data: Date | string, formato: string): string => {
+export const formatarData = (data: Date | string | undefined, formato: string): string => {
   if (!data) return '';
   
   const date = data instanceof Date ? data : new Date(data);
@@ -54,7 +54,7 @@ export const formatarHora = (data: Date | string, formato: string): string => {
 
 // Adjust string size and padding
 export const ajustarTamanho = (
-  texto: string | number,
+  texto: string | number | undefined,
   tamanho: number,
   caractere: string = " ",
   aEsquerda: boolean = false
@@ -118,7 +118,29 @@ export const removerAcentos = (texto: string): string => {
 
 // Remove accents and ensure uppercase
 export const semAcento = (texto: string): string => {
-  return removerAcentos(texto);
+  return removerAcentos(texto.toUpperCase());
+};
+
+// Format CPF or CNPJ
+export const formatarCpfCnpj = (valor: string | number, formatado: boolean = true): string => {
+  // Remove any non-numeric character
+  const valorLimpo = String(valor).replace(/\D/g, '');
+  
+  if (!formatado) {
+    // Return only numbers with leading zeros
+    return valorLimpo.length > 11 
+      ? valorLimpo.padStart(14, '0') 
+      : valorLimpo.padStart(11, '0');
+  }
+  
+  // Fill with zeros to the left until reaching the correct size
+  if (valorLimpo.length <= 11) {  // CPF
+    const valorPreenchido = valorLimpo.padStart(11, '0');
+    return `${valorPreenchido.slice(0, 3)}.${valorPreenchido.slice(3, 6)}.${valorPreenchido.slice(6, 9)}-${valorPreenchido.slice(9)}`;
+  } else {  // CNPJ
+    const valorPreenchido = valorLimpo.padStart(14, '0');
+    return `${valorPreenchido.slice(0, 2)}.${valorPreenchido.slice(2, 5)}.${valorPreenchido.slice(5, 8)}/${valorPreenchido.slice(8, 12)}-${valorPreenchido.slice(12)}`;
+  }
 };
 
 // Validate CNPJ
@@ -132,4 +154,56 @@ export const validarCNPJ = (cnpj: string): boolean => {
   
   // For simplicity just check length, but a real implementation would validate the check digits
   return true;
+};
+
+// Calculate verification digit
+export const calcularDV = (strNumero: string): string => {
+  // Remove white spaces from the number
+  const strNum = strNumero.trim();
+  
+  // Return null string if null string was passed or contains non-digits
+  if (strNum.length === 0 || !/^\d+$/.test(strNum)) {
+    return "";
+  }
+  
+  // String for calculation
+  let strCalc = "23456789";
+  
+  // Increase calculation string size
+  while (strNum.length > strCalc.length) {
+    strCalc += strCalc;
+  }
+  
+  // Make calculation string the same size as number
+  strCalc = strCalc.slice(-strNum.length);
+  
+  // Multiply calculation string with number and accumulate
+  let intAcum = 0;
+  for (let intC = 0; intC < strNum.length; intC++) {
+    intAcum += parseInt(strNum[intC]) * parseInt(strCalc[intC]);
+  }
+  
+  // Find remainder of division by 11 which is the DV
+  const intResto = intAcum % 11;
+  
+  // Return verification digit
+  return intResto !== 10 ? intResto.toString() : "X";
+};
+
+// Format bank branch with hyphen
+export const formatarAgencia = (agencia: string): string => {
+  const ultimoDigito = agencia.slice(-1);
+  const ageSemDigito = agencia.slice(0, -1);
+  return `${ageSemDigito}-${ultimoDigito}`;
+};
+
+// Format account number with dots and hyphen
+export const formatarConta = (conta: string): string => {
+  const ultimoDigito = conta.slice(-1);
+  const nrSemDigito = conta.slice(0, -1);
+  
+  // Format with dots every 3 digits
+  const nrFormatado = parseInt(nrSemDigito).toLocaleString('pt-BR').replace(/\./g, '.');
+  
+  return `${nrFormatado}-${ultimoDigito}`;
 };

@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from '@/components/ui/sonner';
 import { CNABWorkflowData, Favorecido } from '@/types/cnab240';
 import { downloadCNABFile } from '@/services/cnab240/index';
@@ -17,13 +17,13 @@ export const useWorkflowDialog = () => {
   });
 
   // Initialize workflow with saved directory
-  useState(() => {
+  useEffect(() => {
     const savedDirectory = localStorage.getItem('cnab240OutputDirectory') || '';
     setWorkflow(prev => ({
       ...prev,
       outputDirectory: savedDirectory
     }));
-  });
+  }, []);
 
   // Navigation functions
   const goToNextStep = () => {
@@ -61,6 +61,9 @@ export const useWorkflowDialog = () => {
   // Handle workflow submission
   const handleSubmitWorkflow = async (selectedRows: RowData[]) => {
     try {
+      // Show processing message
+      toast.info(`Processando ${selectedRows.length} registros...`);
+      
       // If "API REST" method is selected, we would handle that differently
       if (workflow.sendMethod === 'api') {
         toast.success(`Enviando ${selectedRows.length} pagamentos via API REST...`);
@@ -68,7 +71,7 @@ export const useWorkflowDialog = () => {
         return;
       }
       
-      // For CNAB file generation
+      // For CNAB file generation - convert to the expected format
       const favorecidos: Favorecido[] = selectedRows.map(row => ({
         nome: row.NOME,
         inscricao: row.INSCRICAO,
@@ -82,14 +85,18 @@ export const useWorkflowDialog = () => {
       // Generate and download the CNAB file
       await downloadCNABFile(workflow, favorecidos);
       
+      // Log processing details (for debugging)
       console.log("Dados completos do processamento:", {
-        registros: selectedRows,
+        totalRegistros: selectedRows.length,
         dataPagamento: workflow.paymentDate,
         tipoServico: workflow.serviceType,
         convenente: workflow.convenente,
         metodoEnvio: workflow.sendMethod,
         diretorioSaida: workflow.outputDirectory
       });
+      
+      // Show success message
+      toast.success(`Arquivo de remessa gerado com sucesso para ${selectedRows.length} registros.`);
       
     } catch (error) {
       console.error("Erro ao processar arquivo:", error);
