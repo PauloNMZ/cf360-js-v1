@@ -1,6 +1,6 @@
 
 import { saveAs } from 'file-saver';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import { 
   COD_BB, 
   NOME_BB, 
@@ -601,14 +601,16 @@ export const downloadCNABFile = async (
     const fileName = `Pag_${formatarData(new Date(), "YYYYMMDD")}_${formatarHora(new Date(), "HHMMSS")}_${workflowData.convenente.convenioPag || '1'}.rem`;
     saveAs(blob, fileName);
     
-    toast("Arquivo CNAB gerado com sucesso!", {
+    toast({
+      title: "Arquivo CNAB gerado com sucesso!",
       description: `O arquivo ${fileName} foi gerado e está pronto para download.`,
     });
     
     return Promise.resolve();
   } catch (error) {
     console.error("Erro ao gerar arquivo CNAB:", error);
-    toast("Erro ao gerar arquivo CNAB", {
+    toast({
+      title: "Erro ao gerar arquivo CNAB",
       description: error instanceof Error ? error.message : "Ocorreu um erro ao gerar o arquivo CNAB.",
       variant: "destructive",
     });
