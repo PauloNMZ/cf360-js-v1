@@ -217,7 +217,7 @@ export const validarCPF = (cpf: string): boolean => {
   return parseInt(cpf.charAt(10)) === verificationDigit;
 };
 
-// Calculate verification digit
+// Calculate verification digit - Corrected implementation as per user's input
 export const calcularDV = (strNumero: string): string => {
   // Remove white spaces from the number
   const strNum = strNumero.trim();

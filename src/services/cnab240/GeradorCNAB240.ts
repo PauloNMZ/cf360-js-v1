@@ -307,11 +307,15 @@ export class GeradorCNAB240 {
     header += ajustarTamanho("", 7);                                      // 07.0.BB3 Reserved (46-52)
     
     // Apply correct formatting for agency and account numbers with check digits
+    // Agency number (53-57) with leading zeros
     header += ajustarTamanho(this.config.agencia, 5, "0", true);          // 08.0 Agency (53-57)
     header += ajustarTamanho(this.config.dvAgencia, 1);                   // 09.0 Agency check digit (58)
+    
+    // Account number (59-70) with leading zeros
     header += ajustarTamanho(this.config.conta, 12, "0", true);           // 10.0 Account (59-70)
     header += ajustarTamanho(this.config.dvConta, 1);                     // 11.0 Account check digit (71)
-    header += " ";                                                       // 12.0 Agency/Account check digit (72)
+    header += " ";                                                       // 12.0 Reserved (72) - no longer using combined check digit
+    
     header += ajustarTamanho(formatarNomeFavorecido(this.config.nomeEmpresa), 30); // 13.0 Company name (73-102)
     header += ajustarTamanho(NOME_BB, 30);                                // 14.0 Bank name (103-132)
     header += ajustarTamanho("", 10);                                     // 15.0 FEBRABAN exclusive use (133-142)
@@ -357,11 +361,15 @@ export class GeradorCNAB240 {
     headerLote += ajustarTamanho("", 7);                                  // 11.1.BB3 Reserved (46-52)
     
     // Apply correct formatting for agency and account with separate check digits
+    // Agency number (53-57) with leading zeros
     headerLote += ajustarTamanho(this.config.agencia, 5, "0", true);      // 12.1 Agency (53-57)
     headerLote += ajustarTamanho(this.config.dvAgencia, 1);               // 13.1 Agency check digit (58)
+    
+    // Account number (59-70) with leading zeros
     headerLote += ajustarTamanho(this.config.conta, 12, "0", true);       // 14.1 Account (59-70)
     headerLote += ajustarTamanho(this.config.dvConta, 1);                 // 15.1 Account check digit (71)
-    headerLote += " ";                                                   // 16.1 Agency/Account check digit (72)
+    headerLote += " ";                                                   // 16.1 Reserved (72) - no longer using combined check digit
+    
     headerLote += ajustarTamanho(formatarNomeFavorecido(this.config.nomeEmpresa), 30); // 17.1 Company name (73-102)
     headerLote += ajustarTamanho("", 40);                                 // 18.1 Message (103-142)
     headerLote += ajustarTamanho(this.config.endereco, 30);               // 19.1 Street (143-172)

@@ -92,7 +92,7 @@ export const gravarSegmentoA = (
   segmentoA += ajustarTamanho(dvAgencia, 1);                   // 11.3A Branch check digit (29)
   segmentoA += ajustarTamanho(contaSemDV, 12, "0", true);      // 12.3A Recipient's account (30-41)
   segmentoA += ajustarTamanho(dvConta, 1);                     // 13.3A Account check digit (42)
-  segmentoA += " ";                                            // 14.3A Agency/Account check digit (43)
+  segmentoA += " ";                                            // 14.3A Reserved (43) - no longer using combined check digit
   
   // Recipient name - matches positions 44-73
   segmentoA += ajustarTamanho(formatarNomeFavorecido(nomeFavorecido), 30); // 15.3A Recipient name (44-73)
