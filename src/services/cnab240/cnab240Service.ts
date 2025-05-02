@@ -39,18 +39,15 @@ export const downloadCNABFile = async (
     // Save to user's disk in specified directory, or use browser download if no directory specified
     saveAs(blob, fileName);
     
-    toast({
-      title: "Arquivo CNAB gerado com sucesso!",
+    toast.success("Arquivo CNAB gerado com sucesso!", {
       description: `O arquivo ${fileName} foi gerado e está pronto para download.`,
     });
     
     return Promise.resolve();
   } catch (error) {
     console.error("Erro ao gerar arquivo CNAB:", error);
-    toast({
-      title: "Erro ao gerar arquivo CNAB",
+    toast.error("Erro ao gerar arquivo CNAB", {
       description: error instanceof Error ? error.message : "Ocorreu um erro ao gerar o arquivo CNAB.",
-      variant: "destructive",
     });
     return Promise.reject(error);
   }
