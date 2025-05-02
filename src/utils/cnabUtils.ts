@@ -152,8 +152,69 @@ export const validarCNPJ = (cnpj: string): boolean => {
     return false;
   }
   
-  // For simplicity just check length, but a real implementation would validate the check digits
-  return true;
+  // Check for obvious invalid values (all digits the same)
+  if (/^(\d)\1+$/.test(cnpj)) {
+    return false;
+  }
+
+  // Validate first verification digit
+  let sum = 0;
+  let weight = 5;
+  for (let i = 0; i < 12; i++) {
+    sum += parseInt(cnpj.charAt(i)) * weight;
+    weight = weight === 2 ? 9 : weight - 1;
+  }
+  
+  let verificationDigit = sum % 11 < 2 ? 0 : 11 - sum % 11;
+  if (parseInt(cnpj.charAt(12)) !== verificationDigit) {
+    return false;
+  }
+
+  // Validate second verification digit
+  sum = 0;
+  weight = 6;
+  for (let i = 0; i < 13; i++) {
+    sum += parseInt(cnpj.charAt(i)) * weight;
+    weight = weight === 2 ? 9 : weight - 1;
+  }
+  
+  verificationDigit = sum % 11 < 2 ? 0 : 11 - sum % 11;
+  return parseInt(cnpj.charAt(13)) === verificationDigit;
+};
+
+// Validate CPF
+export const validarCPF = (cpf: string): boolean => {
+  // Basic validation - remove non-digits and check length
+  cpf = cpf.replace(/\D/g, '');
+  
+  if (cpf.length !== 11) {
+    return false;
+  }
+  
+  // Check for obvious invalid values (all digits the same)
+  if (/^(\d)\1+$/.test(cpf)) {
+    return false;
+  }
+
+  // Validate first verification digit
+  let sum = 0;
+  for (let i = 0; i < 9; i++) {
+    sum += parseInt(cpf.charAt(i)) * (10 - i);
+  }
+  
+  let verificationDigit = sum % 11 < 2 ? 0 : 11 - sum % 11;
+  if (parseInt(cpf.charAt(9)) !== verificationDigit) {
+    return false;
+  }
+
+  // Validate second verification digit
+  sum = 0;
+  for (let i = 0; i < 10; i++) {
+    sum += parseInt(cpf.charAt(i)) * (11 - i);
+  }
+  
+  verificationDigit = sum % 11 < 2 ? 0 : 11 - sum % 11;
+  return parseInt(cpf.charAt(10)) === verificationDigit;
 };
 
 // Calculate verification digit
@@ -206,4 +267,57 @@ export const formatarConta = (conta: string): string => {
   const nrFormatado = parseInt(nrSemDigito).toLocaleString('pt-BR').replace(/\./g, '.');
   
   return `${nrFormatado}-${ultimoDigito}`;
+};
+
+// Validate account (extracts account without digit, and validates the digit)
+export const validarConta = (contaCompleta: string): { valido: boolean; contaSemDigito: string; digitoEsperado: string; digitoInformado: string } => {
+  const contaLimpa = retirarCHR(contaCompleta);
+  
+  if (!contaLimpa || contaLimpa.length < 2) {
+    return { valido: false, contaSemDigito: '', digitoEsperado: '', digitoInformado: '' };
+  }
+  
+  // Extract the last character as the verification digit
+  const digitoInformado = contaLimpa.slice(-1);
+  const contaSemDigito = contaLimpa.slice(0, -1);
+  
+  // Calculate the expected verification digit
+  const digitoEsperado = calcularDV(contaSemDigito);
+  
+  // Check if the verification digit matches
+  const valido = digitoEsperado === digitoInformado;
+  
+  return { valido, contaSemDigito, digitoEsperado, digitoInformado };
+};
+
+// Validate branch (extracts branch without digit, and validates the digit)
+export const validarAgencia = (agenciaCompleta: string): { valido: boolean; agenciaSemDigito: string; digitoEsperado: string; digitoInformado: string } => {
+  const agenciaLimpa = retirarCHR(agenciaCompleta);
+  
+  if (!agenciaLimpa || agenciaLimpa.length < 2) {
+    return { valido: false, agenciaSemDigito: '', digitoEsperado: '', digitoInformado: '' };
+  }
+  
+  // Extract the last character as the verification digit
+  const digitoInformado = agenciaLimpa.slice(-1);
+  const agenciaSemDigito = agenciaLimpa.slice(0, -1);
+  
+  // Calculate the expected verification digit
+  const digitoEsperado = calcularDV(agenciaSemDigito);
+  
+  // Check if the verification digit matches
+  const valido = digitoEsperado === digitoInformado;
+  
+  return { valido, agenciaSemDigito, digitoEsperado, digitoInformado };
+};
+
+// Validate registration number (CPF or CNPJ)
+export const validarInscricao = (inscricao: string): boolean => {
+  const limpo = retirarCHR(inscricao);
+  
+  if (limpo.length <= 11) {
+    return validarCPF(limpo);
+  } else {
+    return validarCNPJ(limpo);
+  }
 };

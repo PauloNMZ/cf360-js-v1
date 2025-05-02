@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from '@/components/ui/sonner';
 import { CNABWorkflowData, Favorecido } from '@/types/cnab240';
-import { downloadCNABFile } from '@/services/cnab240/index';
+import { downloadCNABFile, processSelectedRows } from '@/services/cnab240/cnab240Service';
 import { RowData } from '@/types/importacao';
 
 export const useWorkflowDialog = () => {
@@ -71,19 +71,8 @@ export const useWorkflowDialog = () => {
         return;
       }
       
-      // For CNAB file generation - convert to the expected format
-      const favorecidos: Favorecido[] = selectedRows.map(row => ({
-        nome: row.NOME,
-        inscricao: row.INSCRICAO,
-        banco: row.BANCO,
-        agencia: row.AGENCIA,
-        conta: row.CONTA,
-        tipo: row.TIPO,
-        valor: parseFloat(row.VALOR.toString().replace(/[^\d.,]/g, '').replace(',', '.'))
-      }));
-      
-      // Generate and download the CNAB file
-      await downloadCNABFile(workflow, favorecidos);
+      // Process selected rows with validation
+      await processSelectedRows(workflow, selectedRows);
       
       // Log processing details (for debugging)
       console.log("Dados completos do processamento:", {
@@ -95,12 +84,9 @@ export const useWorkflowDialog = () => {
         diretorioSaida: workflow.outputDirectory
       });
       
-      // Show success message
-      toast.success(`Arquivo de remessa gerado com sucesso para ${selectedRows.length} registros.`);
-      
     } catch (error) {
       console.error("Erro ao processar arquivo:", error);
-      toast.error("Ocorreu um erro ao processar o arquivo CNAB");
+      // Error handling is already done in processSelectedRows
     }
   };
 

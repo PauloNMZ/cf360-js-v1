@@ -1,13 +1,23 @@
 
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { FileText, Trash2 } from 'lucide-react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { EXPECTED_HEADERS, TableViewProps } from '@/types/importacao';
+import React, { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { RowData, TableViewProps } from "@/types/importacao";
+import { AlertCircle, ArrowLeft, Trash2 } from "lucide-react";
+import { ValidationErrorsDialog } from "./ValidationErrorsDialog";
+import { validateFavorecidos } from "@/services/cnab240/validationService";
+import { ErrorRecord } from "@/types/cnab240";
+import { toast } from "@/components/ui/sonner";
 
-const TableView: React.FC<TableViewProps> = ({
+export function TableView({
   handleSelectAll,
   selectAll,
   tableData,
@@ -16,99 +26,124 @@ const TableView: React.FC<TableViewProps> = ({
   handleProcessSelected,
   total,
   setShowTable
-}) => {
+}: TableViewProps) {
+  const [showValidationDialog, setShowValidationDialog] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<ErrorRecord[]>([]);
+
+  // Function to validate records and display errors
+  const handleVerifyErrors = () => {
+    const { errors, validRecordsCount, totalRecords } = validateFavorecidos(tableData);
+    setValidationErrors(errors);
+    
+    if (errors.length > 0) {
+      setShowValidationDialog(true);
+      toast.error(`Encontrados ${errors.length} registros com erros de validação`, {
+        description: `${validRecordsCount} de ${totalRecords} registros estão válidos para processamento.`
+      });
+    } else {
+      toast.success(`Todos os registros estão válidos!`, {
+        description: `${validRecordsCount} registros validados com sucesso.`
+      });
+    }
+  };
+
+  // Count selected rows
+  const selectedCount = tableData.filter(row => row.selected).length;
+  
+  // Format currency value for display
+  const formatCurrency = (value: number): string => {
+    return value.toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    });
+  };
+
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Dados Importados</h2>
-        <Button 
-          onClick={() => setShowTable(false)}
-          variant="outline"
-        >
-          Voltar
-        </Button>
-      </div>
-      
-      <div className="rounded-lg border border-gray-200 dark:border-gray-800 overflow-hidden">
-        <div className="bg-gray-50 dark:bg-gray-800 px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Checkbox 
-              id="select-all" 
-              checked={selectAll} 
-              onCheckedChange={handleSelectAll}
-            />
-            <label htmlFor="select-all" className="text-sm font-medium">
-              Selecionar todos
-            </label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <span className="text-sm font-medium">
-              Total selecionado: {tableData.filter(row => row.selected).length} de {tableData.length} registros
-            </span>
-          </div>
+    <div className="w-full">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-4">
+          <Button variant="outline" onClick={() => setShowTable(false)}>
+            <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
+          </Button>
+          <Button variant="outline" onClick={handleVerifyErrors}>
+            <AlertCircle className="mr-2 h-4 w-4" /> Verificar Erros
+          </Button>
         </div>
-        
-        <ScrollArea className="h-[400px]">
-          <Table>
-            <TableHeader className="sticky top-0 z-10 bg-white dark:bg-gray-900">
-              <TableRow>
-                <TableHead className="w-12"></TableHead>
-                {EXPECTED_HEADERS.map((header) => (
-                  <TableHead key={header}>{header}</TableHead>
-                ))}
-                <TableHead className="w-12"></TableHead>
+        <div className="flex items-center gap-4">
+          <div className="text-right">
+            <div className="text-sm text-gray-500">
+              {selectedCount} de {tableData.length} registros selecionados
+            </div>
+            <div className="font-bold">
+              Total: {formatCurrency(total)}
+            </div>
+          </div>
+          <Button onClick={handleProcessSelected} disabled={selectedCount === 0}>
+            Processar Selecionados
+          </Button>
+        </div>
+      </div>
+
+      <div className="rounded-md border overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[50px]">
+                <Checkbox
+                  checked={selectAll}
+                  onCheckedChange={handleSelectAll}
+                />
+              </TableHead>
+              <TableHead>Nome</TableHead>
+              <TableHead>Inscrição</TableHead>
+              <TableHead>Banco</TableHead>
+              <TableHead>Agência</TableHead>
+              <TableHead>Conta</TableHead>
+              <TableHead>Tipo</TableHead>
+              <TableHead>Valor</TableHead>
+              <TableHead className="w-[50px]">Ações</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {tableData.map((row: RowData) => (
+              <TableRow key={row.id}>
+                <TableCell>
+                  <Checkbox
+                    checked={row.selected}
+                    onCheckedChange={(checked) => handleSelectRow(row.id, !!checked)}
+                  />
+                </TableCell>
+                <TableCell>{row.NOME}</TableCell>
+                <TableCell>{row.INSCRICAO}</TableCell>
+                <TableCell>{row.BANCO}</TableCell>
+                <TableCell>{row.AGENCIA}</TableCell>
+                <TableCell>{row.CONTA}</TableCell>
+                <TableCell>{row.TIPO}</TableCell>
+                <TableCell>
+                  {typeof row.VALOR === 'number' 
+                    ? formatCurrency(row.VALOR)
+                    : formatCurrency(parseFloat(row.VALOR.toString().replace(/[^\d.,]/g, '').replace(',', '.')))}
+                </TableCell>
+                <TableCell>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDeleteRow(row.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {tableData.map((row) => (
-                <TableRow key={row.id} className={row.selected ? "bg-blue-50 dark:bg-blue-900/20" : ""}>
-                  <TableCell>
-                    <Checkbox 
-                      checked={row.selected} 
-                      onCheckedChange={(checked) => handleSelectRow(row.id, checked === true)}
-                    />
-                  </TableCell>
-                  {EXPECTED_HEADERS.map((header) => (
-                    <TableCell key={`${row.id}-${header}`}>
-                      {row[header] !== undefined ? row[header] : '—'}
-                    </TableCell>
-                  ))}
-                  <TableCell>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={() => handleDeleteRow(row.id)}
-                      className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </ScrollArea>
+            ))}
+          </TableBody>
+        </Table>
       </div>
-      
-      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 flex justify-between items-center">
-        <span className="font-semibold">
-          Total de valores selecionados: 
-          <span className="ml-2 text-green-600 dark:text-green-400 text-lg">
-            R$ {total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-          </span>
-        </span>
-        
-        <Button 
-          onClick={handleProcessSelected}
-          disabled={tableData.filter(row => row.selected).length === 0}
-          className="bg-green-600 hover:bg-green-700"
-        >
-          <FileText className="mr-2 h-4 w-4" />
-          Processar Selecionados
-        </Button>
-      </div>
+
+      <ValidationErrorsDialog 
+        isOpen={showValidationDialog}
+        onOpenChange={setShowValidationDialog}
+        errors={validationErrors}
+      />
     </div>
   );
-};
-
-export default TableView;
+}

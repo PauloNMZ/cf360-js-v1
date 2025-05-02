@@ -32,6 +32,22 @@ export interface Favorecido {
   conta: string;
   tipo: string;
   valor: number;
+  isValid?: boolean;
+}
+
+// Interface for validation errors
+export interface ErrorRecord {
+  id: number;
+  favorecido: Favorecido;
+  errors: FavorecidoError[];
+}
+
+// Interface for specific errors in a payment record
+export interface FavorecidoError {
+  field: string;
+  message: string;
+  expectedValue?: string;
+  actualValue?: string;
 }
 
 // Interface for CNAB workflow data
