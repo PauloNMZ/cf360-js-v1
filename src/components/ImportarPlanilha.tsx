@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { FileUpload } from '@/components/ui/file-upload';
 import { Button } from '@/components/ui/button';
@@ -28,57 +27,19 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ConvenenteData } from '@/types/convenente';
+import { getConvenentes } from '@/services/convenenteService';
 import * as XLSX from 'xlsx';
 
 // Define the expected column headers
 const EXPECTED_HEADERS = [
   'NOME', 'INSCRICAO', 'BANCO', 'AGENCIA', 'CONTA', 'TIPO', 'VALOR'
-];
-
-// Mock data for convenentes - in a real app, this would come from an API or props
-const mockConvenentes: ConvenenteData[] = [
-  {
-    id: '1',
-    cnpj: '12.345.678/0001-90',
-    razaoSocial: 'Empresa ABC Ltda',
-    endereco: 'Rua Principal',
-    numero: '123',
-    complemento: 'Sala 45',
-    uf: 'SP',
-    cidade: 'São Paulo',
-    contato: 'João Silva',
-    fone: '(11) 3333-4444',
-    celular: '(11) 99999-8888',
-    email: 'contato@empresaabc.com.br',
-    agencia: '1234',
-    conta: '56789-0',
-    chavePix: 'empresa@abc.com.br',
-    convenioPag: '12345'
-  },
-  {
-    id: '2',
-    cnpj: '98.765.432/0001-21',
-    razaoSocial: 'Comércio XYZ S.A.',
-    endereco: 'Av. Comercial',
-    numero: '789',
-    complemento: 'Andar 10',
-    uf: 'RJ',
-    cidade: 'Rio de Janeiro',
-    contato: 'Maria Oliveira',
-    fone: '(21) 2222-3333',
-    celular: '(21) 98888-7777',
-    email: 'contato@comercioxyz.com.br',
-    agencia: '5678',
-    conta: '12345-6',
-    chavePix: '98.765.432/0001-21',
-    convenioPag: '67890'
-  }
 ];
 
 interface PlanilhaData {
@@ -122,6 +83,29 @@ const ImportarPlanilha = () => {
     convenente: null,
     sendMethod: "cnab"
   });
+
+  // Estado para armazenar os convenentes reais do banco de dados
+  const [convenentes, setConvenentes] = useState<Array<ConvenenteData & { id: string }>>([]);
+  const [carregandoConvenentes, setCarregandoConvenentes] = useState(false);
+  
+  // Carregar convenentes do banco de dados
+  useEffect(() => {
+    const loadConvenentes = async () => {
+      try {
+        setCarregandoConvenentes(true);
+        const data = await getConvenentes();
+        console.log("Convenentes carregados:", data);
+        setConvenentes(data);
+      } catch (error) {
+        console.error("Erro ao carregar convenentes:", error);
+        toast.error("Erro ao carregar convenentes");
+      } finally {
+        setCarregandoConvenentes(false);
+      }
+    };
+    
+    loadConvenentes();
+  }, []);
   
   // Original file handling functions
   const handleFileChange = (files: File[]) => {
@@ -379,7 +363,7 @@ const ImportarPlanilha = () => {
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {workflow.paymentDate ? (
-                      format(workflow.paymentDate, "dd/MM/yyyy")
+                      format(workflow.paymentDate, "dd/MM/yyyy", { locale: ptBR })
                     ) : (
                       <span>Selecione uma data</span>
                     )}
@@ -465,24 +449,36 @@ const ImportarPlanilha = () => {
               Selecione o convenente responsável pelos pagamentos.
             </p>
             
-            <Select
-              value={workflow.convenente?.id || ""}
-              onValueChange={(value) => {
-                const selected = mockConvenentes.find(c => c.id === value) || null;
-                updateWorkflow("convenente", selected);
-              }}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione um convenente" />
-              </SelectTrigger>
-              <SelectContent>
-                {mockConvenentes.map((convenente) => (
-                  <SelectItem key={convenente.id} value={convenente.id || ""}>
-                    {convenente.razaoSocial}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {carregandoConvenentes ? (
+              <div className="flex justify-center py-4">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+              </div>
+            ) : (
+              <Select
+                value={workflow.convenente?.id || ""}
+                onValueChange={(value) => {
+                  const selected = convenentes.find(c => c.id === value) || null;
+                  updateWorkflow("convenente", selected);
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione um convenente" />
+                </SelectTrigger>
+                <SelectContent>
+                  {convenentes.length === 0 ? (
+                    <div className="p-2 text-sm text-gray-500">
+                      Nenhum convenente encontrado
+                    </div>
+                  ) : (
+                    convenentes.map((convenente) => (
+                      <SelectItem key={convenente.id} value={convenente.id || ""}>
+                        {convenente.razaoSocial}
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+            )}
             
             {workflow.convenente && (
               <Card className="mt-4">
