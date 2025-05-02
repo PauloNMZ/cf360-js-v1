@@ -94,9 +94,9 @@ export const useIndexPage = () => {
       const filtered = convenentes.filter(conv => {
         if (!conv) return false;
         
-        // Safe access to properties
-        const razaoSocial = conv.razaoSocial || '';
-        const cnpj = conv.cnpj || '';
+        // Safe access to properties with explicit type conversion to string
+        const razaoSocial = String(conv.razaoSocial || '');
+        const cnpj = String(conv.cnpj || '');
         
         // Search by company name - convert to lowercase for comparison
         const nameMatch = razaoSocial.toLowerCase().includes(searchLower);
@@ -107,6 +107,10 @@ export const useIndexPage = () => {
         
         return nameMatch || cnpjMatch;
       });
+      
+      console.log("Search term:", searchLower);
+      console.log("Filtered results:", filtered.length);
+      console.log("Company names:", convenentes.map(c => c.razaoSocial?.toLowerCase() || ''));
       
       setFilteredConvenentes(filtered);
     }
