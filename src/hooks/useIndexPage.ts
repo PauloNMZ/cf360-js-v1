@@ -87,33 +87,38 @@ export const useIndexPage = () => {
   useEffect(() => {
     if (!searchTerm.trim()) {
       setFilteredConvenentes(convenentes);
-    } else {
-      const searchLower = searchTerm.toLowerCase().trim();
-      const searchCNPJ = searchTerm.replace(/\D/g, '');
-      
-      const filtered = convenentes.filter(conv => {
-        if (!conv) return false;
-        
-        // Safe access to properties with explicit type conversion to string
-        const razaoSocial = String(conv.razaoSocial || '');
-        const cnpj = String(conv.cnpj || '');
-        
-        // Search by company name - convert to lowercase for comparison
-        const nameMatch = razaoSocial.toLowerCase().includes(searchLower);
-        
-        // Search by CNPJ - remove formatting before comparing
-        const cnpjClean = cnpj.replace(/\D/g, '');
-        const cnpjMatch = cnpjClean.includes(searchCNPJ);
-        
-        return nameMatch || cnpjMatch;
-      });
-      
-      console.log("Search term:", searchLower);
-      console.log("Filtered results:", filtered.length);
-      console.log("Company names:", convenentes.map(c => c.razaoSocial?.toLowerCase() || ''));
-      
-      setFilteredConvenentes(filtered);
+      return;
     }
+    
+    const searchLower = searchTerm.toLowerCase().trim();
+    const searchCNPJ = searchTerm.replace(/\D/g, '');
+    
+    console.log("Termo de busca:", searchLower);
+    console.log("Convenentes disponíveis:", convenentes.length);
+    
+    const filtered = convenentes.filter(conv => {
+      if (!conv) return false;
+      
+      // Garantir que razaoSocial e cnpj sejam strings e não indefinidos
+      const razaoSocial = String(conv.razaoSocial || '').toLowerCase();
+      const cnpj = String(conv.cnpj || '');
+      
+      // Busca por nome da empresa (case insensitive)
+      const nameMatch = razaoSocial.includes(searchLower);
+      
+      // Busca por CNPJ (remove formatação antes de comparar)
+      const cnpjClean = cnpj.replace(/\D/g, '');
+      const cnpjMatch = cnpjClean.includes(searchCNPJ);
+      
+      console.log(`Verificando: ${razaoSocial} - Nome corresponde: ${nameMatch}, CNPJ corresponde: ${cnpjMatch}`);
+      
+      return nameMatch || cnpjMatch;
+    });
+    
+    console.log("Resultados filtrados:", filtered.length);
+    console.log("Empresas encontradas:", filtered.map(c => c.razaoSocial));
+    
+    setFilteredConvenentes(filtered);
   }, [searchTerm, convenentes]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
