@@ -1,4 +1,3 @@
-
 import {
   ajustarTamanho,
   retirarCHR,

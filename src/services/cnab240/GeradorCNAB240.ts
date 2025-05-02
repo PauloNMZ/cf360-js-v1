@@ -1,4 +1,3 @@
-
 import { EmpresaConfig, Favorecido, CNABWorkflowData } from '@/types/cnab240';
 import { validarCNPJ } from '@/utils/cnabUtils';
 import { inicializarVariaveis, formatarDadosEmpresa } from './utils/configUtils';

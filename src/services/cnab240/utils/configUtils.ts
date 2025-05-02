@@ -1,4 +1,3 @@
-
 import { EmpresaConfig } from '@/types/cnab240';
 import { retirarCHR, formatarData, formatarEnderecoCompleto, semAcento, calcularDV } from '@/utils/cnabUtils';
 
