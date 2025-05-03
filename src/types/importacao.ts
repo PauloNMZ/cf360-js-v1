@@ -56,8 +56,11 @@ export interface TableViewProps {
   handleDeleteRow: (id: number) => void;
   handleProcessSelected: () => void;
   handleVerifyErrors: () => void;
+  handleExportErrors: () => void;
   total: number;
   setShowTable: (show: boolean) => void;
+  validationPerformed: boolean;
+  hasValidationErrors: boolean;
 }
 
 export interface FileUploadViewProps {

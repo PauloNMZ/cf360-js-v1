@@ -1,4 +1,3 @@
-
 import { ErrorRecord, Favorecido, FavorecidoError } from '@/types/cnab240';
 import { 
   validarConta,
@@ -148,6 +147,7 @@ export const validateFavorecido = (favorecido: Favorecido): FavorecidoError[] =>
 
 /**
  * Convert RowData to Favorecido objects with validation
+ * Now includes all selected records, even those with errors
  */
 export const convertAndValidateRows = (rows: RowData[]): { favorecidos: Favorecido[], errorRows: RowData[] } => {
   const favorecidos: Favorecido[] = [];
@@ -169,11 +169,15 @@ export const convertAndValidateRows = (rows: RowData[]): { favorecidos: Favoreci
     };
     
     const errors = validateFavorecido(favorecido);
-    if (errors.length === 0) {
-      favorecido.isValid = true;
-      favorecidos.push(favorecido);
-    } else {
-      favorecido.isValid = false;
+    
+    // Mark the record with its validation status but include all records
+    favorecido.isValid = errors.length === 0;
+    
+    // Always add to favorecidos list so no records are dropped
+    favorecidos.push(favorecido);
+    
+    // Also keep track of rows with errors
+    if (errors.length > 0) {
       errorRows.push(row);
     }
   }

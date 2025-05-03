@@ -28,6 +28,8 @@ const ImportarPlanilha = () => {
     showValidationDialog,
     setShowValidationDialog,
     validationErrors,
+    validationPerformed,
+    hasValidationErrors,
     currentStep,
     workflow,
     convenentes,
@@ -39,6 +41,7 @@ const ImportarPlanilha = () => {
     handleProcessar,
     handleProcessSelected,
     handleVerifyErrors,
+    handleExportErrors,
     goToNextStep,
     goToPreviousStep,
     handleOpenDirectorySettings,
@@ -82,8 +85,11 @@ const ImportarPlanilha = () => {
             handleDeleteRow={handleDeleteRow}
             handleProcessSelected={handleProcessSelected}
             handleVerifyErrors={handleVerifyErrors}
+            handleExportErrors={handleExportErrors}
             total={total}
             setShowTable={setShowTable}
+            validationPerformed={validationPerformed}
+            hasValidationErrors={hasValidationErrors}
           />
         )}
       </div>

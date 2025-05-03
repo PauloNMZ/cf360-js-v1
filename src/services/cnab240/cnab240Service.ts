@@ -70,23 +70,25 @@ export const processSelectedRows = async (
       return Promise.reject(new Error("Nenhum registro selecionado"));
     }
     
-    // Convert and validate rows
+    // Convert rows to favorecidos
     const { favorecidos, errorRows } = convertAndValidateRows(selectedRows);
     
     if (favorecidos.length === 0) {
-      toast.error("Nenhum registro válido para processamento", {
-        description: "Verifique os erros e corrija os dados antes de continuar."
+      toast.error("Nenhum registro para processamento", {
+        description: "Selecione pelo menos um registro antes de continuar."
       });
-      return Promise.reject(new Error("Nenhum registro válido"));
+      return Promise.reject(new Error("Nenhum registro selecionado"));
+    }
+
+    // Warn about invalid records but continue processing
+    const invalidCount = favorecidos.filter(f => !f.isValid).length;
+    if (invalidCount > 0) {
+      toast.warning(`${invalidCount} registros com erros serão incluídos no arquivo`, {
+        description: `Verifique se a instituição financeira aceita registros com erros de validação.`
+      });
     }
     
-    if (errorRows.length > 0) {
-      toast.warning(`${errorRows.length} registros com erros foram ignorados`, {
-        description: `Apenas os ${favorecidos.length} registros válidos serão processados.`
-      });
-    }
-    
-    // Generate and download the CNAB file
+    // Generate and download the CNAB file with all records
     return downloadCNABFile(workflowData, favorecidos);
     
   } catch (error) {
