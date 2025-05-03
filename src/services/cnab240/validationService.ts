@@ -87,39 +87,53 @@ export const validateFavorecido = (favorecido: Favorecido): FavorecidoError[] =>
       message: 'Código do banco é obrigatório'
     });
   } else if (favorecido.banco === '001') {
-    // Additional validations only for Banco do Brasil (001)
+    // Validações específicas para Banco do Brasil (001)
     
     // Validate branch
-    const agenciaResult = validarAgencia(favorecido.agencia);
-    if (!agenciaResult.valido) {
+    if (!favorecido.agencia || favorecido.agencia.trim() === '') {
       errors.push({
         field: 'agencia',
-        message: 'Dígito verificador da agência inválido',
-        expectedValue: agenciaResult.digitoEsperado,
-        actualValue: agenciaResult.digitoInformado
+        message: 'Agência é obrigatória'
       });
+    } else {
+      const agenciaResult = validarAgencia(favorecido.agencia);
+      if (!agenciaResult.valido) {
+        errors.push({
+          field: 'agencia',
+          message: 'Dígito verificador da agência inválido',
+          expectedValue: agenciaResult.digitoEsperado,
+          actualValue: agenciaResult.digitoInformado
+        });
+      }
     }
     
     // Validate account
-    const contaResult = validarConta(favorecido.conta);
-    if (!contaResult.valido) {
+    if (!favorecido.conta || favorecido.conta.trim() === '') {
       errors.push({
         field: 'conta',
-        message: 'Dígito verificador da conta inválido',
-        expectedValue: contaResult.digitoEsperado,
-        actualValue: contaResult.digitoInformado
+        message: 'Conta é obrigatória'
       });
+    } else {
+      const contaResult = validarConta(favorecido.conta);
+      if (!contaResult.valido) {
+        errors.push({
+          field: 'conta',
+          message: 'Dígito verificador da conta inválido',
+          expectedValue: contaResult.digitoEsperado,
+          actualValue: contaResult.digitoInformado
+        });
+      }
     }
     
-    // Validate account type - only check for Banco do Brasil (001)
+    // Para Banco do Brasil (001), validar tipo como CC ou PP
     if (!favorecido.tipo || !['CC', 'PP'].includes(favorecido.tipo.toUpperCase().trim())) {
       errors.push({
         field: 'tipo',
-        message: 'Tipo de conta deve ser CC (Conta Corrente) ou PP (Poupança)'
+        message: 'Para Banco do Brasil (001), tipo de conta deve ser CC (Conta Corrente) ou PP (Poupança)'
       });
     }
   } else {
-    // Basic validations for other banks (without digit verification)
+    // Validações básicas para outros bancos (sem verificação de dígito)
     if (!favorecido.agencia || favorecido.agencia.trim() === '') {
       errors.push({
         field: 'agencia',
@@ -138,7 +152,7 @@ export const validateFavorecido = (favorecido: Favorecido): FavorecidoError[] =>
     if (!favorecido.tipo || !['TD', 'PP'].includes(favorecido.tipo.toUpperCase().trim())) {
       errors.push({
         field: 'tipo',
-        message: 'Tipo de conta deve ser TD (Conta Corrente) ou PP (Poupança)'
+        message: 'Para outros bancos, tipo de conta deve ser TD (Conta Corrente) ou PP (Poupança)'
       });
     }
   }
@@ -193,3 +207,4 @@ export const convertAndValidateRows = (rows: RowData[]): { favorecidos: Favoreci
   
   return { favorecidos, errorRows };
 };
+

@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { RowData, TableViewProps } from "@/types/importacao";
-import { AlertCircle, ArrowLeft, Download, Trash2 } from "lucide-react";
+import { ArrowLeft, Download, Trash2 } from "lucide-react";
 
 export function TableView({
   handleSelectAll,
@@ -44,9 +44,6 @@ export function TableView({
         <div className="flex items-center gap-4">
           <Button variant="outline" onClick={() => setShowTable(false)}>
             <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
-          </Button>
-          <Button variant="outline" onClick={handleVerifyErrors}>
-            <AlertCircle className="mr-2 h-4 w-4" /> Verificar Erros
           </Button>
           {validationPerformed && hasValidationErrors && (
             <Button 
