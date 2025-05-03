@@ -81,3 +81,10 @@ export interface EmailFormValues {
   companyName: string;
   message: string;
 }
+
+export interface ValidationErrorsDialogProps {
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  errors: any[];
+  handleExportErrors?: () => void;
+}

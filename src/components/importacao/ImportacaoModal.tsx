@@ -7,11 +7,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { FileUploadView } from "./FileUploadView";
+import FileUploadView from "./FileUploadView";
 import { TableView } from "./TableView";
 import { useImportacao } from "@/hooks/useImportacao";
-import { WorkflowDialog } from "./WorkflowDialog";
-import { DirectoryDialog } from "./DirectoryDialog";
+import WorkflowDialog from "./WorkflowDialog";
+import DirectoryDialog from "./DirectoryDialog";
 import { ValidationErrorsDialog } from "./ValidationErrorsDialog";
 import { EmailConfigDialog } from "./EmailConfigDialog";
 
@@ -151,7 +151,6 @@ export default function ImportacaoModal({ isOpen, onOpenChange }: ImportacaoModa
         isOpen={showValidationDialog}
         onOpenChange={setShowValidationDialog}
         errors={validationErrors}
-        handleExportErrors={handleExportErrors}
       />
 
       <EmailConfigDialog

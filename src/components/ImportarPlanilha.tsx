@@ -42,6 +42,7 @@ const ImportarPlanilha = () => {
     handleProcessSelected,
     handleVerifyErrors,
     handleExportErrors,
+    handleGenerateReport,
     goToNextStep,
     goToPreviousStep,
     handleOpenDirectorySettings,
@@ -86,6 +87,7 @@ const ImportarPlanilha = () => {
             handleProcessSelected={handleProcessSelected}
             handleVerifyErrors={handleVerifyErrors}
             handleExportErrors={handleExportErrors}
+            handleGenerateReport={handleGenerateReport}
             total={total}
             setShowTable={setShowTable}
             validationPerformed={validationPerformed}
