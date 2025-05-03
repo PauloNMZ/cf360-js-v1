@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -64,18 +64,48 @@ export function EmailConfigDialog({
   onSubmit,
   reportDate
 }: EmailConfigDialogProps) {
+  // Get the company name from localStorage if available
+  const [companyName, setCompanyName] = useState("");
+
+  // Effect to get company name from localStorage
+  useEffect(() => {
+    if (isOpen) {
+      // Get company name from temporary storage if available
+      const storedCompanyName = localStorage.getItem('tempEmailCompanyName');
+      if (storedCompanyName) {
+        setCompanyName(storedCompanyName);
+        // Clear the temporary storage
+        localStorage.removeItem('tempEmailCompanyName');
+      }
+    }
+  }, [isOpen]);
+
   // Form initialization with default values
   const form = useForm<EmailFormValues>({
     resolver: zodResolver(emailFormSchema),
     defaultValues: {
       recipientEmail: "",
       senderName: "",
-      senderDepartment: "",
+      senderDepartment: "Financeiro", // Set default department as Financeiro
       remittanceReference: `Remessa de Pagamento - ${reportDate}`,
-      companyName: "",
+      companyName: companyName || "", // Use companyName if available
       message: defaultMessage,
     },
   });
+
+  // Update form values when companyName changes
+  useEffect(() => {
+    if (companyName) {
+      form.setValue('companyName', companyName);
+    }
+  }, [companyName, form]);
+
+  // Update form values when defaultMessage changes
+  useEffect(() => {
+    if (defaultMessage) {
+      form.setValue('message', defaultMessage);
+    }
+  }, [defaultMessage, form]);
 
   // Handler for form submission
   const handleSubmit = (values: EmailFormValues) => {
@@ -172,7 +202,11 @@ export function EmailConfigDialog({
                       <FormControl>
                         <Input 
                           placeholder="Nome da Empresa" 
-                          {...field} 
+                          value={field.value || companyName}
+                          onChange={field.onChange}
+                          onBlur={field.onBlur}
+                          name={field.name}
+                          disabled={!!companyName} // Disable if company name is provided
                         />
                       </FormControl>
                       <FormMessage />

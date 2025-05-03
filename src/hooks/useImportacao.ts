@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
@@ -251,7 +250,7 @@ export const useImportacao = () => {
       if (workflowDialog.workflow.convenente) {
         const selectedConvenente = convenentesData.convenentes.find(c => c.id === workflowDialog.workflow.convenente);
         if (selectedConvenente) {
-          companyName = selectedConvenente.razao_social;
+          companyName = selectedConvenente.razaoSocial;
         }
       }
       
@@ -282,10 +281,11 @@ export const useImportacao = () => {
       // Store report data
       setReportData(pdfReportData);
       
-      // Generate default email message with the reference
+      // Generate default email message with the reference and formatted date
+      const formattedDateForEmail = formattedDate.split(' ')[0]; // Just the date part
       const emailMsg = `Prezado Diretor Financeiro,
 
-Segue em anexo o relatório detalhado da remessa bancária gerada em ${formattedDate.split(' ')[0]}, contendo os valores a serem creditados nas respectivas contas dos beneficiários. Solicitamos a sua análise e autorização para a liberação dos pagamentos.
+Segue em anexo o relatório detalhado da remessa bancária gerada em ${formattedDateForEmail}, contendo os valores a serem creditados nas respectivas contas dos beneficiários. Solicitamos a sua análise e autorização para a liberação dos pagamentos.
 
 Atenciosamente,
 [Nome do responsável]
@@ -322,8 +322,52 @@ Atenciosamente,
   const handleSendEmailReport = () => {
     // Close PDF dialog
     setShowPDFPreviewDialog(false);
-    // Open email config dialog
+    
+    // Get selected convenente name for company name in email form
+    let companyName = "";
+    if (workflowDialog.workflow.convenente) {
+      const selectedConvenente = convenentesData.convenentes.find(
+        c => c.id === workflowDialog.workflow.convenente
+      );
+      if (selectedConvenente) {
+        companyName = selectedConvenente.razaoSocial;
+      }
+    }
+    
+    // Open email config dialog with company name pre-filled
     setShowEmailConfigDialog(true);
+    
+    // Update default company name in the email form
+    if (companyName) {
+      // This will be picked up by the EmailConfigDialog component
+      localStorage.setItem('tempEmailCompanyName', companyName);
+    }
+  };
+
+  // Handle sending the report via email after preview
+  const handleSendEmailReport = () => {
+    // Close PDF dialog
+    setShowPDFPreviewDialog(false);
+    
+    // Get selected convenente name for company name in email form
+    let companyName = "";
+    if (workflowDialog.workflow.convenente) {
+      const selectedConvenente = convenentesData.convenentes.find(
+        c => c.id === workflowDialog.workflow.convenente
+      );
+      if (selectedConvenente) {
+        companyName = selectedConvenente.razaoSocial;
+      }
+    }
+    
+    // Open email config dialog with company name pre-filled
+    setShowEmailConfigDialog(true);
+    
+    // Update default company name in the email form
+    if (companyName) {
+      // This will be picked up by the EmailConfigDialog component
+      localStorage.setItem('tempEmailCompanyName', companyName);
+    }
   };
 
   // Handle email form submission
