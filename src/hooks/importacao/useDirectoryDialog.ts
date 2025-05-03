@@ -1,4 +1,6 @@
+
 import { useState, useEffect } from 'react';
+import { STORAGE_KEYS } from '@/services/storage';
 
 export const useDirectoryDialog = () => {
   const [showDirectoryDialog, setShowDirectoryDialog] = useState(false);
@@ -6,7 +8,7 @@ export const useDirectoryDialog = () => {
 
   // Initialize with saved settings
   useEffect(() => {
-    const savedDirectory = localStorage.getItem('cnab240OutputDirectory') || '';
+    const savedDirectory = localStorage.getItem(STORAGE_KEYS.CNAB240_OUTPUT_DIRECTORY) || '';
     setOutputDirectory(savedDirectory);
   }, []);
 
@@ -15,10 +17,9 @@ export const useDirectoryDialog = () => {
     setShowDirectoryDialog(true);
   };
 
-  // Handle saving directory settings
-  const handleSaveDirectorySettings = (directory: string) => {
-    setOutputDirectory(directory);
-    localStorage.setItem('cnab240OutputDirectory', directory);
+  // Handle saving directory settings - updated to use the current state
+  const handleSaveDirectorySettings = () => {
+    localStorage.setItem(STORAGE_KEYS.CNAB240_OUTPUT_DIRECTORY, outputDirectory);
     setShowDirectoryDialog(false);
   };
 
@@ -27,6 +28,7 @@ export const useDirectoryDialog = () => {
     showDirectoryDialog,
     setShowDirectoryDialog,
     outputDirectory,
+    setOutputDirectory,
     handleOpenDirectorySettings,
     handleSaveDirectorySettings,
   };

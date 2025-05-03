@@ -28,12 +28,17 @@ export const useImportacao = () => {
     }
   }, [fileImport.tableData]);
 
-  // Sync directory settings between hooks
+  // Update directory in workflow when output directory changes
   useEffect(() => {
-    if (directoryDialog.outputDirectory) {
-      workflowDialog.updateWorkflow('outputDirectory', directoryDialog.outputDirectory);
-    }
+    workflowDialog.updateWorkflow('outputDirectory', directoryDialog.outputDirectory);
   }, [directoryDialog.outputDirectory]);
+  
+  // Sync workflow directory to directoryDialog when workflow changes
+  useEffect(() => {
+    if (workflowDialog.workflow.outputDirectory !== undefined) {
+      directoryDialog.setOutputDirectory(workflowDialog.workflow.outputDirectory);
+    }
+  }, [workflowDialog.workflow.outputDirectory]);
   
   // Handle initial processing
   const handleProcessar = () => {
@@ -62,6 +67,14 @@ export const useImportacao = () => {
     });
     workflowDialog.setCurrentStep(1);
     workflowDialog.setShowWorkflowDialog(true);
+  };
+
+  // Handle save directory settings
+  const handleSaveDirectorySettings = () => {
+    // First update the workflow with the directory dialog value
+    workflowDialog.updateWorkflow('outputDirectory', directoryDialog.outputDirectory);
+    // Then save settings
+    directoryDialog.handleSaveDirectorySettings();
   };
 
   // Final submission handler
@@ -110,7 +123,7 @@ export const useImportacao = () => {
     showDirectoryDialog: directoryDialog.showDirectoryDialog,
     setShowDirectoryDialog: directoryDialog.setShowDirectoryDialog,
     handleOpenDirectorySettings: directoryDialog.handleOpenDirectorySettings,
-    handleSaveDirectorySettings: directoryDialog.handleSaveDirectorySettings,
+    handleSaveDirectorySettings,
     
     // Convenentes data
     convenentes: convenentesData.convenentes,
