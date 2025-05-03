@@ -74,12 +74,13 @@ export const generatePDFReport = async (reportData: ReportData): Promise<Blob> =
     margin: { top: 70 }
   });
   
-  // Add total row
+  // Add total row - CORRIGIDO: Aumentar a distância entre "TOTAL:" e o valor para evitar sobreposição
   const finalY = (doc as any).lastAutoTable.finalY;
   doc.line(15, finalY + 5, 195, finalY + 5);
   
   doc.setFont(undefined, 'bold');
-  doc.text("TOTAL:", 145, finalY + 12);
+  // Movido o texto "TOTAL:" mais para a esquerda para evitar sobreposição
+  doc.text("TOTAL:", 130, finalY + 12);
   doc.text(formatarValorCurrency(reportData.valorTotal).replace('R$', '').trim(), 178, finalY + 12, { align: 'right' });
   
   doc.line(15, finalY + 17, 195, finalY + 17);

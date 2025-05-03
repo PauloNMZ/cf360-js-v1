@@ -77,9 +77,10 @@ export interface FileUploadViewProps {
 export interface EmailFormValues {
   recipientEmail: string;
   senderName: string;
+  senderEmail: string; // Adicionado campo para email do remetente
   senderDepartment: string;
   remittanceReference: string;
-  companyName: string;
+  companyName?: string;
   message: string;
 }
 

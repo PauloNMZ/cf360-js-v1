@@ -26,6 +26,10 @@ const emailFormSchema = z.object({
   senderName: z
     .string()
     .min(1, "Nome do remetente é obrigatório"),
+  senderEmail: z
+    .string()
+    .email("E-mail do remetente inválido")
+    .min(1, "E-mail do remetente é obrigatório"),
   senderDepartment: z
     .string()
     .min(1, "Departamento é obrigatório"),
@@ -100,14 +104,15 @@ export function EmailForm({
 
             <FormField
               control={form.control}
-              name="senderDepartment"
+              name="senderEmail"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Departamento</FormLabel>
+                  <FormLabel>E-mail do Remetente</FormLabel>
                   <FormControl>
-                    <Input 
-                      placeholder="Financeiro" 
-                      {...field} 
+                    <Input
+                      readOnly 
+                      {...field}
+                      className="bg-gray-50" 
                     />
                   </FormControl>
                   <FormMessage />
@@ -115,6 +120,23 @@ export function EmailForm({
               )}
             />
           </div>
+
+          <FormField
+            control={form.control}
+            name="senderDepartment"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Departamento</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="Financeiro" 
+                    {...field} 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           <FormField
             control={form.control}

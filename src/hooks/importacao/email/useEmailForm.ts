@@ -4,8 +4,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useEffect } from "react";
 import { EmailFormValues } from "@/types/importacao";
+import { getCurrentUserEmail } from "@/services/emailService";
 
-// Schema for the email form - updated to make companyName optional and hidden
+// Schema for the email form - updated to include senderEmail field
 const emailFormSchema = z.object({
   recipientEmail: z
     .string()
@@ -14,6 +15,9 @@ const emailFormSchema = z.object({
   senderName: z
     .string()
     .min(1, "Nome do remetente é obrigatório"),
+  senderEmail: z
+    .string()
+    .email("E-mail do remetente inválido"),
   senderDepartment: z
     .string()
     .min(1, "Departamento é obrigatório"),
@@ -37,12 +41,16 @@ export const useEmailForm = ({
   companyName,
   reportDate
 }: UseEmailFormProps) => {
+  // Get the current user's email
+  const userEmail = getCurrentUserEmail();
+  
   // Form initialization with default values
   const form = useForm<EmailFormValues>({
     resolver: zodResolver(emailFormSchema),
     defaultValues: {
       recipientEmail: "",
       senderName: "",
+      senderEmail: userEmail, // Usar o email do usuário logado
       senderDepartment: "Financeiro", // Set default department as Financeiro
       remittanceReference: `Remessa de Pagamento - ${reportDate}`,
       companyName: companyName,

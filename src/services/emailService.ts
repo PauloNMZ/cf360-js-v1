@@ -1,10 +1,12 @@
 
 import { toast } from "@/components/ui/sonner";
 import { saveAs } from 'file-saver';
+import { useAuth } from '@/hooks/use-auth'; // Esta importação será usada apenas para exemplificar o tipo
 
 interface EmailData {
   recipientEmail: string;
   senderName: string;
+  senderEmail: string; // Adicionado campo para email do remetente
   senderDepartment: string;
   subject: string;
   message: string;
@@ -25,7 +27,7 @@ export const sendEmail = async (emailData: EmailData): Promise<EmailResponse> =>
   // Log email data for debugging/demo purposes
   console.log("Sending email:", {
     to: emailData.recipientEmail,
-    from: `${emailData.senderName} <${emailData.senderName.toLowerCase().replace(/\s/g, '.')}@empresa.com>`,
+    from: `${emailData.senderName} <${emailData.senderEmail}>`,
     subject: emailData.subject,
     messagePreview: emailData.message.substring(0, 100) + '...',
     attachmentName: emailData.attachmentFileName,
@@ -65,6 +67,7 @@ export const logEmailActivity = (emailData: EmailData, response: EmailResponse) 
     timestamp: new Date().toISOString(),
     recipient: emailData.recipientEmail,
     sender: emailData.senderName,
+    senderEmail: emailData.senderEmail,
     subject: emailData.subject,
     attachmentName: emailData.attachmentFileName,
     success: response.success,
@@ -85,4 +88,27 @@ export const logEmailActivity = (emailData: EmailData, response: EmailResponse) 
   localStorage.setItem('emailActivityLogs', JSON.stringify(existingLogs));
   
   return logEntry;
+};
+
+/**
+ * Função para obter o email do usuário logado
+ * Em um sistema real, isso viria do contexto de autenticação
+ */
+export const getCurrentUserEmail = (): string => {
+  // Em uma implementação real, isso viria do contexto de autenticação
+  // Por exemplo: return useAuth().user?.email || '';
+  
+  // Recuperar do localStorage (simulando um usuário logado)
+  const userEmail = localStorage.getItem('userEmail') || '';
+  
+  // Se não houver email salvo, usar um email padrão
+  return userEmail || 'usuario@empresa.com';
+};
+
+/**
+ * Função para formatar o email do usuário para uso como remetente
+ */
+export const formatUserEmailAsSender = (name: string): string => {
+  const email = getCurrentUserEmail();
+  return email.toLowerCase();
 };

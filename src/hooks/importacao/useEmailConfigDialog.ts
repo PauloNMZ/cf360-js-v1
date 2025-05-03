@@ -90,6 +90,7 @@ Atenciosamente,
       const emailData = {
         recipientEmail: emailFormValues.recipientEmail,
         senderName: emailFormValues.senderName,
+        senderEmail: emailFormValues.senderEmail, // Usando o email do remetente configurado
         senderDepartment: emailFormValues.senderDepartment,
         subject: `Relatório de Remessa Bancária - ${emailFormValues.remittanceReference}`,
         message: emailFormValues.message,
