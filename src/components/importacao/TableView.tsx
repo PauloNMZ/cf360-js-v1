@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { RowData, TableViewProps } from "@/types/importacao";
-import { ArrowLeft, Download, Filter, Trash2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { ArrowLeft, Download, Filter, Trash2, FileText, Mail } from "lucide-react";
 import {
   Pagination,
   PaginationContent,
@@ -20,6 +20,8 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
+  PaginationFirst,
+  PaginationLast,
 } from "@/components/ui/pagination";
 import {
   Popover,
@@ -43,6 +45,7 @@ export function TableView({
   handleProcessSelected,
   handleVerifyErrors,
   handleExportErrors,
+  handleGenerateReport,
   total,
   setShowTable,
   validationPerformed,
@@ -161,6 +164,16 @@ export function TableView({
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>
+          
+          <Button 
+            variant="outline" 
+            onClick={handleGenerateReport} 
+            disabled={selectedCount === 0}
+            className="bg-green-50 hover:bg-green-100 border-green-200 text-green-700"
+          >
+            <FileText className="mr-2 h-4 w-4" /> Gerar Relatório
+          </Button>
+          
           <Button onClick={handleProcessSelected} disabled={selectedCount === 0}>
             Processar Selecionados
           </Button>
@@ -240,8 +253,15 @@ export function TableView({
         <Pagination>
           <PaginationContent>
             <PaginationItem>
-              <PaginationPrevious 
+              <PaginationFirst 
                 onClick={() => goToPage(1)} 
+                className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+              />
+            </PaginationItem>
+            
+            <PaginationItem>
+              <PaginationPrevious
+                onClick={() => goToPage(currentPage - 1)}
                 className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
               />
             </PaginationItem>
@@ -266,6 +286,13 @@ export function TableView({
             <PaginationItem>
               <PaginationNext 
                 onClick={() => goToPage(currentPage + 1)} 
+                className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+              />
+            </PaginationItem>
+            
+            <PaginationItem>
+              <PaginationLast 
+                onClick={() => goToPage(totalPages)} 
                 className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
               />
             </PaginationItem>

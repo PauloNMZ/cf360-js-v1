@@ -57,6 +57,7 @@ export interface TableViewProps {
   handleProcessSelected: () => void;
   handleVerifyErrors: () => void;
   handleExportErrors: () => void;
+  handleGenerateReport: () => void;
   total: number;
   setShowTable: (show: boolean) => void;
   validationPerformed: boolean;
@@ -70,4 +71,13 @@ export interface FileUploadViewProps {
   planilhaData: PlanilhaData | null;
   loading: boolean;
   handleProcessar: () => void;
+}
+
+export interface EmailFormValues {
+  recipientEmail: string;
+  senderName: string;
+  senderDepartment: string;
+  remittanceReference: string;
+  companyName: string;
+  message: string;
 }

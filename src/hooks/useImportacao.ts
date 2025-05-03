@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { CNABWorkflowData } from '@/types/cnab240';
-import { RowData } from '@/types/importacao';
+import { RowData, EmailFormValues } from '@/types/importacao';
 import { toast } from '@/components/ui/sonner';
 import { validateFavorecidos } from '@/services/cnab240/validationService';
 
@@ -13,12 +13,19 @@ import { useTableOperations } from './importacao/useTableOperations';
 import { useWorkflowDialog } from './importacao/useWorkflowDialog';
 import { useDirectoryDialog } from './importacao/useDirectoryDialog';
 import { useConvenentesData } from './importacao/useConvenentesData';
+import { generateRemittanceReport, generateEmailMessage } from '@/services/reports/remittanceReportService';
+import { sendEmail, logEmailActivity } from '@/services/emailService';
 
 export const useImportacao = () => {
   const [showTable, setShowTable] = useState(false);
   const [showValidationDialog, setShowValidationDialog] = useState(false);
   const [validationErrors, setValidationErrors] = useState<any[]>([]);
   const [validationPerformed, setValidationPerformed] = useState(false);
+  
+  // New states for report generation and email
+  const [showEmailConfigDialog, setShowEmailConfigDialog] = useState(false);
+  const [reportDate, setReportDate] = useState('');
+  const [defaultEmailMessage, setDefaultEmailMessage] = useState('');
   
   // Import functionality from smaller hooks
   const fileImport = useFileImport();
@@ -171,6 +178,103 @@ export const useImportacao = () => {
     await workflowDialog.handleSubmitWorkflow(selectedRows);
   };
 
+  // NEW FUNCTION: Handle report generation
+  const handleGenerateReport = async () => {
+    const selectedRows = tableOps.getSelectedRows();
+    
+    if (selectedRows.length === 0) {
+      toast.error("Nenhum registro selecionado para gerar relatório.");
+      return;
+    }
+
+    try {
+      // Initialize report options with default values
+      const reportOptions = {
+        companyName: "Empresa",
+        remittanceReference: `Remessa de Pagamento - ${new Date().toLocaleDateString('pt-BR')}`,
+        responsibleName: "Usuário do Sistema",
+        department: "Financeiro"
+      };
+
+      // Show toast message
+      toast.info("Gerando relatório de remessa bancária...");
+      
+      // Generate the report
+      const reportResult = await generateRemittanceReport(selectedRows, reportOptions);
+      
+      // Set report date for email dialog
+      setReportDate(reportResult.formattedDate);
+      
+      // Generate default email message
+      const emailMsg = generateEmailMessage(reportResult.formattedDate, reportOptions);
+      setDefaultEmailMessage(emailMsg);
+      
+      // Open email configuration dialog
+      setShowEmailConfigDialog(true);
+      
+      // Return the report data for future use
+      return reportResult;
+      
+    } catch (error) {
+      console.error("Erro ao gerar relatório:", error);
+      toast.error("Erro ao gerar relatório de remessa bancária.");
+    }
+  };
+
+  // Handle email form submission
+  const handleEmailSubmit = async (emailFormValues: EmailFormValues) => {
+    try {
+      const selectedRows = tableOps.getSelectedRows();
+      
+      // Show sending email toast
+      toast.info("Enviando relatório por e-mail...");
+      
+      // Generate the report again with the updated company name and reference
+      const reportOptions = {
+        companyName: emailFormValues.companyName,
+        remittanceReference: emailFormValues.remittanceReference,
+        responsibleName: emailFormValues.senderName,
+        department: emailFormValues.senderDepartment
+      };
+      
+      const reportResult = await generateRemittanceReport(selectedRows, reportOptions);
+      
+      // Prepare email data
+      const emailData = {
+        recipientEmail: emailFormValues.recipientEmail,
+        senderName: emailFormValues.senderName,
+        senderDepartment: emailFormValues.senderDepartment,
+        subject: `Relatório de Remessa Bancária - ${emailFormValues.remittanceReference}`,
+        message: emailFormValues.message,
+        attachmentFile: reportResult.file,
+        attachmentFileName: reportResult.fileName
+      };
+      
+      // Send the email
+      const response = await sendEmail(emailData);
+      
+      // Log email activity for audit
+      logEmailActivity(emailData, response);
+      
+      // Close the email dialog
+      setShowEmailConfigDialog(false);
+      
+      if (response.success) {
+        toast.success("Relatório enviado com sucesso!", {
+          description: `E-mail enviado para ${emailFormValues.recipientEmail}`
+        });
+      } else {
+        toast.error("Erro ao enviar e-mail", {
+          description: response.error || "Ocorreu um erro ao enviar o relatório."
+        });
+      }
+      
+    } catch (error) {
+      console.error("Erro ao enviar relatório por e-mail:", error);
+      toast.error("Erro ao enviar relatório por e-mail.");
+    }
+  };
+
   return {
     // File related props and methods
     file: fileImport.file,
@@ -196,11 +300,19 @@ export const useImportacao = () => {
     validationPerformed,
     hasValidationErrors: validationErrors.length > 0,
     
+    // Email and report dialog states
+    showEmailConfigDialog,
+    setShowEmailConfigDialog,
+    defaultEmailMessage,
+    reportDate,
+    
     // Process handlers
     handleProcessar: handleProcessar,
     handleProcessSelected: handleProcessSelected,
     handleVerifyErrors: handleVerifyErrors,
     handleExportErrors: handleExportErrors,
+    handleGenerateReport: handleGenerateReport,
+    handleEmailSubmit: handleEmailSubmit,
     
     // Workflow dialog related props and methods
     showWorkflowDialog: workflowDialog.showWorkflowDialog,
