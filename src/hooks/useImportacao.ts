@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
@@ -15,6 +14,7 @@ import { useDirectoryDialog } from './importacao/useDirectoryDialog';
 import { useConvenentesData } from './importacao/useConvenentesData';
 import { generateRemittanceReport } from '@/services/reports/remittanceReportService';
 import { sendEmail, logEmailActivity } from '@/services/emailService';
+import { formatarValorCurrency } from '@/utils/formatting/currencyUtils';
 
 export const useImportacao = () => {
   const [showTable, setShowTable] = useState(false);
@@ -282,11 +282,12 @@ export const useImportacao = () => {
       // Store report data
       setReportData(pdfReportData);
       
-      // Generate default email message with the reference and formatted date
+      // Generate default email message with the reference, formatted date and total value
       const formattedDateForEmail = formattedDate.split(' ')[0]; // Just the date part
+      const formattedTotalValue = formatarValorCurrency(totalValue);
       const emailMsg = `Prezado Diretor Financeiro,
 
-Segue em anexo o relatório detalhado da remessa bancária gerada em ${formattedDateForEmail}, contendo os valores a serem creditados nas respectivas contas dos beneficiários. Solicitamos a sua análise e autorização para a liberação dos pagamentos.
+Segue em anexo o relatório detalhado da remessa bancária gerada em ${formattedDateForEmail}, contendo os valores a serem creditados nas respectivas contas dos beneficiários no valor total de ${formattedTotalValue}. Solicitamos a sua análise e autorização para a liberação dos pagamentos.
 
 Atenciosamente,
 [Nome do responsável]
@@ -335,7 +336,7 @@ Atenciosamente,
       }
     }
     
-    // Open email config dialog with company name pre-filled
+    // Open email config dialog
     setShowEmailConfigDialog(true);
     
     // Update default company name in the email form

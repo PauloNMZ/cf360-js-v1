@@ -38,9 +38,7 @@ const emailFormSchema = z.object({
   remittanceReference: z
     .string()
     .min(1, "Referência da remessa é obrigatória"),
-  companyName: z
-    .string()
-    .min(1, "Nome da empresa é obrigatório"),
+  companyName: z.string().optional(), // Make company name optional
   message: z
     .string()
     .min(1, "Mensagem é obrigatória"),
@@ -88,7 +86,7 @@ export function EmailConfigDialog({
       senderName: "",
       senderDepartment: "Financeiro", // Set default department as Financeiro
       remittanceReference: `Remessa de Pagamento - ${reportDate}`,
-      companyName: companyName || "", // Use companyName if available
+      companyName: companyName, // Use companyName if available, but it's optional
       message: defaultMessage,
     },
   });
@@ -109,6 +107,10 @@ export function EmailConfigDialog({
 
   // Handler for form submission
   const handleSubmit = (values: EmailFormValues) => {
+    // Ensure companyName is included in form values even if field is hidden
+    if (companyName && !values.companyName) {
+      values.companyName = companyName;
+    }
     onSubmit(values);
   };
 
@@ -178,42 +180,22 @@ export function EmailConfigDialog({
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="remittanceReference"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Referência da Remessa</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <FormField
+                control={form.control}
+                name="remittanceReference"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Referência da Remessa</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                <FormField
-                  control={form.control}
-                  name="companyName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nome da Empresa</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="Nome da Empresa" 
-                          value={field.value || companyName}
-                          onChange={field.onChange}
-                          onBlur={field.onBlur}
-                          name={field.name}
-                          disabled={!!companyName} // Disable if company name is provided
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              {/* Company name is now hidden as it's automatically determined from the selected convenente */}
+              <input type="hidden" name="companyName" value={companyName} />
 
               <FormField
                 control={form.control}
