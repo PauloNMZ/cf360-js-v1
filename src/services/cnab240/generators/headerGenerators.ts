@@ -160,8 +160,8 @@ export const gerarTrailerArquivo = (
   trailerArquivo += ajustarTamanho("9999", 4);                               // 02.9 Service batch (4-7)
   trailerArquivo += "9";                                                     // 03.9 Record type (8)
   trailerArquivo += ajustarTamanho("", 9);                                   // 04.9 FEBRABAN exclusive use (9-17)
-  trailerArquivo += ajustarTamanho(seqLote.toString() , 6, "0", true);        // 05.9 Number of batches (18-23)
-  trailerArquivo += ajustarTamanho(totalLinhasArquivo.toString()+1, 6, "0", true); // 06.9 Number of records (24-29)
+  trailerArquivo += ajustarTamanho(seqLote.toString() , 6, "0", true)-1;        // 05.9 Number of batches (18-23)
+  trailerArquivo += ajustarTamanho(totalLinhasArquivo.toString(), 6, "0", true); // 06.9 Number of records (24-29)
   trailerArquivo += ajustarTamanho("0", 6, "0", true);                       // 07.9 Number of accounts (30-35)
   trailerArquivo += ajustarTamanho("", 205);                                 // 08.9 FEBRABAN exclusive use (36-240)
   
