@@ -1,4 +1,4 @@
 
-// Export the main interface for using the CNAB service
-export { downloadCNABFile } from './cnab240Service';
-export { GeradorCNAB240 } from './GeradorCNAB240';
+// Export all CNAB240 functionalities from a central location
+export * from './cnab240Service';
+export * from './utils/sequenceUtils';

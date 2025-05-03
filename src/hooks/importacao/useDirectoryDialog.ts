@@ -1,35 +1,33 @@
-
 import { useState, useEffect } from 'react';
-import { toast } from '@/components/ui/sonner';
 
 export const useDirectoryDialog = () => {
   const [showDirectoryDialog, setShowDirectoryDialog] = useState(false);
   const [outputDirectory, setOutputDirectory] = useState<string>('');
 
-  // Load directory from localStorage on mount
+  // Initialize with saved settings
   useEffect(() => {
     const savedDirectory = localStorage.getItem('cnab240OutputDirectory') || '';
     setOutputDirectory(savedDirectory);
   }, []);
 
-  // Function to open directory settings dialog
+  // Handle opening directory settings dialog
   const handleOpenDirectorySettings = () => {
     setShowDirectoryDialog(true);
   };
 
-  // Function to save directory settings
-  const handleSaveDirectorySettings = () => {
-    localStorage.setItem('cnab240OutputDirectory', outputDirectory);
+  // Handle saving directory settings
+  const handleSaveDirectorySettings = (directory: string) => {
+    setOutputDirectory(directory);
+    localStorage.setItem('cnab240OutputDirectory', directory);
     setShowDirectoryDialog(false);
-    toast.success("Configurações de diretório salvas com sucesso!");
   };
 
+  // Export the component's state and functions
   return {
     showDirectoryDialog,
     setShowDirectoryDialog,
     outputDirectory,
-    setOutputDirectory,
     handleOpenDirectorySettings,
-    handleSaveDirectorySettings
+    handleSaveDirectorySettings,
   };
 };

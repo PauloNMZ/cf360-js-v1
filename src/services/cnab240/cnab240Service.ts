@@ -1,3 +1,4 @@
+
 import { saveAs } from 'file-saver';
 import { toast } from '@/components/ui/sonner';
 import { 
@@ -8,6 +9,7 @@ import { formatarData, formatarHora } from '@/utils/cnabUtils';
 import { GeradorCNAB240 } from './GeradorCNAB240';
 import { convertAndValidateRows } from './validationService';
 import { RowData } from '@/types/importacao';
+import { getNextSequenceNumber } from './utils/sequenceUtils';
 
 // Function to download the generated CNAB file
 export const downloadCNABFile = async (
@@ -34,8 +36,11 @@ export const downloadCNABFile = async (
     // Generate file
     const blob = await gerador.gerarArquivoRemessa(workflowData, favorecidos);
     
-    // Generate a file name based on the current date, time, and convenente information
-    const fileName = `Pag_${formatarData(new Date(), "YYYYMMDD")}_${formatarHora(new Date(), "HHMMSS")}_${workflowData.convenente.convenioPag || '1'}.rem`;
+    // Get next sequence number
+    const sequenceNumber = getNextSequenceNumber();
+    
+    // Generate a file name based on the current date, time, convenente information, and sequence number
+    const fileName = `Pag_${formatarData(new Date(), "YYYYMMDD")}_${formatarHora(new Date(), "HHMMSS")}_${workflowData.convenente.convenioPag || '1'}_${sequenceNumber}.rem`;
     
     // Save to user's disk in specified directory, or use browser download if no directory specified
     saveAs(blob, fileName);
