@@ -4,7 +4,6 @@ import { NavButton } from "@/components/ui/NavButton";
 import { 
   Home, 
   FileUp, 
-  FileSearch, 
   Send, 
   RefreshCw, 
   FileText, 
@@ -19,7 +18,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useImportacao } from "@/hooks/useImportacao";
 
 type NavigationMenuProps = {
   onConvenenteClick: () => void;
@@ -34,13 +32,10 @@ const NavigationMenu = ({
   onAdminPanelClick,
   onLogoutClick
 }: NavigationMenuProps) => {
-  // Use the importacao hook to get access to data validation functions
-  const { tableData, handleVerifyErrors } = useImportacao();
-
   return (
     <TooltipProvider>
       <div className="flex justify-center mb-8">
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-10 gap-2 max-w-5xl mx-auto">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-9 gap-2 max-w-5xl mx-auto">
           <Tooltip>
             <TooltipTrigger asChild>
               <div>
@@ -68,21 +63,6 @@ const NavigationMenu = ({
             </TooltipTrigger>
             <TooltipContent>
               <p>Importação de planilhas para processamento</p>
-            </TooltipContent>
-          </Tooltip>
-          
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div>
-                <NavButton 
-                  icon={<FileSearch size={24} />} 
-                  label="Check" 
-                  onClick={handleVerifyErrors} 
-                />
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Verificação de erros nos registros importados</p>
             </TooltipContent>
           </Tooltip>
           

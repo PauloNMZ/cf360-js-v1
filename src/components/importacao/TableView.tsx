@@ -52,7 +52,7 @@ export function TableView({
             <Button 
               variant="destructive" 
               onClick={handleExportErrors}
-              className="animate-pulse"
+              className="animate-pulse border-2 border-red-500"
             >
               <Download className="mr-2 h-4 w-4" /> Exportar Erros
             </Button>

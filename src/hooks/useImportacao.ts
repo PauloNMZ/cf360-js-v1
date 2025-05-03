@@ -141,10 +141,8 @@ export const useImportacao = () => {
       return;
     }
 
-    // Automatically do validation before proceeding
-    if (!validationPerformed) {
-      handleVerifyErrors();
-    }
+    // Automaticamente fazer validação antes de prosseguir
+    handleVerifyErrors();
 
     // Reset workflow steps and open dialog
     workflowDialog.setWorkflow({

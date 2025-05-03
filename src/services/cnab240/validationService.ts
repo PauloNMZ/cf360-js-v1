@@ -133,6 +133,14 @@ export const validateFavorecido = (favorecido: Favorecido): FavorecidoError[] =>
         message: 'Conta é obrigatória'
       });
     }
+    
+    // Para outros bancos, validar tipo como TD ou PP
+    if (!favorecido.tipo || !['TD', 'PP'].includes(favorecido.tipo.toUpperCase().trim())) {
+      errors.push({
+        field: 'tipo',
+        message: 'Tipo de conta deve ser TD (Conta Corrente) ou PP (Poupança)'
+      });
+    }
   }
   
   // Validate value (for all banks)
