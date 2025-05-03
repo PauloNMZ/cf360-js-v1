@@ -13,6 +13,7 @@ export const generatePDFReport = async (reportData: ReportData): Promise<Blob> =
   
   // Add title
   doc.setFontSize(18);
+  doc.setFont(undefined, 'bold');
   doc.text("RELATÓRIO DE REMESSA BANCÁRIA", 105, 20, { align: 'center' });
   
   // Add horizontal line
@@ -21,6 +22,7 @@ export const generatePDFReport = async (reportData: ReportData): Promise<Blob> =
   
   // Add header information
   doc.setFontSize(11);
+  doc.setFont(undefined, 'normal');
   doc.text(`Empresa: ${reportData.empresa}`, 15, 35);
   doc.text(`Data de Geração: ${reportData.dataGeracao}`, 15, 42);
   doc.text(`Referência da Remessa: ${reportData.referencia}`, 15, 49);
@@ -57,7 +59,7 @@ export const generatePDFReport = async (reportData: ReportData): Promise<Blob> =
       : formatarValorCurrency(parseFloat(row.VALOR.toString().replace(/[^\d.,]/g, '').replace(',', '.'))).replace('R$', '').trim()
   }));
   
-  // Create the table
+  // Create the table with improved styling
   (doc as any).autoTable({
     startY: 70,
     head: [tableColumns.map(col => col.header)],
@@ -66,20 +68,28 @@ export const generatePDFReport = async (reportData: ReportData): Promise<Blob> =
     headStyles: {
       fillColor: [220, 220, 220],
       textColor: [0, 0, 0],
-      fontStyle: 'bold'
+      fontStyle: 'bold',
+      fontSize: 10
+    },
+    bodyStyles: {
+      fontSize: 9
     },
     alternateRowStyles: {
       fillColor: [245, 245, 245]
     },
-    margin: { top: 70 }
+    margin: { top: 70 },
+    didDrawPage: (data) => {
+      // Ensure the table starts at the beginning of each page
+      data.settings.margin.top = 20;
+    }
   });
   
-  // Add total row - CORRIGIDO: Aumentar a distância entre "TOTAL:" e o valor para evitar sobreposição
+  // Add total row - CORRIGIDO: Posicionar "TOTAL:" mais à esquerda e valor à direita
   const finalY = (doc as any).lastAutoTable.finalY;
   doc.line(15, finalY + 5, 195, finalY + 5);
   
   doc.setFont(undefined, 'bold');
-  // Movido o texto "TOTAL:" mais para a esquerda para evitar sobreposição
+  // Posicionar "TOTAL:" mais à esquerda para evitar sobreposição
   doc.text("TOTAL:", 130, finalY + 12);
   doc.text(formatarValorCurrency(reportData.valorTotal).replace('R$', '').trim(), 178, finalY + 12, { align: 'right' });
   

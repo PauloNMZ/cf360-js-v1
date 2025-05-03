@@ -22,6 +22,7 @@ export function PDFPreviewDialog({
 }: PDFPreviewDialogProps) {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [iframeKey, setIframeKey] = useState<number>(0); // Estado para forçar recarregamento do iframe
 
   useEffect(() => {
     let url: string | null = null;
@@ -36,6 +37,9 @@ export function PDFPreviewDialog({
           // Create a URL for the blob
           url = URL.createObjectURL(pdfBlob);
           setPdfUrl(url);
+          
+          // Forçar o recarregamento do iframe quando os dados mudarem
+          setIframeKey(prev => prev + 1);
         } catch (error) {
           console.error("Error generating PDF preview:", error);
           toast.error("Erro ao gerar visualização do PDF");
@@ -54,6 +58,32 @@ export function PDFPreviewDialog({
       }
     };
   }, [reportData]);
+
+  // Efeito para garantir que o iframe sempre comece na primeira página
+  useEffect(() => {
+    if (isOpen && pdfUrl && !loading) {
+      // Pequeno atraso para garantir que o iframe esteja pronto
+      const timer = setTimeout(() => {
+        const iframe = document.querySelector('iframe');
+        if (iframe) {
+          // Tentar rolar para o topo
+          try {
+            iframe.contentWindow?.scrollTo(0, 0);
+            
+            // Se o iframe tiver um body, também rolamos ele para o topo
+            const iframeBody = iframe.contentDocument?.body;
+            if (iframeBody) {
+              iframeBody.scrollTop = 0;
+            }
+          } catch (e) {
+            console.log("Não foi possível rolar o iframe para o topo:", e);
+          }
+        }
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, pdfUrl, loading, iframeKey]);
 
   const handleDownload = async () => {
     if (pdfUrl) {
@@ -90,6 +120,7 @@ export function PDFPreviewDialog({
             </div>
           ) : pdfUrl ? (
             <iframe 
+              key={iframeKey}
               src={pdfUrl} 
               className="w-full h-full" 
               title="Relatório de Remessa Bancária"

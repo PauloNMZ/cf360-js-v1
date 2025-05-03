@@ -6,7 +6,7 @@ import { useAuth } from '@/hooks/use-auth'; // Esta importação será usada ape
 interface EmailData {
   recipientEmail: string;
   senderName: string;
-  senderEmail: string; // Adicionado campo para email do remetente
+  senderEmail: string;
   senderDepartment: string;
   subject: string;
   message: string;
@@ -95,14 +95,28 @@ export const logEmailActivity = (emailData: EmailData, response: EmailResponse) 
  * Em um sistema real, isso viria do contexto de autenticação
  */
 export const getCurrentUserEmail = (): string => {
-  // Em uma implementação real, isso viria do contexto de autenticação
-  // Por exemplo: return useAuth().user?.email || '';
+  // Tentar obter o email do usuário do contexto de autenticação
+  try {
+    // Em uma implementação real, isso viria do contexto de autenticação
+    const authData = localStorage.getItem('authUser');
+    if (authData) {
+      const userData = JSON.parse(authData);
+      if (userData && userData.email) {
+        return userData.email;
+      }
+    }
+    
+    // Se não encontrou na auth, tentar diretamente do localStorage
+    const userEmail = localStorage.getItem('userEmail');
+    if (userEmail) {
+      return userEmail;
+    }
+  } catch (error) {
+    console.error("Erro ao obter email do usuário:", error);
+  }
   
-  // Recuperar do localStorage (simulando um usuário logado)
-  const userEmail = localStorage.getItem('userEmail') || '';
-  
-  // Se não houver email salvo, usar um email padrão
-  return userEmail || 'usuario@empresa.com';
+  // Se não conseguir obter, retornar um email padrão
+  return "usuario@empresa.com";
 };
 
 /**

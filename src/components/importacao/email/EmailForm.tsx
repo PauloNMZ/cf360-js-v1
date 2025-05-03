@@ -57,7 +57,7 @@ export function EmailForm({
   onSubmit,
   onCancel
 }: EmailFormProps) {
-  const { form } = useEmailForm({
+  const { form, userEmail } = useEmailForm({
     defaultMessage,
     companyName,
     reportDate

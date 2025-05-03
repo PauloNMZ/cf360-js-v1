@@ -2,11 +2,11 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { EmailFormValues } from "@/types/importacao";
 import { getCurrentUserEmail } from "@/services/emailService";
 
-// Schema for the email form - updated to include senderEmail field
+// Schema para o formulário de email - incluindo campo de email do remetente
 const emailFormSchema = z.object({
   recipientEmail: z
     .string()
@@ -41,24 +41,30 @@ export const useEmailForm = ({
   companyName,
   reportDate
 }: UseEmailFormProps) => {
-  // Get the current user's email
-  const userEmail = getCurrentUserEmail();
+  // Obter o email do usuário atualmente logado
+  const [userEmail, setUserEmail] = useState<string>("");
   
-  // Form initialization with default values
+  // Efeito para buscar o email do usuário quando o componente é montado
+  useEffect(() => {
+    const email = getCurrentUserEmail();
+    setUserEmail(email);
+  }, []);
+  
+  // Inicialização do formulário com valores padrão
   const form = useForm<EmailFormValues>({
     resolver: zodResolver(emailFormSchema),
     defaultValues: {
       recipientEmail: "",
       senderName: "",
       senderEmail: userEmail, // Usar o email do usuário logado
-      senderDepartment: "Financeiro", // Set default department as Financeiro
+      senderDepartment: "Financeiro", // Departamento padrão como Financeiro
       remittanceReference: `Remessa de Pagamento - ${reportDate}`,
       companyName: companyName,
       message: defaultMessage,
     },
   });
 
-  // Update form values when inputs change
+  // Atualizar valores do formulário quando as entradas mudarem
   useEffect(() => {
     if (companyName) {
       form.setValue('companyName', companyName);
@@ -77,5 +83,12 @@ export const useEmailForm = ({
     }
   }, [reportDate, form]);
 
-  return { form };
+  // Atualizar email do remetente quando o email do usuário mudar
+  useEffect(() => {
+    if (userEmail) {
+      form.setValue('senderEmail', userEmail);
+    }
+  }, [userEmail, form]);
+
+  return { form, userEmail };
 };
