@@ -9,6 +9,8 @@ import { TableView } from '@/components/importacao/TableView';
 import WorkflowDialog from '@/components/importacao/WorkflowDialog';
 import DirectoryDialog from '@/components/importacao/DirectoryDialog';
 import { ValidationErrorsDialog } from '@/components/importacao/ValidationErrorsDialog';
+import { EmailConfigDialog } from '@/components/importacao/EmailConfigDialog';
+import { PDFPreviewDialog } from '@/components/importacao/PDFPreviewDialog';
 
 const ImportarPlanilha = () => {
   const {
@@ -30,6 +32,13 @@ const ImportarPlanilha = () => {
     validationErrors,
     validationPerformed,
     hasValidationErrors,
+    showPDFPreviewDialog,
+    setShowPDFPreviewDialog,
+    reportData,
+    showEmailConfigDialog,
+    setShowEmailConfigDialog,
+    defaultEmailMessage,
+    reportDate,
     currentStep,
     workflow,
     convenentes,
@@ -43,6 +52,8 @@ const ImportarPlanilha = () => {
     handleVerifyErrors,
     handleExportErrors,
     handleGenerateReport,
+    handleSendEmailReport,
+    handleEmailSubmit,
     goToNextStep,
     goToPreviousStep,
     handleOpenDirectorySettings,
@@ -126,6 +137,23 @@ const ImportarPlanilha = () => {
         isOpen={showValidationDialog}
         onOpenChange={setShowValidationDialog}
         errors={validationErrors}
+      />
+      
+      {/* Email configuration dialog */}
+      <EmailConfigDialog
+        isOpen={showEmailConfigDialog}
+        onOpenChange={setShowEmailConfigDialog}
+        defaultMessage={defaultEmailMessage}
+        onSubmit={handleEmailSubmit}
+        reportDate={reportDate}
+      />
+      
+      {/* PDF Preview dialog */}
+      <PDFPreviewDialog
+        isOpen={showPDFPreviewDialog}
+        onOpenChange={setShowPDFPreviewDialog}
+        reportData={reportData}
+        onSendEmail={handleSendEmailReport}
       />
     </ScrollArea>
   );

@@ -88,3 +88,20 @@ export interface ValidationErrorsDialogProps {
   errors: any[];
   handleExportErrors?: () => void;
 }
+
+// PDF report types
+export interface ReportData {
+  empresa: string;
+  dataGeracao: string;
+  referencia: string;
+  beneficiarios: RowData[];
+  totalRegistros: number;
+  valorTotal: number;
+}
+
+export interface PDFPreviewDialogProps {
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  reportData: ReportData | null;
+  onSendEmail: () => void;
+}

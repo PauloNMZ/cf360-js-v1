@@ -14,6 +14,7 @@ import WorkflowDialog from "./WorkflowDialog";
 import DirectoryDialog from "./DirectoryDialog";
 import { ValidationErrorsDialog } from "./ValidationErrorsDialog";
 import { EmailConfigDialog } from "./EmailConfigDialog";
+import { PDFPreviewDialog } from "./PDFPreviewDialog";
 
 interface ImportacaoModalProps {
   isOpen: boolean;
@@ -46,6 +47,11 @@ export default function ImportacaoModal({ isOpen, onOpenChange }: ImportacaoModa
     validationPerformed,
     hasValidationErrors,
     
+    // PDF preview state
+    showPDFPreviewDialog,
+    setShowPDFPreviewDialog,
+    reportData,
+    
     // Email and report dialog states
     showEmailConfigDialog,
     setShowEmailConfigDialog,
@@ -58,6 +64,7 @@ export default function ImportacaoModal({ isOpen, onOpenChange }: ImportacaoModa
     handleVerifyErrors,
     handleExportErrors,
     handleGenerateReport,
+    handleSendEmailReport,
     handleEmailSubmit,
     
     // Directory dialog props
@@ -159,6 +166,13 @@ export default function ImportacaoModal({ isOpen, onOpenChange }: ImportacaoModa
         defaultMessage={defaultEmailMessage}
         onSubmit={handleEmailSubmit}
         reportDate={reportDate}
+      />
+      
+      <PDFPreviewDialog
+        isOpen={showPDFPreviewDialog}
+        onOpenChange={setShowPDFPreviewDialog}
+        reportData={reportData}
+        onSendEmail={handleSendEmailReport}
       />
     </>
   );

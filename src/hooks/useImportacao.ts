@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { CNABWorkflowData } from '@/types/cnab240';
-import { RowData, EmailFormValues } from '@/types/importacao';
+import { RowData, EmailFormValues, ReportData } from '@/types/importacao';
 import { toast } from '@/components/ui/sonner';
 import { validateFavorecidos } from '@/services/cnab240/validationService';
 
@@ -13,7 +13,7 @@ import { useTableOperations } from './importacao/useTableOperations';
 import { useWorkflowDialog } from './importacao/useWorkflowDialog';
 import { useDirectoryDialog } from './importacao/useDirectoryDialog';
 import { useConvenentesData } from './importacao/useConvenentesData';
-import { generateRemittanceReport, generateEmailMessage } from '@/services/reports/remittanceReportService';
+import { generateRemittanceReport } from '@/services/reports/remittanceReportService';
 import { sendEmail, logEmailActivity } from '@/services/emailService';
 
 export const useImportacao = () => {
@@ -22,10 +22,16 @@ export const useImportacao = () => {
   const [validationErrors, setValidationErrors] = useState<any[]>([]);
   const [validationPerformed, setValidationPerformed] = useState(false);
   
-  // New states for report generation and email
+  // New states for PDF preview
+  const [showPDFPreviewDialog, setShowPDFPreviewDialog] = useState(false);
+  const [reportData, setReportData] = useState<ReportData | null>(null);
+  
+  // States for report generation and email
   const [showEmailConfigDialog, setShowEmailConfigDialog] = useState(false);
   const [reportDate, setReportDate] = useState('');
   const [defaultEmailMessage, setDefaultEmailMessage] = useState('');
+  const [reportAttachment, setReportAttachment] = useState<Blob | null>(null);
+  const [reportFileName, setReportFileName] = useState<string>('');
   
   // Import functionality from smaller hooks
   const fileImport = useFileImport();
@@ -178,7 +184,31 @@ export const useImportacao = () => {
     await workflowDialog.handleSubmitWorkflow(selectedRows);
   };
 
-  // NEW FUNCTION: Handle report generation
+  // Format date for display
+  const formatCurrentDateTime = () => {
+    const now = new Date();
+    return now.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    }) + ' (UTC-3)';
+  };
+
+  // Generate reference for remittance
+  const generateRemittanceReference = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const sequence = Math.floor(Math.random() * 999).toString().padStart(3, '0');
+    
+    return `REM${year}${month}${day}-${sequence}`;
+  };
+
+  // Handle PDF report generation
   const handleGenerateReport = async () => {
     const selectedRows = tableOps.getSelectedRows();
     
@@ -188,32 +218,73 @@ export const useImportacao = () => {
     }
 
     try {
-      // Initialize report options with default values
-      const reportOptions = {
-        companyName: "Empresa",
-        remittanceReference: `Remessa de Pagamento - ${new Date().toLocaleDateString('pt-BR')}`,
-        responsibleName: "Usuário do Sistema",
-        department: "Financeiro"
+      // Initialize company data
+      let companyName = "Empresa";
+      
+      // Try to get company name from selected convenente if available
+      if (workflow.convenente) {
+        const selectedConvenente = convenentes.find(c => c.id === workflow.convenente);
+        if (selectedConvenente) {
+          companyName = selectedConvenente.razao_social;
+        }
+      }
+      
+      // Generate formatted date
+      const formattedDate = formatCurrentDateTime();
+      setReportDate(formattedDate.split(' ')[0]); // Just the date part for email
+      
+      // Generate reference code
+      const remittanceReference = generateRemittanceReference();
+      
+      // Calculate total value
+      const totalValue = selectedRows.reduce((sum, row) => {
+        const valueStr = row.VALOR.toString().replace(/[^\d.,]/g, '').replace(',', '.');
+        const value = parseFloat(valueStr);
+        return sum + (isNaN(value) ? 0 : value);
+      }, 0);
+      
+      // Create report data
+      const pdfReportData: ReportData = {
+        empresa: companyName,
+        dataGeracao: formattedDate,
+        referencia: remittanceReference,
+        beneficiarios: selectedRows,
+        totalRegistros: selectedRows.length,
+        valorTotal: totalValue
       };
+      
+      // Store report data
+      setReportData(pdfReportData);
+      
+      // Generate default email message with the reference
+      const emailMsg = `Prezado Diretor Financeiro,
 
-      // Show toast message
-      toast.info("Gerando relatório de remessa bancária...");
-      
-      // Generate the report
-      const reportResult = await generateRemittanceReport(selectedRows, reportOptions);
-      
-      // Set report date for email dialog
-      setReportDate(reportResult.formattedDate);
-      
-      // Generate default email message
-      const emailMsg = generateEmailMessage(reportResult.formattedDate, reportOptions);
+Segue em anexo o relatório detalhado da remessa bancária gerada em ${formattedDate.split(' ')[0]}, contendo os valores a serem creditados nas respectivas contas dos beneficiários. Solicitamos a sua análise e autorização para a liberação dos pagamentos.
+
+Atenciosamente,
+[Nome do responsável]
+[Departamento]`;
+
       setDefaultEmailMessage(emailMsg);
       
-      // Open email configuration dialog
-      setShowEmailConfigDialog(true);
+      // Show PDF preview dialog
+      setShowPDFPreviewDialog(true);
       
-      // Return the report data for future use
-      return reportResult;
+      // For Excel report backup
+      try {
+        const reportOptions = {
+          companyName: companyName,
+          remittanceReference: remittanceReference,
+          responsibleName: "Usuário do Sistema",
+          department: "Financeiro"
+        };
+        
+        const excelReport = await generateRemittanceReport(selectedRows, reportOptions);
+        setReportAttachment(excelReport.file);
+        setReportFileName(excelReport.fileName);
+      } catch (error) {
+        console.error("Erro ao gerar relatório Excel:", error);
+      }
       
     } catch (error) {
       console.error("Erro ao gerar relatório:", error);
@@ -221,33 +292,50 @@ export const useImportacao = () => {
     }
   };
 
+  // Handle sending the report via email after preview
+  const handleSendEmailReport = () => {
+    // Close PDF dialog
+    setShowPDFPreviewDialog(false);
+    // Open email config dialog
+    setShowEmailConfigDialog(true);
+  };
+
   // Handle email form submission
   const handleEmailSubmit = async (emailFormValues: EmailFormValues) => {
     try {
-      const selectedRows = tableOps.getSelectedRows();
-      
       // Show sending email toast
       toast.info("Enviando relatório por e-mail...");
       
-      // Generate the report again with the updated company name and reference
-      const reportOptions = {
-        companyName: emailFormValues.companyName,
-        remittanceReference: emailFormValues.remittanceReference,
-        responsibleName: emailFormValues.senderName,
-        department: emailFormValues.senderDepartment
-      };
+      // Prepare email data - using Excel report as attachment
+      let emailAttachment = reportAttachment;
+      let attachmentFileName = reportFileName;
       
-      const reportResult = await generateRemittanceReport(selectedRows, reportOptions);
+      // If there's no Excel report (unlikely), create it now
+      if (!emailAttachment && reportData) {
+        const reportOptions = {
+          companyName: emailFormValues.companyName,
+          remittanceReference: emailFormValues.remittanceReference,
+          responsibleName: emailFormValues.senderName,
+          department: emailFormValues.senderDepartment
+        };
+        
+        const excelReport = await generateRemittanceReport(reportData.beneficiarios, reportOptions);
+        emailAttachment = excelReport.file;
+        attachmentFileName = excelReport.fileName;
+      }
       
-      // Prepare email data
+      if (!emailAttachment) {
+        throw new Error("Falha ao gerar anexo do e-mail");
+      }
+      
       const emailData = {
         recipientEmail: emailFormValues.recipientEmail,
         senderName: emailFormValues.senderName,
         senderDepartment: emailFormValues.senderDepartment,
         subject: `Relatório de Remessa Bancária - ${emailFormValues.remittanceReference}`,
         message: emailFormValues.message,
-        attachmentFile: reportResult.file,
-        attachmentFileName: reportResult.fileName
+        attachmentFile: emailAttachment,
+        attachmentFileName: attachmentFileName
       };
       
       // Send the email
@@ -300,6 +388,11 @@ export const useImportacao = () => {
     validationPerformed,
     hasValidationErrors: validationErrors.length > 0,
     
+    // PDF preview state
+    showPDFPreviewDialog,
+    setShowPDFPreviewDialog,
+    reportData,
+    
     // Email and report dialog states
     showEmailConfigDialog,
     setShowEmailConfigDialog,
@@ -307,12 +400,13 @@ export const useImportacao = () => {
     reportDate,
     
     // Process handlers
-    handleProcessar: handleProcessar,
-    handleProcessSelected: handleProcessSelected,
-    handleVerifyErrors: handleVerifyErrors,
-    handleExportErrors: handleExportErrors,
-    handleGenerateReport: handleGenerateReport,
-    handleEmailSubmit: handleEmailSubmit,
+    handleProcessar,
+    handleProcessSelected,
+    handleVerifyErrors,
+    handleExportErrors,
+    handleGenerateReport,
+    handleSendEmailReport,
+    handleEmailSubmit,
     
     // Workflow dialog related props and methods
     showWorkflowDialog: workflowDialog.showWorkflowDialog,
