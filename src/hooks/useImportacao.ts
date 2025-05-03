@@ -141,13 +141,9 @@ export const useImportacao = () => {
       return;
     }
 
-    // Before processing, verify if user wants to check for errors
+    // Automatically do validation before proceeding
     if (!validationPerformed) {
-      const confirmValidation = window.confirm("Deseja verificar erros nos registros antes de processar? Registros com erros serão excluídos do arquivo CNAB.");
-      if (confirmValidation) {
-        handleVerifyErrors();
-        return;
-      }
+      handleVerifyErrors();
     }
 
     // Reset workflow steps and open dialog

@@ -1,3 +1,4 @@
+
 import { ErrorRecord, Favorecido, FavorecidoError } from '@/types/cnab240';
 import { 
   validarConta,
@@ -86,7 +87,7 @@ export const validateFavorecido = (favorecido: Favorecido): FavorecidoError[] =>
       message: 'Código do banco é obrigatório'
     });
   } else if (favorecido.banco === '001') {
-    // Additional validations for Banco do Brasil (001)
+    // Additional validations only for Banco do Brasil (001)
     
     // Validate branch
     const agenciaResult = validarAgencia(favorecido.agencia);
@@ -110,7 +111,7 @@ export const validateFavorecido = (favorecido: Favorecido): FavorecidoError[] =>
       });
     }
   } else {
-    // Basic validations for other banks
+    // Basic validations for other banks (without digit verification)
     if (!favorecido.agencia || favorecido.agencia.trim() === '') {
       errors.push({
         field: 'agencia',

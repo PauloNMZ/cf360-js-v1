@@ -49,7 +49,11 @@ export function TableView({
             <AlertCircle className="mr-2 h-4 w-4" /> Verificar Erros
           </Button>
           {validationPerformed && hasValidationErrors && (
-            <Button variant="outline" onClick={handleExportErrors}>
+            <Button 
+              variant="destructive" 
+              onClick={handleExportErrors}
+              className="animate-pulse"
+            >
               <Download className="mr-2 h-4 w-4" /> Exportar Erros
             </Button>
           )}
