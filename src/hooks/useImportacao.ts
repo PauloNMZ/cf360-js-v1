@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
@@ -315,32 +316,6 @@ Atenciosamente,
     } catch (error) {
       console.error("Erro ao gerar relatório:", error);
       toast.error("Erro ao gerar relatório de remessa bancária.");
-    }
-  };
-
-  // Handle sending the report via email after preview
-  const handleSendEmailReport = () => {
-    // Close PDF dialog
-    setShowPDFPreviewDialog(false);
-    
-    // Get selected convenente name for company name in email form
-    let companyName = "";
-    if (workflowDialog.workflow.convenente) {
-      const selectedConvenente = convenentesData.convenentes.find(
-        c => c.id === workflowDialog.workflow.convenente
-      );
-      if (selectedConvenente) {
-        companyName = selectedConvenente.razaoSocial;
-      }
-    }
-    
-    // Open email config dialog with company name pre-filled
-    setShowEmailConfigDialog(true);
-    
-    // Update default company name in the email form
-    if (companyName) {
-      // This will be picked up by the EmailConfigDialog component
-      localStorage.setItem('tempEmailCompanyName', companyName);
     }
   };
 
