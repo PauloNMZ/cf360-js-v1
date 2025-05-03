@@ -1,6 +1,5 @@
 
 import { useState } from 'react';
-import { validateCNPJ } from '@/utils/formValidation';
 
 export type CNPJData = {
   cnpj: string;
