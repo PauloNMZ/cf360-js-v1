@@ -147,7 +147,7 @@ export const validateFavorecido = (favorecido: Favorecido): FavorecidoError[] =>
 
 /**
  * Convert RowData to Favorecido objects with validation
- * Now includes all selected records, even those with errors
+ * Now excludes records with validation errors from the CNAB file
  */
 export const convertAndValidateRows = (rows: RowData[]): { favorecidos: Favorecido[], errorRows: RowData[] } => {
   const favorecidos: Favorecido[] = [];
@@ -170,14 +170,14 @@ export const convertAndValidateRows = (rows: RowData[]): { favorecidos: Favoreci
     
     const errors = validateFavorecido(favorecido);
     
-    // Mark the record with its validation status but include all records
+    // Add validation status but only include valid records
     favorecido.isValid = errors.length === 0;
     
-    // Always add to favorecidos list so no records are dropped
-    favorecidos.push(favorecido);
-    
-    // Also keep track of rows with errors
-    if (errors.length > 0) {
+    // Only add valid records to favorecidos list
+    if (favorecido.isValid) {
+      favorecidos.push(favorecido);
+    } else {
+      // Keep track of rows with errors
       errorRows.push(row);
     }
   }

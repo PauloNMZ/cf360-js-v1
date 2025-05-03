@@ -60,7 +60,7 @@ export const useImportacao = () => {
     if (errors.length > 0) {
       setShowValidationDialog(true);
       toast.error(`Encontrados ${errors.length} registros com erros de validação`, {
-        description: `${validRecordsCount} de ${totalRecords} registros estão válidos para processamento.`
+        description: `${validRecordsCount} de ${totalRecords} registros estão válidos para processamento. Registros com erro serão excluídos do arquivo CNAB.`
       });
     } else {
       toast.success(`Todos os registros estão válidos!`, {
@@ -143,7 +143,7 @@ export const useImportacao = () => {
 
     // Before processing, verify if user wants to check for errors
     if (!validationPerformed) {
-      const confirmValidation = window.confirm("Deseja verificar erros nos registros antes de processar?");
+      const confirmValidation = window.confirm("Deseja verificar erros nos registros antes de processar? Registros com erros serão excluídos do arquivo CNAB.");
       if (confirmValidation) {
         handleVerifyErrors();
         return;
