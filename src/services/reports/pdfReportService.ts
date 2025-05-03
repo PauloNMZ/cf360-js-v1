@@ -44,9 +44,9 @@ export const generatePDFReport = async (reportData: ReportData): Promise<Blob> =
     { header: 'Valor (R$)', dataKey: 'VALOR' }
   ];
   
-  // Format data for the table - Convert names to uppercase
+  // Format data for the table - Ensure names are in uppercase
   const tableData = reportData.beneficiarios.map(row => ({
-    NOME: row.NOME.toUpperCase(), // Convert to uppercase
+    NOME: typeof row.NOME === 'string' ? row.NOME.toUpperCase() : String(row.NOME).toUpperCase(),
     INSCRICAO: row.INSCRICAO,
     BANCO: row.BANCO.toString().padStart(3, '0'),
     AGENCIA: row.AGENCIA,

@@ -15,7 +15,7 @@ import { getNextSequenceNumber } from './utils/sequenceUtils';
 export const downloadCNABFile = async (
   workflowData: CNABWorkflowData, 
   favorecidos: Favorecido[]
-): Promise<void> => {
+): Promise<{ success: boolean; fileName: string }> => {
   try {
     // Validate required data
     if (!workflowData.convenente) {
@@ -49,13 +49,13 @@ export const downloadCNABFile = async (
       description: `O arquivo ${fileName} foi gerado e está pronto para download.`,
     });
     
-    return Promise.resolve();
+    return { success: true, fileName };
   } catch (error) {
     console.error("Erro ao gerar arquivo CNAB:", error);
     toast.error("Erro ao gerar arquivo CNAB", {
       description: error instanceof Error ? error.message : "Ocorreu um erro ao gerar o arquivo CNAB.",
     });
-    return Promise.reject(error);
+    return { success: false, fileName: '' };
   }
 };
 
@@ -63,7 +63,7 @@ export const downloadCNABFile = async (
 export const processSelectedRows = async (
   workflowData: CNABWorkflowData,
   selectedRows: RowData[]
-): Promise<void> => {
+): Promise<{ success: boolean; fileName?: string }> => {
   try {
     if (selectedRows.length === 0) {
       toast.error("Nenhum registro selecionado para processamento");
@@ -95,6 +95,6 @@ export const processSelectedRows = async (
     toast.error("Erro ao processar registros", {
       description: error instanceof Error ? error.message : "Ocorreu um erro ao processar os registros."
     });
-    return Promise.reject(error);
+    return { success: false };
   }
 };

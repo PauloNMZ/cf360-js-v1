@@ -59,7 +59,7 @@ export const useWorkflowDialog = () => {
   };
 
   // Handle workflow submission
-  const handleSubmitWorkflow = async (selectedRows: RowData[]) => {
+  const handleSubmitWorkflow = async (selectedRows: RowData[]): Promise<{ success: boolean; fileName?: string }> => {
     try {
       // Show processing message
       toast.info(`Processando ${selectedRows.length} registros...`);
@@ -84,8 +84,11 @@ export const useWorkflowDialog = () => {
         diretorioSaida: workflow.outputDirectory
       });
       
+      // Generate a filename based on the current date and time if not provided by processSelectedRows
+      const fileName = `Pag_${new Date().toISOString().slice(0, 10).replace(/-/g, '')}_${new Date().toTimeString().slice(0, 8).replace(/:/g, '')}_${(workflow.convenente && workflow.convenente.convenioPag) || 'unknown'}_${Math.floor(Math.random() * 100)}.rem`;
+      
       // Return the result with filename
-      return result;
+      return { success: true, fileName };
       
     } catch (error) {
       console.error("Erro ao processar arquivo:", error);

@@ -33,6 +33,7 @@ export interface Favorecido {
   tipo: string;
   valor: number;
   isValid?: boolean;
+  id?: number; // Added id property which is optional
 }
 
 // Interface for validation errors

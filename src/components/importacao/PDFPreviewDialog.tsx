@@ -69,7 +69,7 @@ export function PDFPreviewDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[95vw] w-[95vw] max-h-[95vh] h-[90vh] p-6 overflow-hidden flex flex-col">
+      <DialogContent className="max-w-[95vw] w-[95vw] max-h-[95vh] h-[95vh] p-6 overflow-hidden flex flex-col">
         <DialogHeader className="flex flex-row justify-between items-center">
           <div>
             <DialogTitle className="text-xl">Visualização do Relatório PDF</DialogTitle>
