@@ -67,7 +67,7 @@ export const validateFavorecido = (favorecido: Favorecido): FavorecidoError[] =>
     });
   }
   
-  // Validate inscription (CPF/CNPJ)
+  // Validate inscription (CPF/CNPJ) - always validate for all banks
   if (!favorecido.inscricao || favorecido.inscricao.trim() === '') {
     errors.push({
       field: 'inscricao',
@@ -80,7 +80,7 @@ export const validateFavorecido = (favorecido: Favorecido): FavorecidoError[] =>
     });
   }
   
-  // Validate bank
+  // Validate bank code
   if (!favorecido.banco || favorecido.banco.trim() === '') {
     errors.push({
       field: 'banco',
@@ -110,6 +110,14 @@ export const validateFavorecido = (favorecido: Favorecido): FavorecidoError[] =>
         actualValue: contaResult.digitoInformado
       });
     }
+    
+    // Validate account type - only check for Banco do Brasil (001)
+    if (!favorecido.tipo || !['CC', 'PP'].includes(favorecido.tipo.toUpperCase().trim())) {
+      errors.push({
+        field: 'tipo',
+        message: 'Tipo de conta deve ser CC (Conta Corrente) ou PP (Poupança)'
+      });
+    }
   } else {
     // Basic validations for other banks (without digit verification)
     if (!favorecido.agencia || favorecido.agencia.trim() === '') {
@@ -127,15 +135,7 @@ export const validateFavorecido = (favorecido: Favorecido): FavorecidoError[] =>
     }
   }
   
-  // Validate account type
-  if (!favorecido.tipo || !['CC', 'PP'].includes(favorecido.tipo.toUpperCase().trim())) {
-    errors.push({
-      field: 'tipo',
-      message: 'Tipo de conta deve ser CC (Conta Corrente) ou PP (Poupança)'
-    });
-  }
-  
-  // Validate value
+  // Validate value (for all banks)
   if (isNaN(favorecido.valor) || favorecido.valor <= 0) {
     errors.push({
       field: 'valor',
