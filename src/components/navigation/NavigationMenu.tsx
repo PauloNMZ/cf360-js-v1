@@ -57,7 +57,7 @@ const NavigationMenu = ({
               <div>
                 <NavButton 
                   icon={<FileUp size={24} />} 
-                  label="Up Planilhas" 
+                  label="Planilha" 
                   onClick={onImportarPlanilhaClick} 
                 />
               </div>
