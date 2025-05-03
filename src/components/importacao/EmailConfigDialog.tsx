@@ -23,7 +23,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 
-// Schema for the email form
+// Schema for the email form - updated to make companyName optional and hidden
 const emailFormSchema = z.object({
   recipientEmail: z
     .string()
@@ -38,7 +38,7 @@ const emailFormSchema = z.object({
   remittanceReference: z
     .string()
     .min(1, "Referência da remessa é obrigatória"),
-  companyName: z.string().optional(), // Make company name optional
+  companyName: z.string().optional(), // Keep company name in schema but don't display it
   message: z
     .string()
     .min(1, "Mensagem é obrigatória"),
@@ -86,7 +86,7 @@ export function EmailConfigDialog({
       senderName: "",
       senderDepartment: "Financeiro", // Set default department as Financeiro
       remittanceReference: `Remessa de Pagamento - ${reportDate}`,
-      companyName: companyName, // Use companyName if available, but it's optional
+      companyName: companyName, // Use companyName if available, but field is hidden
       message: defaultMessage,
     },
   });
@@ -194,7 +194,7 @@ export function EmailConfigDialog({
                 )}
               />
 
-              {/* Company name is now hidden as it's automatically determined from the selected convenente */}
+              {/* Company name is completely hidden now as it's automatically determined */}
               <input type="hidden" name="companyName" value={companyName} />
 
               <FormField

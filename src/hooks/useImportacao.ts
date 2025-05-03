@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
@@ -234,9 +235,13 @@ export const useImportacao = () => {
     }
 
     try {
-      // Get only valid records without errors
+      // Get only valid records without errors - FIXED: properly filter out records with errors
       const { errors } = validateFavorecidos(selectedRows);
-      const errorIds = new Set(errors.map(e => e.favorecido.id));
+      
+      // Create a set of IDs from records with errors for easy lookup
+      const errorIds = new Set(errors.map(e => e.id));
+      
+      // Filter out records with errors
       const validRecords = selectedRows.filter(row => !errorIds.has(row.id));
       
       if (validRecords.length === 0) {
@@ -262,14 +267,14 @@ export const useImportacao = () => {
       // Use CNAB filename as reference
       const remittanceReference = cnabFileName || "Remessa_" + new Date().toISOString().slice(0, 10).replace(/-/g, '');
       
-      // Calculate total value
+      // Calculate total value of ONLY valid records
       const totalValue = validRecords.reduce((sum, row) => {
         const valueStr = row.VALOR.toString().replace(/[^\d.,]/g, '').replace(',', '.');
         const value = parseFloat(valueStr);
         return sum + (isNaN(value) ? 0 : value);
       }, 0);
       
-      // Create report data
+      // Create report data with only valid records
       const pdfReportData: ReportData = {
         empresa: companyName,
         dataGeracao: formattedDate,
@@ -298,7 +303,7 @@ Atenciosamente,
       // Show PDF preview dialog
       setShowPDFPreviewDialog(true);
       
-      // For Excel report backup
+      // For Excel report backup - use only valid records
       try {
         const reportOptions = {
           companyName: companyName,
