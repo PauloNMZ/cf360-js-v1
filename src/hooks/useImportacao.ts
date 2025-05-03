@@ -222,8 +222,8 @@ export const useImportacao = () => {
       let companyName = "Empresa";
       
       // Try to get company name from selected convenente if available
-      if (workflow.convenente) {
-        const selectedConvenente = convenentes.find(c => c.id === workflow.convenente);
+      if (workflowDialog.workflow.convenente) {
+        const selectedConvenente = convenentesData.convenentes.find(c => c.id === workflowDialog.workflow.convenente);
         if (selectedConvenente) {
           companyName = selectedConvenente.razao_social;
         }
