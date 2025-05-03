@@ -62,6 +62,7 @@ export interface TableViewProps {
   setShowTable: (show: boolean) => void;
   validationPerformed: boolean;
   hasValidationErrors: boolean;
+  cnabFileGenerated?: boolean;
 }
 
 export interface FileUploadViewProps {

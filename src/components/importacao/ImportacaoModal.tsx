@@ -47,6 +47,9 @@ export default function ImportacaoModal({ isOpen, onOpenChange }: ImportacaoModa
     validationPerformed,
     hasValidationErrors,
     
+    // CNAB file state
+    cnabFileGenerated,
+    
     // PDF preview state
     showPDFPreviewDialog,
     setShowPDFPreviewDialog,
@@ -117,6 +120,7 @@ export default function ImportacaoModal({ isOpen, onOpenChange }: ImportacaoModa
               setShowTable={setShowTable}
               validationPerformed={validationPerformed}
               hasValidationErrors={hasValidationErrors}
+              cnabFileGenerated={cnabFileGenerated}
             />
           ) : (
             <FileUploadView

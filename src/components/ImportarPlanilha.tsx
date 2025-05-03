@@ -32,6 +32,7 @@ const ImportarPlanilha = () => {
     validationErrors,
     validationPerformed,
     hasValidationErrors,
+    cnabFileGenerated,
     showPDFPreviewDialog,
     setShowPDFPreviewDialog,
     reportData,
@@ -103,6 +104,7 @@ const ImportarPlanilha = () => {
             setShowTable={setShowTable}
             validationPerformed={validationPerformed}
             hasValidationErrors={hasValidationErrors}
+            cnabFileGenerated={cnabFileGenerated}
           />
         )}
       </div>

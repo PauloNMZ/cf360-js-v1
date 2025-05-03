@@ -33,6 +33,10 @@ export const useImportacao = () => {
   const [reportAttachment, setReportAttachment] = useState<Blob | null>(null);
   const [reportFileName, setReportFileName] = useState<string>('');
   
+  // State to track if CNAB file was generated
+  const [cnabFileGenerated, setCnabFileGenerated] = useState(false);
+  const [cnabFileName, setCnabFileName] = useState<string>('');
+  
   // Import functionality from smaller hooks
   const fileImport = useFileImport();
   const tableOps = useTableOperations(fileImport.tableData);
@@ -167,6 +171,10 @@ export const useImportacao = () => {
     });
     workflowDialog.setCurrentStep(1);
     workflowDialog.setShowWorkflowDialog(true);
+    
+    // Reset CNAB file generation status
+    setCnabFileGenerated(false);
+    setCnabFileName('');
   };
 
   // Handle save directory settings
@@ -181,7 +189,20 @@ export const useImportacao = () => {
   const handleSubmitWorkflow = async () => {
     const selectedRows = tableOps.getSelectedRows();
     workflowDialog.setShowWorkflowDialog(false);
-    await workflowDialog.handleSubmitWorkflow(selectedRows);
+    
+    try {
+      // Process selected rows with validation
+      const result = await workflowDialog.handleSubmitWorkflow(selectedRows);
+      
+      // If the file was successfully generated, set the filename
+      if (result && result.fileName) {
+        setCnabFileGenerated(true);
+        setCnabFileName(result.fileName);
+      }
+    } catch (error) {
+      console.error("Erro ao processar arquivo:", error);
+      // Error handling is already done in processSelectedRows
+    }
   };
 
   // Format date for display
@@ -197,17 +218,6 @@ export const useImportacao = () => {
     }) + ' (UTC-3)';
   };
 
-  // Generate reference for remittance
-  const generateRemittanceReference = () => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const sequence = Math.floor(Math.random() * 999).toString().padStart(3, '0');
-    
-    return `REM${year}${month}${day}-${sequence}`;
-  };
-
   // Handle PDF report generation
   const handleGenerateReport = async () => {
     const selectedRows = tableOps.getSelectedRows();
@@ -216,9 +226,25 @@ export const useImportacao = () => {
       toast.error("Nenhum registro selecionado para gerar relatório.");
       return;
     }
+    
+    // Check if CNAB file was generated
+    if (!cnabFileGenerated) {
+      toast.warning("É necessário gerar o arquivo CNAB antes de visualizar o relatório.");
+      return;
+    }
 
     try {
-      // Initialize company data
+      // Get only valid records without errors
+      const { errors } = validateFavorecidos(selectedRows);
+      const errorIds = new Set(errors.map(e => e.favorecido.id));
+      const validRecords = selectedRows.filter(row => !errorIds.has(row.id));
+      
+      if (validRecords.length === 0) {
+        toast.error("Não há registros válidos para gerar o relatório.");
+        return;
+      }
+
+      // Initialize company data from selected convenente
       let companyName = "Empresa";
       
       // Try to get company name from selected convenente if available
@@ -233,11 +259,11 @@ export const useImportacao = () => {
       const formattedDate = formatCurrentDateTime();
       setReportDate(formattedDate.split(' ')[0]); // Just the date part for email
       
-      // Generate reference code
-      const remittanceReference = generateRemittanceReference();
+      // Use CNAB filename as reference
+      const remittanceReference = cnabFileName || "Remessa_" + new Date().toISOString().slice(0, 10).replace(/-/g, '');
       
       // Calculate total value
-      const totalValue = selectedRows.reduce((sum, row) => {
+      const totalValue = validRecords.reduce((sum, row) => {
         const valueStr = row.VALOR.toString().replace(/[^\d.,]/g, '').replace(',', '.');
         const value = parseFloat(valueStr);
         return sum + (isNaN(value) ? 0 : value);
@@ -248,8 +274,8 @@ export const useImportacao = () => {
         empresa: companyName,
         dataGeracao: formattedDate,
         referencia: remittanceReference,
-        beneficiarios: selectedRows,
-        totalRegistros: selectedRows.length,
+        beneficiarios: validRecords,
+        totalRegistros: validRecords.length,
         valorTotal: totalValue
       };
       
@@ -279,7 +305,7 @@ Atenciosamente,
           department: "Financeiro"
         };
         
-        const excelReport = await generateRemittanceReport(selectedRows, reportOptions);
+        const excelReport = await generateRemittanceReport(validRecords, reportOptions);
         setReportAttachment(excelReport.file);
         setReportFileName(excelReport.fileName);
       } catch (error) {
@@ -387,6 +413,10 @@ Atenciosamente,
     validationErrors,
     validationPerformed,
     hasValidationErrors: validationErrors.length > 0,
+    
+    // CNAB file state
+    cnabFileGenerated,
+    cnabFileName,
     
     // PDF preview state
     showPDFPreviewDialog,

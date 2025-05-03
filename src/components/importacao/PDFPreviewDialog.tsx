@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { PDFPreviewDialogProps } from "@/types/importacao";
 import { Button } from "@/components/ui/button";
-import { Mail, Download, Loader2 } from "lucide-react";
+import { Mail, Download, Loader2, X } from "lucide-react";
 import { generatePDFReport } from "@/services/reports/pdfReportService";
 import { toast } from "@/components/ui/sonner";
 
@@ -59,7 +59,7 @@ export function PDFPreviewDialog({
     if (pdfUrl) {
       const link = document.createElement('a');
       link.href = pdfUrl;
-      link.download = `Remessa_Bancaria_${new Date().toISOString().slice(0, 10).replace(/-/g, '')}.pdf`;
+      link.download = `Remessa_Bancaria_${reportData?.referencia || new Date().toISOString().slice(0, 10).replace(/-/g, '')}.pdf`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -69,15 +69,20 @@ export function PDFPreviewDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-        <DialogHeader>
-          <DialogTitle>Visualização do Relatório PDF</DialogTitle>
-          <DialogDescription>
-            Confira o relatório antes de enviá-lo por e-mail ao diretor financeiro.
-          </DialogDescription>
+      <DialogContent className="max-w-[95vw] w-[95vw] max-h-[95vh] h-[90vh] p-6 overflow-hidden flex flex-col">
+        <DialogHeader className="flex flex-row justify-between items-center">
+          <div>
+            <DialogTitle className="text-xl">Visualização do Relatório PDF</DialogTitle>
+            <DialogDescription>
+              Confira o relatório antes de enviá-lo por e-mail ao diretor financeiro.
+            </DialogDescription>
+          </div>
+          <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)}>
+            <X className="h-5 w-5" />
+          </Button>
         </DialogHeader>
 
-        <div className="flex-1 min-h-[500px] border rounded-md overflow-hidden bg-gray-100">
+        <div className="flex-1 border rounded-md overflow-hidden bg-gray-100 mt-2">
           {loading ? (
             <div className="w-full h-full flex items-center justify-center">
               <Loader2 className="animate-spin h-8 w-8 text-gray-500" />
@@ -96,7 +101,7 @@ export function PDFPreviewDialog({
           )}
         </div>
 
-        <DialogFooter className="gap-2">
+        <DialogFooter className="gap-2 mt-4">
           <Button variant="outline" onClick={handleDownload} disabled={loading || !pdfUrl}>
             <Download className="h-4 w-4 mr-2" />
             Baixar PDF

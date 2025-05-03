@@ -68,11 +68,11 @@ export const useWorkflowDialog = () => {
       if (workflow.sendMethod === 'api') {
         toast.success(`Enviando ${selectedRows.length} pagamentos via API REST...`);
         // This would call an API integration - not implemented yet
-        return;
+        return { success: true };
       }
       
       // Process selected rows with validation
-      await processSelectedRows(workflow, selectedRows);
+      const result = await processSelectedRows(workflow, selectedRows);
       
       // Log processing details (for debugging)
       console.log("Dados completos do processamento:", {
@@ -84,9 +84,13 @@ export const useWorkflowDialog = () => {
         diretorioSaida: workflow.outputDirectory
       });
       
+      // Return the result with filename
+      return result;
+      
     } catch (error) {
       console.error("Erro ao processar arquivo:", error);
       // Error handling is already done in processSelectedRows
+      return { success: false };
     }
   };
 

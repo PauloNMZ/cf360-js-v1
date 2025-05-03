@@ -1,40 +1,27 @@
 
-import React, { useState, useEffect } from 'react';
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import React, { useState } from "react";
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { RowData, TableViewProps } from "@/types/importacao";
-import { ArrowLeft, Download, Filter, Trash2, FileText, Mail } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
 import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-  PaginationFirst,
-  PaginationLast,
-} from "@/components/ui/pagination";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  FileText,
+  AlertTriangle,
+  ChevronLeft,
+  FileOutput,
+  Trash2,
+  FileCheck,
+  Download,
+} from "lucide-react";
+import { TableViewProps, RowData } from "@/types/importacao";
+import { formatarValorCurrency } from "@/utils/formatting/currencyUtils";
 
 export function TableView({
   handleSelectAll,
@@ -49,145 +36,92 @@ export function TableView({
   total,
   setShowTable,
   validationPerformed,
-  hasValidationErrors
+  hasValidationErrors,
+  cnabFileGenerated = false
 }: TableViewProps) {
-  // Estado para paginação
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [filteredData, setFilteredData] = useState<RowData[]>([]);
-  const [bankFilter, setBankFilter] = useState<string>("todos");
+  const rowsPerPage = 10;
 
-  // Calcular o total de páginas
-  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-  
-  // Filtragem e paginação dos dados
-  useEffect(() => {
-    let result = [...tableData];
-    
-    // Aplicar filtro de banco
-    if (bankFilter === "bb") {
-      result = result.filter(row => {
-        const bankCode = row.BANCO.toString().trim().padStart(3, '0');
-        return bankCode === "001";
-      });
-    } else if (bankFilter === "outros") {
-      result = result.filter(row => {
-        const bankCode = row.BANCO.toString().trim().padStart(3, '0');
-        return bankCode !== "001";
-      });
-    }
-    
-    setFilteredData(result);
-    setCurrentPage(1); // Reset para primeira página ao filtrar
-  }, [tableData, bankFilter]);
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+  const currentRows = tableData.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(tableData.length / rowsPerPage);
 
-  // Dados da página atual
-  const getCurrentPageData = () => {
-    const startIndex = (currentPage - 1) * rowsPerPage;
-    const endIndex = startIndex + rowsPerPage;
-    return filteredData.slice(startIndex, endIndex);
-  };
-
-  // Count selected rows
-  const selectedCount = tableData.filter(row => row.selected).length;
-  
-  // Format currency value for display
-  const formatCurrency = (value: number): string => {
-    return value.toLocaleString('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    });
-  };
-
-  // Navegação entre páginas
-  const goToPage = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
+  const formatarValor = (valor: string | number): string => {
+    if (typeof valor === "string") {
+      // Remove caracteres não numéricos, exceto ponto e vírgula
+      const numericValue = valor.replace(/[^\d.,]/g, "").replace(",", ".");
+      return formatarValorCurrency(parseFloat(numericValue));
     }
-  };
-  
-  // Gerando números de página para exibição
-  const getPageNumbers = () => {
-    const pages = [];
-    const maxPagesToShow = 5;
-    let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
-    let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
-    
-    if (endPage - startPage + 1 < maxPagesToShow) {
-      startPage = Math.max(1, endPage - maxPagesToShow + 1);
-    }
-    
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i);
-    }
-    
-    return pages;
+    return formatarValorCurrency(valor);
   };
 
   return (
-    <div className="w-full">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
-          <Button variant="outline" onClick={() => setShowTable(false)}>
-            <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <Button
+          variant="ghost"
+          onClick={() => setShowTable(false)}
+          className="flex items-center"
+        >
+          <ChevronLeft className="mr-1 h-4 w-4" /> Voltar
+        </Button>
+
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={handleVerifyErrors}
+            className="flex items-center"
+          >
+            <FileCheck className="mr-2 h-4 w-4" />
+            Verificar Erros
           </Button>
+
           {validationPerformed && hasValidationErrors && (
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="outline"
               onClick={handleExportErrors}
-              className="animate-pulse border-2 border-red-500"
+              className="flex items-center text-amber-600"
             >
-              <Download className="mr-2 h-4 w-4" /> Exportar Erros
+              <Download className="mr-2 h-4 w-4" />
+              Exportar Erros
             </Button>
           )}
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="text-right">
-            <div className="text-sm text-gray-500">
-              {selectedCount} de {tableData.length} registros selecionados
-            </div>
-            <div className="font-bold">
-              Total: {formatCurrency(total)}
-            </div>
-          </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="gap-1">
-                <Filter className="h-4 w-4" /> Filtrar
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-40 bg-white">
-              <DropdownMenuRadioGroup value={bankFilter} onValueChange={setBankFilter}>
-                <DropdownMenuRadioItem value="todos">Todos os bancos</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="bb">Banco do Brasil</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="outros">Outras IF</DropdownMenuRadioItem>
-              </DropdownMenuRadioGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          
-          <Button 
-            variant="outline" 
-            onClick={handleGenerateReport} 
-            disabled={selectedCount === 0}
-            className="bg-green-50 hover:bg-green-100 border-green-200 text-green-700"
+
+          <Button
+            onClick={handleProcessSelected}
+            className="flex items-center"
           >
-            <FileText className="mr-2 h-4 w-4" /> Gerar Relatório
+            <FileOutput className="mr-2 h-4 w-4" />
+            Processar Selecionados
           </Button>
           
-          <Button onClick={handleProcessSelected} disabled={selectedCount === 0}>
-            Processar Selecionados
+          <Button
+            onClick={handleGenerateReport}
+            className="flex items-center"
+            disabled={!cnabFileGenerated}
+            title={!cnabFileGenerated ? "Gere o arquivo CNAB antes de visualizar o relatório" : "Gerar relatório PDF dos registros válidos"}
+          >
+            <FileText className="mr-2 h-4 w-4" />
+            Gerar Relatório
           </Button>
         </div>
       </div>
 
-      <div className="rounded-md border overflow-hidden">
+      <div className="rounded-md border">
         <Table>
+          <TableCaption>
+            Exibindo {currentRows.length} de {tableData.length} registros |
+            Página {currentPage} de {totalPages} | Total Selecionado:{" "}
+            {formatarValorCurrency(total)}
+          </TableCaption>
           <TableHeader>
             <TableRow>
               <TableHead className="w-[50px]">
                 <Checkbox
                   checked={selectAll}
                   onCheckedChange={handleSelectAll}
+                  aria-label="Selecionar todos os registros"
                 />
               </TableHead>
               <TableHead>Nome</TableHead>
@@ -196,17 +130,20 @@ export function TableView({
               <TableHead>Agência</TableHead>
               <TableHead>Conta</TableHead>
               <TableHead>Tipo</TableHead>
-              <TableHead>Valor</TableHead>
-              <TableHead className="w-[50px]">Ações</TableHead>
+              <TableHead className="text-right">Valor</TableHead>
+              <TableHead className="w-[70px]">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {getCurrentPageData().map((row: RowData) => (
+            {currentRows.map((row) => (
               <TableRow key={row.id}>
                 <TableCell>
                   <Checkbox
-                    checked={row.selected}
-                    onCheckedChange={(checked) => handleSelectRow(row.id, !!checked)}
+                    checked={row.selected || false}
+                    onCheckedChange={(checked) =>
+                      handleSelectRow(row.id, !!checked)
+                    }
+                    aria-label={`Selecionar ${row.NOME}`}
                   />
                 </TableCell>
                 <TableCell>{row.NOME}</TableCell>
@@ -215,10 +152,8 @@ export function TableView({
                 <TableCell>{row.AGENCIA}</TableCell>
                 <TableCell>{row.CONTA}</TableCell>
                 <TableCell>{row.TIPO}</TableCell>
-                <TableCell>
-                  {typeof row.VALOR === 'number' 
-                    ? formatCurrency(row.VALOR)
-                    : formatCurrency(parseFloat(row.VALOR.toString().replace(/[^\d.,]/g, '').replace(',', '.')))}
+                <TableCell className="text-right font-medium">
+                  {formatarValor(row.VALOR)}
                 </TableCell>
                 <TableCell>
                   <Button
@@ -226,7 +161,7 @@ export function TableView({
                     size="icon"
                     onClick={() => handleDeleteRow(row.id)}
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-4 w-4 text-red-500" />
                   </Button>
                 </TableCell>
               </TableRow>
@@ -234,75 +169,32 @@ export function TableView({
           </TableBody>
         </Table>
       </div>
-      
-      {/* Paginação */}
-      <div className="mt-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-500">Linhas por página:</span>
-          <select 
-            className="border rounded p-1 text-sm"
-            value={rowsPerPage}
-            onChange={(e) => setRowsPerPage(Number(e.target.value))}
-          >
-            {[5, 10, 25, 50].map(value => (
-              <option key={value} value={value}>{value}</option>
-            ))}
-          </select>
+
+      {/* Paginação simples */}
+      <div className="flex justify-between items-center">
+        <div>
+          <span className="text-sm text-gray-500">
+            Mostrando {startIndex + 1} até {Math.min(endIndex, tableData.length)}{" "}
+            de {tableData.length} registros
+          </span>
         </div>
-        
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationFirst 
-                onClick={() => goToPage(1)} 
-                className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-              />
-            </PaginationItem>
-            
-            <PaginationItem>
-              <PaginationPrevious
-                onClick={() => goToPage(currentPage - 1)}
-                className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-              />
-            </PaginationItem>
-            
-            {getPageNumbers().map(page => (
-              <PaginationItem key={page}>
-                <PaginationLink 
-                  isActive={currentPage === page} 
-                  onClick={() => goToPage(page)}
-                >
-                  {page}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-            
-            {totalPages > getPageNumbers()[getPageNumbers().length - 1] && (
-              <PaginationItem>
-                <PaginationEllipsis />
-              </PaginationItem>
-            )}
-            
-            <PaginationItem>
-              <PaginationNext 
-                onClick={() => goToPage(currentPage + 1)} 
-                className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-              />
-            </PaginationItem>
-            
-            <PaginationItem>
-              <PaginationLast 
-                onClick={() => goToPage(totalPages)} 
-                className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-        
-        <div className="text-sm text-gray-500">
-          {filteredData.length > 0 ? 
-            `${(currentPage - 1) * rowsPerPage + 1}-${Math.min(currentPage * rowsPerPage, filteredData.length)} de ${filteredData.length}` : 
-            "0-0 de 0"}
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            Anterior
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            disabled={currentPage === totalPages}
+          >
+            Próximo
+          </Button>
         </div>
       </div>
     </div>
