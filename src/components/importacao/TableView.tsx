@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -12,10 +12,6 @@ import {
 } from "@/components/ui/table";
 import { RowData, TableViewProps } from "@/types/importacao";
 import { AlertCircle, ArrowLeft, Trash2 } from "lucide-react";
-import { ValidationErrorsDialog } from "./ValidationErrorsDialog";
-import { validateFavorecidos } from "@/services/cnab240/validationService";
-import { ErrorRecord } from "@/types/cnab240";
-import { toast } from "@/components/ui/sonner";
 
 export function TableView({
   handleSelectAll,
@@ -24,29 +20,10 @@ export function TableView({
   handleSelectRow,
   handleDeleteRow,
   handleProcessSelected,
+  handleVerifyErrors,
   total,
   setShowTable
 }: TableViewProps) {
-  const [showValidationDialog, setShowValidationDialog] = useState(false);
-  const [validationErrors, setValidationErrors] = useState<ErrorRecord[]>([]);
-
-  // Function to validate records and display errors
-  const handleVerifyErrors = () => {
-    const { errors, validRecordsCount, totalRecords } = validateFavorecidos(tableData);
-    setValidationErrors(errors);
-    
-    if (errors.length > 0) {
-      setShowValidationDialog(true);
-      toast.error(`Encontrados ${errors.length} registros com erros de validação`, {
-        description: `${validRecordsCount} de ${totalRecords} registros estão válidos para processamento.`
-      });
-    } else {
-      toast.success(`Todos os registros estão válidos!`, {
-        description: `${validRecordsCount} registros validados com sucesso.`
-      });
-    }
-  };
-
   // Count selected rows
   const selectedCount = tableData.filter(row => row.selected).length;
   
@@ -138,12 +115,6 @@ export function TableView({
           </TableBody>
         </Table>
       </div>
-
-      <ValidationErrorsDialog 
-        isOpen={showValidationDialog}
-        onOpenChange={setShowValidationDialog}
-        errors={validationErrors}
-      />
     </div>
   );
 }

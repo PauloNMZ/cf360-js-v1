@@ -55,6 +55,7 @@ export interface TableViewProps {
   handleSelectRow: (id: number, checked: boolean) => void;
   handleDeleteRow: (id: number) => void;
   handleProcessSelected: () => void;
+  handleVerifyErrors: () => void;
   total: number;
   setShowTable: (show: boolean) => void;
 }

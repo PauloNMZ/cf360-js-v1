@@ -1,8 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { CNABWorkflowData } from '@/types/cnab240';
 import { RowData } from '@/types/importacao';
 import { toast } from '@/components/ui/sonner';
+import { validateFavorecidos } from '@/services/cnab240/validationService';
 
 // Import smaller hooks
 import { useFileImport } from './importacao/useFileImport';
@@ -13,6 +13,8 @@ import { useConvenentesData } from './importacao/useConvenentesData';
 
 export const useImportacao = () => {
   const [showTable, setShowTable] = useState(false);
+  const [showValidationDialog, setShowValidationDialog] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<any[]>([]);
   
   // Import functionality from smaller hooks
   const fileImport = useFileImport();
@@ -39,7 +41,29 @@ export const useImportacao = () => {
       directoryDialog.setOutputDirectory(workflowDialog.workflow.outputDirectory);
     }
   }, [workflowDialog.workflow.outputDirectory]);
-  
+
+  // Function to validate records and display errors
+  const handleVerifyErrors = () => {
+    if (tableOps.tableData.length === 0) {
+      toast.error('Nenhum registro para validar. Importe uma planilha primeiro.');
+      return;
+    }
+
+    const { errors, validRecordsCount, totalRecords } = validateFavorecidos(tableOps.tableData);
+    setValidationErrors(errors);
+    
+    if (errors.length > 0) {
+      setShowValidationDialog(true);
+      toast.error(`Encontrados ${errors.length} registros com erros de validação`, {
+        description: `${validRecordsCount} de ${totalRecords} registros estão válidos para processamento.`
+      });
+    } else {
+      toast.success(`Todos os registros estão válidos!`, {
+        description: `${validRecordsCount} registros validados com sucesso.`
+      });
+    }
+  };
+
   // Handle initial processing
   const handleProcessar = () => {
     const result = fileImport.handleProcessar();
@@ -103,10 +127,14 @@ export const useImportacao = () => {
     // UI state
     showTable,
     setShowTable,
+    showValidationDialog,
+    setShowValidationDialog,
+    validationErrors,
     
     // Process handlers
-    handleProcessar,
-    handleProcessSelected,
+    handleProcessar: handleProcessar,
+    handleProcessSelected: handleProcessSelected,
+    handleVerifyErrors: handleVerifyErrors,
     
     // Workflow dialog related props and methods
     showWorkflowDialog: workflowDialog.showWorkflowDialog,

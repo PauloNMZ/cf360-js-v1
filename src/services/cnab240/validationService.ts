@@ -4,7 +4,8 @@ import {
   validarConta,
   validarAgencia,
   validarInscricao,
-  retirarCHR
+  retirarCHR,
+  formatarCpfCnpj
 } from '@/utils/cnabUtils';
 import { RowData } from '@/types/importacao';
 

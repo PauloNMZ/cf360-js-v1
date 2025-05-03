@@ -8,6 +8,7 @@ import FileUploadView from '@/components/importacao/FileUploadView';
 import { TableView } from '@/components/importacao/TableView';
 import WorkflowDialog from '@/components/importacao/WorkflowDialog';
 import DirectoryDialog from '@/components/importacao/DirectoryDialog';
+import { ValidationErrorsDialog } from '@/components/importacao/ValidationErrorsDialog';
 
 const ImportarPlanilha = () => {
   const {
@@ -24,6 +25,9 @@ const ImportarPlanilha = () => {
     setShowWorkflowDialog,
     showDirectoryDialog,
     setShowDirectoryDialog,
+    showValidationDialog,
+    setShowValidationDialog,
+    validationErrors,
     currentStep,
     workflow,
     convenentes,
@@ -34,6 +38,7 @@ const ImportarPlanilha = () => {
     handleDeleteRow,
     handleProcessar,
     handleProcessSelected,
+    handleVerifyErrors,
     goToNextStep,
     goToPreviousStep,
     handleOpenDirectorySettings,
@@ -54,7 +59,7 @@ const ImportarPlanilha = () => {
     return () => {
       document.removeEventListener('openDirectorySettings', handleOpenSettings);
     };
-  }, []);
+  }, [handleOpenDirectorySettings]);
 
   return (
     <ScrollArea className="h-[600px]">
@@ -76,6 +81,7 @@ const ImportarPlanilha = () => {
             handleSelectRow={handleSelectRow}
             handleDeleteRow={handleDeleteRow}
             handleProcessSelected={handleProcessSelected}
+            handleVerifyErrors={handleVerifyErrors}
             total={total}
             setShowTable={setShowTable}
           />
@@ -105,6 +111,13 @@ const ImportarPlanilha = () => {
         workflow={workflow}
         updateWorkflow={updateWorkflow}
         handleSaveSettings={handleSaveDirectorySettings}
+      />
+
+      {/* Validation errors dialog */}
+      <ValidationErrorsDialog
+        isOpen={showValidationDialog}
+        onOpenChange={setShowValidationDialog}
+        errors={validationErrors}
       />
     </ScrollArea>
   );

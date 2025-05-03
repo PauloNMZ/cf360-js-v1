@@ -19,6 +19,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useImportacao } from "@/hooks/useImportacao";
 
 type NavigationMenuProps = {
   onConvenenteClick: () => void;
@@ -33,6 +34,9 @@ const NavigationMenu = ({
   onAdminPanelClick,
   onLogoutClick
 }: NavigationMenuProps) => {
+  // Use the importacao hook to get access to data validation functions
+  const { tableData, handleVerifyErrors } = useImportacao();
+
   return (
     <TooltipProvider>
       <div className="flex justify-center mb-8">
@@ -73,7 +77,7 @@ const NavigationMenu = ({
                 <NavButton 
                   icon={<FileSearch size={24} />} 
                   label="Check" 
-                  onClick={() => {}} 
+                  onClick={handleVerifyErrors} 
                 />
               </div>
             </TooltipTrigger>
