@@ -25,7 +25,7 @@ export const validateFavorecidos = (tableData: RowData[]): {
     const favorecido: Favorecido = {
       nome: row.NOME,
       inscricao: row.INSCRICAO,
-      banco: row.BANCO,
+      banco: row.BANCO.toString().trim().padStart(3, '0'), // Normalize bank code
       agencia: row.AGENCIA,
       conta: row.CONTA,
       tipo: row.TIPO,
@@ -189,7 +189,7 @@ export const convertAndValidateRows = (rows: RowData[]): { favorecidos: Favoreci
     const favorecido: Favorecido = {
       nome: row.NOME,
       inscricao: row.INSCRICAO,
-      banco: row.BANCO.trim().padStart(3, '0'), // Normalizar código do banco
+      banco: row.BANCO.toString().trim().padStart(3, '0'), // Normalizar código do banco
       agencia: retirarCHR(row.AGENCIA),
       conta: retirarCHR(row.CONTA),
       tipo: row.TIPO,
