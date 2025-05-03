@@ -1,3 +1,4 @@
+
 import { EmpresaConfig, Favorecido, CNABWorkflowData } from '@/types/cnab240';
 import { validarCNPJ } from '@/utils/cnabUtils';
 import { inicializarVariaveis, formatarDadosEmpresa } from './utils/configUtils';
@@ -167,7 +168,10 @@ export class GeradorCNAB240 {
 
   // Generate the file trailer
   private gerarTrailerArquivo(): void {
-    const trailerArquivo = gerarTrailerArquivo(this.seqLote, this.totalLinhasArquivo);
+    // Important: Add 1 to totalLinhasArquivo to include the trailer itself in the count
+    // This fixes the validation error where the count should be 116 but was 115
+    const totalLinhasComTrailer = this.totalLinhasArquivo + 1;
+    const trailerArquivo = gerarTrailerArquivo(this.seqLote, totalLinhasComTrailer);
     this.escreverNoArquivo(trailerArquivo);
   }
 

@@ -15,13 +15,23 @@ interface StepOneProps {
 }
 
 const StepOne: React.FC<StepOneProps> = ({ workflow, updateWorkflow }) => {
+  // Add state for controlling the popover
+  const [open, setOpen] = React.useState(false);
+
+  // Function to handle date selection
+  const handleSelectDate = (date: Date | undefined) => {
+    updateWorkflow("paymentDate", date);
+    // Close the popover after selecting a date
+    setOpen(false);
+  };
+
   return (
     <div className="py-6 space-y-4">
       <p className="text-sm text-gray-500">
         Selecione a data em que os pagamentos serão processados.
       </p>
       <div className="flex flex-col items-center space-y-4">
-        <Popover>
+        <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
@@ -42,11 +52,10 @@ const StepOne: React.FC<StepOneProps> = ({ workflow, updateWorkflow }) => {
             <Calendar
               mode="single"
               selected={workflow.paymentDate}
-              onSelect={(date) => updateWorkflow("paymentDate", date)}
+              onSelect={handleSelectDate}
               disabled={(date) => date < new Date()}
               initialFocus
               locale={ptBR}
-              className={cn("p-3 pointer-events-auto")}
             />
           </PopoverContent>
         </Popover>
