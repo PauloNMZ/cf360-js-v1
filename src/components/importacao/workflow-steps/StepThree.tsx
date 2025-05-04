@@ -17,6 +17,14 @@ interface StepThreeProps {
   carregandoConvenentes: boolean;
 }
 
+// Helper function to ensure we always have a valid string ID
+const ensureValidId = (id: any): string => {
+  if (id === null || id === undefined || String(id).trim() === '') {
+    return `id-${Math.random().toString(36).substring(2)}`;
+  }
+  return String(id).trim();
+};
+
 const StepThree: React.FC<StepThreeProps> = ({ 
   workflow, 
   updateWorkflow,
@@ -31,18 +39,16 @@ const StepThree: React.FC<StepThreeProps> = ({
     return convenentes
       .filter(convenente => {
         // Filter out null or undefined convenente objects
-        if (!convenente) return false;
-        
-        // Ensure ID exists and is not empty
-        const id = convenente.id;
-        return id !== null && id !== undefined && String(id).trim() !== "";
+        return convenente !== null && convenente !== undefined;
       })
       .map(convenente => {
+        // Generate a valid ID for this convenente
+        const validId = ensureValidId(convenente.id);
+        
         // Ensure all needed properties have default values
-        const id = String(convenente.id).trim();
         return {
           ...convenente,
-          id, // Ensure ID is a clean string
+          id: validId, // Always use our validated ID
           razaoSocial: convenente.razaoSocial || "Sem nome",
           cnpj: convenente.cnpj || "N/A",
           agencia: convenente.agencia || "N/A",
@@ -52,8 +58,12 @@ const StepThree: React.FC<StepThreeProps> = ({
       });
   }, [convenentes]);
 
-  // Generate a default ID for fallback
-  const defaultId = useMemo(() => `default-${Math.random().toString(36).substring(2)}`, []);
+  // Get the current value for the select, ensuring it's always valid
+  const currentValue = useMemo(() => {
+    if (!workflow.convenente || !workflow.convenente.id) return undefined;
+    const validId = ensureValidId(workflow.convenente.id);
+    return validId;
+  }, [workflow.convenente]);
 
   return (
     <div className="py-6 space-y-4">
@@ -67,7 +77,7 @@ const StepThree: React.FC<StepThreeProps> = ({
         </div>
       ) : (
         <Select
-          value={workflow.convenente?.id ? String(workflow.convenente.id) : undefined}
+          value={currentValue}
           onValueChange={(value) => {
             const selected = safeConvenentes.find(c => c.id === value) || null;
             updateWorkflow("convenente", selected);
@@ -82,20 +92,14 @@ const StepThree: React.FC<StepThreeProps> = ({
                 Nenhum convenente encontrado
               </div>
             ) : (
-              safeConvenentes.map((convenente) => {
-                // Ensure we always have a non-empty string value for the SelectItem
-                const valueId = convenente.id || defaultId;
-                const uniqueKey = `convenente-${valueId}-${Math.random().toString(36).substring(2)}`;
-                
-                return (
-                  <SelectItem 
-                    key={uniqueKey}
-                    value={valueId}
-                  >
-                    {convenente.razaoSocial}
-                  </SelectItem>
-                );
-              })
+              safeConvenentes.map((convenente) => (
+                <SelectItem 
+                  key={`conv-${convenente.id}`}
+                  value={convenente.id}
+                >
+                  {convenente.razaoSocial}
+                </SelectItem>
+              ))
             )}
           </SelectContent>
         </Select>
