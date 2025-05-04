@@ -100,7 +100,7 @@ const Index = () => {
 
   return (
     <MainLayout companySettings={companySettings}>
-      <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <div className="w-full px-4 py-6">
         <NavigationMenu 
           onConvenenteClick={handleConvenenteClick}
           onImportarPlanilhaClick={handleImportarPlanilhaClick}

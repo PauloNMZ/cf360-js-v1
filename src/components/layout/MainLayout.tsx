@@ -19,16 +19,16 @@ const MainLayout = ({ children, companySettings }: MainLayoutProps) => {
   // Define header and footer heights (approximate values, adjust as needed)
   const HEADER_HEIGHT = 80;
   const FOOTER_HEIGHT = 60;
-  const HEIGHT_REDUCTION = 100; // Reduce main content height by 100px
+  const HEIGHT_REDUCTION = 0; // Remove the height reduction to use full height
   
-  // Get content container style with height reduction
+  // Get content container style with no height reduction
   const contentContainerStyle = getContentContainerStyle(HEADER_HEIGHT, FOOTER_HEIGHT, 0, HEIGHT_REDUCTION);
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-blue-50 to-white dark:from-blue-950 dark:to-slate-900 dark:text-white">
+    <div className="flex flex-col h-screen w-full bg-gradient-to-br from-blue-50 to-white dark:from-blue-950 dark:to-slate-900 dark:text-white">
       {/* Header with gradiente azul */}
       <header className="bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-800 dark:to-blue-950 text-white py-4 px-6 shadow-md">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
+        <div className="w-full mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
             <AppLogo size={28} customLogoUrl={companySettings.logoUrl} />
             <h1 className="text-2xl font-bold">{companySettings.companyName}</h1>
@@ -42,14 +42,16 @@ const MainLayout = ({ children, companySettings }: MainLayoutProps) => {
         </div>
       </header>
 
-      {/* Conteúdo principal com rolagem controlada e altura reduzida */}
-      <div className="flex-grow overflow-auto" style={contentContainerStyle}>
-        {children}
+      {/* Conteúdo principal com rolagem controlada e altura total disponível */}
+      <div className="flex-grow overflow-auto w-full" style={contentContainerStyle}>
+        <div className="w-full h-full mx-auto">
+          {children}
+        </div>
       </div>
       
       {/* Status bar - Fixed at the bottom */}
       <footer className="bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-800 dark:to-blue-950 text-white py-3 px-6">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
+        <div className="w-full mx-auto flex justify-between items-center">
           <div>
             <h2 className="text-xl font-bold">
               {new Date().toLocaleDateString('pt-BR', { weekday: 'long' })}
