@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { toast } from '@/components/ui/sonner';
 import { EmailFormValues } from '@/types/importacao';
-import { sendEmail, logEmailActivity } from '@/services/emailService';
+import { sendEmail, logEmailActivity, getCurrentUserEmail } from '@/services/emailService';
 import { generateRemittanceReport } from '@/services/reports/remittanceReportService';
 import { formatarValorCurrency } from '@/utils/formatting/currencyUtils';
 
@@ -87,10 +87,13 @@ Atenciosamente,
         throw new Error("Falha ao gerar anexo do e-mail");
       }
       
+      // Garantir que o email do remetente seja sempre o do usuário logado
+      const userEmail = getCurrentUserEmail();
+      
       const emailData = {
         recipientEmail: emailFormValues.recipientEmail,
         senderName: emailFormValues.senderName,
-        senderEmail: emailFormValues.senderEmail, // Usando o email do remetente configurado
+        senderEmail: userEmail, // Sempre usar o email do usuário logado
         senderDepartment: emailFormValues.senderDepartment,
         subject: `Relatório de Remessa Bancária - ${emailFormValues.remittanceReference}`,
         message: emailFormValues.message,

@@ -1,8 +1,5 @@
 
 import React from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import {
   Form,
   FormControl,
@@ -16,31 +13,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { EmailFormValues } from "@/types/importacao";
 import { useEmailForm } from "@/hooks/importacao/email/useEmailForm";
-
-// Schema for the email form - company name is optional and hidden
-const emailFormSchema = z.object({
-  recipientEmail: z
-    .string()
-    .email("E-mail inválido")
-    .min(1, "E-mail é obrigatório"),
-  senderName: z
-    .string()
-    .min(1, "Nome do remetente é obrigatório"),
-  senderEmail: z
-    .string()
-    .email("E-mail do remetente inválido")
-    .min(1, "E-mail do remetente é obrigatório"),
-  senderDepartment: z
-    .string()
-    .min(1, "Departamento é obrigatório"),
-  remittanceReference: z
-    .string()
-    .min(1, "Referência da remessa é obrigatória"),
-  companyName: z.string().optional(),
-  message: z
-    .string()
-    .min(1, "Mensagem é obrigatória"),
-});
 
 interface EmailFormProps {
   defaultMessage: string;
@@ -63,9 +35,16 @@ export function EmailForm({
     reportDate
   });
 
+  // Handler de envio personalizado para garantir que o email do usuário logado seja usado
+  const handleSubmit = (values: EmailFormValues) => {
+    // Garantir que o email do remetente seja o email do usuário logado
+    values.senderEmail = userEmail;
+    onSubmit(values);
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <div className="grid grid-cols-1 gap-4">
           <FormField
             control={form.control}
@@ -84,42 +63,22 @@ export function EmailForm({
             )}
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="senderName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nome do Remetente</FormLabel>
-                  <FormControl>
-                    <Input 
-                      placeholder="Seu Nome" 
-                      {...field} 
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="senderEmail"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>E-mail do Remetente</FormLabel>
-                  <FormControl>
-                    <Input
-                      readOnly 
-                      {...field}
-                      className="bg-gray-50" 
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+          <FormField
+            control={form.control}
+            name="senderName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nome do Remetente</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="Seu Nome" 
+                    {...field} 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           <FormField
             control={form.control}
@@ -154,6 +113,9 @@ export function EmailForm({
 
           {/* Company name is hidden as it's automatically determined */}
           <input type="hidden" name="companyName" value={companyName} />
+
+          {/* Email do remetente é mantido como campo oculto */}
+          <input type="hidden" name="senderEmail" value={userEmail} />
 
           <FormField
             control={form.control}

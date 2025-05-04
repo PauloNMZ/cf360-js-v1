@@ -63,6 +63,7 @@ export function EmailConfigDialog({
           <DialogTitle>Configuração de Envio de E-mail</DialogTitle>
           <DialogDescription>
             Configure os detalhes para o envio do relatório por e-mail.
+            O e-mail será enviado usando sua conta de usuário atual.
           </DialogDescription>
         </DialogHeader>
 

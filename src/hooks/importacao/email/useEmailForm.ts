@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { EmailFormValues } from "@/types/importacao";
 import { getCurrentUserEmail } from "@/services/emailService";
 
-// Schema para o formulário de email - incluindo campo de email do remetente
+// Schema para o formulário de email - removendo o campo de email do remetente
 const emailFormSchema = z.object({
   recipientEmail: z
     .string()
@@ -15,9 +15,6 @@ const emailFormSchema = z.object({
   senderName: z
     .string()
     .min(1, "Nome do remetente é obrigatório"),
-  senderEmail: z
-    .string()
-    .email("E-mail do remetente inválido"),
   senderDepartment: z
     .string()
     .min(1, "Departamento é obrigatório"),
@@ -56,7 +53,7 @@ export const useEmailForm = ({
     defaultValues: {
       recipientEmail: "",
       senderName: "",
-      senderEmail: userEmail, // Usar o email do usuário logado
+      senderEmail: userEmail, // Usar o email do usuário logado (não visível no formulário)
       senderDepartment: "Financeiro", // Departamento padrão como Financeiro
       remittanceReference: `Remessa de Pagamento - ${reportDate}`,
       companyName: companyName,
