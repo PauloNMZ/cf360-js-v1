@@ -29,6 +29,12 @@ const StepThree: React.FC<StepThreeProps> = ({
     return id.trim() === "" ? "no-id-placeholder" : id;
   };
 
+  // Filter out any convenente without a valid ID to prevent Select errors
+  const validConvenentes = convenentes.filter(c => {
+    const id = getValidId(c.id);
+    return id !== "" && id !== null && id !== undefined;
+  });
+
   return (
     <div className="py-6 space-y-4">
       <p className="text-sm text-gray-500 mb-4">
@@ -51,19 +57,22 @@ const StepThree: React.FC<StepThreeProps> = ({
             <SelectValue placeholder="Selecione um convenente" />
           </SelectTrigger>
           <SelectContent>
-            {convenentes.length === 0 ? (
+            {validConvenentes.length === 0 ? (
               <div className="p-2 text-sm text-gray-500">
                 Nenhum convenente encontrado
               </div>
             ) : (
-              convenentes.map((convenente) => (
-                <SelectItem 
-                  key={getValidId(convenente.id) + "-key"} 
-                  value={getValidId(convenente.id)}
-                >
-                  {convenente.razaoSocial || "Sem nome"}
-                </SelectItem>
-              ))
+              validConvenentes.map((convenente) => {
+                const validId = getValidId(convenente.id);
+                return (
+                  <SelectItem 
+                    key={`convenente-${validId}`}
+                    value={validId}
+                  >
+                    {convenente.razaoSocial || "Sem nome"}
+                  </SelectItem>
+                );
+              })
             )}
           </SelectContent>
         </Select>
