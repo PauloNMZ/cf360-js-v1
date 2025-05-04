@@ -1,28 +1,10 @@
-
 import React, { useState } from "react";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import {
-  FileText,
-  AlertTriangle,
-  ChevronLeft,
-  FileOutput,
-  Trash2,
-  FileCheck,
-  Download,
-} from "lucide-react";
+import { FileText, AlertTriangle, ChevronLeft, FileOutput, Trash2, FileCheck, Download } from "lucide-react";
 import { TableViewProps, RowData } from "@/types/importacao";
 import { formatarValorCurrency } from "@/utils/formatting/currencyUtils";
-
 export function TableView({
   handleSelectAll,
   selectAll,
@@ -41,12 +23,10 @@ export function TableView({
 }: TableViewProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 10;
-
   const startIndex = (currentPage - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
   const currentRows = tableData.slice(startIndex, endIndex);
   const totalPages = Math.ceil(tableData.length / rowsPerPage);
-
   const formatarValor = (valor: string | number): string => {
     if (typeof valor === "string") {
       // Remove caracteres não numéricos, exceto ponto e vírgula
@@ -55,53 +35,29 @@ export function TableView({
     }
     return formatarValorCurrency(valor);
   };
-
-  return (
-    <div className="space-y-4">
+  return <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <Button
-          variant="ghost"
-          onClick={() => setShowTable(false)}
-          className="flex items-center"
-        >
+        <Button variant="ghost" onClick={() => setShowTable(false)} className="flex items-center">
           <ChevronLeft className="mr-1 h-4 w-4" /> Voltar
         </Button>
 
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={handleVerifyErrors}
-            className="flex items-center"
-          >
+          <Button variant="outline" onClick={handleVerifyErrors} className="flex items-center">
             <FileCheck className="mr-2 h-4 w-4" />
             Verificar Erros
           </Button>
 
-          {validationPerformed && hasValidationErrors && (
-            <Button
-              variant="outline"
-              onClick={handleExportErrors}
-              className="flex items-center text-amber-600"
-            >
+          {validationPerformed && hasValidationErrors && <Button variant="outline" onClick={handleExportErrors} className="flex items-center text-amber-600">
               <Download className="mr-2 h-4 w-4" />
               Exportar Erros
-            </Button>
-          )}
+            </Button>}
 
-          <Button
-            onClick={handleProcessSelected}
-            className="flex items-center"
-          >
+          <Button onClick={handleProcessSelected} className="flex items-center">
             <FileOutput className="mr-2 h-4 w-4" />
             Processar Selecionados
           </Button>
           
-          <Button
-            onClick={handleGenerateReport}
-            className="flex items-center"
-            disabled={!cnabFileGenerated}
-            title={!cnabFileGenerated ? "Gere o arquivo CNAB antes de visualizar o relatório" : "Gerar relatório PDF dos registros válidos"}
-          >
+          <Button onClick={handleGenerateReport} className="flex items-center" disabled={!cnabFileGenerated} title={!cnabFileGenerated ? "Gere o arquivo CNAB antes de visualizar o relatório" : "Gerar relatório PDF dos registros válidos"}>
             <FileText className="mr-2 h-4 w-4" />
             Gerar Relatório
           </Button>
@@ -118,13 +74,9 @@ export function TableView({
           <TableHeader>
             <TableRow>
               <TableHead className="w-[50px]">
-                <Checkbox
-                  checked={selectAll}
-                  onCheckedChange={handleSelectAll}
-                  aria-label="Selecionar todos os registros"
-                />
+                <Checkbox checked={selectAll} onCheckedChange={handleSelectAll} aria-label="Selecionar todos os registros" />
               </TableHead>
-              <TableHead>Nome</TableHead>
+              <TableHead>Nome do Favorecido</TableHead>
               <TableHead>Inscrição</TableHead>
               <TableHead>Banco</TableHead>
               <TableHead>Agência</TableHead>
@@ -135,16 +87,9 @@ export function TableView({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {currentRows.map((row) => (
-              <TableRow key={row.id}>
+            {currentRows.map(row => <TableRow key={row.id}>
                 <TableCell>
-                  <Checkbox
-                    checked={row.selected || false}
-                    onCheckedChange={(checked) =>
-                      handleSelectRow(row.id, !!checked)
-                    }
-                    aria-label={`Selecionar ${row.NOME}`}
-                  />
+                  <Checkbox checked={row.selected || false} onCheckedChange={checked => handleSelectRow(row.id, !!checked)} aria-label={`Selecionar ${row.NOME}`} />
                 </TableCell>
                 <TableCell>{row.NOME}</TableCell>
                 <TableCell>{row.INSCRICAO}</TableCell>
@@ -156,16 +101,11 @@ export function TableView({
                   {formatarValor(row.VALOR)}
                 </TableCell>
                 <TableCell>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDeleteRow(row.id)}
-                  >
+                  <Button variant="ghost" size="icon" onClick={() => handleDeleteRow(row.id)}>
                     <Trash2 className="h-4 w-4 text-red-500" />
                   </Button>
                 </TableCell>
-              </TableRow>
-            ))}
+              </TableRow>)}
           </TableBody>
         </Table>
       </div>
@@ -179,24 +119,13 @@ export function TableView({
           </span>
         </div>
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
+          <Button variant="outline" onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
             Anterior
           </Button>
-          <Button
-            variant="outline"
-            onClick={() =>
-              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-            }
-            disabled={currentPage === totalPages}
-          >
+          <Button variant="outline" onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>
             Próximo
           </Button>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 }
