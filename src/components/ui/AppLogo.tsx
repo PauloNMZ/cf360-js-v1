@@ -7,7 +7,7 @@ interface AppLogoProps {
   customLogoUrl?: string;
 }
 
-export const AppLogo: React.FC<AppLogoProps> = ({ size = 32, customLogoUrl }) => {
+export const AppLogo: React.FC<AppLogoProps> = ({ size = 64, customLogoUrl }) => {
   return (
     <div className="flex items-center">
       <div className="relative">
