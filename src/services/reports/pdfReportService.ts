@@ -26,15 +26,14 @@ export const generatePDFReport = async (reportData: ReportData): Promise<Blob> =
   doc.text(`Empresa: ${reportData.empresa}`, 15, 35);
   doc.text(`Data de Geração: ${reportData.dataGeracao}`, 15, 42);
   doc.text(`Referência da Remessa: ${reportData.referencia}`, 15, 49);
-  doc.text(`Total Registros: ${reportData.totalRegistros}`, 15, 56);
   
   // Add horizontal line
-  doc.line(15, 62, 195, 62);
+  doc.line(15, 55, 195, 55);
   
   // Add BENEFICIÁRIOS text
   doc.setFontSize(12);
   doc.setFont(undefined, 'bold');
-  doc.text("BENEFICIÁRIOS:", 15, 72);
+  doc.text("BENEFICIÁRIOS:", 15, 65);
   
   // Define table columns
   const tableColumns = [
@@ -62,13 +61,13 @@ export const generatePDFReport = async (reportData: ReportData): Promise<Blob> =
   
   // Create the table with improved styling
   (doc as any).autoTable({
-    startY: 77,
+    startY: 70,
     head: [tableColumns.map(col => col.header)],
     body: tableData.map(row => tableColumns.map(col => row[col.dataKey])),
     theme: 'grid',
     headStyles: {
-      fillColor: [60, 60, 60],
-      textColor: [255, 255, 255],
+      fillColor: [220, 220, 220],
+      textColor: [0, 0, 0],
       fontStyle: 'bold',
       fontSize: 10
     },
@@ -78,21 +77,21 @@ export const generatePDFReport = async (reportData: ReportData): Promise<Blob> =
     alternateRowStyles: {
       fillColor: [245, 245, 245]
     },
-    margin: { top: 77 },
+    margin: { top: 70 },
     didDrawPage: (data) => {
       // Ensure the table starts at the beginning of each page
       data.settings.margin.top = 20;
     }
   });
   
-  // Add total row - Corrigido: Posicionar "TOTAL:" e valor corretamente
+  // Add total row - CORRIGIDO: Posicionar "TOTAL:" mais à esquerda e valor à direita
   const finalY = (doc as any).lastAutoTable.finalY;
   doc.line(15, finalY + 5, 195, finalY + 5);
   
   doc.setFont(undefined, 'bold');
-  // Posicionar "TOTAL:" mais à esquerda e o valor à direita
-  doc.text("TOTAL:", 100, finalY + 12);
-  doc.text(formatarValorCurrency(reportData.valorTotal), 178, finalY + 12, { align: 'right' });
+  // Posicionar "TOTAL:" mais à esquerda para evitar sobreposição
+  doc.text("TOTAL:", 130, finalY + 12);
+  doc.text(formatarValorCurrency(reportData.valorTotal).replace('R$', '').trim(), 178, finalY + 12, { align: 'right' });
   
   doc.line(15, finalY + 17, 195, finalY + 17);
   

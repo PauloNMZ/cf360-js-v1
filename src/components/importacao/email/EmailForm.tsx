@@ -28,7 +28,8 @@ const emailFormSchema = z.object({
     .min(1, "Nome do remetente é obrigatório"),
   senderEmail: z
     .string()
-    .email("E-mail do remetente inválido"),
+    .email("E-mail do remetente inválido")
+    .min(1, "E-mail do remetente é obrigatório"),
   senderDepartment: z
     .string()
     .min(1, "Departamento é obrigatório"),
@@ -56,7 +57,7 @@ export function EmailForm({
   onSubmit,
   onCancel
 }: EmailFormProps) {
-  const { form } = useEmailForm({
+  const { form, userEmail } = useEmailForm({
     defaultMessage,
     companyName,
     reportDate
@@ -83,25 +84,42 @@ export function EmailForm({
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="senderName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nome do Remetente</FormLabel>
-                <FormControl>
-                  <Input 
-                    placeholder="Seu Nome" 
-                    {...field} 
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="senderName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nome do Remetente</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="Seu Nome" 
+                      {...field} 
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          {/* O campo de email do remetente agora está escondido */}
-          <input type="hidden" {...form.register("senderEmail")} />
+            <FormField
+              control={form.control}
+              name="senderEmail"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>E-mail do Remetente</FormLabel>
+                  <FormControl>
+                    <Input
+                      readOnly 
+                      {...field}
+                      className="bg-gray-50" 
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
           <FormField
             control={form.control}

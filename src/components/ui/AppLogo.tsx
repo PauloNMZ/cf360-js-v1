@@ -11,12 +11,12 @@ export const AppLogo: React.FC<AppLogoProps> = ({ size = 32, customLogoUrl }) =>
   return (
     <div className="flex items-center">
       <div className="relative">
-        {/* Usando fundo transparente */}
-        <div className="relative bg-transparent p-1.5 flex items-center justify-center">
+        {/* Fundo transparente */}
+        <div className="relative bg-transparent p-1.5 rounded-full text-white flex items-center justify-center shadow-lg">
           {customLogoUrl ? (
             <img 
               src={customLogoUrl} 
-              alt="Logo da Empresa" 
+              alt="Company Logo" 
               className="w-full h-full object-contain" 
               style={{ width: size, height: size }}
             />

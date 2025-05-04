@@ -46,12 +46,8 @@ export const useEmailForm = ({
   
   // Efeito para buscar o email do usuário quando o componente é montado
   useEffect(() => {
-    const fetchUserEmail = async () => {
-      const email = await getCurrentUserEmail();
-      setUserEmail(email);
-    };
-    
-    fetchUserEmail();
+    const email = getCurrentUserEmail();
+    setUserEmail(email);
   }, []);
   
   // Inicialização do formulário com valores padrão
@@ -94,5 +90,5 @@ export const useEmailForm = ({
     }
   }, [userEmail, form]);
 
-  return { form };
+  return { form, userEmail };
 };
