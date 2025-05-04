@@ -23,6 +23,12 @@ const StepThree: React.FC<StepThreeProps> = ({
   convenentes,
   carregandoConvenentes
 }) => {
+  // Function to ensure we always have a valid ID for SelectItem
+  const getValidId = (id: string | null | undefined): string => {
+    if (!id) return "no-id-placeholder";
+    return id.trim() === "" ? "no-id-placeholder" : id;
+  };
+
   return (
     <div className="py-6 space-y-4">
       <p className="text-sm text-gray-500 mb-4">
@@ -52,10 +58,10 @@ const StepThree: React.FC<StepThreeProps> = ({
             ) : (
               convenentes.map((convenente) => (
                 <SelectItem 
-                  key={convenente.id} 
-                  value={convenente.id || "no-id-placeholder"}
+                  key={convenente.id || "key-placeholder"} 
+                  value={getValidId(convenente.id)}
                 >
-                  {convenente.razaoSocial}
+                  {convenente.razaoSocial || "Sem nome"}
                 </SelectItem>
               ))
             )}
