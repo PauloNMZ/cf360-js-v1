@@ -58,7 +58,7 @@ const StepThree: React.FC<StepThreeProps> = ({
             ) : (
               convenentes.map((convenente) => (
                 <SelectItem 
-                  key={convenente.id || "key-placeholder"} 
+                  key={getValidId(convenente.id) + "-key"} 
                   value={getValidId(convenente.id)}
                 >
                   {convenente.razaoSocial || "Sem nome"}
