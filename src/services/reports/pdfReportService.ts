@@ -3,6 +3,7 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { ReportData, RowData } from '@/types/importacao';
 import { formatarValorCurrency } from '@/utils/formatting/currencyUtils';
+import { formatarCpfCnpj } from '@/utils/formatting/cnabFormatters';
 
 /**
  * Generate a PDF remittance report from the selected rows
@@ -38,7 +39,7 @@ export const generatePDFReport = async (reportData: ReportData): Promise<Blob> =
   // Define table columns
   const tableColumns = [
     { header: 'Nome Completo', dataKey: 'NOME' },
-    { header: 'CPF', dataKey: 'INSCRICAO' },
+    { header: 'CPF/CNPJ', dataKey: 'INSCRICAO' },
     { header: 'Banco', dataKey: 'BANCO' },
     { header: 'Agência', dataKey: 'AGENCIA' },
     { header: 'Conta', dataKey: 'CONTA' },
@@ -49,7 +50,7 @@ export const generatePDFReport = async (reportData: ReportData): Promise<Blob> =
   // Format data for the table - Ensure names are in uppercase
   const tableData = reportData.beneficiarios.map(row => ({
     NOME: typeof row.NOME === 'string' ? row.NOME.toUpperCase() : String(row.NOME).toUpperCase(),
-    INSCRICAO: row.INSCRICAO,
+    INSCRICAO: formatarCpfCnpj(row.INSCRICAO), // Formatando CPF/CNPJ
     BANCO: row.BANCO.toString().padStart(3, '0'),
     AGENCIA: row.AGENCIA,
     CONTA: row.CONTA,
@@ -69,10 +70,21 @@ export const generatePDFReport = async (reportData: ReportData): Promise<Blob> =
       fillColor: [220, 220, 220],
       textColor: [0, 0, 0],
       fontStyle: 'bold',
-      fontSize: 10
+      fontSize: 10,
+      halign: 'center',
     },
     bodyStyles: {
       fontSize: 9
+    },
+    columnStyles: {
+      // Centralizando colunas específicas
+      2: { halign: 'center' }, // Banco
+      3: { halign: 'center' }, // Agência
+      5: { halign: 'center' }, // Tipo
+      // Alinhando à direita colunas específicas
+      1: { halign: 'right' },  // CPF/CNPJ
+      4: { halign: 'right' },  // Conta
+      6: { halign: 'right' },  // Valor
     },
     alternateRowStyles: {
       fillColor: [245, 245, 245]

@@ -1,7 +1,6 @@
 
 import { toast } from "@/components/ui/sonner";
 import { saveAs } from 'file-saver';
-import { useAuth } from '@/hooks/use-auth'; // Esta importação será usada apenas para exemplificar o tipo
 
 interface EmailData {
   recipientEmail: string;
@@ -24,37 +23,33 @@ interface EmailResponse {
  * Mock email service - in production, this would integrate with a real email sending API
  */
 export const sendEmail = async (emailData: EmailData): Promise<EmailResponse> => {
-  // Log email data for debugging/demo purposes
-  console.log("Sending email:", {
-    to: emailData.recipientEmail,
-    from: `${emailData.senderName} <${emailData.senderEmail}>`,
-    subject: emailData.subject,
-    messagePreview: emailData.message.substring(0, 100) + '...',
-    attachmentName: emailData.attachmentFileName,
-    attachmentSize: `${(emailData.attachmentFile.size / 1024).toFixed(2)} KB`
-  });
-  
   try {
-    // In a real application, this would be an API call to an email service
-    // For now, we'll simulate a successful email send after a short delay
+    console.log("Enviando email para:", emailData.recipientEmail);
+    console.log("De:", emailData.senderName, "<" + emailData.senderEmail + ">");
+    console.log("Assunto:", emailData.subject);
+    console.log("Anexo:", emailData.attachmentFileName, `(${(emailData.attachmentFile.size / 1024).toFixed(2)} KB)`);
+    
+    // In a real application, we would send the email to a server endpoint
+    // For demonstration purposes, we'll simulate a successful API call
     await new Promise((resolve) => setTimeout(resolve, 1500));
     
-    // For demonstration purposes, save the file locally
+    // Save the attachment for demonstration purposes
     saveAs(emailData.attachmentFile, emailData.attachmentFileName);
     
-    // Log the success
-    console.log("Email sent successfully (simulated)");
+    // In a real implementation this would actually send the email
+    // instead of just saving the attachment
     
-    // Return a successful response
+    console.log("Email enviado com sucesso (simulado)");
+    
     return {
       success: true,
       messageId: `mock-email-${Date.now()}`
     };
   } catch (error) {
-    console.error("Error sending email:", error);
+    console.error("Erro ao enviar e-mail:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error"
+      error: error instanceof Error ? error.message : "Erro desconhecido ao enviar e-mail"
     };
   }
 };
@@ -75,14 +70,10 @@ export const logEmailActivity = (emailData: EmailData, response: EmailResponse) 
     error: response.error || null
   };
   
-  // In a real application, this would be stored in a database
-  // For now, we'll just log to console
-  console.log("Email Activity Log:", logEntry);
+  // Em um aplicativo real, isso seria armazenado em um banco de dados
+  console.log("Registro de atividade de e-mail:", logEntry);
   
-  // In a production environment, you would store this in a database table
-  // e.g., supabase.from('email_logs').insert(logEntry)
-  
-  // For demonstration purposes, store in localStorage
+  // Para fins de demonstração, armazenamos no localStorage
   const existingLogs = JSON.parse(localStorage.getItem('emailActivityLogs') || '[]');
   existingLogs.push(logEntry);
   localStorage.setItem('emailActivityLogs', JSON.stringify(existingLogs));

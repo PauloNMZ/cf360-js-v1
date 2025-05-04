@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { EmailFormValues } from "@/types/importacao";
 import { useEmailForm } from "@/hooks/importacao/email/useEmailForm";
+import { getCurrentUserEmail } from "@/services/emailService";
 
 interface EmailFormProps {
   defaultMessage: string;
@@ -38,7 +39,7 @@ export function EmailForm({
   // Handler de envio personalizado para garantir que o email do usuário logado seja usado
   const handleSubmit = (values: EmailFormValues) => {
     // Garantir que o email do remetente seja o email do usuário logado
-    values.senderEmail = userEmail;
+    values.senderEmail = getCurrentUserEmail();
     onSubmit(values);
   };
 
