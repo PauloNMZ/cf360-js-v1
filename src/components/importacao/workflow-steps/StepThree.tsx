@@ -25,31 +25,35 @@ const StepThree: React.FC<StepThreeProps> = ({
 }) => {
   // Create a safe version of the convenentes array with guaranteed valid IDs
   const safeConvenentes = useMemo(() => {
+    // First ensure convenentes is an array
     if (!Array.isArray(convenentes)) return [];
     
     return convenentes
-      .filter(convenente => 
+      .filter(convenente => {
         // Filter out null or undefined convenente objects
-        convenente && 
+        if (!convenente) return false;
+        
         // Ensure ID exists and is not empty
-        convenente.id && 
-        String(convenente.id).trim() !== ""
-      )
-      .map(convenente => ({
-        ...convenente,
-        // Create a safe ID that is guaranteed to be a valid string
-        safeId: String(convenente.id).trim(),
-        // Ensure other needed properties have default values
-        razaoSocial: convenente.razaoSocial || "Sem nome",
-        cnpj: convenente.cnpj || "N/A",
-        agencia: convenente.agencia || "N/A",
-        conta: convenente.conta || "N/A",
-        convenioPag: convenente.convenioPag || "N/A"
-      }));
+        const id = convenente.id;
+        return id !== null && id !== undefined && String(id).trim() !== "";
+      })
+      .map(convenente => {
+        // Ensure all needed properties have default values
+        const id = String(convenente.id).trim();
+        return {
+          ...convenente,
+          id, // Ensure ID is a clean string
+          razaoSocial: convenente.razaoSocial || "Sem nome",
+          cnpj: convenente.cnpj || "N/A",
+          agencia: convenente.agencia || "N/A",
+          conta: convenente.conta || "N/A",
+          convenioPag: convenente.convenioPag || "N/A"
+        };
+      });
   }, [convenentes]);
 
-  // Create a unique random ID to use as a fallback
-  const fallbackId = useMemo(() => `fallback-${Math.random().toString(36).substring(2)}`, []);
+  // Generate a default ID for fallback
+  const defaultId = useMemo(() => `default-${Math.random().toString(36).substring(2)}`, []);
 
   return (
     <div className="py-6 space-y-4">
@@ -65,7 +69,7 @@ const StepThree: React.FC<StepThreeProps> = ({
         <Select
           value={workflow.convenente?.id ? String(workflow.convenente.id) : undefined}
           onValueChange={(value) => {
-            const selected = safeConvenentes.find(c => c.safeId === value) || null;
+            const selected = safeConvenentes.find(c => c.id === value) || null;
             updateWorkflow("convenente", selected);
           }}
         >
@@ -78,14 +82,20 @@ const StepThree: React.FC<StepThreeProps> = ({
                 Nenhum convenente encontrado
               </div>
             ) : (
-              safeConvenentes.map((convenente) => (
-                <SelectItem 
-                  key={`convenente-${convenente.safeId || fallbackId}-${Math.random().toString(36).substring(2)}`}
-                  value={convenente.safeId || fallbackId}
-                >
-                  {convenente.razaoSocial}
-                </SelectItem>
-              ))
+              safeConvenentes.map((convenente) => {
+                // Ensure we always have a non-empty string value for the SelectItem
+                const valueId = convenente.id || defaultId;
+                const uniqueKey = `convenente-${valueId}-${Math.random().toString(36).substring(2)}`;
+                
+                return (
+                  <SelectItem 
+                    key={uniqueKey}
+                    value={valueId}
+                  >
+                    {convenente.razaoSocial}
+                  </SelectItem>
+                );
+              })
             )}
           </SelectContent>
         </Select>
