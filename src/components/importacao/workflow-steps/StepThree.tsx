@@ -17,10 +17,15 @@ interface StepThreeProps {
   carregandoConvenentes: boolean;
 }
 
-// Helper function to ensure we always have a valid string ID
+// Generate a unique ID that's guaranteed to be valid
+const generateUniqueId = (): string => {
+  return `id-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+};
+
+// Ensure we always have a valid non-empty string ID
 const ensureValidId = (id: any): string => {
   if (id === null || id === undefined || String(id).trim() === '') {
-    return `id-${Math.random().toString(36).substring(2)}`;
+    return generateUniqueId();
   }
   return String(id).trim();
 };
@@ -33,27 +38,28 @@ const StepThree: React.FC<StepThreeProps> = ({
 }) => {
   // Create a safe version of the convenentes array with guaranteed valid IDs
   const safeConvenentes = useMemo(() => {
-    // First ensure convenentes is an array
-    if (!Array.isArray(convenentes)) return [];
+    // Ensure convenentes is an array
+    if (!Array.isArray(convenentes) || convenentes.length === 0) {
+      console.log("No convenentes array or empty array");
+      return [];
+    }
     
-    // Add additional check: filter out any object that would result in an empty ID
-    return convenentes
+    // Process and filter convenentes
+    const processed = convenentes
       .filter(convenente => {
-        // Filter out null or undefined convenente objects
-        return (
-          convenente !== null && 
-          convenente !== undefined &&
-          // Ensure ID either exists or can be created
-          (convenente.id !== null && 
-           convenente.id !== undefined && 
-           String(convenente.id).trim() !== '')
-        );
+        // Filter out null or undefined convenentes
+        if (!convenente) {
+          console.log("Filtering out null/undefined convenente");
+          return false;
+        }
+        
+        return true;
       })
       .map(convenente => {
-        // Generate a valid ID for this convenente
+        // Create a safe copy with guaranteed valid ID
         const validId = ensureValidId(convenente.id);
+        console.log(`Processed convenente: ${convenente.razaoSocial}, ID: ${validId}`);
         
-        // Ensure all needed properties have default values
         return {
           ...convenente,
           id: validId, // Always use our validated ID
@@ -64,18 +70,30 @@ const StepThree: React.FC<StepThreeProps> = ({
           convenioPag: convenente.convenioPag || "N/A"
         };
       });
+    
+    console.log(`Processed ${processed.length} convenentes`);
+    return processed;
   }, [convenentes]);
 
-  // Get the current value for the select, ensuring it's always valid
+  // Get the current value, ensuring it's always valid
   const currentValue = useMemo(() => {
-    if (!workflow.convenente || !workflow.convenente.id) return undefined;
+    // If no convenente selected, return undefined (not empty string)
+    if (!workflow.convenente) {
+      console.log("No convenente selected");
+      return undefined;
+    }
+    
+    // Ensure the ID is valid
+    if (!workflow.convenente.id) {
+      console.log("Selected convenente has no ID");
+      return undefined;
+    }
+    
+    // Convert to string and validate
     const validId = ensureValidId(workflow.convenente.id);
+    console.log(`Current convenente ID: ${validId}`);
     return validId;
   }, [workflow.convenente]);
-
-  // Debug logs
-  console.log("Safe convenentes:", safeConvenentes);
-  console.log("Current value:", currentValue);
 
   return (
     <div className="py-6 space-y-4">
@@ -91,12 +109,20 @@ const StepThree: React.FC<StepThreeProps> = ({
         <Select
           value={currentValue}
           onValueChange={(value) => {
+            // Safety check: never accept empty value
             if (!value || value.trim() === '') {
-              console.warn("Ignoring empty value selection");
+              console.warn("Rejecting empty selection value");
               return;
             }
-            const selected = safeConvenentes.find(c => c.id === value) || null;
-            updateWorkflow("convenente", selected);
+            
+            const selected = safeConvenentes.find(c => c.id === value);
+            console.log("Selected convenente:", selected);
+            
+            if (selected) {
+              updateWorkflow("convenente", selected);
+            } else {
+              console.warn(`Could not find convenente with ID: ${value}`);
+            }
           }}
         >
           <SelectTrigger>
@@ -108,14 +134,18 @@ const StepThree: React.FC<StepThreeProps> = ({
                 Nenhum convenente encontrado
               </div>
             ) : (
-              safeConvenentes.map((convenente) => (
-                <SelectItem 
-                  key={`conv-${convenente.id}`}
-                  value={convenente.id} // This should now always be a valid, non-empty string
-                >
-                  {convenente.razaoSocial}
-                </SelectItem>
-              ))
+              safeConvenentes.map((convenente) => {
+                // Final validation before rendering SelectItem
+                const itemId = ensureValidId(convenente.id);
+                return (
+                  <SelectItem 
+                    key={`conv-${itemId}`}
+                    value={itemId} // This is guaranteed to be a valid non-empty string
+                  >
+                    {convenente.razaoSocial || "Sem nome"}
+                  </SelectItem>
+                );
+              })
             )}
           </SelectContent>
         </Select>
