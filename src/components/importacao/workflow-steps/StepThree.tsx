@@ -17,6 +17,14 @@ interface StepThreeProps {
   carregandoConvenentes: boolean;
 }
 
+// Helper function to ensure we always have a valid string ID
+const ensureValidId = (id: any): string => {
+  if (id === null || id === undefined || String(id).trim() === '') {
+    return `id-${Math.random().toString(36).substring(2)}`;
+  }
+  return String(id).trim();
+};
+
 const StepThree: React.FC<StepThreeProps> = ({ 
   workflow, 
   updateWorkflow,
@@ -26,28 +34,29 @@ const StepThree: React.FC<StepThreeProps> = ({
   // Create a safe version of the convenentes array with guaranteed valid IDs
   const safeConvenentes = useMemo(() => {
     // First ensure convenentes is an array
-    const convenentesArray = Array.isArray(convenentes) ? convenentes : [];
+    if (!Array.isArray(convenentes)) return [];
     
-    // Only include valid convenente objects with non-empty IDs
-    return convenentesArray
+    // Add additional check: filter out any object that would result in an empty ID
+    return convenentes
       .filter(convenente => {
-        // Filter out null, undefined, or objects without valid IDs
+        // Filter out null or undefined convenente objects
         return (
           convenente !== null && 
-          convenente !== undefined && 
-          convenente.id !== null && 
-          convenente.id !== undefined && 
-          String(convenente.id).trim() !== ''
+          convenente !== undefined &&
+          // Ensure ID either exists or can be created
+          (convenente.id !== null && 
+           convenente.id !== undefined && 
+           String(convenente.id).trim() !== '')
         );
       })
-      .map((convenente, index) => {
-        // Make sure we're working with a valid ID (string type, non-empty)
-        const id = String(convenente.id || `fallback-id-${index}`).trim();
+      .map(convenente => {
+        // Generate a valid ID for this convenente
+        const validId = ensureValidId(convenente.id);
         
-        // Return a safe convenente object with guaranteed properties
+        // Ensure all needed properties have default values
         return {
           ...convenente,
-          id, // Ensure ID is a clean string
+          id: validId, // Always use our validated ID
           razaoSocial: convenente.razaoSocial || "Sem nome",
           cnpj: convenente.cnpj || "N/A",
           agencia: convenente.agencia || "N/A",
@@ -57,18 +66,15 @@ const StepThree: React.FC<StepThreeProps> = ({
       });
   }, [convenentes]);
 
-  // Get a safe current value for the select component
+  // Get the current value for the select, ensuring it's always valid
   const currentValue = useMemo(() => {
-    if (!workflow.convenente || !workflow.convenente.id) {
-      return undefined;
-    }
-    
-    const id = String(workflow.convenente.id).trim();
-    return id !== "" ? id : undefined;
+    if (!workflow.convenente || !workflow.convenente.id) return undefined;
+    const validId = ensureValidId(workflow.convenente.id);
+    return validId;
   }, [workflow.convenente]);
 
   // Debug logs
-  console.log("Available convenentes:", safeConvenentes); 
+  console.log("Safe convenentes:", safeConvenentes);
   console.log("Current value:", currentValue);
 
   return (
@@ -85,11 +91,12 @@ const StepThree: React.FC<StepThreeProps> = ({
         <Select
           value={currentValue}
           onValueChange={(value) => {
-            // Only find matching convenentes with non-empty values
-            if (value && value.trim() !== '') {
-              const selected = safeConvenentes.find(c => c.id === value) || null;
-              updateWorkflow("convenente", selected);
+            if (!value || value.trim() === '') {
+              console.warn("Ignoring empty value selection");
+              return;
             }
+            const selected = safeConvenentes.find(c => c.id === value) || null;
+            updateWorkflow("convenente", selected);
           }}
         >
           <SelectTrigger>
@@ -104,7 +111,7 @@ const StepThree: React.FC<StepThreeProps> = ({
               safeConvenentes.map((convenente) => (
                 <SelectItem 
                   key={`conv-${convenente.id}`}
-                  value={convenente.id}
+                  value={convenente.id} // This should now always be a valid, non-empty string
                 >
                   {convenente.razaoSocial}
                 </SelectItem>
