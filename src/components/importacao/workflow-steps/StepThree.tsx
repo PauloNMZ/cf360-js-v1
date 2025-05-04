@@ -38,7 +38,7 @@ const StepThree: React.FC<StepThreeProps> = ({
     }
     
     return convenentes
-      .filter(convenente => convenente && convenente.razaoSocial)
+      .filter(convenente => convenente && typeof convenente === 'object' && convenente.razaoSocial)
       .map(convenente => ({
         ...convenente,
         id: ensureValidId(convenente.id),
@@ -82,6 +82,8 @@ const StepThree: React.FC<StepThreeProps> = ({
             const selected = validConvenentes.find(c => c.id === value);
             if (selected) {
               updateWorkflow("convenente", selected);
+            } else {
+              console.warn("Selected convenente not found:", value);
             }
           }}
         >
@@ -96,12 +98,15 @@ const StepThree: React.FC<StepThreeProps> = ({
             ) : (
               validConvenentes.map((convenente) => {
                 const itemId = ensureValidId(convenente.id);
+                // Only render SelectItem if we have a valid ID
+                if (!itemId) return null;
+                
                 return (
                   <SelectItem 
                     key={`conv-${itemId}`}
                     value={itemId}
                   >
-                    {convenente.razaoSocial}
+                    {convenente.razaoSocial || "Convenente sem nome"}
                   </SelectItem>
                 );
               })
