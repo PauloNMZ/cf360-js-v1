@@ -1,7 +1,6 @@
 
 import { toast } from "@/components/ui/sonner";
 import { saveAs } from 'file-saver';
-import { useAuth } from '@/hooks/use-auth'; // Esta importação será usada apenas para exemplificar o tipo
 
 interface EmailData {
   recipientEmail: string;
@@ -94,7 +93,7 @@ export const logEmailActivity = (emailData: EmailData, response: EmailResponse) 
  * Função para obter o email do usuário logado
  * Em um sistema real, isso viria do contexto de autenticação
  */
-export const getCurrentUserEmail = (): string => {
+export const getCurrentUserEmail = async (): Promise<string> => {
   // Tentar obter o email do usuário do contexto de autenticação
   try {
     // Em uma implementação real, isso viria do contexto de autenticação
@@ -106,23 +105,27 @@ export const getCurrentUserEmail = (): string => {
       }
     }
     
-    // Se não encontrou na auth, tentar diretamente do localStorage
-    const userEmail = localStorage.getItem('userEmail');
-    if (userEmail) {
-      return userEmail;
-    }
+    // Se não encontrou na auth, tentar obter da tabela de usuários
+    // Simulação de uma consulta à base de dados
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    // Em uma implementação real, isso seria uma consulta ao banco de dados
+    // por exemplo: const user = await supabase.from('users').select('email').single();
+    
+    // Para demonstração, vamos usar um e-mail de usuário real para simulação
+    return "usuario.logado@empresa.com.br";
   } catch (error) {
     console.error("Erro ao obter email do usuário:", error);
   }
   
-  // Se não conseguir obter, retornar um email padrão
-  return "usuario@empresa.com";
+  // Se não conseguir obter, retornar um email do usuário
+  return "usuario.logado@empresa.com.br";
 };
 
 /**
  * Função para formatar o email do usuário para uso como remetente
  */
 export const formatUserEmailAsSender = (name: string): string => {
-  const email = getCurrentUserEmail();
+  const email = localStorage.getItem('userEmail') || "usuario.logado@empresa.com.br";
   return email.toLowerCase();
 };

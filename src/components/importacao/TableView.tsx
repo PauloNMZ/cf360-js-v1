@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   FileText,
   AlertTriangle,
@@ -19,9 +20,18 @@ import {
   Trash2,
   FileCheck,
   Download,
+  Search,
+  Filter,
 } from "lucide-react";
 import { TableViewProps, RowData } from "@/types/importacao";
 import { formatarValorCurrency } from "@/utils/formatting/currencyUtils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export function TableView({
   handleSelectAll,
@@ -40,12 +50,49 @@ export function TableView({
   cnabFileGenerated = false
 }: TableViewProps) {
   const [currentPage, setCurrentPage] = useState(1);
+  const [filteredData, setFilteredData] = useState<RowData[]>(tableData);
+  const [bankFilter, setBankFilter] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const rowsPerPage = 10;
+
+  // Efeito para atualizar dados filtrados quando os dados da tabela mudam
+  useEffect(() => {
+    applyFilters();
+  }, [tableData, bankFilter, searchTerm]);
+
+  // Função para aplicar filtros
+  const applyFilters = () => {
+    let result = [...tableData];
+    
+    // Aplicar filtro de banco
+    if (bankFilter) {
+      result = result.filter(row => 
+        row.BANCO.toString().padStart(3, '0').includes(bankFilter)
+      );
+    }
+    
+    // Aplicar termo de busca
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      result = result.filter(row => 
+        (row.NOME?.toLowerCase().includes(term) || 
+         row.INSCRICAO?.toLowerCase().includes(term))
+      );
+    }
+    
+    setFilteredData(result);
+    setCurrentPage(1); // Reset para a primeira página ao filtrar
+  };
+
+  // Lista de bancos única para o filtro
+  const uniqueBanks = Array.from(new Set(tableData.map(row => 
+    row.BANCO.toString().padStart(3, '0')
+  ))).sort();
 
   const startIndex = (currentPage - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
-  const currentRows = tableData.slice(startIndex, endIndex);
-  const totalPages = Math.ceil(tableData.length / rowsPerPage);
+  const currentRows = filteredData.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
 
   const formatarValor = (valor: string | number): string => {
     if (typeof valor === "string") {
@@ -55,6 +102,9 @@ export function TableView({
     }
     return formatarValorCurrency(valor);
   };
+
+  // Calcular total de registros selecionados
+  const selectedCount = tableData.filter(row => row.selected).length;
 
   return (
     <div className="space-y-4">
@@ -108,12 +158,49 @@ export function TableView({
         </div>
       </div>
 
+      {/* Área de filtros */}
+      <div className="flex flex-col md:flex-row gap-3 items-start md:items-center mb-4">
+        <div className="flex-1">
+          <div className="relative">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+            <Input
+              placeholder="Buscar por nome ou CPF/CNPJ..."
+              className="pl-8"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </div>
+        
+        <div className="w-full md:w-[180px]">
+          <Select
+            value={bankFilter}
+            onValueChange={setBankFilter}
+          >
+            <SelectTrigger className="w-full">
+              <div className="flex items-center gap-2">
+                <Filter className="h-4 w-4" />
+                <SelectValue placeholder="Filtrar banco" />
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Todos os bancos</SelectItem>
+              {uniqueBanks.map(bank => (
+                <SelectItem key={bank} value={bank}>
+                  Banco {bank}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
       <div className="rounded-md border">
         <Table>
           <TableCaption>
-            Exibindo {currentRows.length} de {tableData.length} registros |
+            Exibindo {currentRows.length} de {filteredData.length} registros |
             Página {currentPage} de {totalPages} | Total Selecionado:{" "}
-            {formatarValorCurrency(total)}
+            {formatarValorCurrency(total)} | Registros selecionados: {selectedCount}
           </TableCaption>
           <TableHeader>
             <TableRow>
@@ -174,8 +261,8 @@ export function TableView({
       <div className="flex justify-between items-center">
         <div>
           <span className="text-sm text-gray-500">
-            Mostrando {startIndex + 1} até {Math.min(endIndex, tableData.length)}{" "}
-            de {tableData.length} registros
+            Mostrando {startIndex + 1} até {Math.min(endIndex, filteredData.length)}{" "}
+            de {filteredData.length} registros
           </span>
         </div>
         <div className="flex gap-2">
