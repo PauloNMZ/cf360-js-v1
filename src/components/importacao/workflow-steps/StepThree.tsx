@@ -35,7 +35,7 @@ const StepThree: React.FC<StepThreeProps> = ({
         </div>
       ) : (
         <Select
-          value={workflow.convenente?.id || ""}
+          value={workflow.convenente?.id || undefined}
           onValueChange={(value) => {
             const selected = convenentes.find(c => c.id === value) || null;
             updateWorkflow("convenente", selected);
@@ -51,7 +51,10 @@ const StepThree: React.FC<StepThreeProps> = ({
               </div>
             ) : (
               convenentes.map((convenente) => (
-                <SelectItem key={convenente.id} value={convenente.id || ""}>
+                <SelectItem 
+                  key={convenente.id} 
+                  value={convenente.id || "no-id-placeholder"}
+                >
                   {convenente.razaoSocial}
                 </SelectItem>
               ))
