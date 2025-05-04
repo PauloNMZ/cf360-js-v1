@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { 
   Select, 
   SelectContent, 
@@ -23,22 +23,33 @@ const StepThree: React.FC<StepThreeProps> = ({
   convenentes,
   carregandoConvenentes
 }) => {
-  // Function to ensure we always have a valid ID for SelectItem
-  const getValidId = (id: string | null | undefined): string => {
-    if (!id) return "no-id-placeholder";
-    const trimmedId = String(id).trim();
-    return trimmedId === "" ? "no-id-placeholder" : trimmedId;
-  };
-
-  // Filter out any convenente without a valid ID to prevent Select errors
-  const validConvenentes = convenentes.filter(c => {
-    // Make sure the convenente object exists
-    if (!c) return false;
+  // Create a safe version of the convenentes array with guaranteed valid IDs
+  const safeConvenentes = useMemo(() => {
+    if (!Array.isArray(convenentes)) return [];
     
-    // Make sure the ID is not empty, null, or undefined after sanitization
-    const id = getValidId(c.id);
-    return id !== "no-id-placeholder";
-  });
+    return convenentes
+      .filter(convenente => 
+        // Filter out null or undefined convenente objects
+        convenente && 
+        // Ensure ID exists and is not empty
+        convenente.id && 
+        String(convenente.id).trim() !== ""
+      )
+      .map(convenente => ({
+        ...convenente,
+        // Create a safe ID that is guaranteed to be a valid string
+        safeId: String(convenente.id).trim(),
+        // Ensure other needed properties have default values
+        razaoSocial: convenente.razaoSocial || "Sem nome",
+        cnpj: convenente.cnpj || "N/A",
+        agencia: convenente.agencia || "N/A",
+        conta: convenente.conta || "N/A",
+        convenioPag: convenente.convenioPag || "N/A"
+      }));
+  }, [convenentes]);
+
+  // Create a unique random ID to use as a fallback
+  const fallbackId = useMemo(() => `fallback-${Math.random().toString(36).substring(2)}`, []);
 
   return (
     <div className="py-6 space-y-4">
@@ -52,9 +63,9 @@ const StepThree: React.FC<StepThreeProps> = ({
         </div>
       ) : (
         <Select
-          value={workflow.convenente?.id || undefined}
+          value={workflow.convenente?.id ? String(workflow.convenente.id) : undefined}
           onValueChange={(value) => {
-            const selected = convenentes.find(c => c.id === value) || null;
+            const selected = safeConvenentes.find(c => c.safeId === value) || null;
             updateWorkflow("convenente", selected);
           }}
         >
@@ -62,22 +73,19 @@ const StepThree: React.FC<StepThreeProps> = ({
             <SelectValue placeholder="Selecione um convenente" />
           </SelectTrigger>
           <SelectContent>
-            {validConvenentes.length === 0 ? (
+            {safeConvenentes.length === 0 ? (
               <div className="p-2 text-sm text-gray-500">
                 Nenhum convenente encontrado
               </div>
             ) : (
-              validConvenentes.map((convenente) => {
-                const validId = getValidId(convenente.id);
-                return (
-                  <SelectItem 
-                    key={`convenente-${validId}-${Math.random().toString(36).substring(2, 9)}`}
-                    value={validId}
-                  >
-                    {convenente.razaoSocial || "Sem nome"}
-                  </SelectItem>
-                );
-              })
+              safeConvenentes.map((convenente) => (
+                <SelectItem 
+                  key={`convenente-${convenente.safeId || fallbackId}-${Math.random().toString(36).substring(2)}`}
+                  value={convenente.safeId || fallbackId}
+                >
+                  {convenente.razaoSocial}
+                </SelectItem>
+              ))
             )}
           </SelectContent>
         </Select>
