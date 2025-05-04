@@ -26,13 +26,18 @@ const StepThree: React.FC<StepThreeProps> = ({
   // Function to ensure we always have a valid ID for SelectItem
   const getValidId = (id: string | null | undefined): string => {
     if (!id) return "no-id-placeholder";
-    return id.trim() === "" ? "no-id-placeholder" : id;
+    const trimmedId = String(id).trim();
+    return trimmedId === "" ? "no-id-placeholder" : trimmedId;
   };
 
   // Filter out any convenente without a valid ID to prevent Select errors
   const validConvenentes = convenentes.filter(c => {
+    // Make sure the convenente object exists
+    if (!c) return false;
+    
+    // Make sure the ID is not empty, null, or undefined after sanitization
     const id = getValidId(c.id);
-    return id !== "" && id !== null && id !== undefined;
+    return id !== "no-id-placeholder";
   });
 
   return (
@@ -66,7 +71,7 @@ const StepThree: React.FC<StepThreeProps> = ({
                 const validId = getValidId(convenente.id);
                 return (
                   <SelectItem 
-                    key={`convenente-${validId}`}
+                    key={`convenente-${validId}-${Math.random().toString(36).substring(2, 9)}`}
                     value={validId}
                   >
                     {convenente.razaoSocial || "Sem nome"}
@@ -87,19 +92,23 @@ const StepThree: React.FC<StepThreeProps> = ({
             <dl className="text-sm divide-y">
               <div className="grid grid-cols-3 py-2">
                 <dt className="font-medium text-gray-500">CNPJ:</dt>
-                <dd className="col-span-2">{workflow.convenente.cnpj}</dd>
+                <dd className="col-span-2">{workflow.convenente.cnpj || "Não informado"}</dd>
               </div>
               <div className="grid grid-cols-3 py-2">
                 <dt className="font-medium text-gray-500">Razão Social:</dt>
-                <dd className="col-span-2">{workflow.convenente.razaoSocial}</dd>
+                <dd className="col-span-2">{workflow.convenente.razaoSocial || "Não informado"}</dd>
               </div>
               <div className="grid grid-cols-3 py-2">
                 <dt className="font-medium text-gray-500">Banco:</dt>
-                <dd className="col-span-2">Ag {workflow.convenente.agencia} - Conta {workflow.convenente.conta}</dd>
+                <dd className="col-span-2">
+                  {workflow.convenente.agencia && workflow.convenente.conta 
+                    ? `Ag ${workflow.convenente.agencia} - Conta ${workflow.convenente.conta}`
+                    : "Não informado"}
+                </dd>
               </div>
               <div className="grid grid-cols-3 py-2">
                 <dt className="font-medium text-gray-500">Convênio:</dt>
-                <dd className="col-span-2">{workflow.convenente.convenioPag}</dd>
+                <dd className="col-span-2">{workflow.convenente.convenioPag || "Não informado"}</dd>
               </div>
             </dl>
           </CardContent>
