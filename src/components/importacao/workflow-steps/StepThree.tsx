@@ -46,15 +46,15 @@ const StepThree: React.FC<StepThreeProps> = ({
       return [];
     }
     
-    const filtered = convenentes
+    return convenentes
       .filter(convenente => 
         convenente && 
         typeof convenente === 'object' && 
         convenente.razaoSocial
       )
       .map(convenente => {
+        // Ensure each convenente has a valid ID
         const validId = ensureValidId(convenente.id);
-        console.log(`Mapped convenente: ${convenente.razaoSocial} with ID: ${validId}`);
         
         return {
           ...convenente,
@@ -66,9 +66,6 @@ const StepThree: React.FC<StepThreeProps> = ({
           convenioPag: convenente.convenioPag || "N/A"
         };
       });
-    
-    console.log(`Filtered ${filtered.length} valid convenentes`);
-    return filtered;
   }, [convenentes]);
 
   // Determine the current value safely
@@ -77,19 +74,8 @@ const StepThree: React.FC<StepThreeProps> = ({
       console.log("No current convenente selected");
       return undefined;
     }
-    const validId = ensureValidId(workflow.convenente.id);
-    console.log(`Current convenente ID: ${validId}`);
-    return validId;
+    return ensureValidId(workflow.convenente.id);
   }, [workflow.convenente]);
-
-  // Check if we have any SelectItems with empty values before rendering
-  React.useEffect(() => {
-    validConvenentes.forEach(convenente => {
-      if (!convenente.id || convenente.id.trim() === '') {
-        console.error("Found convenente with empty ID:", convenente);
-      }
-    });
-  }, [validConvenentes]);
 
   return (
     <div className="py-6 space-y-4">
@@ -105,16 +91,12 @@ const StepThree: React.FC<StepThreeProps> = ({
         <Select
           value={currentValue}
           onValueChange={(value) => {
-            // Log the selected value
-            console.log("Selected value:", value);
-            
-            // Safety check for empty value
+            // Validate value is not empty
             if (!value || value.trim() === '') {
-              console.warn("Empty selection value detected and ignored");
+              console.warn("Empty selection value detected");
               return;
             }
             
-            // Find selected convenente by ID
             const selected = validConvenentes.find(c => c.id === value);
             if (selected) {
               console.log("Selected convenente:", selected);
@@ -134,27 +116,13 @@ const StepThree: React.FC<StepThreeProps> = ({
               </div>
             ) : (
               validConvenentes.map((convenente) => {
-                // Double check the ID is valid and properly formatted
-                if (!convenente || typeof convenente !== 'object') {
-                  console.error("Invalid convenente object:", convenente);
-                  return null;
-                }
-                
-                const itemId = ensureValidId(convenente.id);
-                
-                // Skip rendering if ID is somehow still invalid
-                if (!itemId || itemId.trim() === '') {
-                  console.error("Invalid ID for convenente:", convenente);
-                  return null;
-                }
-                
-                // Debug the ID value
-                console.log(`Rendering SelectItem with ID: ${itemId}`);
+                // Double check the ID is valid
+                const safeId = ensureValidId(convenente.id);
                 
                 return (
                   <SelectItem 
-                    key={`conv-${itemId}`}
-                    value={itemId} // This should never be empty
+                    key={`conv-${safeId}`}
+                    value={safeId}
                   >
                     {convenente.razaoSocial || "Convenente sem nome"}
                   </SelectItem>
