@@ -1,5 +1,5 @@
 
-import React, { useMemo } from 'react';
+import React from 'react';
 import { 
   Select, 
   SelectContent, 
@@ -17,15 +17,10 @@ interface StepThreeProps {
   carregandoConvenentes: boolean;
 }
 
-// Generate a unique ID that's guaranteed to be valid
-const generateUniqueId = (): string => {
-  return `id-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-};
-
-// Ensure we always have a valid non-empty string ID
+// Ensure we always have a valid string ID
 const ensureValidId = (id: any): string => {
   if (id === null || id === undefined || String(id).trim() === '') {
-    return generateUniqueId();
+    return `id-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
   }
   return String(id).trim();
 };
@@ -36,63 +31,31 @@ const StepThree: React.FC<StepThreeProps> = ({
   convenentes,
   carregandoConvenentes
 }) => {
-  // Create a safe version of the convenentes array with guaranteed valid IDs
-  const safeConvenentes = useMemo(() => {
-    // Ensure convenentes is an array
+  // Filter and validate convenentes to ensure they all have valid IDs
+  const validConvenentes = React.useMemo(() => {
     if (!Array.isArray(convenentes) || convenentes.length === 0) {
-      console.log("No convenentes array or empty array");
       return [];
     }
     
-    // Process and filter convenentes
-    const processed = convenentes
-      .filter(convenente => {
-        // Filter out null or undefined convenentes
-        if (!convenente) {
-          console.log("Filtering out null/undefined convenente");
-          return false;
-        }
-        
-        return true;
-      })
-      .map(convenente => {
-        // Create a safe copy with guaranteed valid ID
-        const validId = ensureValidId(convenente.id);
-        console.log(`Processed convenente: ${convenente.razaoSocial}, ID: ${validId}`);
-        
-        return {
-          ...convenente,
-          id: validId, // Always use our validated ID
-          razaoSocial: convenente.razaoSocial || "Sem nome",
-          cnpj: convenente.cnpj || "N/A",
-          agencia: convenente.agencia || "N/A",
-          conta: convenente.conta || "N/A",
-          convenioPag: convenente.convenioPag || "N/A"
-        };
-      });
-    
-    console.log(`Processed ${processed.length} convenentes`);
-    return processed;
+    return convenentes
+      .filter(convenente => convenente && convenente.razaoSocial)
+      .map(convenente => ({
+        ...convenente,
+        id: ensureValidId(convenente.id),
+        razaoSocial: convenente.razaoSocial || "Sem nome",
+        cnpj: convenente.cnpj || "N/A",
+        agencia: convenente.agencia || "N/A",
+        conta: convenente.conta || "N/A",
+        convenioPag: convenente.convenioPag || "N/A"
+      }));
   }, [convenentes]);
 
-  // Get the current value, ensuring it's always valid
-  const currentValue = useMemo(() => {
-    // If no convenente selected, return undefined (not empty string)
-    if (!workflow.convenente) {
-      console.log("No convenente selected");
+  // Determine the current value safely
+  const currentValue = React.useMemo(() => {
+    if (!workflow.convenente || !workflow.convenente.id) {
       return undefined;
     }
-    
-    // Ensure the ID is valid
-    if (!workflow.convenente.id) {
-      console.log("Selected convenente has no ID");
-      return undefined;
-    }
-    
-    // Convert to string and validate
-    const validId = ensureValidId(workflow.convenente.id);
-    console.log(`Current convenente ID: ${validId}`);
-    return validId;
+    return ensureValidId(workflow.convenente.id);
   }, [workflow.convenente]);
 
   return (
@@ -109,40 +72,36 @@ const StepThree: React.FC<StepThreeProps> = ({
         <Select
           value={currentValue}
           onValueChange={(value) => {
-            // Safety check: never accept empty value
+            // Safety check for empty value
             if (!value || value.trim() === '') {
-              console.warn("Rejecting empty selection value");
+              console.warn("Empty selection value detected and ignored");
               return;
             }
             
-            const selected = safeConvenentes.find(c => c.id === value);
-            console.log("Selected convenente:", selected);
-            
+            // Find selected convenente by ID
+            const selected = validConvenentes.find(c => c.id === value);
             if (selected) {
               updateWorkflow("convenente", selected);
-            } else {
-              console.warn(`Could not find convenente with ID: ${value}`);
             }
           }}
         >
           <SelectTrigger>
             <SelectValue placeholder="Selecione um convenente" />
           </SelectTrigger>
-          <SelectContent>
-            {safeConvenentes.length === 0 ? (
+          <SelectContent className="bg-white">
+            {validConvenentes.length === 0 ? (
               <div className="p-2 text-sm text-gray-500">
                 Nenhum convenente encontrado
               </div>
             ) : (
-              safeConvenentes.map((convenente) => {
-                // Final validation before rendering SelectItem
+              validConvenentes.map((convenente) => {
                 const itemId = ensureValidId(convenente.id);
                 return (
                   <SelectItem 
                     key={`conv-${itemId}`}
-                    value={itemId} // This is guaranteed to be a valid non-empty string
+                    value={itemId}
                   >
-                    {convenente.razaoSocial || "Sem nome"}
+                    {convenente.razaoSocial}
                   </SelectItem>
                 );
               })
