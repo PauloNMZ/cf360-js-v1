@@ -29,16 +29,23 @@ export const usePDFReportDialog = () => {
     cnabFileGenerated: boolean, 
     cnabFileName: string,
     companyName: string,
-    validateFavorecidos: any
+    validateFavorecidos: any,
+    convenente: any
   ) => {
     if (selectedRows.length === 0) {
-      toast.error("Nenhum registro selecionado para gerar relatório.");
+      toast.error("Nenhum registro selecionado para gerar relatório.", {
+        position: "bottom-right",
+        duration: 5000,
+      });
       return null;
     }
     
     // Check if CNAB file was generated
     if (!cnabFileGenerated) {
-      toast.warning("É necessário gerar o arquivo CNAB antes de visualizar o relatório.");
+      toast.warning("É necessário gerar o arquivo CNAB antes de visualizar o relatório.", {
+        position: "bottom-right",
+        duration: 5000,
+      });
       return null;
     }
 
@@ -53,7 +60,10 @@ export const usePDFReportDialog = () => {
       const validRecords = selectedRows.filter(row => !errorIds.has(row.id));
       
       if (validRecords.length === 0) {
-        toast.error("Não há registros válidos para gerar o relatório.");
+        toast.error("Não há registros válidos para gerar o relatório.", {
+          position: "bottom-right",
+          duration: 5000,
+        });
         return null;
       }
       
@@ -70,9 +80,12 @@ export const usePDFReportDialog = () => {
         return sum + (isNaN(value) ? 0 : value);
       }, 0);
       
+      // Use convenente name if available, otherwise use companyName
+      const empresaName = convenente?.razaoSocial || companyName;
+      
       // Create report data with only valid records
       const pdfReportData: ReportData = {
-        empresa: companyName,
+        empresa: empresaName,
         dataGeracao: formattedDate,
         referencia: remittanceReference,
         beneficiarios: validRecords,
@@ -86,7 +99,7 @@ export const usePDFReportDialog = () => {
       // For Excel report backup - use only valid records
       try {
         const reportOptions = {
-          companyName: companyName,
+          companyName: empresaName,
           remittanceReference: remittanceReference,
           responsibleName: "Usuário do Sistema",
           department: "Financeiro"
@@ -110,7 +123,10 @@ export const usePDFReportDialog = () => {
       };
     } catch (error) {
       console.error("Erro ao gerar relatório:", error);
-      toast.error("Erro ao gerar relatório de remessa bancária.");
+      toast.error("Erro ao gerar relatório de remessa bancária.", {
+        position: "bottom-right",
+        duration: 5000,
+      });
       return null;
     }
   };

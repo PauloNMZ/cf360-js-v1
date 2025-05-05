@@ -42,7 +42,9 @@ export function PDFPreviewDialog({
           setIframeKey(prev => prev + 1);
         } catch (error) {
           console.error("Error generating PDF preview:", error);
-          toast.error("Erro ao gerar visualização do PDF");
+          toast.error("Erro ao gerar visualização do PDF", {
+            position: "bottom-right",
+          });
         } finally {
           setLoading(false);
         }
@@ -93,7 +95,9 @@ export function PDFPreviewDialog({
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      toast.success("Relatório PDF baixado com sucesso!");
+      toast.success("Relatório PDF baixado com sucesso!", {
+        position: "bottom-right",
+      });
     }
   };
 

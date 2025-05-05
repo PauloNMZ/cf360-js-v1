@@ -34,8 +34,8 @@ const NavigationMenu = ({
 }: NavigationMenuProps) => {
   return (
     <TooltipProvider>
-      <div className="flex justify-center mb-8">
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-9 gap-2 max-w-5xl mx-auto">
+      <div className="flex justify-center mb-10">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-9 gap-4 max-w-6xl mx-auto">
           <Tooltip>
             <TooltipTrigger asChild>
               <div>
@@ -46,7 +46,7 @@ const NavigationMenu = ({
                 />
               </div>
             </TooltipTrigger>
-            <TooltipContent>
+            <TooltipContent className="bg-blue-50 dark:bg-blue-900/80 border border-blue-200 dark:border-blue-800">
               <p>Acesso ao cadastro e gerenciamento de convenentes</p>
             </TooltipContent>
           </Tooltip>
@@ -61,7 +61,7 @@ const NavigationMenu = ({
                 />
               </div>
             </TooltipTrigger>
-            <TooltipContent>
+            <TooltipContent className="bg-blue-50 dark:bg-blue-900/80 border border-blue-200 dark:border-blue-800">
               <p>Importação de planilhas para processamento</p>
             </TooltipContent>
           </Tooltip>
@@ -76,7 +76,7 @@ const NavigationMenu = ({
                 />
               </div>
             </TooltipTrigger>
-            <TooltipContent>
+            <TooltipContent className="bg-blue-50 dark:bg-blue-900/80 border border-blue-200 dark:border-blue-800">
               <p>Envio de arquivos de remessa ao banco</p>
             </TooltipContent>
           </Tooltip>
@@ -91,7 +91,7 @@ const NavigationMenu = ({
                 />
               </div>
             </TooltipTrigger>
-            <TooltipContent>
+            <TooltipContent className="bg-blue-50 dark:bg-blue-900/80 border border-blue-200 dark:border-blue-800">
               <p>Processamento de arquivos de retorno bancário</p>
             </TooltipContent>
           </Tooltip>
@@ -106,7 +106,7 @@ const NavigationMenu = ({
                 />
               </div>
             </TooltipTrigger>
-            <TooltipContent>
+            <TooltipContent className="bg-blue-50 dark:bg-blue-900/80 border border-blue-200 dark:border-blue-800">
               <p>Visualização e download de comprovantes</p>
             </TooltipContent>
           </Tooltip>
@@ -121,7 +121,7 @@ const NavigationMenu = ({
                 />
               </div>
             </TooltipTrigger>
-            <TooltipContent>
+            <TooltipContent className="bg-blue-50 dark:bg-blue-900/80 border border-blue-200 dark:border-blue-800">
               <p>Consulta de registros e operações</p>
             </TooltipContent>
           </Tooltip>
@@ -136,7 +136,7 @@ const NavigationMenu = ({
                 />
               </div>
             </TooltipTrigger>
-            <TooltipContent>
+            <TooltipContent className="bg-blue-50 dark:bg-blue-900/80 border border-blue-200 dark:border-blue-800">
               <p>Acesso ao painel de controle e estatísticas</p>
             </TooltipContent>
           </Tooltip>
@@ -151,7 +151,7 @@ const NavigationMenu = ({
                 />
               </div>
             </TooltipTrigger>
-            <TooltipContent>
+            <TooltipContent className="bg-blue-50 dark:bg-blue-900/80 border border-blue-200 dark:border-blue-800">
               <p>Configurações do sistema e parâmetros</p>
             </TooltipContent>
           </Tooltip>
@@ -167,7 +167,7 @@ const NavigationMenu = ({
                 />
               </div>
             </TooltipTrigger>
-            <TooltipContent>
+            <TooltipContent className="bg-red-50 dark:bg-red-900/80 border border-red-200 dark:border-red-800">
               <p>Encerrar sessão e sair do sistema</p>
             </TooltipContent>
           </Tooltip>

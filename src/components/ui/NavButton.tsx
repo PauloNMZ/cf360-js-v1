@@ -11,15 +11,15 @@ interface NavButtonProps {
 export const NavButton = ({ icon, label, onClick, className = "" }: NavButtonProps) => {
   return (
     <button 
-      className={`flex-shrink-0 w-20 h-20 bg-white/90 dark:bg-slate-800/90 hover:bg-blue-50 dark:hover:bg-slate-700 
+      className={`flex-shrink-0 w-24 h-24 bg-white/90 dark:bg-slate-800/90 hover:bg-blue-50 dark:hover:bg-slate-700 
       rounded-lg shadow-md transition-all hover:shadow-lg border border-blue-100 dark:border-slate-700 
-      flex flex-col items-center justify-center p-2 ${className}`}
+      flex flex-col items-center justify-center p-2 mx-1 ${className}`}
       onClick={onClick}
     >
-      <div className="flex items-center justify-center w-10 h-10 bg-blue-100 dark:bg-blue-900/50 rounded-full text-blue-700 dark:text-blue-300">
-        {icon}
+      <div className="flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900/50 rounded-full text-blue-700 dark:text-blue-300 shadow-sm">
+        {React.cloneElement(icon as React.ReactElement, { size: 28, strokeWidth: 1.5 })}
       </div>
-      <span className="text-xs text-gray-800 dark:text-gray-200 text-center mt-2 font-ubuntu">{label}</span>
+      <span className="text-sm text-gray-800 dark:text-gray-200 text-center mt-3 font-medium tracking-wide">{label}</span>
     </button>
   );
 };

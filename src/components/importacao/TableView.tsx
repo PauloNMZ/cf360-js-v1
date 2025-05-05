@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -5,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { FileText, AlertTriangle, ChevronLeft, FileOutput, Trash2, FileCheck, Download } from "lucide-react";
 import { TableViewProps, RowData } from "@/types/importacao";
 import { formatarValorCurrency } from "@/utils/formatting/currencyUtils";
+import { formatCPFCNPJ } from "@/utils/formatting/stringUtils";
+
 export function TableView({
   handleSelectAll,
   selectAll,
@@ -27,6 +30,7 @@ export function TableView({
   const endIndex = startIndex + rowsPerPage;
   const currentRows = tableData.slice(startIndex, endIndex);
   const totalPages = Math.ceil(tableData.length / rowsPerPage);
+  
   const formatarValor = (valor: string | number): string => {
     if (typeof valor === "string") {
       // Remove caracteres não numéricos, exceto ponto e vírgula
@@ -35,6 +39,13 @@ export function TableView({
     }
     return formatarValorCurrency(valor);
   };
+
+  // Função para formatar CPF/CNPJ com máscara
+  const formatarInscricao = (inscricao: string): string => {
+    if (!inscricao) return "";
+    return formatCPFCNPJ(inscricao);
+  };
+  
   return <div className="space-y-4">
       <div className="flex justify-between items-center">
         <Button variant="ghost" onClick={() => setShowTable(false)} className="flex items-center">
@@ -77,11 +88,11 @@ export function TableView({
                 <Checkbox checked={selectAll} onCheckedChange={handleSelectAll} aria-label="Selecionar todos os registros" />
               </TableHead>
               <TableHead>Nome do Favorecido</TableHead>
-              <TableHead>Inscrição</TableHead>
-              <TableHead>Banco</TableHead>
-              <TableHead>Agência</TableHead>
-              <TableHead>Conta</TableHead>
-              <TableHead>Tipo</TableHead>
+              <TableHead className="text-right">Inscrição</TableHead>
+              <TableHead className="text-center">Banco</TableHead>
+              <TableHead className="text-center">Agência</TableHead>
+              <TableHead className="text-right">Conta</TableHead>
+              <TableHead className="text-center">Tipo</TableHead>
               <TableHead className="text-right">Valor</TableHead>
               <TableHead className="w-[70px]">Ações</TableHead>
             </TableRow>
@@ -92,11 +103,11 @@ export function TableView({
                   <Checkbox checked={row.selected || false} onCheckedChange={checked => handleSelectRow(row.id, !!checked)} aria-label={`Selecionar ${row.NOME}`} />
                 </TableCell>
                 <TableCell>{row.NOME}</TableCell>
-                <TableCell>{row.INSCRICAO}</TableCell>
-                <TableCell>{row.BANCO}</TableCell>
-                <TableCell>{row.AGENCIA}</TableCell>
-                <TableCell>{row.CONTA}</TableCell>
-                <TableCell>{row.TIPO}</TableCell>
+                <TableCell className="text-right font-mono">{formatarInscricao(row.INSCRICAO)}</TableCell>
+                <TableCell className="text-center">{row.BANCO}</TableCell>
+                <TableCell className="text-center">{row.AGENCIA}</TableCell>
+                <TableCell className="text-right">{row.CONTA}</TableCell>
+                <TableCell className="text-center">{row.TIPO}</TableCell>
                 <TableCell className="text-right font-medium">
                   {formatarValor(row.VALOR)}
                 </TableCell>
