@@ -28,13 +28,17 @@ export const generatePDFReport = async (reportData: ReportData): Promise<Blob> =
   doc.text(`Data de Geração: ${reportData.dataGeracao}`, 15, 42);
   doc.text(`Referência da Remessa: ${reportData.referencia}`, 15, 49);
   
-  // Add horizontal line
-  doc.line(15, 55, 195, 55);
+  // Add total value information - NEW LINE
+  const valorTotalFormatado = formatarValorCurrency(reportData.valorTotal);
+  doc.text(`Valor total dessa remessa: ${valorTotalFormatado} com ${reportData.totalRegistros} favorecidos`, 15, 56);
   
-  // Add BENEFICIÁRIOS text
+  // Add horizontal line - adjusted position to fit the new line
+  doc.line(15, 62, 195, 62);
+  
+  // Add BENEFICIÁRIOS text - adjusted position
   doc.setFontSize(12);
   doc.setFont(undefined, 'bold');
-  doc.text("BENEFICIÁRIOS:", 15, 65);
+  doc.text("BENEFICIÁRIOS:", 15, 72);
   
   // Define table columns
   const tableColumns = [
@@ -60,9 +64,9 @@ export const generatePDFReport = async (reportData: ReportData): Promise<Blob> =
       : formatarValorCurrency(parseFloat(row.VALOR.toString().replace(/[^\d.,]/g, '').replace(',', '.'))).replace('R$', '').trim()
   }));
   
-  // Create the table with improved styling
+  // Create the table with improved styling - adjusted starting position
   (doc as any).autoTable({
-    startY: 70,
+    startY: 77, // Adjusted to fit after the new line
     head: [tableColumns.map(col => col.header)],
     body: tableData.map(row => tableColumns.map(col => row[col.dataKey])),
     theme: 'grid',
