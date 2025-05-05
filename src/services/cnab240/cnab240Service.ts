@@ -30,6 +30,9 @@ export const downloadCNABFile = async (
       throw new Error("Nenhum favorecido selecionado para pagamento.");
     }
 
+    // Log workflow data for debugging
+    console.log("Service Type in downloadCNABFile:", workflowData.serviceType);
+    
     // Create CNAB generator
     const gerador = new GeradorCNAB240();
     
@@ -69,6 +72,9 @@ export const processSelectedRows = async (
       toast.error("Nenhum registro selecionado para processamento");
       return Promise.reject(new Error("Nenhum registro selecionado"));
     }
+    
+    // Log service type for debugging
+    console.log("Service Type in processSelectedRows:", workflowData.serviceType);
     
     // Convert rows to favorecidos with validation
     const { favorecidos, errorRows } = convertAndValidateRows(selectedRows);

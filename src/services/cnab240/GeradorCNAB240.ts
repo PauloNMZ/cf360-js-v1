@@ -43,6 +43,9 @@ export class GeradorCNAB240 {
   public gerarArquivoRemessa(workflowData: CNABWorkflowData, favorecidos: Favorecido[]): Promise<Blob> {
     return new Promise((resolve, reject) => {
       try {
+        // Log service type for debugging
+        console.log("Service Type in gerarArquivoRemessa:", workflowData.serviceType);
+        
         // Setup the configuration from workflow data
         const config = {
           nomeEmpresa: workflowData.convenente?.razaoSocial || '',
@@ -51,7 +54,8 @@ export class GeradorCNAB240 {
           agencia: workflowData.convenente?.agencia || '',
           conta: workflowData.convenente?.conta || '',
           convenioPag: workflowData.convenente?.convenioPag || '',
-          dataPagamento: workflowData.paymentDate || new Date()
+          dataPagamento: workflowData.paymentDate || new Date(),
+          serviceType: workflowData.serviceType || 'Pagamentos Diversos' // Add service type to config
         };
         
         // Initialize variables

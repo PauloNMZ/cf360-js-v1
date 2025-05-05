@@ -1,71 +1,54 @@
-import { EmpresaConfig } from '@/types/cnab240';
-import { retirarCHR, formatarData, formatarEnderecoCompleto, semAcento, calcularDV } from '@/utils/cnabUtils';
 
-/**
- * Initializes configuration variables for CNAB240 generation
- */
+import { EmpresaConfig } from '@/types/cnab240';
+import { strZero } from '@/utils/cnabUtils';
+
+// Initialize variables with configuration data
 export const inicializarVariaveis = (config: any): EmpresaConfig => {
+  // Format date string
+  const dateParts = config.dataPagamento instanceof Date ?
+    [
+      config.dataPagamento.getDate().toString().padStart(2, '0'),
+      (config.dataPagamento.getMonth() + 1).toString().padStart(2, '0'),
+      config.dataPagamento.getFullYear()
+    ] :
+    (config.dataPagamento || '').split('/');
+
+  const formattedDateStr = dateParts.length === 3 ? `${dateParts[0]}/${dateParts[1]}/${dateParts[2]}` : '';
+
+  // Extract parts from convenente data
+  const agenciaParts = (config.agencia || '').trim().split('-');
+  const contaParts = (config.conta || '').trim().split('-');
+
+  // Create basic configuration
   const empresaConfig: EmpresaConfig = {
-    nomeEmpresa: config.nomeEmpresa || '',
-    cnpj: retirarCHR(config.cnpj || ''),
-    endereco: config.endereco || '',
-    agencia: '',
-    dvAgencia: '',
-    conta: '',
-    dvConta: '',
-    nrConvenio: config.convenioPag || '',
-    codProduto: "0126", // Fixed product code for BB
-    nrRemessa: "1", // Could be incremented based on stored value
-    dataPagamento: '',
-    nrDocumento: "1" // Could be incremented based on stored value
+    nomeEmpresa: (config.nomeEmpresa || '').trim(),
+    cnpj: (config.cnpj || '').replace(/[^0-9]/g, ''),
+    endereco: (config.endereco || '').trim(),
+    agencia: agenciaParts[0] || '',
+    dvAgencia: agenciaParts[1] || '',
+    conta: contaParts[0] || '',
+    dvConta: contaParts[1] || '',
+    nrConvenio: (config.convenioPag || '').trim(),
+    codProduto: "0126", // Fixed value for Banco do Brasil
+    nrRemessa: strZero((Math.floor(Math.random() * 999999) + 1).toString(), 6),
+    dataPagamento: formattedDateStr,
+    nrDocumento: strZero((Math.floor(Math.random() * 999999999) + 1).toString(), 9),
+    serviceType: config.serviceType || 'Pagamentos Diversos' // Add serviceType to config
   };
-  
-  // Process agency: Separate the agency number and its check digit
-  const agenciaCompleta = retirarCHR(config.agencia || '');
-  if (agenciaCompleta.length > 0) {
-    if (agenciaCompleta.length > 1) {
-      // Extract the last character as check digit
-      empresaConfig.dvAgencia = agenciaCompleta.slice(-1);
-      empresaConfig.agencia = agenciaCompleta.slice(0, -1);
-    } else {
-      empresaConfig.agencia = agenciaCompleta;
-      empresaConfig.dvAgencia = calcularDV(agenciaCompleta);
-    }
-  }
-  
-  // Process account: Separate the account number and its check digit
-  const contaCompleta = retirarCHR(config.conta || '');
-  if (contaCompleta.length > 0) {
-    if (contaCompleta.length > 1) {
-      // Extract the last character as check digit
-      empresaConfig.dvConta = contaCompleta.slice(-1);
-      empresaConfig.conta = contaCompleta.slice(0, -1);
-    } else {
-      empresaConfig.conta = contaCompleta;
-      empresaConfig.dvConta = calcularDV(contaCompleta);
-    }
-  }
-  
-  // Format payment date if provided
-  if (config.dataPagamento && config.dataPagamento instanceof Date) {
-    empresaConfig.dataPagamento = formatarData(config.dataPagamento, "DDMMYYYY");
-  } else {
-    empresaConfig.dataPagamento = formatarData(new Date(), "DDMMYYYY");
-  }
-  
+
   return empresaConfig;
 };
 
-/**
- * Format and validate company information
- */
+// Format company data
 export const formatarDadosEmpresa = (config: EmpresaConfig): EmpresaConfig => {
-  const configFormatada = { ...config };
-  
-  // Format company name and address (if provided)
-  if (configFormatada.nomeEmpresa) {
-    configFormatada.nomeEmpresa = semAcento(configFormatada.nomeEmpresa.toUpperCase().trim());
-  }
-  
-  return configFormatada;
+  // Return a new object with formatted data
+  return {
+    ...config,
+    cnpj: config.cnpj.replace(/[^0-9]/g, ''), // Remove non-numeric characters from CNPJ
+    nomeEmpresa: (config.nomeEmpresa || '').toUpperCase(),
+    endereco: (config.endereco || '').toUpperCase(),
+    agencia: config.agencia.padStart(4, '0'), // Ensure agency has 4 digits
+    conta: config.conta.padStart(8, '0'), // Ensure account has 8 digits
+    nrConvenio: (config.nrConvenio || '').padStart(9, '0') // Ensure agreement number has 9 digits
+  };
 };

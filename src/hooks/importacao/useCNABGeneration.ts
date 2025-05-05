@@ -17,6 +17,9 @@ export const useCNABGeneration = () => {
     setShowWorkflowDialog(false);
     
     try {
+      // Add console logs to debug service type
+      console.log("Workflow service type:", workflow.serviceType);
+      
       // Pass the service type from workflow to the processing function
       const result = await processSelectedRows(workflow, selectedRows);
       
