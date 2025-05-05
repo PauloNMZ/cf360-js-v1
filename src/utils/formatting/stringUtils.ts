@@ -54,3 +54,26 @@ export const semAcento = (texto: string): string => {
   return removerAcentos(texto.toUpperCase());
 };
 
+// Format CPF (000.000.000-00) or CNPJ (00.000.000/0001-00)
+export const formatCPFCNPJ = (value: string): string => {
+  if (!value) return '';
+  
+  // Remove all non-digit characters
+  const digits = value.replace(/\D/g, '');
+  
+  if (digits.length <= 11) {
+    // CPF formatting: 000.000.000-00
+    return digits
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+  } else {
+    // CNPJ formatting: 00.000.000/0001-00
+    return digits
+      .replace(/^(\d{2})(\d)/, '$1.$2')
+      .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+      .replace(/\.(\d{3})(\d)/, '.$1/$2')
+      .replace(/(\d{4})(\d)/, '$1-$2');
+  }
+};
+
