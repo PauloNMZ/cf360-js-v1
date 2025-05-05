@@ -81,6 +81,8 @@ export const getTipoServico = (serviceType: string): string => {
   }
 };
 
+console.log("Tipo de serviço recebido:", config.serviceType);
+
 /**
  * Write batch header according to CNAB240 specifications
  */
