@@ -3,7 +3,6 @@
 export const COD_BB: string = "001";
 export const NOME_BB: string = "BANCO DO BRASIL";
 export const LAYOUT_VERSAO: string = "083";
-export const TIPO_SERVICO_PAGAMENTO: string = "98";
 export const TIPO_OPERACAO: string = "C";
 export const MOEDA_BRL: string = "BRL";
 
@@ -21,6 +20,7 @@ export interface EmpresaConfig {
   nrRemessa: string;
   dataPagamento: string;
   nrDocumento: string;
+  serviceType?: string; // Added to support different service types
 }
 
 // Interface for payment recipients

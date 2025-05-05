@@ -17,7 +17,7 @@ export const useCNABGeneration = () => {
     setShowWorkflowDialog(false);
     
     try {
-      // Process selected rows with validation
+      // Pass the service type from workflow to the processing function
       const result = await processSelectedRows(workflow, selectedRows);
       
       // If the file was successfully generated, set the filename

@@ -1,8 +1,8 @@
+
 import { 
   COD_BB,
   NOME_BB, 
   LAYOUT_VERSAO, 
-  TIPO_SERVICO_PAGAMENTO, 
   TIPO_OPERACAO,
   EmpresaConfig
 } from '@/types/cnab240';
@@ -65,6 +65,23 @@ export const gerarHeaderArquivo = (config: EmpresaConfig): string => {
 };
 
 /**
+ * Get the service type code based on the selected service type
+ */
+export const getTipoServico = (serviceType: string): string => {
+  switch(serviceType) {
+    case "Pagamento a Fornecedor":
+      return "20";
+    case "Pagamento de Salarios":
+      return "30";
+    case "Pix Transferências":
+      return "45";
+    case "Pagamentos Diversos":
+    default:
+      return "98";
+  }
+};
+
+/**
  * Write batch header according to CNAB240 specifications
  */
 export const gravarHeaderLote = (
@@ -72,8 +89,8 @@ export const gravarHeaderLote = (
   seqLoteStr: string, 
   tipoLancamento: string
 ): string => {
-  // Define service type (default "98" - Various Payments)
-  const tipoServico = TIPO_SERVICO_PAGAMENTO;
+  // Define service type based on the selected service type in workflow
+  const tipoServico = getTipoServico(config.serviceType || "Pagamentos Diversos");
 
   // Build batch header
   let headerLote = "";

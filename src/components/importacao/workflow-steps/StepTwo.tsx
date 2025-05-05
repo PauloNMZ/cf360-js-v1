@@ -27,29 +27,29 @@ const StepTwo: React.FC<StepTwoProps> = ({ workflow, updateWorkflow }) => {
             <Banknote className="h-5 w-5 text-blue-600" />
             <div className="space-y-0.5">
               <p className="font-medium leading-none">Pagamentos Diversos</p>
-              <p className="text-sm text-gray-500">Pagamentos para qualquer finalidade</p>
+              <p className="text-sm text-gray-500">Código de serviço: 98</p>
             </div>
           </Label>
         </div>
         
         <div className="flex items-center space-x-3 space-y-0 border rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
-          <RadioGroupItem value="Pagamentos de Salarios" id="salarios" />
+          <RadioGroupItem value="Pagamento de Salarios" id="salarios" />
           <Label htmlFor="salarios" className="flex flex-1 items-center space-x-3 cursor-pointer">
             <CreditCard className="h-5 w-5 text-green-600" />
             <div className="space-y-0.5">
-              <p className="font-medium leading-none">Pagamentos de Salários</p>
-              <p className="text-sm text-gray-500">Folha de pagamento e benefícios</p>
+              <p className="font-medium leading-none">Pagamento de Salários</p>
+              <p className="text-sm text-gray-500">Código de serviço: 30</p>
             </div>
           </Label>
         </div>
         
         <div className="flex items-center space-x-3 space-y-0 border rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
-          <RadioGroupItem value="Pagamento de Fornecedores" id="fornecedores" />
+          <RadioGroupItem value="Pagamento a Fornecedor" id="fornecedores" />
           <Label htmlFor="fornecedores" className="flex flex-1 items-center space-x-3 cursor-pointer">
             <Coins className="h-5 w-5 text-orange-600" />
             <div className="space-y-0.5">
-              <p className="font-medium leading-none">Pagamento de Fornecedores</p>
-              <p className="text-sm text-gray-500">Pagamentos para fornecedores e prestadores</p>
+              <p className="font-medium leading-none">Pagamento a Fornecedor</p>
+              <p className="text-sm text-gray-500">Código de serviço: 20</p>
             </div>
           </Label>
         </div>
@@ -60,7 +60,7 @@ const StepTwo: React.FC<StepTwoProps> = ({ workflow, updateWorkflow }) => {
             <PiggyBank className="h-5 w-5 text-purple-600" />
             <div className="space-y-0.5">
               <p className="font-medium leading-none">Pix Transferências</p>
-              <p className="text-sm text-gray-500">Transferências via Pix</p>
+              <p className="text-sm text-gray-500">Código de serviço: 45</p>
             </div>
           </Label>
         </div>
