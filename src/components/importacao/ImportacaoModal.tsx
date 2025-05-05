@@ -67,7 +67,7 @@ export default function ImportacaoModal({ isOpen, onOpenChange }: ImportacaoModa
     handleVerifyErrors,
     handleExportErrors,
     handleGenerateReport,
-    handleSendEmailReport,
+    handleSendEmailReport, // This now uses the no-parameter version
     handleEmailSubmit,
     
     // Directory dialog props

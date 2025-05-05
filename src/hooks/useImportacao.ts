@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { validateFavorecidos } from '@/services/cnab240/validationService';
 
@@ -106,12 +105,10 @@ export const useImportacao = () => {
     handleProcessar,
     handleProcessSelected: processWorkflow.handleProcessSelected,
     handleGenerateReport,
-    handleSendEmailReport: (onClosePDFPreview) => 
-      pdfReportWithEmail.handleSendEmailReport(
-        onClosePDFPreview, 
-        convenentesData.convenentes, 
-        processWorkflow.workflow.convenente
-      ),
+    // Use the simpler version for PDFPreviewDialog
+    handleSendEmailReport: pdfReportWithEmail.handleSendEmailReport,
+    // Keep the parameterized version for other usages
+    handleSendEmailReportWithParams: pdfReportWithEmail.handleSendEmailReportWithParams,
     handleEmailSubmit: pdfReportWithEmail.handleEmailSubmit,
     handleSubmitWorkflow: processWorkflow.handleSubmitWorkflow,
     

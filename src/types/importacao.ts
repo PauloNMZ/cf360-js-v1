@@ -1,4 +1,3 @@
-
 import { CNABWorkflowData, Favorecido } from "@/types/cnab240";
 
 // Define the expected column headers
@@ -74,10 +73,17 @@ export interface FileUploadViewProps {
   handleProcessar: () => void;
 }
 
+export interface PDFPreviewDialogProps {
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  reportData: ReportData | null;
+  onSendEmail: () => void; // Updated to match the function signature
+}
+
 export interface EmailFormValues {
   recipientEmail: string;
   senderName: string;
-  senderEmail: string; // Adicionado campo para email do remetente
+  senderEmail: string;
   senderDepartment: string;
   remittanceReference: string;
   companyName?: string;
@@ -99,11 +105,4 @@ export interface ReportData {
   beneficiarios: RowData[];
   totalRegistros: number;
   valorTotal: number;
-}
-
-export interface PDFPreviewDialogProps {
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-  reportData: ReportData | null;
-  onSendEmail: () => void;
 }

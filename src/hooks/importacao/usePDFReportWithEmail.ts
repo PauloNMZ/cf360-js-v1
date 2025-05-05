@@ -51,7 +51,18 @@ export const usePDFReportWithEmail = () => {
   };
 
   // Handle sending the report via email after preview
-  const handleSendEmailReport = (
+  // Modified to accept no parameters and handle the closure internally
+  const handleSendEmailReport = () => {
+    emailConfigDialog.handleSendEmailReport(
+      (open: boolean) => pdfReportDialog.setShowPDFPreviewDialog(open),
+      [], // Empty array for convenentes since we'll get it from the hook below
+      null // No convenente ID
+    );
+  };
+
+  // This overload function is for places that need to pass specific parameters
+  // Like in useImportacao.ts where we have access to convenentes and convenenteId
+  const handleSendEmailReportWithParams = (
     onClosePDFPreview: (open: boolean) => void,
     convenentes: any[],
     convenenteId: string | null
@@ -88,6 +99,7 @@ export const usePDFReportWithEmail = () => {
     // Handler functions
     handleGenerateReport,
     handleSendEmailReport,
+    handleSendEmailReportWithParams, // Export the parameterized version as well
     handleEmailSubmit
   };
 };

@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useImportacao } from '@/hooks/useImportacao';
@@ -150,7 +149,7 @@ const ImportarPlanilha = () => {
         reportDate={reportDate}
       />
       
-      {/* PDF Preview dialog */}
+      {/* PDF Preview dialog - using no-parameter version of the handler */}
       <PDFPreviewDialog
         isOpen={showPDFPreviewDialog}
         onOpenChange={setShowPDFPreviewDialog}
