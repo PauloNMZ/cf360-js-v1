@@ -1,4 +1,3 @@
-
 /**
  * String formatting utility functions for CNAB files
  */
@@ -54,3 +53,23 @@ export const semAcento = (texto: string): string => {
   return removerAcentos(texto.toUpperCase());
 };
 
+// Format CPF/CNPJ with mask
+export const formatCPFCNPJ = (valor: string): string => {
+  if (!valor) return '';
+  
+  // Clean input, keep only numbers
+  const valorLimpo = valor.replace(/\D/g, '');
+  
+  // Format as CPF
+  if (valorLimpo.length <= 11) {
+    // Ensure 11 digits for CPF with leading zeros
+    const cpf = valorLimpo.padStart(11, '0');
+    return `${cpf.substr(0, 3)}.${cpf.substr(3, 3)}.${cpf.substr(6, 3)}-${cpf.substr(9, 2)}`;
+  } 
+  // Format as CNPJ
+  else {
+    // Ensure 14 digits for CNPJ with leading zeros
+    const cnpj = valorLimpo.padStart(14, '0');
+    return `${cnpj.substr(0, 2)}.${cnpj.substr(2, 3)}.${cnpj.substr(5, 3)}/${cnpj.substr(8, 4)}-${cnpj.substr(12, 2)}`;
+  }
+};

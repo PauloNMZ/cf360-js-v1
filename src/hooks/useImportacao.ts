@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { validateFavorecidos } from '@/services/cnab240/validationService';
 import { toast } from '@/components/ui/sonner';
@@ -132,13 +131,14 @@ export const useImportacao = () => {
       }
     }
     
-    // Generate report
+    // Generate report - adding the missing companyName parameter that was causing the error
     const reportResult = await pdfReportDialog.generateReport(
       selectedRows,
       cnabGeneration.cnabFileGenerated,
       cnabGeneration.cnabFileName,
       companyName,
-      validateFavorecidos
+      validateFavorecidos,
+      true // Adding the 6th parameter that was missing - setting it to true
     );
     
     if (reportResult) {
