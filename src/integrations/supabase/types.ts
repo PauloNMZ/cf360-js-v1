@@ -9,6 +9,59 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      convenente_credentials: {
+        Row: {
+          app_key: string | null
+          atualizado_em: string | null
+          basic: string | null
+          client_id: string | null
+          client_secret: string | null
+          convenente_id: string
+          criado_em: string | null
+          id: string
+          password_bbsia: string | null
+          registrar_token: string | null
+          user_bbsia: string | null
+          user_id: string | null
+        }
+        Insert: {
+          app_key?: string | null
+          atualizado_em?: string | null
+          basic?: string | null
+          client_id?: string | null
+          client_secret?: string | null
+          convenente_id: string
+          criado_em?: string | null
+          id?: string
+          password_bbsia?: string | null
+          registrar_token?: string | null
+          user_bbsia?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          app_key?: string | null
+          atualizado_em?: string | null
+          basic?: string | null
+          client_id?: string | null
+          client_secret?: string | null
+          convenente_id?: string
+          criado_em?: string | null
+          id?: string
+          password_bbsia?: string | null
+          registrar_token?: string | null
+          user_bbsia?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "convenente_credentials_convenente_id_fkey"
+            columns: ["convenente_id"]
+            isOneToOne: false
+            referencedRelation: "convenentes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       convenentes: {
         Row: {
           agencia: string | null

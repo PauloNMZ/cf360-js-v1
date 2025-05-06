@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,8 @@ import { AlertCircle, Edit, Loader2, Plus, Save, Search, TrashIcon } from "lucid
 import FormularioModerno from "@/components/FormularioModerno";
 import { ConvenenteData, emptyConvenente } from "@/types/convenente";
 import { formatCNPJ } from "@/utils/formValidation";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ConvenenteCredentialsSection from "./ConvenenteCredentialsSection";
 
 type ConvenenteModalProps = {
   isOpen: boolean;
@@ -51,15 +53,22 @@ const ConvenenteModal = ({
   onFormDataChange,
 }: ConvenenteModalProps) => {
   
+  const [activeTab, setActiveTab] = useState<string>("dados");
+  
   const handleCreateNewClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     onCreateNew();
+    // Quando criar um novo, voltar para a aba de dados
+    setActiveTab("dados");
   };
 
   const handleSaveClick = () => {
     onSave();
   };
+
+  // Somente mostrar a aba de credenciais se houver um convenente selecionado
+  const showCredentialsTab = formMode === 'view' && currentConvenenteId !== null;
 
   // Determine if save button should be disabled
   const isSaveDisabled = !(formMode === 'create' || formMode === 'edit') || 
@@ -170,15 +179,38 @@ const ConvenenteModal = ({
               )}
             </div>
             
-            <ScrollArea className="h-[500px] pr-4">
-              <div className="py-4">
-                <FormularioModerno 
-                  onFormDataChange={onFormDataChange} 
-                  formMode={formMode}
-                  initialData={formData} 
-                />
-              </div>
-            </ScrollArea>
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="mb-4">
+                <TabsTrigger value="dados">Dados Cadastrais</TabsTrigger>
+                {showCredentialsTab && (
+                  <TabsTrigger value="credenciais">Credenciais de API</TabsTrigger>
+                )}
+              </TabsList>
+              
+              <TabsContent value="dados" className="mt-0">
+                <ScrollArea className="h-[500px] pr-4">
+                  <div className="py-4">
+                    <FormularioModerno 
+                      onFormDataChange={onFormDataChange} 
+                      formMode={formMode}
+                      initialData={formData} 
+                    />
+                  </div>
+                </ScrollArea>
+              </TabsContent>
+              
+              {showCredentialsTab && (
+                <TabsContent value="credenciais" className="mt-0">
+                  <ScrollArea className="h-[500px] pr-4">
+                    <div className="py-4">
+                      <ConvenenteCredentialsSection 
+                        convenenteId={currentConvenenteId}
+                      />
+                    </div>
+                  </ScrollArea>
+                </TabsContent>
+              )}
+            </Tabs>
           </div>
         </div>
       </DialogContent>
