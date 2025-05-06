@@ -22,6 +22,7 @@ export const useConvenenteForm = ({
   contactInfoRef: React.RefObject<ContactInfoSectionRef> 
 }) => {
   const userEditingRef = useRef<boolean>(false);
+  const processingChangeRef = useRef<boolean>(false);
   
   // Setup form validation
   const { 
@@ -31,7 +32,8 @@ export const useConvenenteForm = ({
     markFieldAsTouched,
     setTouched,
     resetErrors,
-    resetTouch
+    resetTouch,
+    validationInProgress
   } = useFormValidation();
   
   // Use the form data hook
@@ -72,21 +74,28 @@ export const useConvenenteForm = ({
     isSearchPending
   } = useCNPJSearch(formData, setFormData, setDataLoaded, setTouched, contactInfoRef);
 
-  // Notify parent component when form data changes
+  // Notify parent component when form data changes, with anti-loop protection
   useEffect(() => {
     // Skip validation during updates to prevent loops
-    if (isUpdating || shouldSkipValidation) {
+    if (isUpdating || shouldSkipValidation || processingChangeRef.current) {
       return;
     }
     
-    validateForm(formData, isUpdating);
+    // Protect against nested calls
+    processingChangeRef.current = true;
     
-    if (onFormDataChange && (dataLoaded || Object.keys(touched).length > 0)) {
-      console.log("Calling onFormDataChange with current data:", {
-        cnpj: formData.cnpj,
-        razaoSocial: formData.razaoSocial,
-      });
-      onFormDataChange(formData);
+    try {
+      validateForm(formData);
+      
+      if (onFormDataChange && (dataLoaded || Object.keys(touched).length > 0)) {
+        // Only notify parent if we have data loaded or user has interacted with form
+        onFormDataChange(formData);
+      }
+    } finally {
+      // Release protection after a short delay to prevent immediate re-entry
+      setTimeout(() => {
+        processingChangeRef.current = false;
+      }, 100);
     }
   }, [formData, dataLoaded, onFormDataChange, validateForm, touched, isUpdating, shouldSkipValidation]);
 

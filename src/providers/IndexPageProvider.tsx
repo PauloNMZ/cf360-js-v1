@@ -22,8 +22,9 @@ export const IndexPageProvider = ({ children }: { children: ReactNode }) => {
   // Add additional state for CNAB to API modal
   const [cnabToApiModalOpen, setCnabToApiModalOpen] = React.useState(false);
   
-  // Use a ref to track modal state changes
+  // Use a ref to track modal state changes and prevent loops
   const modalStateChangingRef = useRef(false);
+  const saveActionInProgressRef = useRef(false);
   
   // Get actions from useIndexPageActions
   const indexPageActions = useIndexPageActions({
@@ -112,21 +113,15 @@ export const IndexPageProvider = ({ children }: { children: ReactNode }) => {
       
       // Reset form data when closing the modal
       if (!open) {
-        console.log("Modal closing - preparing to reset form");
-        
         // IMPORTANT: Set form mode first to 'view'
-        console.log("Setting formMode back to 'view' on modal close");
         indexPage.setFormMode('view');
         
         // Wait for mode change to take effect before clearing data
         setTimeout(() => {
-          console.log("Resetting form data after form mode change");
           indexPage.setFormData({...emptyConvenente});
           indexPage.setCurrentConvenenteId(null);
           indexPage.setFormValid(false);
         }, 100);
-      } else {
-        console.log("Modal opening - initializing in view mode");
       }
     } finally {
       // Release state change lock after a delay to prevent race conditions
@@ -136,34 +131,47 @@ export const IndexPageProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Function to save current form data
+  // Function to save current form data with anti-loop protection
   const handleSaveClick = () => {
-    console.log("IndexPageProvider - handleSaveClick called with mode:", indexPage.formMode);
-    console.log("FormData being saved:", indexPage.formData);
-    
-    // Validate CNPJ and RazaoSocial before saving
-    if (!indexPage.formData.cnpj || indexPage.formData.cnpj.trim() === '') {
-      console.log("CNPJ vazio, não é possível salvar");
-      toast({
-        title: "Dados incompletos",
-        description: "CNPJ é obrigatório.",
-        variant: "destructive",
-      });
+    // Prevent multiple save attempts
+    if (saveActionInProgressRef.current) {
+      console.log("Save action already in progress, ignoring duplicate request");
       return;
     }
+
+    saveActionInProgressRef.current = true;
     
-    if (!indexPage.formData.razaoSocial || indexPage.formData.razaoSocial.trim() === '') {
-      console.log("Razão Social vazia, não é possível salvar");
-      toast({
-        title: "Dados incompletos",
-        description: "Razão Social é obrigatória.",
-        variant: "destructive",
-      });
-      return;
+    try {
+      if (!indexPage.formData.cnpj || indexPage.formData.cnpj.trim() === '') {
+        toast({
+          title: "Dados incompletos",
+          description: "CNPJ é obrigatório.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      if (!indexPage.formData.razaoSocial || indexPage.formData.razaoSocial.trim() === '') {
+        toast({
+          title: "Dados incompletos",
+          description: "Razão Social é obrigatória.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Clone the form data to prevent any reference issues
+      const dataToSave = {...indexPage.formData};
+      console.log("Initiating save with data:", dataToSave);
+      
+      // Directly call the handleSave function with the current form data
+      indexPageActions.handleSave(dataToSave);
+    } finally {
+      // Release the save action lock after a delay
+      setTimeout(() => {
+        saveActionInProgressRef.current = false;
+      }, 500);
     }
-    
-    // Directly call the handleSave function with the current form data
-    indexPageActions.handleSave(indexPage.formData);
   };
 
   // Combine all values and functions to pass down via context

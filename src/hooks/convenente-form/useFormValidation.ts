@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { validateCNPJ, validateEmail, validatePhone } from "@/utils/formValidation";
 import { FormErrors } from "./types";
 import { ConvenenteData } from "@/types/convenente";
@@ -8,11 +8,18 @@ export const useFormValidation = () => {
   const [errors, setErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [validationInProgress, setValidationInProgress] = useState(false);
+  const lastValidationTimeRef = useRef<number>(0);
 
   const validateForm = (formData: ConvenenteData, isUpdating = false) => {
+    // Throttle validation to avoid rapid consecutive calls
+    const now = Date.now();
+    if (now - lastValidationTimeRef.current < 100) {
+      return true; // Skip if called too frequently
+    }
+    lastValidationTimeRef.current = now;
+    
     // Skip validation if it's already in progress or during updates
     if (validationInProgress || isUpdating) {
-      console.log("Skipping validation - in progress or during update");
       return true;
     }
 
@@ -49,7 +56,10 @@ export const useFormValidation = () => {
       setErrors(newErrors);
       return Object.keys(newErrors).length === 0;
     } finally {
-      setValidationInProgress(false);
+      // Release validation lock after a short delay to prevent immediate re-entry
+      setTimeout(() => {
+        setValidationInProgress(false);
+      }, 100);
     }
   };
 

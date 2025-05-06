@@ -17,6 +17,8 @@ type FormularioModernoProps = {
 const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: FormularioModernoProps) => {
   // Create a direct ref to contact section
   const contactInfoRef = useRef<ContactInfoSectionRef>(null);
+  // Track if we've already notified about form changes
+  const hasNotifiedRef = useRef(false);
   
   const {
     cnpjInput,
@@ -39,8 +41,11 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
 
   // Send form data changes to parent component whenever formData changes
   useEffect(() => {
-    console.log("FormularioModerno: formData changed, calling onFormDataChange with:", formData);
-    onFormDataChange(formData);
+    if (formData.cnpj || formData.razaoSocial || hasNotifiedRef.current) {
+      // Avoid unnecessary updates when form is empty
+      onFormDataChange(formData);
+      hasNotifiedRef.current = true;
+    }
   }, [formData, onFormDataChange]);
 
   return (

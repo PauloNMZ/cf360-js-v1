@@ -6,6 +6,7 @@ import {
   fetchConvenentes, 
   updateConvenenteData 
 } from "@/services/convenente/convenenteService";
+import { useRef } from "react";
 
 export const useSaveActions = (
   {
@@ -25,100 +26,108 @@ export const useSaveActions = (
   }
 ) => {
   const { toast } = useToast();
+  const saveInProgressRef = useRef<boolean>(false);
 
   const handleSave = async (formData: ConvenenteData) => {
-    console.log("handleSave chamado com dados:", formData);
-    
-    // Check for CNPJ
-    if (!formData.cnpj || formData.cnpj.trim() === '') {
-      console.log("Erro de validação: CNPJ vazio");
-      toast({
-        title: "Dados incompletos",
-        description: "CNPJ é obrigatório.",
-        variant: "destructive",
-      });
+    // Prevent re-entrancy
+    if (saveInProgressRef.current) {
+      console.log("Save already in progress, ignoring duplicate request");
       return;
     }
     
-    // Check for Razão Social
-    if (!formData.razaoSocial || formData.razaoSocial.trim() === '') {
-      console.log("Erro de validação: Razão Social vazia");
-      toast({
-        title: "Dados incompletos",
-        description: "Razão Social é obrigatória.",
-        variant: "destructive",
-      });
-      return;
-    }
+    saveInProgressRef.current = true;
     
     try {
-      console.log("Iniciando processo de salvamento:", formData);
-      setIsLoading(true);
-      
-      if (currentConvenenteId === null) {
-        // Save new convenente
-        console.log("Criando novo convenente:", formData);
-        const savedConvenente = await createConvenente(formData);
-        console.log("Convenente salvo com sucesso:", savedConvenente);
-        
+      // Check for CNPJ
+      if (!formData.cnpj || formData.cnpj.trim() === '') {
         toast({
-          title: "Convenente salvo",
-          description: `${formData.razaoSocial} foi cadastrado com sucesso.`,
+          title: "Dados incompletos",
+          description: "CNPJ é obrigatório.",
+          variant: "destructive",
         });
-        
-        // Update convenente list
-        const updatedConvenentes = await fetchConvenentes();
-        setConvenentes(updatedConvenentes);
-        
-        // Optional: Select the newly created convenente
-        if (savedConvenente && savedConvenente.id) {
-          setCurrentConvenenteId(savedConvenente.id);
-        }
-      } else {
-        // Update existing convenente
-        console.log("Atualizando convenente existente:", currentConvenenteId, formData);
-        const updatedConvenente = await updateConvenenteData(currentConvenenteId, formData);
-        console.log("Convenente atualizado com sucesso:", updatedConvenente);
-        
-        if (updatedConvenente) {
-          toast({
-            title: "Convenente atualizado",
-            description: `${formData.razaoSocial} foi atualizado com sucesso.`,
-          });
-          
-          // Update list
-          const updatedConvenentes = await fetchConvenentes();
-          setConvenentes(updatedConvenentes);
-        } else {
-          toast({
-            title: "Erro ao atualizar",
-            description: "Não foi possível atualizar o convenente.",
-            variant: "destructive",
-          });
-        }
+        return;
       }
       
-      // Return to view mode - delay this slightly to prevent race conditions
-      setTimeout(() => {
-        console.log("Form saved, returning to view mode");
-        setFormMode('view');
+      // Check for Razão Social
+      if (!formData.razaoSocial || formData.razaoSocial.trim() === '') {
+        toast({
+          title: "Dados incompletos",
+          description: "Razão Social é obrigatória.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      try {
+        console.log("Starting save process with data:", {
+          cnpj: formData.cnpj,
+          razaoSocial: formData.razaoSocial
+        });
         
-        // Only clear form data after mode change
-        setTimeout(() => {
-          if (currentConvenenteId === null) {
-            setFormData({...emptyConvenente});
+        setIsLoading(true);
+        
+        if (currentConvenenteId === null) {
+          // Save new convenente
+          console.log("Creating new convenente");
+          const savedConvenente = await createConvenente(formData);
+          
+          toast({
+            title: "Convenente salvo",
+            description: `${formData.razaoSocial} foi cadastrado com sucesso.`,
+          });
+          
+          // Update convenente list
+          const updatedConvenentes = await fetchConvenentes();
+          setConvenentes(updatedConvenentes);
+          
+          // Optional: Select the newly created convenente
+          if (savedConvenente && savedConvenente.id) {
+            setCurrentConvenenteId(savedConvenente.id);
           }
-        }, 50);
-      }, 100);
-    } catch (error) {
-      console.error('Erro ao salvar convenente:', error);
-      toast({
-        title: "Erro ao salvar",
-        description: "Ocorreu um erro ao salvar o convenente.",
-        variant: "destructive",
-      });
+        } else {
+          // Update existing convenente
+          console.log("Updating existing convenente:", currentConvenenteId);
+          const updatedConvenente = await updateConvenenteData(currentConvenenteId, formData);
+          
+          if (updatedConvenente) {
+            toast({
+              title: "Convenente atualizado",
+              description: `${formData.razaoSocial} foi atualizado com sucesso.`,
+            });
+            
+            // Update list
+            const updatedConvenentes = await fetchConvenentes();
+            setConvenentes(updatedConvenentes);
+          } else {
+            toast({
+              title: "Erro ao atualizar",
+              description: "Não foi possível atualizar o convenente.",
+              variant: "destructive",
+            });
+          }
+        }
+        
+        // Return to view mode - delay this to prevent race conditions
+        setTimeout(() => {
+          console.log("Form saved, returning to view mode");
+          setFormMode('view');
+        }, 300);
+        
+      } catch (error) {
+        console.error('Erro ao salvar convenente:', error);
+        toast({
+          title: "Erro ao salvar",
+          description: "Ocorreu um erro ao salvar o convenente.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
     } finally {
-      setIsLoading(false);
+      // Release save lock after a delay
+      setTimeout(() => {
+        saveInProgressRef.current = false;
+      }, 500);
     }
   };
 
