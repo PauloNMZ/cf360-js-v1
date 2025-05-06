@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useIndexPage } from "@/hooks/useIndexPage";
@@ -108,21 +107,37 @@ const Index = () => {
   };
 
   return (
+    
     <MainLayout companySettings={companySettings}>
       <div className="w-full px-4 py-6">
         <NavigationMenu 
-          onConvenenteClick={handleConvenenteClick}
-          onImportarPlanilhaClick={handleImportarPlanilhaClick}
-          onCnabToApiClick={handleCnabToApiClick}
-          onAdminPanelClick={handleAdminPanelClick}
-          onLogoutClick={handleLogoutClick}
+          onConvenenteClick={() => setModalOpen(true)}
+          onImportarPlanilhaClick={() => setImportModalOpen(true)}
+          onCnabToApiClick={() => setCnabToApiModalOpen(true)}
+          onAdminPanelClick={() => setAdminPanelOpen(true)}
+          onLogoutClick={async () => {
+            await signOut();
+            // Limpar todos os dados após logout
+            setFormData({...emptyConvenente});
+            setCurrentConvenenteId(null);
+          }}
         />
       </div>
 
       {/* Modals */}
       <ConvenenteModal 
         isOpen={modalOpen}
-        onOpenChange={handleConvenenteModalOpenChange}
+        onOpenChange={(open) => {
+          setModalOpen(open);
+          
+          // Ao fechar o modal, reseta os dados do formulário
+          if (!open) {
+            setFormData({...emptyConvenente});
+            setCurrentConvenenteId(null);
+            setFormMode('view');
+            setFormValid(false);
+          }
+        }}
         convenentes={convenentes}
         filteredConvenentes={filteredConvenentes}
         currentConvenenteId={currentConvenenteId}
@@ -137,7 +152,7 @@ const Index = () => {
         onCreateNew={handleCreateNew}
         onEdit={handleEdit}
         onDelete={handleDelete}
-        onSave={handleSaveClick}
+        onSave={() => handleSave(formData)}
         onFormDataChange={handleFormDataChange}
       />
 

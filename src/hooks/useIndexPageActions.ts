@@ -3,11 +3,11 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ConvenenteData, emptyConvenente } from "@/types/convenente";
 import { 
-  saveConvenente, 
-  getConvenentes, 
-  updateConvenente, 
-  deleteConvenente 
-} from "@/services/convenenteService";
+  createConvenente, 
+  fetchConvenentes, 
+  updateConvenenteData, 
+  removeConvenente 
+} from "@/services/convenente/convenenteService";
 
 export const useIndexPageActions = (
   {
@@ -50,9 +50,6 @@ export const useIndexPageActions = (
     
     setFormMode('edit');
     setFormValid(true); // Assume the existing data is valid when editing
-    
-    // Note: We're no longer making an API call here
-    // The data should already be available in the form
   };
 
   const handleDelete = () => {
@@ -72,7 +69,7 @@ export const useIndexPageActions = (
     if (currentConvenenteId) {
       setIsLoading(true);
       try {
-        await deleteConvenente(currentConvenenteId);
+        await removeConvenente(currentConvenenteId);
         
         toast({
           title: "Convenente excluído",
@@ -80,7 +77,7 @@ export const useIndexPageActions = (
         });
         
         // Update list and close dialog
-        const updatedConvenentes = await getConvenentes();
+        const updatedConvenentes = await fetchConvenentes();
         setConvenentes(updatedConvenentes);
         setCurrentConvenenteId(null);
         setFormData({...emptyConvenente});
@@ -106,37 +103,21 @@ export const useIndexPageActions = (
       
       if (currentConvenenteId === null) {
         // Save new convenente
-        const newConvenente = await saveConvenente(formData);
+        await createConvenente(formData);
         
         toast({
           title: "Convenente salvo",
           description: `${formData.razaoSocial} foi cadastrado com sucesso.`,
         });
-        
-        // Update list and select new convenente
-        const updatedConvenentes = await getConvenentes();
-        setConvenentes(updatedConvenentes);
-        
-        // Limpar os campos e voltar para modo de visualização
-        setFormData({...emptyConvenente});
-        setCurrentConvenenteId(null);
       } else {
         // Update existing convenente
-        const updatedConvenente = await updateConvenente(currentConvenenteId, formData);
+        const updatedConvenente = await updateConvenenteData(currentConvenenteId, formData);
         
         if (updatedConvenente) {
           toast({
             title: "Convenente atualizado",
             description: `${formData.razaoSocial} foi atualizado com sucesso.`,
           });
-          
-          // Update list
-          const updatedConvenentes = await getConvenentes();
-          setConvenentes(updatedConvenentes);
-          
-          // Limpar os campos
-          setFormData({...emptyConvenente});
-          setCurrentConvenenteId(null);
         } else {
           toast({
             title: "Erro ao atualizar",
@@ -145,6 +126,14 @@ export const useIndexPageActions = (
           });
         }
       }
+      
+      // Update list
+      const updatedConvenentes = await fetchConvenentes();
+      setConvenentes(updatedConvenentes);
+      
+      // Limpar os campos e voltar para modo de visualização
+      setFormData({...emptyConvenente});
+      setCurrentConvenenteId(null);
       
       // Return to view mode
       setFormMode('view');
