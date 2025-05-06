@@ -1,27 +1,12 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
-import { 
-  AlertDialog, 
-  AlertDialogAction, 
-  AlertDialogCancel, 
-  AlertDialogContent, 
-  AlertDialogDescription, 
-  AlertDialogFooter, 
-  AlertDialogHeader, 
-  AlertDialogTitle 
-} from "@/components/ui/alert-dialog";
-import { Edit, TrashIcon, Upload, WalletCards } from "lucide-react";
+
+import React, { useState, useEffect } from "react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { getCompanySettings, saveCompanySettings } from "@/services/companySettings";
 import { useToast } from "@/components/ui/use-toast";
+import AdminMenu from "@/components/admin/AdminMenu";
+import CompanySettingsSection from "@/components/admin/CompanySettingsSection";
+import BankConnectionsList from "@/components/admin/BankConnectionsList";
+import BankConnectionForm from "@/components/admin/BankConnectionForm";
 
 interface AdminPanelProps {
   onClose?: () => void;
@@ -29,7 +14,6 @@ interface AdminPanelProps {
 
 const AdminPanel = ({ onClose }: AdminPanelProps) => {
   const { toast } = useToast();
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [showBankConnections, setShowBankConnections] = useState(false);
   const [showCompanySettings, setShowCompanySettings] = useState(false);
   const [bankConnections, setBankConnections] = useState([
@@ -104,7 +88,6 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
     }));
   };
 
-  // Updated to use the fileInputRef
   const handleLogoChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -119,11 +102,6 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
     }
   };
 
-  const handleLogoButtonClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  // Modified to call onClose when toast is shown
   const handleSaveCompanySettings = () => {
     const updatedSettings = {
       ...companySettings,
@@ -196,326 +174,35 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
   return (
     <div className="space-y-6">
       {!showBankConnections && !showCompanySettings && !isEditing && !isCreating ? (
-        <>
-          <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-            <h3 className="text-lg font-medium text-blue-800 mb-2">Gestão de Usuários</h3>
-            <p className="text-sm text-gray-600 mb-3">Gerencie usuários e permissões do sistema</p>
-            <div className="flex gap-2">
-              <button className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
-                Adicionar Usuário
-              </button>
-              <button className="px-3 py-1 bg-white border border-blue-300 text-blue-600 text-sm rounded hover:bg-blue-50">
-                Listar Usuários
-              </button>
-            </div>
-          </div>
-
-          <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-            <h3 className="text-lg font-medium text-blue-800 mb-2">Configurações do Sistema</h3>
-            <p className="text-sm text-gray-600 mb-3">Ajuste configurações globais e parâmetros operacionais</p>
-            <div className="flex gap-2">
-              <button 
-                className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
-                onClick={handleCompanySettingsClick}
-              >
-                Configurações da Empresa
-              </button>
-              <button 
-                className="px-3 py-1 bg-white border border-blue-300 text-blue-600 text-sm rounded hover:bg-blue-50"
-                onClick={handleBankConnectionsClick}
-              >
-                Conexões Bancárias
-              </button>
-            </div>
-          </div>
-
-          <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-            <h3 className="text-lg font-medium text-blue-800 mb-2">Auditoria</h3>
-            <p className="text-sm text-gray-600 mb-3">Visualize logs e histórico de operações</p>
-            <div className="flex gap-2">
-              <button className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
-                Logs do Sistema
-              </button>
-              <button className="px-3 py-1 bg-white border border-blue-300 text-blue-600 text-sm rounded hover:bg-blue-50">
-                Histórico de Transações
-              </button>
-            </div>
-          </div>
-        </>
+        <AdminMenu 
+          onBankConnectionsClick={handleBankConnectionsClick}
+          onCompanySettingsClick={handleCompanySettingsClick}
+        />
       ) : showCompanySettings ? (
-        <div className="bg-white p-6 rounded-lg shadow-sm">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-blue-800">Configurações da Empresa</h3>
-            <Button 
-              onClick={handleBackToMenu}
-              variant="outline"
-              className="text-sm"
-            >
-              Voltar
-            </Button>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Nome da Empresa
-                </label>
-                <Input 
-                  name="companyName"
-                  value={companySettings.companyName}
-                  onChange={handleCompanySettingChange}
-                  placeholder="Nome que aparecerá no cabeçalho"
-                />
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Logo da Empresa
-                </label>
-                <div className="flex items-center gap-2">
-                  <Input 
-                    type="file"
-                    accept="image/*"
-                    onChange={handleLogoChange}
-                    className="flex-1"
-                    ref={fileInputRef}
-                  />
-                  <Button 
-                    variant="outline" 
-                    className="flex items-center gap-1"
-                    onClick={handleLogoButtonClick}
-                  >
-                    <Upload size={16} /> Carregar
-                  </Button>
-                </div>
-                <p className="text-xs text-gray-500 mt-1">
-                  Recomendamos uma imagem quadrada com pelo menos 128x128 pixels.
-                </p>
-              </div>
-
-              <Button 
-                onClick={handleSaveCompanySettings}
-                className="bg-green-600 hover:bg-green-700 mt-4"
-              >
-                Salvar Configurações
-              </Button>
-            </div>
-
-            <div className="flex flex-col items-center">
-              <div className="text-sm font-medium text-gray-700 mb-4">Pré-visualização do Logo</div>
-              <div className="border border-gray-200 rounded-lg p-6 bg-slate-50 flex flex-col items-center">
-                <div className="mb-4">
-                  {logoPreview ? (
-                    <div className="relative">
-                      <div className="absolute inset-0 bg-blue-600 rounded-full blur-sm opacity-30"></div>
-                      <div className="relative bg-gradient-to-br from-blue-500 to-purple-600 p-1.5 rounded-full text-white flex items-center justify-center shadow-lg">
-                        <img 
-                          src={logoPreview} 
-                          alt="Company Logo Preview" 
-                          className="w-16 h-16 object-contain"
-                        />
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="relative">
-                      <div className="absolute inset-0 bg-blue-600 rounded-full blur-sm opacity-30"></div>
-                      <div className="relative bg-gradient-to-br from-blue-500 to-purple-600 p-1.5 rounded-full text-white flex items-center justify-center shadow-lg">
-                        <WalletCards size={64} strokeWidth={1.5} className="drop-shadow-sm" />
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <div className="text-xl font-bold text-center text-blue-800">
-                  {companySettings.companyName}
-                </div>
-              </div>
-              {logoPreview && (
-                <Button 
-                  variant="outline" 
-                  className="text-red-600 mt-4"
-                  onClick={() => {
-                    setLogoPreview('');
-                    setCompanySettings(prev => ({ ...prev, logoUrl: '' }));
-                  }}
-                >
-                  Remover Logo
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
+        <CompanySettingsSection
+          companySettings={companySettings}
+          logoPreview={logoPreview}
+          onCompanySettingChange={handleCompanySettingChange}
+          onLogoChange={handleLogoChange}
+          onSaveSettings={handleSaveCompanySettings}
+          onBack={handleBackToMenu}
+        />
       ) : showBankConnections && !isEditing && !isCreating ? (
-        <div className="bg-white p-6 rounded-lg shadow-sm">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-blue-800">Conexões Bancárias</h3>
-            <div className="flex space-x-2">
-              <Button 
-                onClick={handleBackToMenu}
-                variant="outline"
-                className="text-sm"
-              >
-                Voltar
-              </Button>
-              <Button 
-                onClick={handleCreateNew}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                Nova Conexão
-              </Button>
-            </div>
-          </div>
-          
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>App Key</TableHead>
-                  <TableHead>Client ID</TableHead>
-                  <TableHead>Usuário BBSIA</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {bankConnections.map((connection) => (
-                  <TableRow key={connection.id}>
-                    <TableCell className="font-medium">{connection.id}</TableCell>
-                    <TableCell>{connection.appKey.substring(0, 8)}...</TableCell>
-                    <TableCell>{connection.clientId.substring(0, 8)}...</TableCell>
-                    <TableCell>{connection.userBBsia || 'N/A'}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleEdit(connection)}
-                        >
-                          <Edit size={14} className="mr-1" /> Editar
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          className="text-red-600 border-red-200 hover:bg-red-50"
-                          onClick={() => handleDelete(connection)}
-                        >
-                          <TrashIcon size={14} className="mr-1" /> Excluir
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </div>
+        <BankConnectionsList
+          bankConnections={bankConnections}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onCreateNew={handleCreateNew}
+          onBack={handleBackToMenu}
+        />
       ) : (
-        <div className="bg-white p-6 rounded-lg shadow-sm">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-blue-800">
-              {isEditing ? 'Editar Conexão' : 'Nova Conexão'}
-            </h3>
-            <Button 
-              onClick={handleBackToMenu}
-              variant="outline"
-              className="text-sm"
-            >
-              Cancelar
-            </Button>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                App Key
-              </label>
-              <Input 
-                name="appKey"
-                value={formValues.appKey}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Client ID
-              </label>
-              <Input 
-                name="clientId"
-                value={formValues.clientId}
-                onChange={handleInputChange}
-              />
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Client Secret
-              </label>
-              <Input 
-                name="clientSecret"
-                value={formValues.clientSecret}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Registrar Token
-              </label>
-              <Input 
-                name="registrarToken"
-                value={formValues.registrarToken}
-                onChange={handleInputChange}
-              />
-            </div>
-          </div>
-          
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Basic Authentication
-            </label>
-            <Input 
-              name="basic"
-              value={formValues.basic}
-              onChange={handleInputChange}
-            />
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Usuário BBSIA
-              </label>
-              <Input 
-                name="userBBsia"
-                value={formValues.userBBsia}
-                onChange={handleInputChange}
-                placeholder="Usuário para autenticação BBSIA"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Senha BBSIA
-              </label>
-              <Input 
-                name="passwordBBsia"
-                type="password"
-                value={formValues.passwordBBsia}
-                onChange={handleInputChange}
-                placeholder="Senha para autenticação BBSIA"
-              />
-            </div>
-          </div>
-          
-          <div className="flex justify-end">
-            <Button 
-              onClick={handleSave}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              {isEditing ? 'Atualizar' : 'Salvar'}
-            </Button>
-          </div>
-        </div>
+        <BankConnectionForm
+          isEditing={isEditing}
+          formValues={formValues}
+          onInputChange={handleInputChange}
+          onSave={handleSave}
+          onCancel={handleBackToMenu}
+        />
       )}
       
       {/* Diálogo de confirmação para exclusão de conexão */}

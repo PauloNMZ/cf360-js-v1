@@ -1,3 +1,4 @@
+
 import * as React from "react"
 
 import { Toast } from "@/components/ui/toast"
@@ -5,13 +6,16 @@ import { Toast } from "@/components/ui/toast"
 const TOAST_LIMIT = 5
 const TOAST_REMOVE_DELAY = 1000000
 
-type ToasterToast = Toast & {
+type ToasterToastProps = Toast & {
   id: string
   title?: React.ReactNode
   description?: React.ReactNode
   action?: React.ReactNode
-  onDismiss?: () => void; // Add onDismiss callback
+  onDismiss?: () => void;
 }
+
+// Renamed to avoid circular reference
+type ToasterToast = ToasterToastProps;
 
 const actionTypes = {
   ADD_TOAST: "ADD_TOAST",
@@ -140,12 +144,10 @@ function dispatch(action: Action) {
   })
 }
 
-type Toast = Omit<
-  ToasterToast,
-  "id"
->
+// Renamed to fix circular reference
+type ToastProps = Omit<ToasterToast, "id">
 
-function toast({ ...props }: Toast) {
+function toast({ ...props }: ToastProps) {
   const id = genId()
 
   const update = (props: ToasterToast) =>
