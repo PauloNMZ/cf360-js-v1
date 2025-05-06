@@ -15,22 +15,49 @@ export const useFormData = ({ initialData, formMode, userEditingRef }: UseFormDa
   const [isUpdating, setIsUpdating] = useState(false);
   const [shouldSkipValidation, setShouldSkipValidation] = useState(false);
   const [lastFormMode, setLastFormMode] = useState<'view' | 'create' | 'edit'>(formMode);
+  
+  // Add a ref to track if we've already applied initial data
+  const initialDataAppliedRef = useRef(false);
+  const formModeChangeTimeRef = useRef<number>(0);
 
   // Add an effect to track form mode changes for debugging
   useEffect(() => {
     if (formMode !== lastFormMode) {
       console.log(`useFormData: formMode changed from ${lastFormMode} to ${formMode}`);
       setLastFormMode(formMode);
+      
+      // Track when the form mode changed
+      formModeChangeTimeRef.current = Date.now();
+      
+      // Reset the initialDataApplied flag when switching to create mode
+      if (formMode === 'create') {
+        initialDataAppliedRef.current = false;
+      }
     }
   }, [formMode, lastFormMode]);
 
   // Initialize form with provided data
   useEffect(() => {
+    // Skip if we've recently changed form modes (within past 500ms)
+    if (Date.now() - formModeChangeTimeRef.current < 500) {
+      console.log("Skipping initialData effect due to recent form mode change");
+      return;
+    }
+    
+    const hasInitialData = initialData && Object.keys(initialData || {}).length > 0;
+    
     console.log("useFormData: initialData effect running", { 
-      hasInitialData: Object.keys(initialData || {}).length > 0,
+      hasInitialData,
       formMode,
-      isUserEditing: userEditingRef.current
+      isUserEditing: userEditingRef.current,
+      dataAlreadyApplied: initialDataAppliedRef.current
     });
+    
+    // Prevent unnecessary re-application of the same data
+    if (hasInitialData && initialDataAppliedRef.current && formMode !== 'create') {
+      console.log("Initial data already applied, skipping");
+      return;
+    }
     
     // Skip if user is actively editing a field (prevents data reset during typing)
     if (userEditingRef && userEditingRef.current) {
@@ -38,7 +65,7 @@ export const useFormData = ({ initialData, formMode, userEditingRef }: UseFormDa
       return;
     }
     
-    if (initialData && Object.keys(initialData).length > 0) {
+    if (hasInitialData) {
       setIsUpdating(true);
       setShouldSkipValidation(true);
       
@@ -50,13 +77,14 @@ export const useFormData = ({ initialData, formMode, userEditingRef }: UseFormDa
         }));
         
         setDataLoaded(true);
+        initialDataAppliedRef.current = true;
       } finally {
         setIsUpdating(false);
         // Give a short delay before re-enabling validation
-        setTimeout(() => setShouldSkipValidation(false), 100);
+        setTimeout(() => setShouldSkipValidation(false), 200);
       }
     }
-  }, [initialData, userEditingRef]);
+  }, [initialData, userEditingRef, formMode]);
 
   // Reset form if formMode is 'create'
   useEffect(() => {
@@ -67,6 +95,7 @@ export const useFormData = ({ initialData, formMode, userEditingRef }: UseFormDa
       if (!userEditingRef.current) {
         setFormData({...emptyConvenente});
         setDataLoaded(false);
+        initialDataAppliedRef.current = false;
       } else {
         console.log("Skipping form reset as user is actively editing");
       }

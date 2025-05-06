@@ -15,8 +15,17 @@ const IndexPageContent = () => {
     handleLogoutClick,
   } = useIndexPageContext();
 
+  // Ensure we always have valid company settings
+  const defaultSettings = { 
+    logoUrl: '', 
+    companyName: 'Gerador de Pagamentos' 
+  };
+
+  // Use a safe version of company settings to prevent undefined errors
+  const safeCompanySettings = companySettings || defaultSettings;
+
   return (
-    <MainLayout companySettings={companySettings || { logoUrl: '', companyName: 'Gerador de Pagamentos' }}>
+    <MainLayout companySettings={safeCompanySettings}>
       <div className="w-full px-4 py-6">
         <NavigationMenu 
           onConvenenteClick={handleConvenenteClick}

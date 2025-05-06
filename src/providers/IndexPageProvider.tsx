@@ -22,9 +22,10 @@ export const IndexPageProvider = ({ children }: { children: ReactNode }) => {
   // Add additional state for CNAB to API modal
   const [cnabToApiModalOpen, setCnabToApiModalOpen] = React.useState(false);
   
-  // Use a ref to track modal state changes and prevent loops
+  // Use refs to track state changes and prevent loops
   const modalStateChangingRef = useRef(false);
   const saveActionInProgressRef = useRef(false);
+  const editStateChangingRef = useRef(false); // New ref to track edit state changes
   
   // Get actions from useIndexPageActions
   const indexPageActions = useIndexPageActions({
@@ -97,6 +98,31 @@ export const IndexPageProvider = ({ children }: { children: ReactNode }) => {
     indexPage.setAdminPanelOpen(true);
   };
 
+  // Improved function to handle edit mode
+  const handleEdit = () => {
+    // Prevent re-entrant calls
+    if (editStateChangingRef.current) {
+      console.log("Edit mode change already in progress, ignoring request");
+      return;
+    }
+    
+    editStateChangingRef.current = true;
+    
+    try {
+      // Only enter edit mode if we're not already in edit mode
+      // and we have a selected convenente
+      if (indexPage.formMode !== 'edit' && indexPage.currentConvenenteId) {
+        console.log("Entering edit mode for convenente:", indexPage.currentConvenenteId);
+        indexPage.setFormMode('edit');
+      }
+    } finally {
+      // Release the edit state change lock after a delay
+      setTimeout(() => {
+        editStateChangingRef.current = false;
+      }, 300);
+    }
+  };
+
   // Improved function to handle opening/closing the convenente modal
   const handleConvenenteModalOpenChange = (open: boolean) => {
     // Prevent re-entrant changes
@@ -162,9 +188,9 @@ export const IndexPageProvider = ({ children }: { children: ReactNode }) => {
       
       // Clone the form data to prevent any reference issues
       const dataToSave = {...indexPage.formData};
-      console.log("Initiating save with data:", dataToSave);
+      console.log("Iniciando salvamento com dados:", dataToSave);
       
-      // Directly call the handleSave function with the current form data
+      // Use custom action to handle save
       indexPageActions.handleSave(dataToSave);
     } finally {
       // Release the save action lock after a delay
@@ -187,6 +213,7 @@ export const IndexPageProvider = ({ children }: { children: ReactNode }) => {
     handleAdminPanelClick,
     handleConvenenteModalOpenChange,
     handleSaveClick,
+    handleEdit, // Use our improved edit handler
   };
 
   return (

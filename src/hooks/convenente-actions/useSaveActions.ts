@@ -27,6 +27,7 @@ export const useSaveActions = (
 ) => {
   const { toast } = useToast();
   const saveInProgressRef = useRef<boolean>(false);
+  const modeChangeInProgressRef = useRef<boolean>(false);
 
   const handleSave = async (formData: ConvenenteData) => {
     // Prevent re-entrancy
@@ -45,6 +46,7 @@ export const useSaveActions = (
           description: "CNPJ é obrigatório.",
           variant: "destructive",
         });
+        saveInProgressRef.current = false;
         return;
       }
       
@@ -55,13 +57,15 @@ export const useSaveActions = (
           description: "Razão Social é obrigatória.",
           variant: "destructive",
         });
+        saveInProgressRef.current = false;
         return;
       }
       
       try {
         console.log("Starting save process with data:", {
           cnpj: formData.cnpj,
-          razaoSocial: formData.razaoSocial
+          razaoSocial: formData.razaoSocial,
+          mode: currentConvenenteId ? 'update' : 'create'
         });
         
         setIsLoading(true);
@@ -107,11 +111,17 @@ export const useSaveActions = (
           }
         }
         
-        // Return to view mode - delay this to prevent race conditions
-        setTimeout(() => {
-          console.log("Form saved, returning to view mode");
-          setFormMode('view');
-        }, 300);
+        // Check if we're in the middle of a mode change
+        if (!modeChangeInProgressRef.current) {
+          modeChangeInProgressRef.current = true;
+          
+          // Return to view mode with delay to prevent race conditions
+          setTimeout(() => {
+            console.log("Form saved, returning to view mode");
+            setFormMode('view');
+            modeChangeInProgressRef.current = false;
+          }, 400);
+        }
         
       } catch (error) {
         console.error('Erro ao salvar convenente:', error);
@@ -127,7 +137,7 @@ export const useSaveActions = (
       // Release save lock after a delay
       setTimeout(() => {
         saveInProgressRef.current = false;
-      }, 500);
+      }, 800); // Increased delay to ensure full completion
     }
   };
 
