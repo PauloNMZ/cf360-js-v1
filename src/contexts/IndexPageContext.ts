@@ -1,7 +1,7 @@
 
 import { createContext } from "react";
 import { ConvenenteData } from "@/types/convenente";
-import { CompanySettings } from "@/services/companySettings";
+import { CompanySettings } from "@/types/companySettings";
 
 // Define the type for our context
 export interface IndexPageContextType {

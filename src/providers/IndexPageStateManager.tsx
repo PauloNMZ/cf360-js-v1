@@ -1,6 +1,7 @@
 
 import React, { useEffect } from "react";
 import { useAppState } from "@/hooks/useAppState";
+import { ConvenenteData } from "@/types/convenente";
 
 export const useIndexPageStateManager = ({
   modalOpen,
@@ -17,10 +18,10 @@ export const useIndexPageStateManager = ({
   importModalOpen: boolean;
   cnabToApiModalOpen: boolean;
   adminPanelOpen: boolean;
-  setFormData: any;
-  setFormMode: any;
-  setFormValid: any;
-  setCurrentConvenenteId: any;
+  setFormData: (data: ConvenenteData) => void;
+  setFormMode: (mode: 'view' | 'create' | 'edit') => void;
+  setFormValid: (valid: boolean) => void;
+  setCurrentConvenenteId: (id: string | null) => void;
   loadConvenenteData: (isOpen: boolean) => void;
 }) => {
   const { loadAppState, saveAppState } = useAppState();
