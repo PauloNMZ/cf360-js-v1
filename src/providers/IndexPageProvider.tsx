@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, ReactNode, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useIndexPage } from "@/hooks/useIndexPage";

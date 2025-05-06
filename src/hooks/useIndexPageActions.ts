@@ -1,13 +1,8 @@
 
-import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { ConvenenteData, emptyConvenente } from "@/types/convenente";
-import { 
-  createConvenente, 
-  fetchConvenentes, 
-  updateConvenenteData, 
-  removeConvenente 
-} from "@/services/convenente/convenenteService";
+import { useCreateEditActions } from "./convenente-actions/useCreateEditActions";
+import { useDeleteActions } from "./convenente-actions/useDeleteActions";
+import { useSaveActions } from "./convenente-actions/useSaveActions";
+import { ConvenenteData } from "@/types/convenente";
 
 export const useIndexPageActions = (
   {
@@ -28,178 +23,37 @@ export const useIndexPageActions = (
     setIsLoading: (loading: boolean) => void;
   }
 ) => {
-  const { toast } = useToast();
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  // Use our smaller hooks
+  const createEditActions = useCreateEditActions({
+    setFormMode,
+    setFormData,
+    setFormValid,
+    currentConvenenteId,
+    setCurrentConvenenteId
+  });
 
-  const handleCreateNew = () => {
-    console.log("handleCreateNew called - STARTING CREATE FLOW");
-    
-    // First set the mode to create - this ensures the form knows it should accept new input
-    console.log("Setting formMode to 'create'");
-    setFormMode('create');
-    
-    // Short delay to ensure mode change propagates
-    setTimeout(() => {
-      // Clear any current selection AFTER mode change
-      setCurrentConvenenteId(null);
-      console.log("Current convenente ID cleared");
-      
-      // Reset form data to empty object AFTER mode change
-      const emptyData = {...emptyConvenente};
-      console.log("Setting form data to empty:", emptyData);
-      setFormData(emptyData);
-      
-      // Reset form validity
-      setFormValid(false);
-      
-      // Add a delay and log to verify the mode was set correctly
-      setTimeout(() => {
-        console.log("VERIFICATION: Form mode should now be 'create'");
-      }, 100);
-      
-      // Show toast to confirm action to user
-      toast({
-        title: "Modo de inclusão",
-        description: "Você está no modo de inclusão de um novo convenente.",
-      });
-    }, 50);
-  };
+  const deleteActions = useDeleteActions({
+    setFormMode, 
+    setFormData,
+    setConvenentes,
+    currentConvenenteId,
+    setCurrentConvenenteId,
+    setIsLoading
+  });
 
-  const handleEdit = () => {
-    if (!currentConvenenteId) {
-      toast({
-        title: "Nenhum convenente selecionado",
-        description: "Selecione um convenente da lista para editar.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    console.log("handleEdit called, setting formMode to 'edit'");
-    setFormMode('edit');
-    console.log("Form mode should now be 'edit'");
-    setFormValid(true); // Assume the existing data is valid when editing
-  };
-
-  const handleDelete = () => {
-    if (!currentConvenenteId) {
-      toast({
-        title: "Nenhum convenente selecionado",
-        description: "Selecione um convenente da lista para excluir.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    setShowDeleteDialog(true);
-  };
-
-  const confirmDelete = async () => {
-    if (currentConvenenteId) {
-      setIsLoading(true);
-      try {
-        await removeConvenente(currentConvenenteId);
-        
-        toast({
-          title: "Convenente excluído",
-          description: "O convenente foi excluído com sucesso.",
-        });
-        
-        // Update list and close dialog
-        const updatedConvenentes = await fetchConvenentes();
-        setConvenentes(updatedConvenentes);
-        setCurrentConvenenteId(null);
-        setFormData({...emptyConvenente});
-        setFormMode('view');
-      } catch (error) {
-        console.error("Erro ao excluir:", error);
-        toast({
-          title: "Erro ao excluir",
-          description: "Não foi possível excluir o convenente.",
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    
-    setShowDeleteDialog(false);
-  };
-
-  const handleSave = async (formData: ConvenenteData) => {
-    try {
-      setIsLoading(true);
-      
-      if (currentConvenenteId === null) {
-        // Save new convenente
-        const savedConvenente = await createConvenente(formData);
-        
-        toast({
-          title: "Convenente salvo",
-          description: `${formData.razaoSocial} foi cadastrado com sucesso.`,
-        });
-        
-        // Update convenente list
-        const updatedConvenentes = await fetchConvenentes();
-        setConvenentes(updatedConvenentes);
-        
-        // Optional: Select the newly created convenente
-        if (savedConvenente && savedConvenente.id) {
-          setCurrentConvenenteId(savedConvenente.id);
-        }
-      } else {
-        // Update existing convenente
-        const updatedConvenente = await updateConvenenteData(currentConvenenteId, formData);
-        
-        if (updatedConvenente) {
-          toast({
-            title: "Convenente atualizado",
-            description: `${formData.razaoSocial} foi atualizado com sucesso.`,
-          });
-          
-          // Update list
-          const updatedConvenentes = await fetchConvenentes();
-          setConvenentes(updatedConvenentes);
-        } else {
-          toast({
-            title: "Erro ao atualizar",
-            description: "Não foi possível atualizar o convenente.",
-            variant: "destructive",
-          });
-        }
-      }
-      
-      // Return to view mode - delay this slightly to prevent race conditions
-      setTimeout(() => {
-        console.log("Form saved, returning to view mode");
-        setFormMode('view');
-        
-        // Only clear form data after mode change
-        setTimeout(() => {
-          if (currentConvenenteId === null) {
-            setFormData({...emptyConvenente});
-          }
-        }, 50);
-      }, 100);
-    } catch (error) {
-      console.error('Erro ao salvar convenente:', error);
-      toast({
-        title: "Erro ao salvar",
-        description: "Ocorreu um erro ao salvar o convenente.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const saveActions = useSaveActions({
+    setFormMode,
+    setFormData,
+    setConvenentes,
+    currentConvenenteId,
+    setCurrentConvenenteId,
+    setIsLoading
+  });
 
   return {
-    showDeleteDialog,
-    setShowDeleteDialog,
-    handleCreateNew,
-    handleEdit,
-    handleDelete,
-    confirmDelete,
-    handleSave
+    // Combine all actions from the smaller hooks
+    ...createEditActions,
+    ...deleteActions,
+    ...saveActions
   };
 };
