@@ -6,8 +6,8 @@ import { useIndexPageActions } from "@/hooks/useIndexPageActions";
 import { useAppState } from "@/hooks/useAppState";
 import { emptyConvenente } from "@/types/convenente";
 
-// Create context
-export const IndexPageContext = createContext<any>(null);
+// Create context with a default value
+export const IndexPageContext = createContext<any>({});
 
 // Create provider
 export const IndexPageProvider = ({ children }: { children: ReactNode }) => {

@@ -32,27 +32,29 @@ export const useIndexPageActions = (
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const handleCreateNew = () => {
-    console.log("handleCreateNew called");
+    console.log("handleCreateNew called - STARTING CREATE FLOW");
     
-    // Reset form data to empty object FIRST
+    // Clear any current selection FIRST
+    setCurrentConvenenteId(null);
+    console.log("Current convenente ID cleared");
+    
+    // Set form mode to create AFTER resetting data
+    // This is critical to ensure the form renders with the right mode
+    console.log("Setting formMode to 'create'");
+    setFormMode('create');
+    
+    // Reset form data to empty object AFTER mode change
+    // This ensures the mode is already 'create' when data is set
     const emptyData = {...emptyConvenente};
     console.log("Setting form data to empty:", emptyData);
     setFormData(emptyData);
-    
-    // Clear any current selection
-    setCurrentConvenenteId(null);
-    
-    // IMPORTANT: Set form mode to create AFTER resetting data
-    // This ensures the form is in create mode when it renders with the empty data
-    console.log("Setting formMode to 'create'");
-    setFormMode('create');
     
     // Reset form validity
     setFormValid(false);
     
     // Add a delay and log to verify the mode was set correctly
     setTimeout(() => {
-      console.log("Checking formMode after timeout: should be 'create'");
+      console.log("VERIFICATION: Form mode should now be 'create'");
     }, 100);
     
     // Show toast to confirm action to user

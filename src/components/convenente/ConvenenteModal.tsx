@@ -138,7 +138,7 @@ const ConvenenteModal = ({
                 <Button
                   onClick={handleCreateNewClick}
                   variant="outline"
-                  className={`flex items-center gap-1 ${formMode === 'create' ? 'bg-blue-100 border-blue-300' : ''}`}
+                  className={`flex items-center gap-1 ${formMode === 'create' ? 'bg-blue-100 border-blue-300 font-bold' : ''}`}
                   disabled={formMode === 'create'}
                 >
                   <Plus size={16} /> Novo
@@ -146,7 +146,7 @@ const ConvenenteModal = ({
                 <Button
                   onClick={onEdit}
                   variant="outline"
-                  className={`flex items-center gap-1 ${formMode === 'edit' ? 'bg-blue-100 border-blue-300' : ''}`}
+                  className={`flex items-center gap-1 ${formMode === 'edit' ? 'bg-blue-100 border-blue-300 font-bold' : ''}`}
                   disabled={formMode === 'edit' || !currentConvenenteId}
                 >
                   <Edit size={16} /> Editar
