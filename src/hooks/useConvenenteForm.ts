@@ -1,11 +1,12 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { ConvenenteData, emptyConvenente } from "@/types/convenente";
 import { useFormValidation } from "./convenente-form/useFormValidation";
 import { useCNPJSearch } from "./convenente-form/useCNPJSearch";
 import { usePixKeyType } from "./convenente-form/usePixKeyType";
 import { UseConvenenteFormProps, FormErrors, PixKeyType } from "./convenente-form/types";
 import { formatCNPJ } from "@/utils/formValidation";
+import { ContactInfoSectionRef } from "@/components/ConvenenteForm/ContactInfoSection";
 
 // Re-export the types
 export type { FormErrors, PixKeyType };
@@ -17,7 +18,9 @@ export const useConvenenteForm = ({
 }: UseConvenenteFormProps) => {
   const [formData, setFormData] = useState<ConvenenteData>({...emptyConvenente});
   const [dataLoaded, setDataLoaded] = useState(false);
-  
+  const [isUpdating, setIsUpdating] = useState(false);
+  const contactInfoRef = useRef<React.RefObject<ContactInfoSectionRef>>(null);
+
   const { 
     errors, 
     touched, 
@@ -38,11 +41,17 @@ export const useConvenenteForm = ({
     isLoading,
     handleCNPJSearch,
     handleCNPJChange
-  } = useCNPJSearch(formData, setFormData, setDataLoaded, setTouched);
+  } = useCNPJSearch(formData, setFormData, setDataLoaded, setTouched, contactInfoRef.current);
+
+  // Function to store the ContactInfoSection ref
+  const setContactInfoRef = useCallback((ref: React.RefObject<ContactInfoSectionRef>) => {
+    contactInfoRef.current = ref;
+  }, []);
 
   // Initialize form with provided data
   useEffect(() => {
     if (initialData && Object.keys(initialData).length > 0) {
+      setIsUpdating(true);
       setFormData(prev => ({
         ...prev,
         ...initialData
@@ -62,8 +71,9 @@ export const useConvenenteForm = ({
       }
 
       setDataLoaded(true);
+      setIsUpdating(false);
     }
-  }, [initialData, setTouched]);
+  }, [initialData, setTouched, setCnpjInput]);
 
   // Reset form if formMode is 'create'
   useEffect(() => {
@@ -73,21 +83,25 @@ export const useConvenenteForm = ({
       setDataLoaded(false);
       setCnpjInput('');
     }
-  }, [formMode]);
+  }, [formMode, setCnpjInput]);
 
   // Validate fields and notify parent component
   useEffect(() => {
+    // Skip validation during updates to prevent loops
+    if (isUpdating) return;
+    
     validateForm(formData);
     
     if (onFormDataChange && (dataLoaded || Object.keys(touched).length > 0)) {
       onFormDataChange(formData);
     }
-  }, [formData, dataLoaded, onFormDataChange, validateForm, touched]);
+  }, [formData, dataLoaded, onFormDataChange, validateForm, touched, isUpdating]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     markFieldAsTouched(name);
     
+    setIsUpdating(true);
     // Apply specific formatting depending on the field
     if (name === 'fone' || name === 'celular') {
       setFormData(prev => ({
@@ -100,6 +114,7 @@ export const useConvenenteForm = ({
         [name]: value
       }));
     }
+    setIsUpdating(false);
     
     // Debug log
     console.log(`Campo ${name} alterado para: ${value}`);
@@ -141,6 +156,7 @@ export const useConvenenteForm = ({
     handleInputChange,
     handleBlur,
     handlePixKeyTypeChange,
-    getPixKeyPlaceholder
+    getPixKeyPlaceholder,
+    setContactInfoRef
   };
 };

@@ -24,17 +24,18 @@ const CNPJSearchField = ({
   error,
   disabled = false
 }: CNPJSearchFieldProps) => {
-  // Prevent form submission when clicking the button
+  // Stop propagation and prevent default on button click
   const onSearchClick = (e: React.MouseEvent) => {
-    e.preventDefault(); 
+    e.preventDefault();
     e.stopPropagation();
     handleCNPJSearch();
   };
 
-  // Prevent search on Enter key in the input
+  // Handle keyboard events in the input
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault();
+      e.stopPropagation();
       handleCNPJSearch();
     }
   };

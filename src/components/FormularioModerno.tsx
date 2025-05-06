@@ -1,10 +1,10 @@
 
-import React from "react";
+import React, { useRef } from "react";
 import { useConvenenteForm } from "@/hooks/useConvenenteForm";
 import { ConvenenteData } from "@/types/convenente";
 import FormHeader from "./ConvenenteForm/FormHeader";
 import CompanyInfoSection from "./ConvenenteForm/CompanyInfoSection";
-import ContactInfoSection from "./ConvenenteForm/ContactInfoSection";
+import ContactInfoSection, { ContactInfoSectionRef } from "./ConvenenteForm/ContactInfoSection";
 import BankInfoSection from "./ConvenenteForm/BankInfoSection";
 import FormFooter from "./ConvenenteForm/FormFooter";
 
@@ -15,6 +15,8 @@ type FormularioModernoProps = {
 };
 
 const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: FormularioModernoProps) => {
+  const contactInfoRef = useRef<ContactInfoSectionRef>(null);
+
   const {
     cnpjInput,
     formData,
@@ -26,8 +28,18 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
     handleInputChange,
     handleBlur,
     handlePixKeyTypeChange,
-    getPixKeyPlaceholder
-  } = useConvenenteForm({ onFormDataChange, formMode, initialData });
+    getPixKeyPlaceholder,
+    setContactInfoRef
+  } = useConvenenteForm({ 
+    onFormDataChange, 
+    formMode, 
+    initialData,
+  });
+
+  // Pass the ref to the hook so it can be used for focus management
+  React.useEffect(() => {
+    setContactInfoRef(contactInfoRef);
+  }, [setContactInfoRef]);
 
   return (
     <div className="bg-white p-6 rounded-lg dark:bg-background dark:text-foreground">
@@ -48,6 +60,7 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
       
       {/* Informações de Contato */}
       <ContactInfoSection 
+        ref={contactInfoRef}
         formData={formData}
         errors={errors}
         handleInputChange={handleInputChange}

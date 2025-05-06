@@ -72,18 +72,6 @@ export const useCNPJQuery = ({ onSuccess, onError }: UseCNPJQueryProps = {}) => 
       
       if (onSuccess) {
         onSuccess(responseData);
-        
-        // Set focus to the celular field with a short delay to ensure DOM is updated
-        // And use a more specific selector
-        setTimeout(() => {
-          const celularInput = document.querySelector('input[name="celular"]') as HTMLInputElement;
-          if (celularInput) {
-            console.log("Setting focus to celular field");
-            celularInput.focus();
-          } else {
-            console.log("Celular input field not found");
-          }
-        }, 300);
       }
       
       return { success: true, data: responseData };

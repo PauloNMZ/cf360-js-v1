@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import { Input } from "@/components/ui/input";
 import { FormError } from "@/components/ui/form-error";
 import { ConvenenteData } from "@/types/convenente";
@@ -12,14 +12,28 @@ type ContactInfoSectionProps = {
   formMode: 'view' | 'create' | 'edit';
 };
 
-const ContactInfoSection = ({
+export interface ContactInfoSectionRef {
+  focusCelularField: () => void;
+}
+
+const ContactInfoSection = forwardRef<ContactInfoSectionRef, ContactInfoSectionProps>(({
   formData,
   errors,
   handleInputChange,
   handleBlur,
   formMode
-}: ContactInfoSectionProps) => {
+}, ref) => {
   const isViewOnly = formMode === 'view';
+  const celularInputRef = useRef<HTMLInputElement>(null);
+
+  // Expose methods through the ref
+  useImperativeHandle(ref, () => ({
+    focusCelularField: () => {
+      if (celularInputRef.current) {
+        celularInputRef.current.focus();
+      }
+    }
+  }));
 
   return (
     <div className="mb-8">
@@ -83,6 +97,7 @@ const ContactInfoSection = ({
             </label>
             <div className="flex flex-col">
               <Input 
+                ref={celularInputRef} 
                 placeholder="(00) 00000-0000" 
                 className={`border-blue-200 focus:border-blue-500 bg-blue-50 dark:bg-blue-950 dark:border-blue-800 ${errors.celular ? 'border-red-500' : ''}`}
                 name="celular"
@@ -121,6 +136,8 @@ const ContactInfoSection = ({
       </div>
     </div>
   );
-};
+});
+
+ContactInfoSection.displayName = 'ContactInfoSection';
 
 export default ContactInfoSection;

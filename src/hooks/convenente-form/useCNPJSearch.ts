@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useCNPJQuery } from "@/hooks/useCNPJQuery";
 import { formatCNPJ } from "@/utils/formValidation";
@@ -9,12 +9,13 @@ export const useCNPJSearch = (
   formData: ConvenenteData,
   setFormData: React.Dispatch<React.SetStateAction<ConvenenteData>>,
   setDataLoaded: React.Dispatch<React.SetStateAction<boolean>>,
-  setTouched: React.Dispatch<React.SetStateAction<Record<string, boolean>>>
+  setTouched: React.Dispatch<React.SetStateAction<Record<string, boolean>>>,
+  contactRef: React.RefObject<any>
 ) => {
   const { toast } = useToast();
   const [cnpjInput, setCnpjInput] = useState("");
   const [isSearchPending, setIsSearchPending] = useState(false);
-
+  
   const { fetchCNPJ, isLoading } = useCNPJQuery({
     onSuccess: (data) => {
       // Make sure a valid business name was received
@@ -24,6 +25,7 @@ export const useCNPJSearch = (
           description: "A consulta não retornou uma razão social válida.",
           variant: "destructive",
         });
+        setIsSearchPending(false);
         return;
       }
       
@@ -65,6 +67,14 @@ export const useCNPJSearch = (
         description: `CNPJ ${data.cnpj} carregado com sucesso.`,
       });
       
+      // Focus the celular field using the ref after a short delay
+      setTimeout(() => {
+        if (contactRef.current) {
+          contactRef.current.focusCelularField();
+          console.log("Focus set to celular field via ref");
+        }
+      }, 100);
+      
       setIsSearchPending(false);
     },
     onError: (error) => {
@@ -77,7 +87,8 @@ export const useCNPJSearch = (
     }
   });
 
-  const handleCNPJSearch = () => {
+  // Debounced search function to prevent multiple rapid calls
+  const handleCNPJSearch = useCallback(() => {
     // Don't allow multiple searches to be triggered
     if (isLoading || isSearchPending) {
       console.log("Search already in progress, ignoring request");
@@ -100,8 +111,9 @@ export const useCNPJSearch = (
     // Set a flag to prevent repeated searches
     setIsSearchPending(true);
     console.log("Initiating CNPJ search for:", cnpjClean);
+    
     fetchCNPJ(cnpjClean);
-  };
+  }, [cnpjInput, isLoading, isSearchPending, toast, fetchCNPJ]);
 
   const handleCNPJChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
