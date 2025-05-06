@@ -121,7 +121,7 @@ export const useCNPJSearch = (
       variant: "destructive",
     });
     setSearchPending(false);
-    lastSearchRef.current = ""; // Reset last search on error
+    // No longer using lastSearchRef directly - it's managed inside useDebounceSearch
     processingDataRef.current = false;
   };
   
