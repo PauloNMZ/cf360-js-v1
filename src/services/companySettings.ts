@@ -1,13 +1,10 @@
 
-interface CompanySettings {
-  logoUrl: string;
-  companyName: string;
-}
+import { CompanySettings } from "@/types/companySettings";
 
 const COMPANY_SETTINGS_KEY = 'gerapag_company_settings';
 
 // Default company settings
-const DEFAULT_SETTINGS: CompanySettings = { 
+export const DEFAULT_SETTINGS: CompanySettings = { 
   logoUrl: '', 
   companyName: 'Gerador de Pagamentos' 
 };

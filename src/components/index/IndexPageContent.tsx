@@ -7,6 +7,7 @@ import { IndexPageModals } from "./IndexPageModals";
 import { Shield } from "lucide-react";
 import { hasCredentials } from "@/services/convenente/credenciaisService";
 import { ConvenenteData } from "@/types/convenente";
+import { DEFAULT_SETTINGS } from "@/services/companySettings";
 
 const IndexPageContent = () => {
   const {
@@ -42,14 +43,8 @@ const IndexPageContent = () => {
     }
   }, [convenentes]);
 
-  // Ensure we always have valid company settings
-  const defaultSettings = { 
-    logoUrl: '', 
-    companyName: 'Gerador de Pagamentos' 
-  };
-
   // Use a safe version of company settings to prevent undefined errors
-  const safeCompanySettings = companySettings || defaultSettings;
+  const safeCompanySettings = companySettings || DEFAULT_SETTINGS;
 
   // Contagem de convenentes com credenciais
   const credentialsCount = Object.values(convenentesWithCredentials).filter(Boolean).length;
