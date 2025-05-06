@@ -27,11 +27,23 @@ export const useSaveActions = (
   const { toast } = useToast();
 
   const handleSave = async (formData: ConvenenteData) => {
+    // Validação mínima antes de salvar
+    if (!formData.razaoSocial || !formData.cnpj) {
+      toast({
+        title: "Dados incompletos",
+        description: "CNPJ e Razão Social são obrigatórios.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     try {
+      console.log("Iniciando processo de salvamento:", formData);
       setIsLoading(true);
       
       if (currentConvenenteId === null) {
         // Save new convenente
+        console.log("Criando novo convenente:", formData);
         const savedConvenente = await createConvenente(formData);
         
         toast({
@@ -49,6 +61,7 @@ export const useSaveActions = (
         }
       } else {
         // Update existing convenente
+        console.log("Atualizando convenente existente:", currentConvenenteId, formData);
         const updatedConvenente = await updateConvenenteData(currentConvenenteId, formData);
         
         if (updatedConvenente) {

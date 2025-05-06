@@ -38,8 +38,8 @@ export const useCreateEditActions = (
       console.log("Setting form data to empty:", emptyData);
       setFormData(emptyData);
       
-      // Reset form validity
-      setFormValid(false);
+      // Reset form validity - in create mode, we'll validate as they type
+      setFormValid(true);
       
       // Add a delay and log to verify the mode was set correctly
       setTimeout(() => {

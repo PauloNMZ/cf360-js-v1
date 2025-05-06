@@ -55,6 +55,12 @@ const ConvenenteModal = ({
   useEffect(() => {
     console.log("ConvenenteModal - formMode changed to:", formMode);
   }, [formMode]);
+
+  // Add debug logging for form validation status
+  useEffect(() => {
+    console.log("Form valid status:", formValid);
+    console.log("Form data:", formData);
+  }, [formValid, formData]);
   
   // Handle create new click with improved debugging
   const handleCreateNewClick = (e: React.MouseEvent) => {
@@ -67,6 +73,32 @@ const ConvenenteModal = ({
     setTimeout(() => {
       console.log("Verifying form mode after Create New clicked...");
     }, 100);
+  };
+
+  // Handle save click with debugging
+  const handleSaveClick = () => {
+    console.log("Save button clicked, current mode:", formMode);
+    console.log("Form data at save:", formData);
+    console.log("Form valid:", formValid);
+    
+    // Always call onSave for create mode regardless of formValid
+    if (formMode === 'create' && (formData.razaoSocial || formData.cnpj)) {
+      console.log("Saving in create mode with data:", formData);
+      onSave();
+    } else if (formMode === 'edit' && formValid) {
+      console.log("Saving in edit mode with data:", formData);
+      onSave();
+    } else {
+      console.log("Save not proceeding. Mode:", formMode, "Valid:", formValid);
+      
+      if (!formData.razaoSocial) {
+        console.log("Missing required field: razaoSocial");
+      }
+      
+      if (!formData.cnpj) {
+        console.log("Missing required field: cnpj");
+      }
+    }
   };
 
   return (
@@ -162,12 +194,13 @@ const ConvenenteModal = ({
               </div>
               {(formMode === 'create' || formMode === 'edit') && (
                 <Button
-                  onClick={onSave}
+                  onClick={handleSaveClick}
                   variant="default"
                   className="flex items-center gap-1 bg-green-600 hover:bg-green-700"
-                  disabled={!formValid}
+                  disabled={formMode === 'edit' && !formValid}
                 >
                   <Save size={16} /> Salvar
+                  {isLoading && <Loader2 className="ml-2 animate-spin" size={16} />}
                 </Button>
               )}
             </div>
