@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useIndexPage } from "@/hooks/useIndexPage";
@@ -148,7 +149,7 @@ const Index = () => {
         isSearching={isSearching}
         searchTerm={searchTerm}
         onSearchChange={handleSearchChange}
-        onSelectConvenente={handleSelectConvenente}
+        onSelectConvenente={(convenente) => handleSelectConvenente(convenente, formMode)}
         onCreateNew={handleCreateNew}
         onEdit={handleEdit}
         onDelete={handleDelete}
