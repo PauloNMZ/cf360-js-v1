@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import NavigationMenu from "@/components/navigation/NavigationMenu";
-import { useIndexPageContext } from "@/providers/IndexPageProvider";
+import { useIndexPageContext } from "@/hooks/useIndexPageContext";
 import { IndexPageModals } from "./IndexPageModals";
 import { Shield } from "lucide-react";
 import { hasCredentials } from "@/services/convenente/credenciaisService";

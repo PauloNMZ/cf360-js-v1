@@ -5,7 +5,7 @@ import DeleteConvenenteDialog from "@/components/convenente/DeleteConvenenteDial
 import ImportacaoModal from "@/components/importacao/ImportacaoModal";
 import CNABToAPIModal from "@/components/cnabToApi/CNABToAPIModal";
 import AdminPanelModal from "@/components/admin/AdminPanelModal";
-import { useIndexPageContext } from "@/providers/IndexPageProvider";
+import { useIndexPageContext } from "@/hooks/useIndexPageContext";
 import { emptyConvenente } from "@/types/convenente";
 
 export const IndexPageModals = () => {
