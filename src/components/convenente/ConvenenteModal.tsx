@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,7 @@ type ConvenenteModalProps = {
   formMode: 'view' | 'create' | 'edit';
   formValid: boolean;
   isLoading: boolean;
-  isSearching?: boolean; // New prop for search loading state
+  isSearching?: boolean;
   searchTerm: string;
   onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSelectConvenente: (convenente: ConvenenteData & { id: string }) => void;
@@ -40,7 +40,7 @@ const ConvenenteModal = ({
   formMode,
   formValid,
   isLoading,
-  isSearching = false, // Default to false for backward compatibility
+  isSearching = false,
   searchTerm,
   onSearchChange,
   onSelectConvenente,
@@ -50,6 +50,18 @@ const ConvenenteModal = ({
   onSave,
   onFormDataChange,
 }: ConvenenteModalProps) => {
+  
+  // Add debug logging for formMode changes
+  useEffect(() => {
+    console.log("ConvenenteModal - formMode changed to:", formMode);
+  }, [formMode]);
+  
+  // Handle create new click with improved debugging
+  const handleCreateNewClick = () => {
+    console.log("Create New button clicked in ConvenenteModal");
+    onCreateNew();
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-6xl">
@@ -117,7 +129,7 @@ const ConvenenteModal = ({
             <div className="flex justify-between mb-4">
               <div className="flex space-x-2">
                 <Button
-                  onClick={onCreateNew}
+                  onClick={handleCreateNewClick}
                   variant="outline"
                   className="flex items-center gap-1"
                   disabled={formMode === 'create'}
@@ -155,6 +167,9 @@ const ConvenenteModal = ({
             
             <ScrollArea className="h-[500px] pr-4">
               <div className="py-4">
+                <div className="bg-blue-50 mb-2 p-2 rounded text-sm">
+                  <strong>Modo atual:</strong> {formMode} (Editable: {formMode !== 'view' ? 'Sim' : 'Não'})
+                </div>
                 <FormularioModerno 
                   onFormDataChange={onFormDataChange} 
                   formMode={formMode}

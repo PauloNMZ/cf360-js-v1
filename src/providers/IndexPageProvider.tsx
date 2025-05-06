@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, ReactNode } from "react";
+import React, { createContext, useContext, ReactNode, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useIndexPage } from "@/hooks/useIndexPage";
 import { useIndexPageActions } from "@/hooks/useIndexPageActions";
@@ -30,6 +30,11 @@ export const IndexPageProvider = ({ children }: { children: ReactNode }) => {
     setCurrentConvenenteId: indexPage.setCurrentConvenenteId,
     setIsLoading: indexPage.setIsLoading
   });
+
+  // Debug mode changes
+  useEffect(() => {
+    console.log("IndexPageProvider - formMode changed to:", indexPage.formMode);
+  }, [indexPage.formMode]);
   
   // Load saved app state when component mounts
   React.useEffect(() => {
@@ -97,10 +102,13 @@ export const IndexPageProvider = ({ children }: { children: ReactNode }) => {
     
     // Reset form data when closing the modal
     if (!open) {
+      console.log("Modal closing - resetting form to view mode");
       indexPage.setFormData({...emptyConvenente});
       indexPage.setCurrentConvenenteId(null);
       indexPage.setFormMode('view');
       indexPage.setFormValid(false);
+    } else {
+      console.log("Modal opening - initializing in view mode");
     }
   };
 

@@ -1,5 +1,5 @@
 
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import { useConvenenteForm } from "@/hooks/useConvenenteForm";
 import { ConvenenteData } from "@/types/convenente";
 import FormHeader from "./ConvenenteForm/FormHeader";
@@ -19,6 +19,11 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
   const contactInfoRef = useRef<ContactInfoSectionRef>(null);
   
   console.log("FormularioModerno render - mode:", formMode, "initialData:", initialData);
+  
+  // Add effect to log whenever formMode changes
+  useEffect(() => {
+    console.log("FormularioModerno formMode changed to:", formMode);
+  }, [formMode]);
 
   const {
     cnpjInput,
@@ -36,7 +41,7 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
     onFormDataChange, 
     formMode, 
     initialData,
-    contactInfoRef, // Pass the ref directly to the hook
+    contactInfoRef,
   });
   
   console.log("Current form state:", { 

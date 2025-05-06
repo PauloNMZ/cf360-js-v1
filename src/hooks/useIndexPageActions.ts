@@ -32,10 +32,28 @@ export const useIndexPageActions = (
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const handleCreateNew = () => {
-    setFormMode('create');
-    setFormValid(false); // Reset form validity when creating new
+    console.log("handleCreateNew called, setting formMode to 'create'");
+    
+    // First clear any current selection
     setCurrentConvenenteId(null);
-    setFormData({...emptyConvenente});
+    
+    // Reset form data to empty object
+    const emptyData = {...emptyConvenente};
+    console.log("Setting form data to empty:", emptyData);
+    setFormData(emptyData);
+    
+    // Set form mode to create AFTER resetting data
+    setFormMode('create');
+    console.log("Form mode should now be 'create'");
+    
+    // Reset form validity
+    setFormValid(false);
+    
+    // Show toast to confirm action to user
+    toast({
+      title: "Modo de inclusão",
+      description: "Você está no modo de inclusão de um novo convenente.",
+    });
   };
 
   const handleEdit = () => {
@@ -48,7 +66,9 @@ export const useIndexPageActions = (
       return;
     }
     
+    console.log("handleEdit called, setting formMode to 'edit'");
     setFormMode('edit');
+    console.log("Form mode should now be 'edit'");
     setFormValid(true); // Assume the existing data is valid when editing
   };
 
