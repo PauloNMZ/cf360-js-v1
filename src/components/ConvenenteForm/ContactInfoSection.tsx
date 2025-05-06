@@ -1,5 +1,5 @@
 
-import React, { forwardRef, useImperativeHandle, useRef } from 'react';
+import React, { forwardRef, useImperativeHandle, useRef, useEffect, useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { FormError } from "@/components/ui/form-error";
 import { ConvenenteData } from "@/types/convenente";
@@ -25,24 +25,51 @@ const ContactInfoSection = forwardRef<ContactInfoSectionRef, ContactInfoSectionP
 }, ref) => {
   const isViewOnly = formMode === 'view';
   const celularInputRef = useRef<HTMLInputElement>(null);
+  const [focusAttempts, setFocusAttempts] = useState(0);
 
-  // Improved focus method with debug logging
+  // Improved focus method with retry mechanism
   const focusCelularField = () => {
     console.log("focusCelularField called, ref exists:", !!celularInputRef.current);
     
     if (celularInputRef.current) {
-      // Try focusing with a very small delay to ensure render is complete
-      setTimeout(() => {
-        if (celularInputRef.current) {
-          celularInputRef.current.focus();
-          console.log("Celular field focused successfully");
-          
-          // Select all text for easy replacement
-          celularInputRef.current.select();
-        }
-      }, 50);
+      try {
+        celularInputRef.current.focus();
+        celularInputRef.current.select();
+        console.log("Focus set successfully on first attempt");
+      } catch (e) {
+        console.log("Focus failed on first attempt, scheduling retries");
+        setFocusAttempts(prev => prev + 1);
+      }
+    } else {
+      console.log("Ref not available, scheduling retry");
+      setFocusAttempts(prev => prev + 1);
     }
   };
+
+  // Retry focus when attempts counter changes
+  useEffect(() => {
+    if (focusAttempts > 0) {
+      const timeoutId = setTimeout(() => {
+        if (celularInputRef.current) {
+          try {
+            console.log(`Focus retry attempt ${focusAttempts}`);
+            celularInputRef.current.focus();
+            celularInputRef.current.select();
+            console.log("Focus retry succeeded");
+          } catch (e) {
+            if (focusAttempts < 5) {
+              console.log("Focus retry failed, scheduling another");
+              setFocusAttempts(prev => prev + 1);
+            } else {
+              console.log("Max focus retries reached, giving up");
+            }
+          }
+        }
+      }, 200 * focusAttempts); // Increase delay with each attempt
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [focusAttempts]);
 
   // Expose methods through the ref with better implementation
   useImperativeHandle(ref, () => ({

@@ -18,72 +18,91 @@ export const useCNPJSearch = (
   const [isSearchPending, setIsSearchPending] = useState(false);
   const lastSearchRef = useRef(""); // Store last search term
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null); // For debounce
+  const processingDataRef = useRef(false); // Flag to prevent multiple data processing
   
   const { fetchCNPJ, isLoading } = useCNPJQuery({
     onSuccess: (data) => {
       console.log("CNPJ API onSuccess callback triggered");
       
-      // Make sure a valid business name was received
-      if (!data.razao_social || data.razao_social.trim() === '') {
-        toast({
-          title: "Dados incompletos",
-          description: "A consulta não retornou uma razão social válida.",
-          variant: "destructive",
-        });
-        setIsSearchPending(false);
+      // Prevent multiple processing of the same response
+      if (processingDataRef.current) {
+        console.log("Already processing CNPJ data, ignoring duplicate callback");
         return;
       }
       
-      const formattedData = {
-        cnpj: data.cnpj || "",
-        razaoSocial: data.razao_social || "",
-        endereco: data.logradouro || "",
-        numero: data.numero || "",
-        complemento: data.complemento || "",
-        uf: data.uf || "",
-        cidade: data.municipio || "",
-        contato: data.qsa && data.qsa.length > 0 ? data.qsa[0].nome_socio || "" : "",
-        fone: data.ddd_telefone_1 ? formatPhone(data.ddd_telefone_1) : "",
-        celular: data.ddd_telefone_2 ? formatPhone(data.ddd_telefone_2) : "",
-        email: data.email || "",
-        agencia: formData.agencia || "",  // Preserve fields not from API
-        conta: formData.conta || "",
-        chavePix: formData.chavePix || "",
-        convenioPag: formData.convenioPag || ""
-      };
+      // Set processing flag
+      processingDataRef.current = true;
       
-      console.log("Dados formatados da API:", formattedData);
-      
-      // Update form data
-      setFormData(formattedData);
-      setDataLoaded(true);
-      
-      // Mark fields as touched based on their values
-      setTouched({
-        cnpj: true,
-        razaoSocial: true,
-        endereco: Boolean(formattedData.endereco),
-        email: Boolean(formattedData.email),
-        fone: Boolean(formattedData.fone),
-        celular: Boolean(formattedData.celular)
-      });
-      
-      toast({
-        title: "Dados encontrados",
-        description: `CNPJ ${data.cnpj} carregado com sucesso.`,
-      });
-      
-      // Reset search pending state
-      setIsSearchPending(false);
-      
-      // Focus the celular field immediately after state updates
-      console.log("Attempting to focus celular field:", contactRef?.current);
-      setTimeout(() => {
-        if (contactRef?.current) {
-          contactRef.current.focusCelularField();
-          console.log("Focus set to celular field via ref after timeout");
+      try {
+        // Make sure a valid business name was received
+        if (!data.razao_social || data.razao_social.trim() === '') {
+          toast({
+            title: "Dados incompletos",
+            description: "A consulta não retornou uma razão social válida.",
+            variant: "destructive",
+          });
+          setIsSearchPending(false);
+          return;
         }
-      }, 100);
+        
+        const formattedData = {
+          cnpj: data.cnpj || "",
+          razaoSocial: data.razao_social || "",
+          endereco: data.logradouro || "",
+          numero: data.numero || "",
+          complemento: data.complemento || "",
+          uf: data.uf || "",
+          cidade: data.municipio || "",
+          contato: data.qsa && data.qsa.length > 0 ? data.qsa[0].nome_socio || "" : "",
+          fone: data.ddd_telefone_1 ? formatPhone(data.ddd_telefone_1) : "",
+          celular: data.ddd_telefone_2 ? formatPhone(data.ddd_telefone_2) : "",
+          email: data.email || "",
+          agencia: formData.agencia || "",  // Preserve fields not from API
+          conta: formData.conta || "",
+          chavePix: formData.chavePix || "",
+          convenioPag: formData.convenioPag || ""
+        };
+        
+        console.log("Dados formatados da API:", formattedData);
+        
+        // Update form data
+        setFormData(formattedData);
+        
+        // Mark data as loaded
+        setDataLoaded(true);
+        
+        // Reset touched state first
+        setTouched({});
+        
+        // Then mark fields as touched based on their values after a small delay
+        setTimeout(() => {
+          setTouched({
+            cnpj: true,
+            razaoSocial: Boolean(formattedData.razaoSocial)
+          });
+        }, 100);
+        
+        toast({
+          title: "Dados encontrados",
+          description: `CNPJ ${data.cnpj} carregado com sucesso.`,
+        });
+        
+        // Focus the celular field immediately after state updates
+        console.log("Attempting to focus celular field:", contactRef?.current);
+        setTimeout(() => {
+          if (contactRef?.current) {
+            contactRef.current.focusCelularField();
+            console.log("Focus set to celular field via ref after timeout");
+          }
+        }, 500);
+      } finally {
+        // Reset search pending state
+        setIsSearchPending(false);
+        // Reset processing flag after a small delay
+        setTimeout(() => {
+          processingDataRef.current = false;
+        }, 500);
+      }
     },
     onError: (error) => {
       toast({
@@ -93,6 +112,7 @@ export const useCNPJSearch = (
       });
       setIsSearchPending(false);
       lastSearchRef.current = ""; // Reset last search on error
+      processingDataRef.current = false;
     }
   });
 
@@ -104,7 +124,7 @@ export const useCNPJSearch = (
     }
     
     // Don't allow multiple searches to be triggered
-    if (isLoading || isSearchPending) {
+    if (isLoading || isSearchPending || processingDataRef.current) {
       console.log("Search already in progress, ignoring request");
       return;
     }

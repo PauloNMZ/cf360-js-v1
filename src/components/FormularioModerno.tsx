@@ -17,6 +17,8 @@ type FormularioModernoProps = {
 const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: FormularioModernoProps) => {
   // Create a direct ref to contact section
   const contactInfoRef = useRef<ContactInfoSectionRef>(null);
+  
+  console.log("FormularioModerno render - mode:", formMode, "initialData:", initialData);
 
   const {
     cnpjInput,
@@ -35,6 +37,13 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
     formMode, 
     initialData,
     contactInfoRef, // Pass the ref directly to the hook
+  });
+  
+  console.log("Current form state:", { 
+    formData,
+    errors,
+    mode: formMode,
+    loading: isLoading
   });
 
   return (

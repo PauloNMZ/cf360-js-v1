@@ -22,13 +22,16 @@ export const useConvenenteForm = ({
   const [formData, setFormData] = useState<ConvenenteData>({...emptyConvenente});
   const [dataLoaded, setDataLoaded] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [shouldSkipValidation, setShouldSkipValidation] = useState(false);
 
   const { 
     errors, 
     touched, 
     validateForm,
     markFieldAsTouched,
-    setTouched
+    setTouched,
+    resetErrors,
+    resetTouch
   } = useFormValidation();
   
   const {
@@ -49,26 +52,33 @@ export const useConvenenteForm = ({
   useEffect(() => {
     if (initialData && Object.keys(initialData).length > 0) {
       setIsUpdating(true);
-      setFormData(prev => ({
-        ...prev,
-        ...initialData
-      }));
-
-      // Ensure CNPJ input field is populated for editing
-      if (initialData.cnpj) {
-        setCnpjInput(formatCNPJ(initialData.cnpj));
-      }
+      setShouldSkipValidation(true);
       
-      // Mark fields as touched when there's initial data
-      if (initialData.razaoSocial) {
-        setTouched(prev => ({
+      try {
+        setFormData(prev => ({
           ...prev,
-          razaoSocial: true
+          ...initialData
         }));
-      }
 
-      setDataLoaded(true);
-      setIsUpdating(false);
+        // Ensure CNPJ input field is populated for editing
+        if (initialData.cnpj) {
+          setCnpjInput(formatCNPJ(initialData.cnpj));
+        }
+        
+        // Mark fields as touched when there's initial data
+        if (initialData.razaoSocial) {
+          setTouched(prev => ({
+            ...prev,
+            razaoSocial: true
+          }));
+        }
+
+        setDataLoaded(true);
+      } finally {
+        setIsUpdating(false);
+        // Give a short delay before re-enabling validation
+        setTimeout(() => setShouldSkipValidation(false), 100);
+      }
     }
   }, [initialData, setTouched, setCnpjInput]);
 
@@ -76,29 +86,33 @@ export const useConvenenteForm = ({
   useEffect(() => {
     if (formMode === 'create') {
       setFormData({...emptyConvenente});
-      setTouched({});
+      resetTouch();
+      resetErrors();
       setDataLoaded(false);
       setCnpjInput('');
     }
-  }, [formMode, setCnpjInput]);
+  }, [formMode, setCnpjInput, resetTouch, resetErrors]);
 
   // Validate fields and notify parent component
   useEffect(() => {
     // Skip validation during updates to prevent loops
-    if (isUpdating) {
-      console.log("Skipping validation during update");
+    if (isUpdating || shouldSkipValidation) {
+      console.log("Skipping validation due to update or explicit skip flag");
       return;
     }
     
-    validateForm(formData);
+    validateForm(formData, isUpdating);
     
     if (onFormDataChange && (dataLoaded || Object.keys(touched).length > 0)) {
       onFormDataChange(formData);
     }
-  }, [formData, dataLoaded, onFormDataChange, validateForm, touched, isUpdating]);
+  }, [formData, dataLoaded, onFormDataChange, validateForm, touched, isUpdating, shouldSkipValidation]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    
+    // Clear any previous error for this field as user is fixing it
+    resetErrors(name);
     markFieldAsTouched(name);
     
     setIsUpdating(true);
