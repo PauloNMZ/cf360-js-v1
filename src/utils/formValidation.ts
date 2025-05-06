@@ -16,12 +16,15 @@ export const validatePhone = (phone: string): boolean => {
   return cleaned.length >= 10 && cleaned.length <= 11;
 };
 
-// Improved CNPJ formatter that's more consistent
+// Improved CNPJ formatter with better partial formatting support
 export const formatCNPJ = (value: string): string => {
+  // Get cursor position and original length for later calculation
+  const originalLength = value.length;
+  
   // Remove non-digit characters
   const cnpjClean = value.replace(/\D/g, '');
   
-  // Apply formatting only if we have digits
+  // If no digits, return empty string
   if (cnpjClean.length === 0) return '';
   
   // Apply partial formatting based on the number of digits

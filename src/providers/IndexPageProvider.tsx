@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, ReactNode, useEffect } from "react";
+import React, { createContext, useContext, ReactNode, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useIndexPage } from "@/hooks/useIndexPage";
 import { useIndexPageActions } from "@/hooks/useIndexPageActions";
@@ -19,6 +19,9 @@ export const IndexPageProvider = ({ children }: { children: ReactNode }) => {
   
   // Add additional state for CNAB to API modal
   const [cnabToApiModalOpen, setCnabToApiModalOpen] = React.useState(false);
+  
+  // Use a ref to track modal state changes
+  const modalStateChangingRef = useRef(false);
   
   // Get actions from useIndexPageActions
   const indexPageActions = useIndexPageActions({
@@ -96,22 +99,43 @@ export const IndexPageProvider = ({ children }: { children: ReactNode }) => {
     indexPage.setAdminPanelOpen(true);
   };
 
-  // Function to handle opening/closing the convenente modal
+  // Improved function to handle opening/closing the convenente modal
   const handleConvenenteModalOpenChange = (open: boolean) => {
-    indexPage.setModalOpen(open);
+    // Prevent re-entrant changes
+    if (modalStateChangingRef.current) {
+      console.log("Modal state already changing, ignoring request");
+      return;
+    }
     
-    // Reset form data when closing the modal
-    if (!open) {
-      console.log("Modal closing - resetting form to view mode");
-      indexPage.setFormData({...emptyConvenente});
-      indexPage.setCurrentConvenenteId(null);
+    modalStateChangingRef.current = true;
+    
+    try {
+      // Update modal state
+      indexPage.setModalOpen(open);
       
-      // IMPORTANT: Set form mode last to avoid race conditions
-      console.log("Setting formMode back to 'view' on modal close");
-      indexPage.setFormMode('view');
-      indexPage.setFormValid(false);
-    } else {
-      console.log("Modal opening - initializing in view mode");
+      // Reset form data when closing the modal
+      if (!open) {
+        console.log("Modal closing - preparing to reset form");
+        
+        // IMPORTANT: Set form mode first to 'view'
+        console.log("Setting formMode back to 'view' on modal close");
+        indexPage.setFormMode('view');
+        
+        // Wait for mode change to take effect before clearing data
+        setTimeout(() => {
+          console.log("Resetting form data after form mode change");
+          indexPage.setFormData({...emptyConvenente});
+          indexPage.setCurrentConvenenteId(null);
+          indexPage.setFormValid(false);
+        }, 100);
+      } else {
+        console.log("Modal opening - initializing in view mode");
+      }
+    } finally {
+      // Release state change lock after a delay to prevent race conditions
+      setTimeout(() => {
+        modalStateChangingRef.current = false;
+      }, 200);
     }
   };
 

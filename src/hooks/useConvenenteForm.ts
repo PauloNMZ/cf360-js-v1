@@ -23,6 +23,7 @@ export const useConvenenteForm = ({
   const [dataLoaded, setDataLoaded] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [shouldSkipValidation, setShouldSkipValidation] = useState(false);
+  const [lastFormMode, setLastFormMode] = useState<'view' | 'create' | 'edit'>(formMode);
 
   const { 
     errors, 
@@ -45,23 +46,40 @@ export const useConvenenteForm = ({
     setCnpjInput,
     isLoading,
     handleCNPJSearch,
-    handleCNPJChange
+    handleCNPJChange,
+    userEditingRef
   } = useCNPJSearch(formData, setFormData, setDataLoaded, setTouched, contactInfoRef);
+
+  // Add an effect to track form mode changes for debugging
+  useEffect(() => {
+    if (formMode !== lastFormMode) {
+      console.log(`useConvenenteForm: formMode changed from ${lastFormMode} to ${formMode}`);
+      setLastFormMode(formMode);
+    }
+  }, [formMode, lastFormMode]);
 
   // Debug log for formMode changes
   useEffect(() => {
-    console.log(`useConvenenteForm: formMode changed to ${formMode}`, { 
+    console.log(`useConvenenteForm: formMode effect running`, { 
       initialData, 
-      formMode 
+      formMode,
+      dataLoaded
     });
-  }, [formMode, initialData]);
+  }, [formMode, initialData, dataLoaded]);
 
   // Initialize form with provided data
   useEffect(() => {
     console.log("useConvenenteForm: initialData effect running", { 
       hasInitialData: Object.keys(initialData).length > 0,
-      formMode
+      formMode,
+      isUserEditing: userEditingRef.current
     });
+    
+    // Skip if user is actively editing a field (prevents data reset during typing)
+    if (userEditingRef && userEditingRef.current) {
+      console.log("Skipping initialData effect as user is actively editing");
+      return;
+    }
     
     if (initialData && Object.keys(initialData).length > 0) {
       setIsUpdating(true);
@@ -94,19 +112,25 @@ export const useConvenenteForm = ({
         setTimeout(() => setShouldSkipValidation(false), 100);
       }
     }
-  }, [initialData, setTouched, setCnpjInput]);
+  }, [initialData, setTouched, setCnpjInput, userEditingRef]);
 
   // Reset form if formMode is 'create'
   useEffect(() => {
-    if (formMode === 'create') {
+    if (formMode === 'create' && lastFormMode !== 'create') {
       console.log("useConvenenteForm: Resetting form for create mode");
-      setFormData({...emptyConvenente});
-      resetTouch();
-      resetErrors();
-      setDataLoaded(false);
-      setCnpjInput('');
+      
+      // Only reset if user is not actively editing
+      if (!userEditingRef.current) {
+        setFormData({...emptyConvenente});
+        resetTouch();
+        resetErrors();
+        setDataLoaded(false);
+        setCnpjInput('');
+      } else {
+        console.log("Skipping form reset as user is actively editing");
+      }
     }
-  }, [formMode, setCnpjInput, resetTouch, resetErrors]);
+  }, [formMode, lastFormMode, setCnpjInput, resetTouch, resetErrors, userEditingRef]);
 
   // Validate fields and notify parent component
   useEffect(() => {
@@ -119,9 +143,14 @@ export const useConvenenteForm = ({
     validateForm(formData, isUpdating);
     
     if (onFormDataChange && (dataLoaded || Object.keys(touched).length > 0)) {
+      console.log("Calling onFormDataChange with current data:", {
+        cnpj: formData.cnpj,
+        razaoSocial: formData.razaoSocial,
+        mode: formMode
+      });
       onFormDataChange(formData);
     }
-  }, [formData, dataLoaded, onFormDataChange, validateForm, touched, isUpdating, shouldSkipValidation]);
+  }, [formData, dataLoaded, onFormDataChange, validateForm, touched, isUpdating, shouldSkipValidation, formMode]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

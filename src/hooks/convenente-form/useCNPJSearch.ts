@@ -19,6 +19,7 @@ export const useCNPJSearch = (
   const lastSearchRef = useRef(""); // Store last search term
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null); // For debounce
   const processingDataRef = useRef(false); // Flag to prevent multiple data processing
+  const userEditingRef = useRef(false); // Track if user is actively editing
   
   const { fetchCNPJ, isLoading } = useCNPJQuery({
     onSuccess: (data) => {
@@ -67,6 +68,11 @@ export const useCNPJSearch = (
         
         // Update form data
         setFormData(formattedData);
+        
+        // Set the formatted CNPJ in the input field
+        if (data.cnpj) {
+          setCnpjInput(formatCNPJ(data.cnpj));
+        }
         
         // Mark data as loaded
         setDataLoaded(true);
@@ -161,44 +167,73 @@ export const useCNPJSearch = (
     
   }, [cnpjInput, isLoading, isSearchPending, toast, fetchCNPJ]);
 
-  // Improved CNPJ input handling with cursor position preservation
+  // Completely reimplemented CNPJ input handling with better cursor position preservation
   const handleCNPJChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Track that user is editing
+    userEditingRef.current = true;
+    
     const input = e.target;
     const value = input.value;
     const selectionStart = input.selectionStart || 0;
-    const selectionEnd = input.selectionEnd || 0;
     
-    // Count special characters before the cursor
+    console.log(`CNPJ Input change: value=${value}, cursor at ${selectionStart}`);
+    
+    // Count digits before cursor position
     const valueBeforeCursor = value.substring(0, selectionStart);
-    const specialCharsBeforeCursor = (valueBeforeCursor.match(/[^\d]/g) || []).length;
+    const digitsBeforeCursor = (valueBeforeCursor.replace(/\D/g, '')).length;
     
     // Format the CNPJ
     const formattedValue = formatCNPJ(value);
+    
+    // Log the transformation
+    console.log(`CNPJ formatting: "${value}" -> "${formattedValue}"`);
     
     // Update the display value
     setCnpjInput(formattedValue);
     
     // Update the underlying form data with only digits
-    setFormData(prev => ({
-      ...prev,
-      cnpj: formattedValue.replace(/\D/g, '')
-    }));
+    setFormData(prev => {
+      const cnpjDigits = formattedValue.replace(/\D/g, '');
+      console.log(`Setting CNPJ in formData: ${cnpjDigits}`);
+      return {
+        ...prev,
+        cnpj: cnpjDigits
+      };
+    });
     
-    // Calculate new cursor position
+    // Calculate new cursor position by counting to same digit position
     setTimeout(() => {
-      if (input) {
-        // Count special chars in the formatted value up to where the cursor would be
-        const formattedBeforeCursor = formattedValue.substring(0, selectionStart);
-        const newSpecialCharsBeforeCursor = (formattedBeforeCursor.match(/[^\d]/g) || []).length;
+      if (input && input === document.activeElement) {
+        // Get the formatted value freshly from the input
+        const currentFormatted = input.value;
         
-        // Adjust cursor position based on added/removed special characters
-        const specialCharDiff = newSpecialCharsBeforeCursor - specialCharsBeforeCursor;
-        const newPosition = selectionStart + specialCharDiff;
+        // Find the position after the Nth digit
+        let digitCount = 0;
+        let newPosition = 0;
+        
+        for (let i = 0; i < currentFormatted.length && digitCount <= digitsBeforeCursor; i++) {
+          if (/\d/.test(currentFormatted[i])) {
+            digitCount++;
+          }
+          if (digitCount <= digitsBeforeCursor) {
+            newPosition = i + 1;
+          }
+        }
         
         // Set cursor position, ensuring it's within bounds
-        const safePosition = Math.min(Math.max(0, newPosition), formattedValue.length);
-        input.setSelectionRange(safePosition, safePosition);
+        const safePosition = Math.min(Math.max(0, newPosition), currentFormatted.length);
+        console.log(`Adjusting cursor: digits before=${digitsBeforeCursor}, new position=${safePosition}`);
+        
+        // Only set if the element is still focused
+        if (document.activeElement === input) {
+          input.setSelectionRange(safePosition, safePosition);
+        }
       }
+      
+      // Reset editing flag after a short delay
+      setTimeout(() => {
+        userEditingRef.current = false;
+      }, 100);
     }, 0);
   };
 
@@ -207,7 +242,8 @@ export const useCNPJSearch = (
     setCnpjInput,
     isLoading,
     handleCNPJSearch,
-    handleCNPJChange
+    handleCNPJChange,
+    userEditingRef // Expose the ref so other components can check if user is editing
   };
 };
 

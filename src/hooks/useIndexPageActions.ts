@@ -34,34 +34,35 @@ export const useIndexPageActions = (
   const handleCreateNew = () => {
     console.log("handleCreateNew called - STARTING CREATE FLOW");
     
-    // Clear any current selection FIRST
-    setCurrentConvenenteId(null);
-    console.log("Current convenente ID cleared");
-    
-    // Set form mode to create AFTER resetting data
-    // This is critical to ensure the form renders with the right mode
+    // First set the mode to create - this ensures the form knows it should accept new input
     console.log("Setting formMode to 'create'");
     setFormMode('create');
     
-    // Reset form data to empty object AFTER mode change
-    // This ensures the mode is already 'create' when data is set
-    const emptyData = {...emptyConvenente};
-    console.log("Setting form data to empty:", emptyData);
-    setFormData(emptyData);
-    
-    // Reset form validity
-    setFormValid(false);
-    
-    // Add a delay and log to verify the mode was set correctly
+    // Short delay to ensure mode change propagates
     setTimeout(() => {
-      console.log("VERIFICATION: Form mode should now be 'create'");
-    }, 100);
-    
-    // Show toast to confirm action to user
-    toast({
-      title: "Modo de inclusão",
-      description: "Você está no modo de inclusão de um novo convenente.",
-    });
+      // Clear any current selection AFTER mode change
+      setCurrentConvenenteId(null);
+      console.log("Current convenente ID cleared");
+      
+      // Reset form data to empty object AFTER mode change
+      const emptyData = {...emptyConvenente};
+      console.log("Setting form data to empty:", emptyData);
+      setFormData(emptyData);
+      
+      // Reset form validity
+      setFormValid(false);
+      
+      // Add a delay and log to verify the mode was set correctly
+      setTimeout(() => {
+        console.log("VERIFICATION: Form mode should now be 'create'");
+      }, 100);
+      
+      // Show toast to confirm action to user
+      toast({
+        title: "Modo de inclusão",
+        description: "Você está no modo de inclusão de um novo convenente.",
+      });
+    }, 50);
   };
 
   const handleEdit = () => {
@@ -131,12 +132,21 @@ export const useIndexPageActions = (
       
       if (currentConvenenteId === null) {
         // Save new convenente
-        await createConvenente(formData);
+        const savedConvenente = await createConvenente(formData);
         
         toast({
           title: "Convenente salvo",
           description: `${formData.razaoSocial} foi cadastrado com sucesso.`,
         });
+        
+        // Update convenente list
+        const updatedConvenentes = await fetchConvenentes();
+        setConvenentes(updatedConvenentes);
+        
+        // Optional: Select the newly created convenente
+        if (savedConvenente && savedConvenente.id) {
+          setCurrentConvenenteId(savedConvenente.id);
+        }
       } else {
         // Update existing convenente
         const updatedConvenente = await updateConvenenteData(currentConvenenteId, formData);
@@ -146,6 +156,10 @@ export const useIndexPageActions = (
             title: "Convenente atualizado",
             description: `${formData.razaoSocial} foi atualizado com sucesso.`,
           });
+          
+          // Update list
+          const updatedConvenentes = await fetchConvenentes();
+          setConvenentes(updatedConvenentes);
         } else {
           toast({
             title: "Erro ao atualizar",
@@ -155,17 +169,18 @@ export const useIndexPageActions = (
         }
       }
       
-      // Update list
-      const updatedConvenentes = await fetchConvenentes();
-      setConvenentes(updatedConvenentes);
-      
-      // Limpar os campos e voltar para modo de visualização
-      setFormData({...emptyConvenente});
-      setCurrentConvenenteId(null);
-      
-      // Return to view mode
-      console.log("Form saved, returning to view mode");
-      setFormMode('view');
+      // Return to view mode - delay this slightly to prevent race conditions
+      setTimeout(() => {
+        console.log("Form saved, returning to view mode");
+        setFormMode('view');
+        
+        // Only clear form data after mode change
+        setTimeout(() => {
+          if (currentConvenenteId === null) {
+            setFormData({...emptyConvenente});
+          }
+        }, 50);
+      }, 100);
     } catch (error) {
       console.error('Erro ao salvar convenente:', error);
       toast({

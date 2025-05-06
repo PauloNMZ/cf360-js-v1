@@ -26,7 +26,7 @@ const CNPJSearchField = ({
 }: CNPJSearchFieldProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   
-  // Improved event handlers with better stopPropagation and preventDefault
+  // Enhanced event handlers with better stopPropagation and preventDefault
   const onSearchClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -39,7 +39,7 @@ const CNPJSearchField = ({
     }
   };
 
-  // Handle keyboard events in the input with better controls
+  // Handle keyboard events with improved controls
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -76,12 +76,14 @@ const CNPJSearchField = ({
             disabled={disabled}
             required
             autoComplete="off" // Prevent autocomplete interference
+            data-testid="cnpj-input" // Add test ID for easier debugging
           />
           <Button 
             onClick={onSearchClick}
             disabled={isLoading || disabled} 
             className="rounded-l-none bg-blue-600 hover:bg-blue-700"
             type="button"
+            data-testid="cnpj-search-button"
           >
             {isLoading ? (
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
