@@ -1,12 +1,17 @@
 
 import { useState } from 'react';
 import { toast } from '@/components/ui/sonner';
-import { parseCNABFile, convertCNABToJSON, sendToAPI } from '@/services/cnabToApiService';
+import { 
+  parseCNABFile, 
+  convertCNABToJSON, 
+  sendToAPI,
+  ParsedCNABData
+} from '@/services/cnabToApiService';
 
 export const useCNABToAPI = () => {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
-  const [cnabData, setCnabData] = useState<any | null>(null);
+  const [cnabData, setCnabData] = useState<ParsedCNABData | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [jsonOutput, setJsonOutput] = useState<string | null>(null);
 
