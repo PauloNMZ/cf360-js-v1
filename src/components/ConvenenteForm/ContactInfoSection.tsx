@@ -26,14 +26,28 @@ const ContactInfoSection = forwardRef<ContactInfoSectionRef, ContactInfoSectionP
   const isViewOnly = formMode === 'view';
   const celularInputRef = useRef<HTMLInputElement>(null);
 
-  // Expose methods through the ref
-  useImperativeHandle(ref, () => ({
-    focusCelularField: () => {
-      if (celularInputRef.current) {
-        celularInputRef.current.focus();
-      }
+  // Improved focus method with debug logging
+  const focusCelularField = () => {
+    console.log("focusCelularField called, ref exists:", !!celularInputRef.current);
+    
+    if (celularInputRef.current) {
+      // Try focusing with a very small delay to ensure render is complete
+      setTimeout(() => {
+        if (celularInputRef.current) {
+          celularInputRef.current.focus();
+          console.log("Celular field focused successfully");
+          
+          // Select all text for easy replacement
+          celularInputRef.current.select();
+        }
+      }, 50);
     }
-  }));
+  };
+
+  // Expose methods through the ref with better implementation
+  useImperativeHandle(ref, () => ({
+    focusCelularField
+  }), []);
 
   return (
     <div className="mb-8">

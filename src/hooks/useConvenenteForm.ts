@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ConvenenteData, emptyConvenente } from "@/types/convenente";
 import { useFormValidation } from "./convenente-form/useFormValidation";
 import { useCNPJSearch } from "./convenente-form/useCNPJSearch";
@@ -14,12 +14,14 @@ export type { FormErrors, PixKeyType };
 export const useConvenenteForm = ({ 
   onFormDataChange, 
   formMode, 
-  initialData = {} 
-}: UseConvenenteFormProps) => {
+  initialData = {},
+  contactInfoRef  // Accept the ref directly
+}: UseConvenenteFormProps & { 
+  contactInfoRef: React.RefObject<ContactInfoSectionRef> 
+}) => {
   const [formData, setFormData] = useState<ConvenenteData>({...emptyConvenente});
   const [dataLoaded, setDataLoaded] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
-  const contactInfoRef = useRef<React.RefObject<ContactInfoSectionRef>>(null);
 
   const { 
     errors, 
@@ -41,12 +43,7 @@ export const useConvenenteForm = ({
     isLoading,
     handleCNPJSearch,
     handleCNPJChange
-  } = useCNPJSearch(formData, setFormData, setDataLoaded, setTouched, contactInfoRef.current);
-
-  // Function to store the ContactInfoSection ref
-  const setContactInfoRef = useCallback((ref: React.RefObject<ContactInfoSectionRef>) => {
-    contactInfoRef.current = ref;
-  }, []);
+  } = useCNPJSearch(formData, setFormData, setDataLoaded, setTouched, contactInfoRef);
 
   // Initialize form with provided data
   useEffect(() => {
@@ -88,7 +85,10 @@ export const useConvenenteForm = ({
   // Validate fields and notify parent component
   useEffect(() => {
     // Skip validation during updates to prevent loops
-    if (isUpdating) return;
+    if (isUpdating) {
+      console.log("Skipping validation during update");
+      return;
+    }
     
     validateForm(formData);
     
@@ -156,7 +156,6 @@ export const useConvenenteForm = ({
     handleInputChange,
     handleBlur,
     handlePixKeyTypeChange,
-    getPixKeyPlaceholder,
-    setContactInfoRef
+    getPixKeyPlaceholder
   };
 };

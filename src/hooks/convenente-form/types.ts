@@ -1,5 +1,6 @@
 
 import { ConvenenteData } from "@/types/convenente";
+import { ContactInfoSectionRef } from "@/components/ConvenenteForm/ContactInfoSection";
 
 export type FormErrors = {
   cnpj?: string;

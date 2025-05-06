@@ -15,6 +15,7 @@ type FormularioModernoProps = {
 };
 
 const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: FormularioModernoProps) => {
+  // Create a direct ref to contact section
   const contactInfoRef = useRef<ContactInfoSectionRef>(null);
 
   const {
@@ -29,17 +30,12 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
     handleBlur,
     handlePixKeyTypeChange,
     getPixKeyPlaceholder,
-    setContactInfoRef
   } = useConvenenteForm({ 
     onFormDataChange, 
     formMode, 
     initialData,
+    contactInfoRef, // Pass the ref directly to the hook
   });
-
-  // Pass the ref to the hook so it can be used for focus management
-  React.useEffect(() => {
-    setContactInfoRef(contactInfoRef);
-  }, [setContactInfoRef]);
 
   return (
     <div className="bg-white p-6 rounded-lg dark:bg-background dark:text-foreground">

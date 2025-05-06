@@ -24,19 +24,29 @@ const CNPJSearchField = ({
   error,
   disabled = false
 }: CNPJSearchFieldProps) => {
-  // Stop propagation and prevent default on button click
+  // Improved event handlers with better stopPropagation and preventDefault
   const onSearchClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    handleCNPJSearch();
+    
+    if (!isLoading && !disabled) {
+      console.log("Search button clicked, triggering search");
+      handleCNPJSearch();
+    } else {
+      console.log("Search button clicked but disabled or loading");
+    }
   };
 
-  // Handle keyboard events in the input
+  // Handle keyboard events in the input with better controls
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       e.stopPropagation();
-      handleCNPJSearch();
+      
+      if (!isLoading && !disabled) {
+        console.log("Enter key pressed in CNPJ field, triggering search");
+        handleCNPJSearch();
+      }
     }
   };
 
@@ -62,6 +72,7 @@ const CNPJSearchField = ({
             name="cnpj"
             disabled={disabled}
             required
+            autoComplete="off" // Prevent autocomplete interference
           />
           <Button 
             onClick={onSearchClick}

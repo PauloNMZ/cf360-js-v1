@@ -1,23 +1,28 @@
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useCNPJQuery } from "@/hooks/useCNPJQuery";
 import { formatCNPJ } from "@/utils/formValidation";
 import { ConvenenteData } from "@/types/convenente";
+import { ContactInfoSectionRef } from "@/components/ConvenenteForm/ContactInfoSection";
 
 export const useCNPJSearch = (
   formData: ConvenenteData,
   setFormData: React.Dispatch<React.SetStateAction<ConvenenteData>>,
   setDataLoaded: React.Dispatch<React.SetStateAction<boolean>>,
   setTouched: React.Dispatch<React.SetStateAction<Record<string, boolean>>>,
-  contactRef: React.RefObject<any>
+  contactRef: React.RefObject<ContactInfoSectionRef>
 ) => {
   const { toast } = useToast();
   const [cnpjInput, setCnpjInput] = useState("");
   const [isSearchPending, setIsSearchPending] = useState(false);
+  const lastSearchRef = useRef(""); // Store last search term
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null); // For debounce
   
   const { fetchCNPJ, isLoading } = useCNPJQuery({
     onSuccess: (data) => {
+      console.log("CNPJ API onSuccess callback triggered");
+      
       // Make sure a valid business name was received
       if (!data.razao_social || data.razao_social.trim() === '') {
         toast({
@@ -49,6 +54,7 @@ export const useCNPJSearch = (
       
       console.log("Dados formatados da API:", formattedData);
       
+      // Update form data
       setFormData(formattedData);
       setDataLoaded(true);
       
@@ -67,15 +73,17 @@ export const useCNPJSearch = (
         description: `CNPJ ${data.cnpj} carregado com sucesso.`,
       });
       
-      // Focus the celular field using the ref after a short delay
+      // Reset search pending state
+      setIsSearchPending(false);
+      
+      // Focus the celular field immediately after state updates
+      console.log("Attempting to focus celular field:", contactRef?.current);
       setTimeout(() => {
-        if (contactRef.current) {
+        if (contactRef?.current) {
           contactRef.current.focusCelularField();
-          console.log("Focus set to celular field via ref");
+          console.log("Focus set to celular field via ref after timeout");
         }
       }, 100);
-      
-      setIsSearchPending(false);
     },
     onError: (error) => {
       toast({
@@ -84,11 +92,17 @@ export const useCNPJSearch = (
         variant: "destructive",
       });
       setIsSearchPending(false);
+      lastSearchRef.current = ""; // Reset last search on error
     }
   });
 
-  // Debounced search function to prevent multiple rapid calls
+  // Improved debounced search function
   const handleCNPJSearch = useCallback(() => {
+    // Clear any existing timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    
     // Don't allow multiple searches to be triggered
     if (isLoading || isSearchPending) {
       console.log("Search already in progress, ignoring request");
@@ -108,11 +122,23 @@ export const useCNPJSearch = (
       return;
     }
     
+    // Check if this CNPJ was just searched
+    if (cnpjClean === lastSearchRef.current) {
+      console.log("CNPJ was just searched, ignoring duplicate request");
+      return;
+    }
+    
     // Set a flag to prevent repeated searches
     setIsSearchPending(true);
+    lastSearchRef.current = cnpjClean;
+    
     console.log("Initiating CNPJ search for:", cnpjClean);
     
-    fetchCNPJ(cnpjClean);
+    // Add a small delay before actually triggering the search
+    searchTimeoutRef.current = setTimeout(() => {
+      fetchCNPJ(cnpjClean);
+    }, 300);
+    
   }, [cnpjInput, isLoading, isSearchPending, toast, fetchCNPJ]);
 
   const handleCNPJChange = (e: React.ChangeEvent<HTMLInputElement>) => {
