@@ -41,6 +41,7 @@ const Index = () => {
     companySettings,
     isLoading,
     setIsLoading,
+    isSearching,
     handleSearchChange,
     handleSelectConvenente,
     handleFormDataChange
@@ -129,6 +130,7 @@ const Index = () => {
         formMode={formMode}
         formValid={formValid}
         isLoading={isLoading}
+        isSearching={isSearching}
         searchTerm={searchTerm}
         onSearchChange={handleSearchChange}
         onSelectConvenente={handleSelectConvenente}

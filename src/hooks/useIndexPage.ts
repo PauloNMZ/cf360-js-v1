@@ -1,8 +1,10 @@
+
 import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { 
   getConvenentes, 
-  getConvenenteById 
+  getConvenenteById,
+  searchConvenentesByTerm
 } from "@/services/convenenteService";
 import { ConvenenteData, emptyConvenente } from "@/types/convenente";
 import { getCompanySettings } from "@/services/companySettings";
@@ -30,6 +32,7 @@ export const useIndexPage = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
 
   // Load convenentes when modal is opened only once
   useEffect(() => {
@@ -82,51 +85,43 @@ export const useIndexPage = () => {
     }
   }, [adminPanelOpen]);
 
-  // Filter convenentes when search term changes
+  // Use database search function when search term changes
   useEffect(() => {
-    if (!searchTerm.trim()) {
-      setFilteredConvenentes(convenentes);
-      return;
-    }
-    
-    const searchLower = searchTerm.toLowerCase().trim();
-    const searchCNPJ = searchTerm.replace(/\D/g, '');
-    
-    console.log("Termo de busca:", searchLower);
-    console.log("Convenentes disponíveis:", convenentes.length);
-    
-    // For debugging, let's print all available company names before filtering
-    console.log("All available companies:", convenentes.map(c => ({
-      name: String(c.razaoSocial || ''), 
-      nameLower: String(c.razaoSocial || '').toLowerCase()
-    })));
-    
-    const filtered = convenentes.filter(conv => {
-      if (!conv) return false;
-      
-      // Convert razaoSocial and cnpj to strings and ensure they're not undefined
-      // Important: keep the original value and only convert to lowercase during comparison
-      const razaoSocial = String(conv.razaoSocial || '');
-      const razaoSocialLower = razaoSocial.toLowerCase();
-      const cnpj = String(conv.cnpj || '');
-      const cnpjClean = cnpj.replace(/\D/g, '');
-      
-      // Check if company name contains search term (case insensitive)
-      const nameMatch = razaoSocialLower.includes(searchLower);
-      
-      // Check if CNPJ contains search digits
-      const cnpjMatch = cnpjClean.includes(searchCNPJ);
-      
-      console.log(`Checking: "${razaoSocial}" (${razaoSocialLower}) - Name matches: ${nameMatch}, CNPJ matches: ${cnpjMatch}`);
-      
-      return nameMatch || cnpjMatch;
-    });
-    
-    console.log("Filtered results:", filtered.length);
-    console.log("Companies found:", filtered.map(c => c.razaoSocial));
-    
-    setFilteredConvenentes(filtered);
-  }, [searchTerm, convenentes]);
+    const searchConvenentes = async () => {
+      // Minimum search length check
+      if (!searchTerm || searchTerm.trim().length < 1) {
+        // If search is cleared, reset to all convenentes
+        setFilteredConvenentes(convenentes);
+        return;
+      }
+
+      setIsSearching(true);
+      try {
+        console.log("Searching for:", searchTerm);
+        const searchResults = await searchConvenentesByTerm(searchTerm);
+        console.log("Search results:", searchResults.length);
+        setFilteredConvenentes(searchResults);
+      } catch (error) {
+        console.error("Erro na pesquisa:", error);
+        toast({
+          title: "Erro na pesquisa",
+          description: "Ocorreu um erro ao pesquisar convenentes.",
+          variant: "destructive",
+        });
+        // If search fails, fallback to all convenentes
+        setFilteredConvenentes(convenentes);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+
+    // Use a small delay to prevent excessive API calls
+    const timeoutId = setTimeout(() => {
+      searchConvenentes();
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm, convenentes, toast]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -196,6 +191,7 @@ export const useIndexPage = () => {
     companySettings,
     isLoading,
     setIsLoading,
+    isSearching,
     handleSearchChange,
     handleSelectConvenente,
     handleFormDataChange

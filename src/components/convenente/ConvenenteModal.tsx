@@ -1,10 +1,9 @@
-
 import React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { AlertCircle, Edit, Plus, Save, Search, TrashIcon } from "lucide-react";
+import { AlertCircle, Edit, Loader2, Plus, Save, Search, TrashIcon } from "lucide-react";
 import FormularioModerno from "@/components/FormularioModerno";
 import { ConvenenteData, emptyConvenente } from "@/types/convenente";
 import { formatCNPJ } from "@/utils/formValidation";
@@ -19,6 +18,7 @@ type ConvenenteModalProps = {
   formMode: 'view' | 'create' | 'edit';
   formValid: boolean;
   isLoading: boolean;
+  isSearching?: boolean; // New prop for search loading state
   searchTerm: string;
   onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSelectConvenente: (convenente: ConvenenteData & { id: string }) => void;
@@ -39,6 +39,7 @@ const ConvenenteModal = ({
   formMode,
   formValid,
   isLoading,
+  isSearching = false, // Default to false for backward compatibility
   searchTerm,
   onSearchChange,
   onSelectConvenente,
@@ -67,6 +68,9 @@ const ConvenenteModal = ({
                   value={searchTerm}
                   onChange={onSearchChange}
                 />
+                {isSearching && (
+                  <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 animate-spin text-blue-500" size={18} />
+                )}
               </div>
             </div>
             
