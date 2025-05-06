@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { ConvenenteData, emptyConvenente } from "@/types/convenente";
 import { useFormValidation } from "./convenente-form/useFormValidation";
 import { useCNPJSearch } from "./convenente-form/useCNPJSearch";
@@ -7,6 +7,8 @@ import { usePixKeyType } from "./convenente-form/usePixKeyType";
 import { UseConvenenteFormProps, FormErrors, PixKeyType } from "./convenente-form/types";
 import { formatCNPJ } from "@/utils/formValidation";
 import { ContactInfoSectionRef } from "@/components/ConvenenteForm/ContactInfoSection";
+import { useFormData } from "./convenente-form/useFormData";
+import { useInputHandlers } from "./convenente-form/useInputHandlers";
 
 // Re-export the types
 export type { FormErrors, PixKeyType };
@@ -19,12 +21,8 @@ export const useConvenenteForm = ({
 }: UseConvenenteFormProps & { 
   contactInfoRef: React.RefObject<ContactInfoSectionRef> 
 }) => {
-  const [formData, setFormData] = useState<ConvenenteData>({...emptyConvenente});
-  const [dataLoaded, setDataLoaded] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [shouldSkipValidation, setShouldSkipValidation] = useState(false);
-  const [lastFormMode, setLastFormMode] = useState<'view' | 'create' | 'edit'>(formMode);
-
+  const userEditingRef = useRef<boolean>(false);
+  
   // Setup form validation
   const { 
     errors, 
@@ -35,6 +33,26 @@ export const useConvenenteForm = ({
     resetErrors,
     resetTouch
   } = useFormValidation();
+  
+  // Use the form data hook
+  const {
+    formData,
+    setFormData,
+    dataLoaded,
+    setDataLoaded,
+    isUpdating,
+    setIsUpdating,
+    shouldSkipValidation
+  } = useFormData({ initialData, formMode, userEditingRef });
+  
+  // Use the input handlers hook
+  const { handleInputChange, handleBlur } = useInputHandlers({
+    setFormData,
+    resetErrors,
+    markFieldAsTouched,
+    setIsUpdating,
+    validateForm: () => validateForm(formData)
+  });
   
   // Setup PIX key type handling
   const {
@@ -50,94 +68,12 @@ export const useConvenenteForm = ({
     isLoading,
     handleCNPJSearch,
     handleCNPJChange,
-    userEditingRef,
-    inputRef
+    inputRef,
+    isSearchPending
   } = useCNPJSearch(formData, setFormData, setDataLoaded, setTouched, contactInfoRef);
 
-  // Add an effect to track form mode changes for debugging
-  useEffect(() => {
-    if (formMode !== lastFormMode) {
-      console.log(`useConvenenteForm: formMode changed from ${lastFormMode} to ${formMode}`);
-      setLastFormMode(formMode);
-    }
-  }, [formMode, lastFormMode]);
-
-  // Debug log for formMode changes
-  useEffect(() => {
-    console.log(`useConvenenteForm: formMode effect running`, { 
-      initialData, 
-      formMode,
-      dataLoaded
-    });
-  }, [formMode, initialData, dataLoaded]);
-
-  // Initialize form with provided data
-  useEffect(() => {
-    console.log("useConvenenteForm: initialData effect running", { 
-      hasInitialData: Object.keys(initialData).length > 0,
-      formMode,
-      isUserEditing: userEditingRef.current
-    });
-    
-    // Skip if user is actively editing a field (prevents data reset during typing)
-    if (userEditingRef && userEditingRef.current) {
-      console.log("Skipping initialData effect as user is actively editing");
-      return;
-    }
-    
-    if (initialData && Object.keys(initialData).length > 0) {
-      setIsUpdating(true);
-      setShouldSkipValidation(true);
-      
-      try {
-        console.log("Setting form data from initialData:", initialData);
-        setFormData(prev => ({
-          ...prev,
-          ...initialData
-        }));
-
-        // Ensure CNPJ input field is populated for editing
-        if (initialData.cnpj) {
-          setCnpjInput(formatCNPJ(initialData.cnpj));
-        }
-        
-        // Mark fields as touched when there's initial data
-        if (initialData.razaoSocial) {
-          setTouched(prev => ({
-            ...prev,
-            razaoSocial: true
-          }));
-        }
-
-        setDataLoaded(true);
-      } finally {
-        setIsUpdating(false);
-        // Give a short delay before re-enabling validation
-        setTimeout(() => setShouldSkipValidation(false), 100);
-      }
-    }
-  }, [initialData, setTouched, setCnpjInput, userEditingRef]);
-
-  // Reset form if formMode is 'create'
-  useEffect(() => {
-    if (formMode === 'create' && lastFormMode !== 'create') {
-      console.log("useConvenenteForm: Resetting form for create mode");
-      
-      // Only reset if user is not actively editing
-      if (!userEditingRef.current) {
-        setFormData({...emptyConvenente});
-        resetTouch();
-        resetErrors();
-        setDataLoaded(false);
-        setCnpjInput('');
-      } else {
-        console.log("Skipping form reset as user is actively editing");
-      }
-    }
-  }, [formMode, lastFormMode, setCnpjInput, resetTouch, resetErrors, userEditingRef]);
-
   // Validate fields and notify parent component
-  useEffect(() => {
+  useCallback(() => {
     // Skip validation during updates to prevent loops
     if (isUpdating || shouldSkipValidation) {
       console.log("Skipping validation due to update or explicit skip flag");
@@ -156,57 +92,6 @@ export const useConvenenteForm = ({
     }
   }, [formData, dataLoaded, onFormDataChange, validateForm, touched, isUpdating, shouldSkipValidation, formMode]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    
-    // Clear any previous error for this field as user is fixing it
-    resetErrors(name);
-    markFieldAsTouched(name);
-    
-    setIsUpdating(true);
-    // Apply specific formatting depending on the field
-    if (name === 'fone' || name === 'celular') {
-      setFormData(prev => ({
-        ...prev,
-        [name]: formatPhone(value)
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: value
-      }));
-    }
-    setIsUpdating(false);
-    
-    // Debug log
-    console.log(`Campo ${name} alterado para: ${value}`);
-  };
-
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const { name } = e.target;
-    markFieldAsTouched(name);
-    validateForm(formData);
-  };
-
-  // Helper function to avoid circular dependencies
-  const formatPhone = (value: string): string => {
-    const cleaned = value.replace(/\D/g, '');
-    if (cleaned.length <= 11) {
-      if (cleaned.length <= 10) {
-        return cleaned
-          .replace(/(\d{2})(\d)/, '($1) $2')
-          .replace(/(\d{4})(\d)/, '$1-$2')
-          .replace(/(-\d{4})\d+?$/, '$1');
-      } else {
-        return cleaned
-          .replace(/(\d{2})(\d)/, '($1) $2')
-          .replace(/(\d{5})(\d)/, '$1-$2')
-          .replace(/(-\d{4})\d+?$/, '$1');
-      }
-    }
-    return cleaned.substring(0, 11);
-  };
-
   return {
     cnpjInput,
     formData,
@@ -219,6 +104,8 @@ export const useConvenenteForm = ({
     handleBlur,
     handlePixKeyTypeChange,
     getPixKeyPlaceholder,
-    inputRef
+    inputRef,
+    userEditingRef,
+    isSearchPending
   };
 };
