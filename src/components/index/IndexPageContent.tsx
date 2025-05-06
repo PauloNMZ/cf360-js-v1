@@ -16,7 +16,7 @@ const IndexPageContent = () => {
   } = useIndexPageContext();
 
   return (
-    <MainLayout companySettings={companySettings}>
+    <MainLayout companySettings={companySettings || { logoUrl: '', companyName: 'Gerador de Pagamentos' }}>
       <div className="w-full px-4 py-6">
         <NavigationMenu 
           onConvenenteClick={handleConvenenteClick}

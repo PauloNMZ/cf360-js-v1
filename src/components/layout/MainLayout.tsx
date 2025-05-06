@@ -4,16 +4,14 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { AppLogo } from "@/components/ui/AppLogo";
 import { useAuth } from "@/hooks/use-auth";
 import { getContentContainerStyle } from "@/utils/viewportUtils";
+import { CompanySettings } from "@/hooks/convenente/useCompanySettings";
 
 type MainLayoutProps = {
   children: React.ReactNode;
-  companySettings: {
-    logoUrl: string;
-    companyName: string;
-  };
+  companySettings?: CompanySettings; // Make it optional
 };
 
-const MainLayout = ({ children, companySettings }: MainLayoutProps) => {
+const MainLayout = ({ children, companySettings = { logoUrl: '', companyName: 'Gerador de Pagamentos' } }: MainLayoutProps) => {
   const { user } = useAuth();
   
   // Define header and footer heights
@@ -30,8 +28,8 @@ const MainLayout = ({ children, companySettings }: MainLayoutProps) => {
       <header className="bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-800 dark:to-blue-950 text-white py-4 px-6 shadow-md">
         <div className="w-full mx-auto flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <AppLogo size={36} customLogoUrl={companySettings.logoUrl} />
-            <h1 className="text-2xl font-bold">{companySettings.companyName}</h1>
+            <AppLogo size={36} customLogoUrl={companySettings?.logoUrl} />
+            <h1 className="text-2xl font-bold">{companySettings?.companyName}</h1>
           </div>
           <div className="flex items-center space-x-4">
             {user && (
