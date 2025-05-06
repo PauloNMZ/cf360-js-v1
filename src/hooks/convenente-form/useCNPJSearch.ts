@@ -13,6 +13,7 @@ export const useCNPJSearch = (
 ) => {
   const { toast } = useToast();
   const [cnpjInput, setCnpjInput] = useState("");
+  const [isSearchPending, setIsSearchPending] = useState(false);
 
   const { fetchCNPJ, isLoading } = useCNPJQuery({
     onSuccess: (data) => {
@@ -63,6 +64,8 @@ export const useCNPJSearch = (
         title: "Dados encontrados",
         description: `CNPJ ${data.cnpj} carregado com sucesso.`,
       });
+      
+      setIsSearchPending(false);
     },
     onError: (error) => {
       toast({
@@ -70,10 +73,17 @@ export const useCNPJSearch = (
         description: `${error}`,
         variant: "destructive",
       });
+      setIsSearchPending(false);
     }
   });
 
   const handleCNPJSearch = () => {
+    // Don't allow multiple searches to be triggered
+    if (isLoading || isSearchPending) {
+      console.log("Search already in progress, ignoring request");
+      return;
+    }
+    
     // Remove non-numeric characters
     const cnpjClean = cnpjInput.replace(/\D/g, '');
     
@@ -87,6 +97,9 @@ export const useCNPJSearch = (
       return;
     }
     
+    // Set a flag to prevent repeated searches
+    setIsSearchPending(true);
+    console.log("Initiating CNPJ search for:", cnpjClean);
     fetchCNPJ(cnpjClean);
   };
 

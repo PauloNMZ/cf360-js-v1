@@ -24,6 +24,21 @@ const CNPJSearchField = ({
   error,
   disabled = false
 }: CNPJSearchFieldProps) => {
+  // Prevent form submission when clicking the button
+  const onSearchClick = (e: React.MouseEvent) => {
+    e.preventDefault(); 
+    e.stopPropagation();
+    handleCNPJSearch();
+  };
+
+  // Prevent search on Enter key in the input
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleCNPJSearch();
+    }
+  };
+
   return (
     <div className="flex flex-col space-y-1">
       <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
@@ -42,14 +57,16 @@ const CNPJSearchField = ({
             value={cnpjInput}
             onChange={handleCNPJChange}
             onBlur={handleBlur}
+            onKeyDown={onKeyDown}
             name="cnpj"
             disabled={disabled}
             required
           />
           <Button 
-            onClick={handleCNPJSearch} 
+            onClick={onSearchClick}
             disabled={isLoading || disabled} 
             className="rounded-l-none bg-blue-600 hover:bg-blue-700"
+            type="button"
           >
             {isLoading ? (
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />

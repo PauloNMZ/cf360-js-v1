@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 export type CNPJData = {
   cnpj: string;
@@ -32,6 +32,7 @@ export const useCNPJQuery = ({ onSuccess, onError }: UseCNPJQueryProps = {}) => 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<CNPJData | null>(null);
+  const isQueryRunning = useRef(false);
 
   const cleanCNPJ = (cnpj: string): string => {
     return cnpj.replace(/\D/g, '');
@@ -40,11 +41,19 @@ export const useCNPJQuery = ({ onSuccess, onError }: UseCNPJQueryProps = {}) => 
   const fetchCNPJ = async (cnpj: string) => {
     setError(null);
     
+    // Prevent multiple simultaneous queries
+    if (isQueryRunning.current) {
+      console.log("CNPJ query is already running. Skipping duplicate request.");
+      return { success: false, error: "Query is already running" };
+    }
+    
     const cleanedCNPJ = cleanCNPJ(cnpj);
     
     setIsLoading(true);
+    isQueryRunning.current = true;
     
     try {
+      console.log("Starting CNPJ fetch:", cleanedCNPJ);
       const response = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${cleanedCNPJ}`);
       
       if (!response.ok) {
@@ -64,13 +73,17 @@ export const useCNPJQuery = ({ onSuccess, onError }: UseCNPJQueryProps = {}) => 
       if (onSuccess) {
         onSuccess(responseData);
         
-        // Set focus to the WhatsApp/celular field after successful CNPJ search
+        // Set focus to the celular field with a short delay to ensure DOM is updated
+        // And use a more specific selector
         setTimeout(() => {
           const celularInput = document.querySelector('input[name="celular"]') as HTMLInputElement;
           if (celularInput) {
+            console.log("Setting focus to celular field");
             celularInput.focus();
+          } else {
+            console.log("Celular input field not found");
           }
-        }, 100);
+        }, 300);
       }
       
       return { success: true, data: responseData };
@@ -84,6 +97,10 @@ export const useCNPJQuery = ({ onSuccess, onError }: UseCNPJQueryProps = {}) => 
       return { success: false, error: errorMessage };
     } finally {
       setIsLoading(false);
+      // Reset the query flag with a small delay to prevent immediate re-triggering
+      setTimeout(() => {
+        isQueryRunning.current = false;
+      }, 500);
     }
   };
 
