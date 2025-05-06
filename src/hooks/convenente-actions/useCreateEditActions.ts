@@ -48,11 +48,7 @@ export const useCreateEditActions = (
       console.log("Setting formMode to 'create'");
       setFormMode('create');
       
-      // Show toast to confirm action to user
-      toast({
-        title: "Modo de inclusão",
-        description: "Você está no modo de inclusão de um novo convenente.",
-      });
+      // Removida a mensagem toast que indicava o modo de inclusão
     } finally {
       // Release action lock after a delay
       setTimeout(() => {
