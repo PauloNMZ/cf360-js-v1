@@ -10,7 +10,8 @@ import {
   Search, 
   LogOut,
   Shield,
-  LayoutDashboard
+  LayoutDashboard,
+  Upload
 } from "lucide-react";
 import { 
   Tooltip,
@@ -22,6 +23,7 @@ import {
 type NavigationMenuProps = {
   onConvenenteClick: () => void;
   onImportarPlanilhaClick: () => void;
+  onCnabToApiClick: () => void;
   onAdminPanelClick: () => void;
   onLogoutClick: () => void;
 };
@@ -29,6 +31,7 @@ type NavigationMenuProps = {
 const NavigationMenu = ({
   onConvenenteClick,
   onImportarPlanilhaClick,
+  onCnabToApiClick,
   onAdminPanelClick,
   onLogoutClick
 }: NavigationMenuProps) => {
@@ -63,6 +66,21 @@ const NavigationMenu = ({
             </TooltipTrigger>
             <TooltipContent className="bg-blue-50 dark:bg-blue-900/80 border border-blue-200 dark:border-blue-800">
               <p>Importação de planilhas para processamento</p>
+            </TooltipContent>
+          </Tooltip>
+          
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div>
+                <NavButton 
+                  icon={<Upload size={24} />} 
+                  label="CNAB to API" 
+                  onClick={onCnabToApiClick} 
+                />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent className="bg-blue-50 dark:bg-blue-900/80 border border-blue-200 dark:border-blue-800">
+              <p>Converter arquivo CNAB para requisição JSON para API</p>
             </TooltipContent>
           </Tooltip>
           
@@ -123,21 +141,6 @@ const NavigationMenu = ({
             </TooltipTrigger>
             <TooltipContent className="bg-blue-50 dark:bg-blue-900/80 border border-blue-200 dark:border-blue-800">
               <p>Consulta de registros e operações</p>
-            </TooltipContent>
-          </Tooltip>
-          
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div>
-                <NavButton 
-                  icon={<LayoutDashboard size={24} />} 
-                  label="Dashboard" 
-                  onClick={() => {}} 
-                />
-              </div>
-            </TooltipTrigger>
-            <TooltipContent className="bg-blue-50 dark:bg-blue-900/80 border border-blue-200 dark:border-blue-800">
-              <p>Acesso ao painel de controle e estatísticas</p>
             </TooltipContent>
           </Tooltip>
           

@@ -10,6 +10,7 @@ import NavigationMenu from "@/components/navigation/NavigationMenu";
 import ConvenenteModal from "@/components/convenente/ConvenenteModal";
 import DeleteConvenenteDialog from "@/components/convenente/DeleteConvenenteDialog";
 import ImportacaoModal from "@/components/importacao/ImportacaoModal";
+import CNABToAPIModal from "@/components/cnabToApi/CNABToAPIModal";
 import AdminPanelModal from "@/components/admin/AdminPanelModal";
 import { emptyConvenente } from "@/types/convenente";
 
@@ -45,6 +46,9 @@ const Index = () => {
     handleFormDataChange
   } = useIndexPage();
 
+  // Add state for CNAB to API modal
+  const [cnabToApiModalOpen, setCnabToApiModalOpen] = React.useState(false);
+
   const {
     handleCreateNew,
     handleEdit,
@@ -67,6 +71,10 @@ const Index = () => {
 
   const handleImportarPlanilhaClick = () => {
     setImportModalOpen(true);
+  };
+
+  const handleCnabToApiClick = () => {
+    setCnabToApiModalOpen(true);
   };
 
   const handleLogoutClick = async () => {
@@ -104,6 +112,7 @@ const Index = () => {
         <NavigationMenu 
           onConvenenteClick={handleConvenenteClick}
           onImportarPlanilhaClick={handleImportarPlanilhaClick}
+          onCnabToApiClick={handleCnabToApiClick}
           onAdminPanelClick={handleAdminPanelClick}
           onLogoutClick={handleLogoutClick}
         />
@@ -133,6 +142,11 @@ const Index = () => {
       <ImportacaoModal 
         isOpen={importModalOpen}
         onOpenChange={setImportModalOpen}
+      />
+
+      <CNABToAPIModal 
+        isOpen={cnabToApiModalOpen}
+        onOpenChange={setCnabToApiModalOpen}
       />
 
       <AdminPanelModal 
