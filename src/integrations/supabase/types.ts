@@ -101,7 +101,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      buscar_convenentes: {
+        Args: { criterio: string }
+        Returns: {
+          id: string
+          razao_social: string
+          cnpj: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

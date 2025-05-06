@@ -16,7 +16,7 @@ const AdminPanelModal = ({ isOpen, onOpenChange }: AdminPanelModalProps) => {
           <DialogTitle className="text-2xl font-bold text-center mb-6">Painel de Setup</DialogTitle>
         </DialogHeader>
         <div className="py-4">
-          <AdminPanel />
+          <AdminPanel onClose={() => onOpenChange(false)} />
         </div>
       </DialogContent>
     </Dialog>

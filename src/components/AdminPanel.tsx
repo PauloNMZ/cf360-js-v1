@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 
@@ -24,8 +23,13 @@ import { Edit, TrashIcon, Upload, WalletCards } from "lucide-react";
 import { getCompanySettings, saveCompanySettings } from "@/services/companySettings";
 import { useToast } from "@/components/ui/use-toast";
 
-const AdminPanel = () => {
+interface AdminPanelProps {
+  onClose?: () => void;
+}
+
+const AdminPanel = ({ onClose }: AdminPanelProps) => {
   const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [showBankConnections, setShowBankConnections] = useState(false);
   const [showCompanySettings, setShowCompanySettings] = useState(false);
   const [bankConnections, setBankConnections] = useState([
@@ -50,8 +54,6 @@ const AdminPanel = () => {
     companyName: 'GERADOR DE PAGAMENTOS'
   });
   const [logoPreview, setLogoPreview] = useState('');
-
-  // Form fields for creating/editing
   const [formValues, setFormValues] = useState({
     appKey: '51f3e692d4f797199a0caa25c4784f3a',
     clientId: 'eyJpZCI6IjY8&3NjZmOTctNmM5My0iLCJjb2RpZ29QdWJsaWNhZG9yIjowLCJjb2RpZ29Tb2Z0d2FyZSI6MTAzNTgxLCJzZXF1ZW5jaWFsSW5zdGFsYWNhbyI6Mn0',
@@ -102,8 +104,9 @@ const AdminPanel = () => {
     }));
   };
 
+  // Updated to use the fileInputRef
   const handleLogoChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -116,6 +119,11 @@ const AdminPanel = () => {
     }
   };
 
+  const handleLogoButtonClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  // Modified to call onClose when toast is shown
   const handleSaveCompanySettings = () => {
     const updatedSettings = {
       ...companySettings,
@@ -125,6 +133,7 @@ const AdminPanel = () => {
     toast({
       title: "Configurações salvas",
       description: "As configurações da empresa foram atualizadas com sucesso.",
+      onDismiss: onClose
     });
   };
 
@@ -270,11 +279,12 @@ const AdminPanel = () => {
                     accept="image/*"
                     onChange={handleLogoChange}
                     className="flex-1"
+                    ref={fileInputRef}
                   />
                   <Button 
                     variant="outline" 
                     className="flex items-center gap-1"
-                    onClick={() => document.getElementById('logo-upload')?.click()}
+                    onClick={handleLogoButtonClick}
                   >
                     <Upload size={16} /> Carregar
                   </Button>

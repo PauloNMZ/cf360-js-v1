@@ -42,9 +42,6 @@ export const useCNPJQuery = ({ onSuccess, onError }: UseCNPJQueryProps = {}) => 
     
     const cleanedCNPJ = cleanCNPJ(cnpj);
     
-    // Removed CNPJ validation check as requested
-    // The API will handle invalid CNPJs with appropriate errors
-    
     setIsLoading(true);
     
     try {
@@ -66,6 +63,14 @@ export const useCNPJQuery = ({ onSuccess, onError }: UseCNPJQueryProps = {}) => 
       
       if (onSuccess) {
         onSuccess(responseData);
+        
+        // Set focus to the WhatsApp/celular field after successful CNPJ search
+        setTimeout(() => {
+          const celularInput = document.querySelector('input[name="celular"]') as HTMLInputElement;
+          if (celularInput) {
+            celularInput.focus();
+          }
+        }, 100);
       }
       
       return { success: true, data: responseData };
