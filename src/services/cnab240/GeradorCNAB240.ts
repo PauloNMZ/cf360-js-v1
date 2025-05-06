@@ -43,6 +43,8 @@ export class GeradorCNAB240 {
   public gerarArquivoRemessa(workflowData: CNABWorkflowData, favorecidos: Favorecido[]): Promise<Blob> {
     return new Promise((resolve, reject) => {
       try {
+        console.log("Workflow data received:", JSON.stringify(workflowData, null, 2));
+        
         // Setup the configuration from workflow data
         const config = {
           nomeEmpresa: workflowData.convenente?.razaoSocial || '',
@@ -51,8 +53,11 @@ export class GeradorCNAB240 {
           agencia: workflowData.convenente?.agencia || '',
           conta: workflowData.convenente?.conta || '',
           convenioPag: workflowData.convenente?.convenioPag || '',
-          dataPagamento: workflowData.paymentDate || new Date()
+          dataPagamento: workflowData.paymentDate || new Date(),
+          serviceType: workflowData.serviceType // Make sure to pass the service type
         };
+        
+        console.log("Config created from workflow:", JSON.stringify(config, null, 2));
         
         // Initialize variables
         this.inicializarVariaveis(config);
@@ -74,6 +79,8 @@ export class GeradorCNAB240 {
 
         // Format company data
         this.config = formatarDadosEmpresa(this.config);
+        
+        console.log("Final config after formatting:", JSON.stringify(this.config, null, 2));
 
         // Basic validations
         if (!validarCNPJ(this.config.cnpj)) {

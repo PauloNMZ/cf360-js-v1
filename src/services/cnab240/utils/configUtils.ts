@@ -1,3 +1,4 @@
+
 import { EmpresaConfig } from '@/types/cnab240';
 import { retirarCHR, formatarData, formatarEnderecoCompleto, semAcento, calcularDV } from '@/utils/cnabUtils';
 
@@ -17,8 +18,11 @@ export const inicializarVariaveis = (config: any): EmpresaConfig => {
     codProduto: "0126", // Fixed product code for BB
     nrRemessa: "1", // Could be incremented based on stored value
     dataPagamento: '',
-    nrDocumento: "1" // Could be incremented based on stored value
+    nrDocumento: "1", // Could be incremented based on stored value
+    serviceType: config.serviceType // Make sure to copy the service type
   };
+  
+  console.log("Service type in inicializarVariaveis:", config.serviceType, "->", empresaConfig.serviceType);
   
   // Process agency: Separate the agency number and its check digit
   const agenciaCompleta = retirarCHR(config.agencia || '');

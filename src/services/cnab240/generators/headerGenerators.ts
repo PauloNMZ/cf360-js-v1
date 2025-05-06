@@ -68,6 +68,8 @@ export const gerarHeaderArquivo = (config: EmpresaConfig): string => {
  * Get the service type code based on the selected service type
  */
 export const getTipoServico = (serviceType: string): string => {
+  console.log("getTipoServico called with:", serviceType);
+  
   switch(serviceType) {
     case "Pagamento a Fornecedor":
       return "20";
@@ -81,8 +83,6 @@ export const getTipoServico = (serviceType: string): string => {
   }
 };
 
-// Removed the problematic console.log that was accessing undefined config
-
 /**
  * Write batch header according to CNAB240 specifications
  */
@@ -92,10 +92,14 @@ export const gravarHeaderLote = (
   tipoLancamento: string
 ): string => {
   // Define service type based on the selected service type in workflow
+  // Add extensive logging to debug the issue
+  console.log("Config in gravarHeaderLote:", JSON.stringify(config, null, 2));
+  console.log("Service type in config:", config.serviceType);
+  
   const tipoServico = getTipoServico(config.serviceType || "Pagamentos Diversos");
   
   // For debugging
-  console.log("Service type in gravarHeaderLote:", config.serviceType, "-> Code:", tipoServico);
+  console.log("Service type resolved to:", config.serviceType, "-> Code:", tipoServico);
 
   // Build batch header
   let headerLote = "";
