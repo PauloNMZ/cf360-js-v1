@@ -27,11 +27,25 @@ export const useSaveActions = (
   const { toast } = useToast();
 
   const handleSave = async (formData: ConvenenteData) => {
-    // Validação mínima antes de salvar
-    if (!formData.razaoSocial || !formData.cnpj) {
+    console.log("handleSave chamado com dados:", formData);
+    
+    // Check for CNPJ
+    if (!formData.cnpj || formData.cnpj.trim() === '') {
+      console.log("Erro de validação: CNPJ vazio");
       toast({
         title: "Dados incompletos",
-        description: "CNPJ e Razão Social são obrigatórios.",
+        description: "CNPJ é obrigatório.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Check for Razão Social
+    if (!formData.razaoSocial || formData.razaoSocial.trim() === '') {
+      console.log("Erro de validação: Razão Social vazia");
+      toast({
+        title: "Dados incompletos",
+        description: "Razão Social é obrigatória.",
         variant: "destructive",
       });
       return;

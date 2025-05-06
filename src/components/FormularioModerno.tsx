@@ -18,8 +18,6 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
   // Create a direct ref to contact section
   const contactInfoRef = useRef<ContactInfoSectionRef>(null);
   
-  console.log("FormularioModerno render - mode:", formMode, "initialData:", initialData);
-
   const {
     cnpjInput,
     formData,
@@ -39,8 +37,11 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
     contactInfoRef,
   });
 
-  // Determine if fields should be editable based on formMode
-  const isEditableMode = formMode === 'create' || formMode === 'edit';
+  // Send form data changes to parent component whenever formData changes
+  useEffect(() => {
+    console.log("FormularioModerno: formData changed, calling onFormDataChange with:", formData);
+    onFormDataChange(formData);
+  }, [formData, onFormDataChange]);
 
   return (
     <div className="bg-white p-6 rounded-lg dark:bg-background dark:text-foreground">

@@ -1,5 +1,5 @@
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { ConvenenteData, emptyConvenente } from "@/types/convenente";
 import { useFormValidation } from "./convenente-form/useFormValidation";
 import { useCNPJSearch } from "./convenente-form/useCNPJSearch";
@@ -72,11 +72,10 @@ export const useConvenenteForm = ({
     isSearchPending
   } = useCNPJSearch(formData, setFormData, setDataLoaded, setTouched, contactInfoRef);
 
-  // Validate fields and notify parent component
-  useCallback(() => {
+  // Notify parent component when form data changes
+  useEffect(() => {
     // Skip validation during updates to prevent loops
     if (isUpdating || shouldSkipValidation) {
-      console.log("Skipping validation due to update or explicit skip flag");
       return;
     }
     
@@ -86,11 +85,10 @@ export const useConvenenteForm = ({
       console.log("Calling onFormDataChange with current data:", {
         cnpj: formData.cnpj,
         razaoSocial: formData.razaoSocial,
-        mode: formMode
       });
       onFormDataChange(formData);
     }
-  }, [formData, dataLoaded, onFormDataChange, validateForm, touched, isUpdating, shouldSkipValidation, formMode]);
+  }, [formData, dataLoaded, onFormDataChange, validateForm, touched, isUpdating, shouldSkipValidation]);
 
   return {
     cnpjInput,

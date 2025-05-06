@@ -137,7 +137,28 @@ export const IndexPageProvider = ({ children }: { children: ReactNode }) => {
   // Function to save current form data
   const handleSaveClick = () => {
     console.log("IndexPageProvider - handleSaveClick called with mode:", indexPage.formMode);
-    console.log("FormData:", indexPage.formData);
+    console.log("FormData being saved:", indexPage.formData);
+    
+    // Validate CNPJ and RazaoSocial before saving
+    if (!indexPage.formData.cnpj || indexPage.formData.cnpj.trim() === '') {
+      console.log("CNPJ vazio, não é possível salvar");
+      toast({
+        title: "Dados incompletos",
+        description: "CNPJ é obrigatório.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (!indexPage.formData.razaoSocial || indexPage.formData.razaoSocial.trim() === '') {
+      console.log("Razão Social vazia, não é possível salvar");
+      toast({
+        title: "Dados incompletos",
+        description: "Razão Social é obrigatória.",
+        variant: "destructive",
+      });
+      return;
+    }
     
     // Directly call the handleSave function with the current form data
     indexPageActions.handleSave(indexPage.formData);

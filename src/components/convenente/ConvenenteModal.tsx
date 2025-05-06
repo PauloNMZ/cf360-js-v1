@@ -1,5 +1,5 @@
 
-import React, { useEffect } from "react";
+import React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -51,21 +51,20 @@ const ConvenenteModal = ({
   onFormDataChange,
 }: ConvenenteModalProps) => {
   
-  // Handle create new click with improved debugging
   const handleCreateNewClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log("Create New button clicked in ConvenenteModal");
     onCreateNew();
   };
 
-  // Handle save click with debugging
   const handleSaveClick = () => {
-    console.log("Save button clicked, current mode:", formMode);
-    
-    // Call the onSave function directly - this should trigger the save process
     onSave();
   };
+
+  // Determine if save button should be disabled
+  const isSaveDisabled = !(formMode === 'create' || formMode === 'edit') || 
+                        isLoading || 
+                        (!formData.cnpj || !formData.razaoSocial);
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -163,6 +162,7 @@ const ConvenenteModal = ({
                   onClick={handleSaveClick}
                   variant="default"
                   className="flex items-center gap-1 bg-green-600 hover:bg-green-700"
+                  disabled={isSaveDisabled}
                 >
                   <Save size={16} /> Salvar
                   {isLoading && <Loader2 className="ml-2 animate-spin" size={16} />}
