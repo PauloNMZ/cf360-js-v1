@@ -13,7 +13,9 @@ export const IndexPageModals = () => {
     // Modal states
     modalOpen,
     importModalOpen,
+    setImportModalOpen,
     adminPanelOpen,
+    setAdminPanelOpen,
     cnabToApiModalOpen,
     setCnabToApiModalOpen,
     
@@ -71,7 +73,7 @@ export const IndexPageModals = () => {
 
       <ImportacaoModal 
         isOpen={importModalOpen}
-        onOpenChange={(open) => open}
+        onOpenChange={(open) => setImportModalOpen(open)}
       />
 
       <CNABToAPIModal 
@@ -81,7 +83,7 @@ export const IndexPageModals = () => {
 
       <AdminPanelModal 
         isOpen={adminPanelOpen}
-        onOpenChange={(open) => open}
+        onOpenChange={(open) => setAdminPanelOpen(open)}
       />
 
       <DeleteConvenenteDialog 
