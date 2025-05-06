@@ -1,3 +1,4 @@
+
 import { toast } from '@/components/ui/sonner';
 
 /**
@@ -107,6 +108,41 @@ export const parseCNABFile = async (file: File): Promise<any> => {
   });
 };
 
+// Define interfaces for better type safety
+interface PagamentoData {
+  tipoRegistro: string;
+  segmento: string;
+  tipoMovimento: string;
+  codMovimento: string;
+  camara: string;
+  bancoFavorecido: string;
+  agenciaFavorecido: string;
+  digitoAgencia: string;
+  contaFavorecido: string;
+  digitoConta: string;
+  nomeFavorecido: string;
+  numeroDocumento: string;
+  dataPagamento: string;
+  moeda: string;
+  valorPagamento: number;
+  nossoNumero: string;
+  dataEfetiva: string;
+  valorEfetivo: number;
+  inscricaoFavorecido?: {
+    tipo: string;
+    numero: string;
+  };
+  enderecoFavorecido?: {
+    logradouro: string;
+    numero: string;
+    complemento: string;
+    bairro: string;
+    cidade: string;
+    cep: string;
+    estado: string;
+  };
+}
+
 /**
  * Convert CNAB data to JSON for API
  */
@@ -122,7 +158,7 @@ export const convertCNABToJSON = (cnabData: any): any => {
     };
     
     // Process payment details
-    const pagamentos = [];
+    const pagamentos: PagamentoData[] = [];
     
     // Loop through each batch
     for (const lote of cnabData.lotes) {
@@ -135,7 +171,7 @@ export const convertCNABToJSON = (cnabData: any): any => {
         const segmentoB = i + 1 < lote.segmentos.length ? lote.segmentos[i + 1] : null;
         
         if (segmentoA && segmentoA.substring(13, 14) === 'A') {
-          const pagamento = {
+          const pagamento: PagamentoData = {
             tipoRegistro: segmentoA.substring(7, 8),
             segmento: segmentoA.substring(13, 14),
             tipoMovimento: segmentoA.substring(14, 15),
