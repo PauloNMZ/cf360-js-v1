@@ -59,7 +59,7 @@ export const useDeleteActions = (
           setFormData({...emptyConvenente});
           setFormMode('view');
           
-          // Close the dialog after successful deletion
+          // Only close the dialog after everything is done
           setShowDeleteDialog(false);
         } else {
           throw new Error("Falha ao excluir convenente");

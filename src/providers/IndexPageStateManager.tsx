@@ -52,6 +52,8 @@ export const useIndexPageStateManager = ({
   
   // Load convenentes when modal is opened
   useEffect(() => {
-    loadConvenenteData(modalOpen);
-  }, [modalOpen, loadConvenenteData]);
+    if (!isDeleting) { // Only load data if we're not currently deleting
+      loadConvenenteData(modalOpen);
+    }
+  }, [modalOpen, loadConvenenteData, isDeleting]);
 };

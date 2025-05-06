@@ -25,8 +25,17 @@ const DeleteConvenenteDialog = ({
   onDelete,
   isDeleting = false
 }: DeleteConvenenteDialogProps) => {
+  // Prevent closing the dialog while deleting
+  const handleOpenChange = (open: boolean) => {
+    // Don't allow closing the dialog during deletion
+    if (isDeleting && !open) {
+      return;
+    }
+    onOpenChange(open);
+  };
+
   return (
-    <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
+    <AlertDialog open={isOpen} onOpenChange={handleOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
