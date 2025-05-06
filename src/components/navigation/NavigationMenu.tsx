@@ -1,4 +1,3 @@
-
 import React from "react";
 import { NavButton } from "@/components/ui/NavButton";
 import { 
@@ -10,7 +9,7 @@ import {
   Search, 
   LogOut,
   Shield,
-  LayoutDashboard,
+  FileJson,
 } from "lucide-react";
 import { 
   Tooltip,
@@ -72,8 +71,8 @@ const NavigationMenu = ({
             <TooltipTrigger asChild>
               <div>
                 <NavButton 
-                  icon={<FileUp size={24} />} 
-                  label={<span className="text-xs">CNAB to API</span>} 
+                  icon={<Send size={24} />} 
+                  label="CNAB2API" 
                   onClick={onCnabToApiClick} 
                 />
               </div>
