@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Banknote, CreditCard, Coins, PiggyBank } from 'lucide-react';
+import { Banknote, CreditCard, Coins } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { CNABWorkflowData } from '@/types/cnab240';
@@ -50,17 +50,6 @@ const StepTwo: React.FC<StepTwoProps> = ({ workflow, updateWorkflow }) => {
             <div className="space-y-0.5">
               <p className="font-medium leading-none">Pagamento a Fornecedor</p>
               <p className="text-sm text-gray-500">Código de serviço: 20</p>
-            </div>
-          </Label>
-        </div>
-        
-        <div className="flex items-center space-x-3 space-y-0 border rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
-          <RadioGroupItem value="Pix Transferências" id="pix" />
-          <Label htmlFor="pix" className="flex flex-1 items-center space-x-3 cursor-pointer">
-            <PiggyBank className="h-5 w-5 text-purple-600" />
-            <div className="space-y-0.5">
-              <p className="font-medium leading-none">Pix Transferências</p>
-              <p className="text-sm text-gray-500">Código de serviço: 45</p>
             </div>
           </Label>
         </div>
