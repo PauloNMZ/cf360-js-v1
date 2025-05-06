@@ -15,6 +15,7 @@ type CompanyInfoSectionProps = {
   handleCNPJSearch: () => void;
   isLoading: boolean;
   formMode: 'view' | 'create' | 'edit';
+  inputRef?: React.RefObject<HTMLInputElement>;
 };
 
 const CompanyInfoSection = ({
@@ -26,7 +27,8 @@ const CompanyInfoSection = ({
   handleBlur,
   handleCNPJSearch,
   isLoading,
-  formMode
+  formMode,
+  inputRef
 }: CompanyInfoSectionProps) => {
   const isViewOnly = formMode === 'view';
 
@@ -47,6 +49,7 @@ const CompanyInfoSection = ({
           isLoading={isLoading}
           error={errors.cnpj}
           disabled={isViewOnly}
+          inputRef={inputRef}
         />
         
         <div className="flex flex-col space-y-1 md:col-span-1">

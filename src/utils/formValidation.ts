@@ -1,6 +1,7 @@
 
 import { validarCPF, validarCNPJ } from './validation/registrationUtils';
 import { ajustarTamanho } from './formatting/stringUtils';
+import { formatCNPJ as formatCNPJUtil } from './formatting/cnpjFormatter';
 
 export const validateCNPJ = (cnpj: string): boolean => {
   return validarCNPJ(cnpj);
@@ -16,33 +17,8 @@ export const validatePhone = (phone: string): boolean => {
   return cleaned.length >= 10 && cleaned.length <= 11;
 };
 
-// Improved CNPJ formatter with better partial formatting support
-export const formatCNPJ = (value: string): string => {
-  // Get cursor position and original length for later calculation
-  const originalLength = value.length;
-  
-  // Remove non-digit characters
-  const cnpjClean = value.replace(/\D/g, '');
-  
-  // If no digits, return empty string
-  if (cnpjClean.length === 0) return '';
-  
-  // Apply partial formatting based on the number of digits
-  if (cnpjClean.length <= 2) {
-    return cnpjClean;
-  } else if (cnpjClean.length <= 5) {
-    return cnpjClean.replace(/^(\d{2})(\d*)$/, '$1.$2');
-  } else if (cnpjClean.length <= 8) {
-    return cnpjClean.replace(/^(\d{2})(\d{3})(\d*)$/, '$1.$2.$3');
-  } else if (cnpjClean.length <= 12) {
-    return cnpjClean.replace(/^(\d{2})(\d{3})(\d{3})(\d*)$/, '$1.$2.$3/$4');
-  } else {
-    // Full CNPJ formatting: xx.xxx.xxx/xxxx-xx
-    return cnpjClean
-      .replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d*)$/, '$1.$2.$3/$4-$5')
-      .substring(0, 18); // Ensure it doesn't exceed 18 chars (formatted CNPJ length)
-  }
-};
+// Use the well-tested CNPJ formatter from the utility file
+export const formatCNPJ = formatCNPJUtil;
 
 export const formatPhone = (value: string): string => {
   const cleaned = value.replace(/\D/g, '');

@@ -1,10 +1,12 @@
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useRef } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useCNPJQuery } from "@/hooks/useCNPJQuery";
-import { formatCNPJ } from "@/utils/formValidation";
 import { ConvenenteData } from "@/types/convenente";
 import { ContactInfoSectionRef } from "@/components/ConvenenteForm/ContactInfoSection";
+import { formatCNPJ } from "@/utils/formatting/cnpjFormatter";
+import { useDebounceSearch } from "./useDebounceSearch";
+import { useCursorPosition } from "./useCursorPosition";
 
 export const useCNPJSearch = (
   formData: ConvenenteData,
@@ -15,178 +17,168 @@ export const useCNPJSearch = (
 ) => {
   const { toast } = useToast();
   const [cnpjInput, setCnpjInput] = useState("");
-  const [isSearchPending, setIsSearchPending] = useState(false);
-  const lastSearchRef = useRef(""); // Store last search term
-  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null); // For debounce
-  const processingDataRef = useRef(false); // Flag to prevent multiple data processing
-  const userEditingRef = useRef(false); // Track if user is actively editing
+  const processingDataRef = useRef(false);
+  const userEditingRef = useRef(false);
+  const inputRef = useRef<HTMLInputElement | null>(null);
   
-  const { fetchCNPJ, isLoading } = useCNPJQuery({
-    onSuccess: (data) => {
-      console.log("CNPJ API onSuccess callback triggered");
-      
-      // Prevent multiple processing of the same response
-      if (processingDataRef.current) {
-        console.log("Already processing CNPJ data, ignoring duplicate callback");
+  // Use the cursor position hook
+  const { saveCursorState, restoreCursorPosition } = useCursorPosition();
+  
+  // Handle CNPJ API fetch success
+  const handleCNPJSuccess = (data: any) => {
+    console.log("CNPJ API onSuccess callback triggered");
+    
+    // Prevent multiple processing of the same response
+    if (processingDataRef.current) {
+      console.log("Already processing CNPJ data, ignoring duplicate callback");
+      return;
+    }
+    
+    // Set processing flag
+    processingDataRef.current = true;
+    
+    try {
+      // Make sure a valid business name was received
+      if (!data.razao_social || data.razao_social.trim() === '') {
+        toast({
+          title: "Dados incompletos",
+          description: "A consulta não retornou uma razão social válida.",
+          variant: "destructive",
+        });
+        setSearchPending(false);
         return;
       }
       
-      // Set processing flag
-      processingDataRef.current = true;
+      const formattedData = {
+        cnpj: data.cnpj || "",
+        razaoSocial: data.razao_social || "",
+        endereco: data.logradouro || "",
+        numero: data.numero || "",
+        complemento: data.complemento || "",
+        uf: data.uf || "",
+        cidade: data.municipio || "",
+        contato: data.qsa && data.qsa.length > 0 ? data.qsa[0].nome_socio || "" : "",
+        fone: data.ddd_telefone_1 ? formatPhone(data.ddd_telefone_1) : "",
+        celular: data.ddd_telefone_2 ? formatPhone(data.ddd_telefone_2) : "",
+        email: data.email || "",
+        agencia: formData.agencia || "",
+        conta: formData.conta || "",
+        chavePix: formData.chavePix || "",
+        convenioPag: formData.convenioPag || ""
+      };
       
-      try {
-        // Make sure a valid business name was received
-        if (!data.razao_social || data.razao_social.trim() === '') {
-          toast({
-            title: "Dados incompletos",
-            description: "A consulta não retornou uma razão social válida.",
-            variant: "destructive",
-          });
-          setIsSearchPending(false);
-          return;
-        }
-        
-        const formattedData = {
-          cnpj: data.cnpj || "",
-          razaoSocial: data.razao_social || "",
-          endereco: data.logradouro || "",
-          numero: data.numero || "",
-          complemento: data.complemento || "",
-          uf: data.uf || "",
-          cidade: data.municipio || "",
-          contato: data.qsa && data.qsa.length > 0 ? data.qsa[0].nome_socio || "" : "",
-          fone: data.ddd_telefone_1 ? formatPhone(data.ddd_telefone_1) : "",
-          celular: data.ddd_telefone_2 ? formatPhone(data.ddd_telefone_2) : "",
-          email: data.email || "",
-          agencia: formData.agencia || "",  // Preserve fields not from API
-          conta: formData.conta || "",
-          chavePix: formData.chavePix || "",
-          convenioPag: formData.convenioPag || ""
-        };
-        
-        console.log("Dados formatados da API:", formattedData);
-        
-        // Update form data
-        setFormData(formattedData);
-        
-        // Set the formatted CNPJ in the input field
-        if (data.cnpj) {
-          setCnpjInput(formatCNPJ(data.cnpj));
-        }
-        
-        // Mark data as loaded
-        setDataLoaded(true);
-        
-        // Reset touched state first
-        setTouched({});
-        
-        // Then mark fields as touched based on their values after a small delay
-        setTimeout(() => {
-          setTouched({
-            cnpj: true,
-            razaoSocial: Boolean(formattedData.razaoSocial)
-          });
-        }, 100);
-        
-        toast({
-          title: "Dados encontrados",
-          description: `CNPJ ${data.cnpj} carregado com sucesso.`,
-        });
-        
-        // Focus the celular field immediately after state updates
-        console.log("Attempting to focus celular field:", contactRef?.current);
-        setTimeout(() => {
-          if (contactRef?.current) {
-            contactRef.current.focusCelularField();
-            console.log("Focus set to celular field via ref after timeout");
-          }
-        }, 500);
-      } finally {
-        // Reset search pending state
-        setIsSearchPending(false);
-        // Reset processing flag after a small delay
-        setTimeout(() => {
-          processingDataRef.current = false;
-        }, 500);
+      console.log("Dados formatados da API:", formattedData);
+      
+      // Update form data
+      setFormData(formattedData);
+      
+      // Set the formatted CNPJ in the input field
+      if (data.cnpj) {
+        setCnpjInput(formatCNPJ(data.cnpj));
       }
-    },
-    onError: (error) => {
+      
+      // Mark data as loaded
+      setDataLoaded(true);
+      
+      // Reset touched state first
+      setTouched({});
+      
+      // Then mark fields as touched based on their values after a small delay
+      setTimeout(() => {
+        setTouched({
+          cnpj: true,
+          razaoSocial: Boolean(formattedData.razaoSocial)
+        });
+      }, 100);
+      
       toast({
-        title: "Erro ao consultar CNPJ",
-        description: `${error}`,
-        variant: "destructive",
+        title: "Dados encontrados",
+        description: `CNPJ ${data.cnpj} carregado com sucesso.`,
       });
-      setIsSearchPending(false);
-      lastSearchRef.current = ""; // Reset last search on error
-      processingDataRef.current = false;
+      
+      // Focus the celular field immediately after state updates
+      setTimeout(() => {
+        if (contactRef?.current) {
+          contactRef.current.focusCelularField();
+          console.log("Focus set to celular field via ref after timeout");
+        }
+      }, 500);
+    } finally {
+      // Reset search pending state
+      setSearchPending(false);
+      // Reset processing flag after a small delay
+      setTimeout(() => {
+        processingDataRef.current = false;
+      }, 500);
     }
+  };
+  
+  // Handle CNPJ API fetch errors
+  const handleCNPJError = (error: any) => {
+    toast({
+      title: "Erro ao consultar CNPJ",
+      description: `${error}`,
+      variant: "destructive",
+    });
+    setSearchPending(false);
+    lastSearchRef.current = ""; // Reset last search on error
+    processingDataRef.current = false;
+  };
+  
+  // Use the CNPJ API query hook
+  const { fetchCNPJ, isLoading } = useCNPJQuery({
+    onSuccess: handleCNPJSuccess,
+    onError: handleCNPJError
   });
 
-  // Improved debounced search function
-  const handleCNPJSearch = useCallback(() => {
-    // Clear any existing timeout
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current);
+  // Helper function for phone formatting used only internally
+  const formatPhone = (value: string): string => {
+    const cleaned = value.replace(/\D/g, '');
+    if (cleaned.length <= 11) {
+      if (cleaned.length <= 10) {
+        return cleaned
+          .replace(/(\d{2})(\d)/, '($1) $2')
+          .replace(/(\d{4})(\d)/, '$1-$2')
+          .replace(/(-\d{4})\d+?$/, '$1');
+      } else {
+        return cleaned
+          .replace(/(\d{2})(\d)/, '($1) $2')
+          .replace(/(\d{5})(\d)/, '$1-$2')
+          .replace(/(-\d{4})\d+?$/, '$1');
+      }
     }
-    
-    // Don't allow multiple searches to be triggered
-    if (isLoading || isSearchPending || processingDataRef.current) {
-      console.log("Search already in progress, ignoring request");
-      return;
-    }
-    
-    // Remove non-numeric characters
-    const cnpjClean = cnpjInput.replace(/\D/g, '');
-    
-    // Check if there's input before querying
-    if (!cnpjClean) {
-      toast({
-        title: "Campo vazio",
-        description: "Digite um CNPJ para pesquisar.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    // Check if this CNPJ was just searched
-    if (cnpjClean === lastSearchRef.current) {
-      console.log("CNPJ was just searched, ignoring duplicate request");
-      return;
-    }
-    
-    // Set a flag to prevent repeated searches
-    setIsSearchPending(true);
-    lastSearchRef.current = cnpjClean;
-    
-    console.log("Initiating CNPJ search for:", cnpjClean);
-    
-    // Add a small delay before actually triggering the search
-    searchTimeoutRef.current = setTimeout(() => {
-      fetchCNPJ(cnpjClean);
-    }, 300);
-    
-  }, [cnpjInput, isLoading, isSearchPending, toast, fetchCNPJ]);
+    return cleaned.substring(0, 11);
+  };
 
-  // Completely reimplemented CNPJ input handling with better cursor position preservation
+  // Use the debounce search hook
+  const { 
+    debounceSearch, 
+    setSearchPending, 
+    isSearchPendingRef 
+  } = useDebounceSearch({ 
+    isLoading, 
+    onSearch: fetchCNPJ
+  });
+  
+  // CNPJ search handler
+  const handleCNPJSearch = () => {
+    debounceSearch(cnpjInput);
+  };
+
+  // CNPJ input change handler with cursor position preservation
   const handleCNPJChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Track that user is editing
     userEditingRef.current = true;
     
     const input = e.target;
-    const value = input.value;
-    const selectionStart = input.selectionStart || 0;
+    inputRef.current = input;
     
-    console.log(`CNPJ Input change: value=${value}, cursor at ${selectionStart}`);
-    
-    // Count digits before cursor position
-    const valueBeforeCursor = value.substring(0, selectionStart);
-    const digitsBeforeCursor = (valueBeforeCursor.replace(/\D/g, '')).length;
+    // Save cursor position before formatting
+    saveCursorState(input);
     
     // Format the CNPJ
-    const formattedValue = formatCNPJ(value);
-    
-    // Log the transformation
-    console.log(`CNPJ formatting: "${value}" -> "${formattedValue}"`);
+    const formattedValue = formatCNPJ(input.value);
+    console.log(`CNPJ formatting: "${input.value}" -> "${formattedValue}"`);
     
     // Update the display value
     setCnpjInput(formattedValue);
@@ -194,41 +186,15 @@ export const useCNPJSearch = (
     // Update the underlying form data with only digits
     setFormData(prev => {
       const cnpjDigits = formattedValue.replace(/\D/g, '');
-      console.log(`Setting CNPJ in formData: ${cnpjDigits}`);
       return {
         ...prev,
         cnpj: cnpjDigits
       };
     });
     
-    // Calculate new cursor position by counting to same digit position
+    // Restore cursor position after state update
     setTimeout(() => {
-      if (input && input === document.activeElement) {
-        // Get the formatted value freshly from the input
-        const currentFormatted = input.value;
-        
-        // Find the position after the Nth digit
-        let digitCount = 0;
-        let newPosition = 0;
-        
-        for (let i = 0; i < currentFormatted.length && digitCount <= digitsBeforeCursor; i++) {
-          if (/\d/.test(currentFormatted[i])) {
-            digitCount++;
-          }
-          if (digitCount <= digitsBeforeCursor) {
-            newPosition = i + 1;
-          }
-        }
-        
-        // Set cursor position, ensuring it's within bounds
-        const safePosition = Math.min(Math.max(0, newPosition), currentFormatted.length);
-        console.log(`Adjusting cursor: digits before=${digitsBeforeCursor}, new position=${safePosition}`);
-        
-        // Only set if the element is still focused
-        if (document.activeElement === input) {
-          input.setSelectionRange(safePosition, safePosition);
-        }
-      }
+      restoreCursorPosition(input);
       
       // Reset editing flag after a short delay
       setTimeout(() => {
@@ -243,25 +209,8 @@ export const useCNPJSearch = (
     isLoading,
     handleCNPJSearch,
     handleCNPJChange,
-    userEditingRef // Expose the ref so other components can check if user is editing
+    userEditingRef,
+    inputRef,
+    isSearchPending: isSearchPendingRef.current
   };
-};
-
-// Helper function copied from formValidation.ts to avoid circular dependencies
-const formatPhone = (value: string): string => {
-  const cleaned = value.replace(/\D/g, '');
-  if (cleaned.length <= 11) {
-    if (cleaned.length <= 10) {
-      return cleaned
-        .replace(/(\d{2})(\d)/, '($1) $2')
-        .replace(/(\d{4})(\d)/, '$1-$2')
-        .replace(/(-\d{4})\d+?$/, '$1');
-    } else {
-      return cleaned
-        .replace(/(\d{2})(\d)/, '($1) $2')
-        .replace(/(\d{5})(\d)/, '$1-$2')
-        .replace(/(-\d{4})\d+?$/, '$1');
-    }
-  }
-  return cleaned.substring(0, 11);
 };

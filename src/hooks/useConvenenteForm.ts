@@ -25,6 +25,7 @@ export const useConvenenteForm = ({
   const [shouldSkipValidation, setShouldSkipValidation] = useState(false);
   const [lastFormMode, setLastFormMode] = useState<'view' | 'create' | 'edit'>(formMode);
 
+  // Setup form validation
   const { 
     errors, 
     touched, 
@@ -35,19 +36,22 @@ export const useConvenenteForm = ({
     resetTouch
   } = useFormValidation();
   
+  // Setup PIX key type handling
   const {
     pixKeyType,
     handlePixKeyTypeChange,
     getPixKeyPlaceholder
   } = usePixKeyType();
 
+  // Setup CNPJ search functionality
   const {
     cnpjInput,
     setCnpjInput,
     isLoading,
     handleCNPJSearch,
     handleCNPJChange,
-    userEditingRef
+    userEditingRef,
+    inputRef
   } = useCNPJSearch(formData, setFormData, setDataLoaded, setTouched, contactInfoRef);
 
   // Add an effect to track form mode changes for debugging
@@ -214,6 +218,7 @@ export const useConvenenteForm = ({
     handleInputChange,
     handleBlur,
     handlePixKeyTypeChange,
-    getPixKeyPlaceholder
+    getPixKeyPlaceholder,
+    inputRef
   };
 };

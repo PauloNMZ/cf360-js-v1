@@ -1,5 +1,5 @@
 
-import React, { useRef } from 'react';
+import React from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
@@ -13,6 +13,7 @@ type CNPJSearchFieldProps = {
   isLoading: boolean;
   error?: string;
   disabled?: boolean;
+  inputRef?: React.RefObject<HTMLInputElement>;
 };
 
 const CNPJSearchField = ({
@@ -22,10 +23,9 @@ const CNPJSearchField = ({
   handleCNPJSearch,
   isLoading,
   error,
-  disabled = false
+  disabled = false,
+  inputRef
 }: CNPJSearchFieldProps) => {
-  const inputRef = useRef<HTMLInputElement>(null);
-  
   // Enhanced event handlers with better stopPropagation and preventDefault
   const onSearchClick = (e: React.MouseEvent) => {
     e.preventDefault();
