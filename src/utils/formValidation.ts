@@ -16,18 +16,29 @@ export const validatePhone = (phone: string): boolean => {
   return cleaned.length >= 10 && cleaned.length <= 11;
 };
 
-// Formatadores
+// Improved CNPJ formatter that's more consistent
 export const formatCNPJ = (value: string): string => {
+  // Remove non-digit characters
   const cnpjClean = value.replace(/\D/g, '');
-  if (cnpjClean.length <= 14) {
+  
+  // Apply formatting only if we have digits
+  if (cnpjClean.length === 0) return '';
+  
+  // Apply partial formatting based on the number of digits
+  if (cnpjClean.length <= 2) {
+    return cnpjClean;
+  } else if (cnpjClean.length <= 5) {
+    return cnpjClean.replace(/^(\d{2})(\d*)$/, '$1.$2');
+  } else if (cnpjClean.length <= 8) {
+    return cnpjClean.replace(/^(\d{2})(\d{3})(\d*)$/, '$1.$2.$3');
+  } else if (cnpjClean.length <= 12) {
+    return cnpjClean.replace(/^(\d{2})(\d{3})(\d{3})(\d*)$/, '$1.$2.$3/$4');
+  } else {
+    // Full CNPJ formatting: xx.xxx.xxx/xxxx-xx
     return cnpjClean
-      .replace(/(\d{2})(\d)/, '$1.$2')
-      .replace(/(\d{3})(\d)/, '$1.$2')
-      .replace(/(\d{3})(\d)/, '$1/$2')
-      .replace(/(\d{4})(\d)/, '$1-$2')
-      .replace(/(-\d{2})\d+?$/, '$1');
+      .replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d*)$/, '$1.$2.$3/$4-$5')
+      .substring(0, 18); // Ensure it doesn't exceed 18 chars (formatted CNPJ length)
   }
-  return cnpjClean.substring(0, 14);
 };
 
 export const formatPhone = (value: string): string => {

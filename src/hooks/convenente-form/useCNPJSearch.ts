@@ -161,13 +161,45 @@ export const useCNPJSearch = (
     
   }, [cnpjInput, isLoading, isSearchPending, toast, fetchCNPJ]);
 
+  // Improved CNPJ input handling with cursor position preservation
   const handleCNPJChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setCnpjInput(formatCNPJ(value));
+    const input = e.target;
+    const value = input.value;
+    const selectionStart = input.selectionStart || 0;
+    const selectionEnd = input.selectionEnd || 0;
+    
+    // Count special characters before the cursor
+    const valueBeforeCursor = value.substring(0, selectionStart);
+    const specialCharsBeforeCursor = (valueBeforeCursor.match(/[^\d]/g) || []).length;
+    
+    // Format the CNPJ
+    const formattedValue = formatCNPJ(value);
+    
+    // Update the display value
+    setCnpjInput(formattedValue);
+    
+    // Update the underlying form data with only digits
     setFormData(prev => ({
       ...prev,
-      cnpj: value.replace(/\D/g, '')
+      cnpj: formattedValue.replace(/\D/g, '')
     }));
+    
+    // Calculate new cursor position
+    setTimeout(() => {
+      if (input) {
+        // Count special chars in the formatted value up to where the cursor would be
+        const formattedBeforeCursor = formattedValue.substring(0, selectionStart);
+        const newSpecialCharsBeforeCursor = (formattedBeforeCursor.match(/[^\d]/g) || []).length;
+        
+        // Adjust cursor position based on added/removed special characters
+        const specialCharDiff = newSpecialCharsBeforeCursor - specialCharsBeforeCursor;
+        const newPosition = selectionStart + specialCharDiff;
+        
+        // Set cursor position, ensuring it's within bounds
+        const safePosition = Math.min(Math.max(0, newPosition), formattedValue.length);
+        input.setSelectionRange(safePosition, safePosition);
+      }
+    }, 0);
   };
 
   return {

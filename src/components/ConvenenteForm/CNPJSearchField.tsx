@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
@@ -24,6 +24,8 @@ const CNPJSearchField = ({
   error,
   disabled = false
 }: CNPJSearchFieldProps) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  
   // Improved event handlers with better stopPropagation and preventDefault
   const onSearchClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -63,6 +65,7 @@ const CNPJSearchField = ({
       <div className="flex flex-col">
         <div className="flex">
           <Input 
+            ref={inputRef}
             placeholder="00.000.000/0000-00" 
             className={`border-blue-200 focus:border-blue-500 bg-blue-50 rounded-r-none ${error ? 'border-red-500' : ''}`}
             value={cnpjInput}
