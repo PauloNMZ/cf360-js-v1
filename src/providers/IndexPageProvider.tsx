@@ -35,7 +35,8 @@ export const IndexPageProvider = ({ children }: { children: ReactNode }) => {
     setFormMode: indexPage.setFormMode,
     setFormValid: indexPage.setFormValid,
     setCurrentConvenenteId: indexPage.setCurrentConvenenteId,
-    loadConvenenteData: indexPage.loadConvenenteData
+    loadConvenenteData: indexPage.loadConvenenteData,
+    isDeleting: indexPageActions.isDeleting // Add isDeleting to state manager
   });
 
   // Get event handlers

@@ -12,7 +12,8 @@ export const useIndexPageStateManager = ({
   setFormMode,
   setFormValid,
   setCurrentConvenenteId,
-  loadConvenenteData
+  loadConvenenteData,
+  isDeleting
 }: {
   modalOpen: boolean;
   importModalOpen: boolean;
@@ -23,6 +24,7 @@ export const useIndexPageStateManager = ({
   setFormValid: (valid: boolean) => void;
   setCurrentConvenenteId: (id: string | null) => void;
   loadConvenenteData: (isOpen: boolean) => void;
+  isDeleting: boolean;
 }) => {
   const { loadAppState, saveAppState } = useAppState();
   
