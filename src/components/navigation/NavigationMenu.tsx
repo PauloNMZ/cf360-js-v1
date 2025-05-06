@@ -10,7 +10,7 @@ import {
   Search, 
   LogOut,
   Shield,
-  FileJson,
+  FileSpreadsheet,
 } from "lucide-react";
 import { 
   Tooltip,
@@ -57,7 +57,7 @@ const NavigationMenu = ({
             <TooltipTrigger asChild>
               <div>
                 <NavButton 
-                  icon={<CloudUpload size={24} />} 
+                  icon={<FileSpreadsheet size={24} />} 
                   label="Planilha" 
                   onClick={onImportarPlanilhaClick} 
                 />
