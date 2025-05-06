@@ -1,5 +1,5 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useConvenenteData } from "../convenente/useConvenenteData";
 import { useConvenenteSearch } from "../convenente/useConvenenteSearch";
 
@@ -11,17 +11,22 @@ export const useIndexPageData = (modalOpen: boolean) => {
   const convenenteData = useConvenenteData();
   const searchState = useConvenenteSearch(convenenteData.convenentes);
   
+  // Initialize isDeleting state
+  const [isDeleting, setIsDeleting] = useState(false);
+  
   // Load convenentes when modal is opened
   useEffect(() => {
-    convenenteData.loadConvenenteData(modalOpen);
-  }, [modalOpen]);
+    if (!isDeleting) { // Don't load data during deletion
+      convenenteData.loadConvenenteData(modalOpen);
+    }
+  }, [modalOpen, isDeleting]);
 
   // Reset form data when modal is closed
   useEffect(() => {
-    if (!modalOpen) {
+    if (!modalOpen && !isDeleting) { // Don't reset during deletion
       convenenteData.resetFormData();
     }
-  }, [modalOpen]);
+  }, [modalOpen, isDeleting]);
 
   return {
     // Form and data states from useConvenenteData
@@ -35,7 +40,8 @@ export const useIndexPageData = (modalOpen: boolean) => {
     setCurrentConvenenteId: convenenteData.setCurrentConvenenteId,
     isLoading: convenenteData.isLoading,
     setIsLoading: convenenteData.setIsLoading,
-    isDeleting: false, // Default isDeleting state
+    isDeleting, // Expose isDeleting state
+    setIsDeleting, // Expose setter
     
     // Functions from useConvenenteData
     handleSelectConvenente: convenenteData.handleSelectConvenente,

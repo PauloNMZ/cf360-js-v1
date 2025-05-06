@@ -45,11 +45,14 @@ export const useDeleteActions = (
     }
     
     try {
+      // Set deletion status FIRST before any other operations
       setIsDeleting(true);
       setIsLoading(true);
       
       console.log("Iniciando exclusão do convenente:", currentConvenenteId);
-      const success = await removeConvenente(currentConvenenteId);
+      const convenenteIdToDelete = currentConvenenteId; // Store ID for later use
+      
+      const success = await removeConvenente(convenenteIdToDelete);
       
       if (success) {
         console.log("Convenente excluído com sucesso");
@@ -58,10 +61,8 @@ export const useDeleteActions = (
         const updatedConvenentes = await fetchConvenentes();
         console.log("Lista atualizada:", updatedConvenentes.length, "convenentes");
         
+        // Update state in proper sequence
         setConvenentes(updatedConvenentes);
-        
-        // Clear selected convenente and form
-        const convenenteId = currentConvenenteId; // Store ID for logging
         setCurrentConvenenteId(null);
         setFormData({...emptyConvenente});
         setFormMode('view');
@@ -71,7 +72,7 @@ export const useDeleteActions = (
           description: "O convenente foi excluído com sucesso.",
         });
         
-        console.log("Operação concluída para convenente:", convenenteId);
+        console.log("Operação concluída para convenente:", convenenteIdToDelete);
       } else {
         throw new Error("Falha ao excluir convenente");
       }
@@ -83,10 +84,10 @@ export const useDeleteActions = (
         variant: "destructive",
       });
     } finally {
-      // Only close the dialog after all operations are complete
-      setIsDeleting(false);
+      // IMPORTANT: Only update these states after all other operations are complete
+      // and only close the dialog at the very end
       setIsLoading(false);
-      // It's important to close the dialog last, after all state updates
+      setIsDeleting(false);
       setShowDeleteDialog(false);
     }
   };

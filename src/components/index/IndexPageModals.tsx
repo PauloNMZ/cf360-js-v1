@@ -6,7 +6,6 @@ import ImportacaoModal from "@/components/importacao/ImportacaoModal";
 import CNABToAPIModal from "@/components/cnabToApi/CNABToAPIModal";
 import AdminPanelModal from "@/components/admin/AdminPanelModal";
 import { useIndexPageContext } from "@/hooks/useIndexPageContext";
-import { emptyConvenente } from "@/types/convenente";
 
 export const IndexPageModals = () => {
   const {
@@ -22,7 +21,7 @@ export const IndexPageModals = () => {
     // Dialogs
     showDeleteDialog,
     setShowDeleteDialog,
-    isDeleting,
+    isDeleting, // Make sure isDeleting is used from context
     
     // Form states and data
     convenentes,
@@ -47,26 +46,37 @@ export const IndexPageModals = () => {
     handleFormDataChange,
   } = useIndexPageContext();
 
+  // Create a special modal change handler that respects isDeleting state
+  const handleModalOpenChange = (open: boolean, currentlyOpen: boolean, setOpen: (o: boolean) => void) => {
+    // Prevent closing any modal if a deletion is in progress
+    if (isDeleting && !open && currentlyOpen) {
+      console.log("Preventing modal close during deletion");
+      return;
+    }
+    setOpen(open);
+  };
+
   return (
     <>
       <ConvenenteModal 
         isOpen={modalOpen}
-        onOpenChange={(open) => {
-          // Don't close the modal if a deletion is in progress
-          if (isDeleting && !open) return;
-          handleConvenenteModalOpenChange(open);
-        }}
+        onOpenChange={(open) => handleConvenenteModalOpenChange(open)}
         convenentes={convenentes}
         filteredConvenentes={filteredConvenentes}
         currentConvenenteId={currentConvenenteId}
         formData={formData}
         formMode={formMode}
         formValid={formValid}
-        isLoading={isLoading}
+        isLoading={isLoading || isDeleting} // Show loading state during deletion
         isSearching={isSearching}
         searchTerm={searchTerm}
         onSearchChange={handleSearchChange}
-        onSelectConvenente={(convenente) => handleSelectConvenente(convenente, formMode)}
+        onSelectConvenente={(convenente) => {
+          // Prevent selecting convenentes during deletion
+          if (!isDeleting) {
+            handleSelectConvenente(convenente, formMode);
+          }
+        }}
         onCreateNew={handleCreateNew}
         onEdit={handleEdit}
         onDelete={handleDelete}
@@ -77,30 +87,34 @@ export const IndexPageModals = () => {
       <ImportacaoModal 
         isOpen={importModalOpen}
         onOpenChange={(open) => {
-          if (isDeleting) return; // Prevent modal changes during deletion
-          setImportModalOpen(open);
+          handleModalOpenChange(open, importModalOpen, setImportModalOpen);
         }}
       />
 
       <CNABToAPIModal 
         isOpen={cnabToApiModalOpen}
         onOpenChange={(open) => {
-          if (isDeleting) return; // Prevent modal changes during deletion
-          setCnabToApiModalOpen(open);
+          handleModalOpenChange(open, cnabToApiModalOpen, setCnabToApiModalOpen);
         }}
       />
 
       <AdminPanelModal 
         isOpen={adminPanelOpen}
         onOpenChange={(open) => {
-          if (isDeleting) return; // Prevent modal changes during deletion
-          setAdminPanelOpen(open);
+          handleModalOpenChange(open, adminPanelOpen, setAdminPanelOpen);
         }}
       />
 
       <DeleteConvenenteDialog 
         isOpen={showDeleteDialog}
-        onOpenChange={setShowDeleteDialog}
+        onOpenChange={(open) => {
+          // Special handling for delete dialog to prevent closure during deletion
+          if (isDeleting && !open) {
+            console.log("Preventing delete dialog close during deletion");
+            return;
+          }
+          setShowDeleteDialog(open);
+        }}
         onDelete={confirmDelete}
         isDeleting={isDeleting}
       />

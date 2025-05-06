@@ -25,9 +25,9 @@ const DeleteConvenenteDialog = ({
   onDelete,
   isDeleting = false
 }: DeleteConvenenteDialogProps) => {
-  // Prevent closing the dialog while deleting
+  // Strictly prevent closing the dialog while deleting
   const handleOpenChange = (open: boolean) => {
-    // Don't allow closing the dialog during deletion
+    // If trying to close during deletion, prevent it
     if (isDeleting && !open) {
       return;
     }
