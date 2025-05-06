@@ -1,8 +1,9 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useIndexPage } from "@/hooks/useIndexPage";
 import { useIndexPageActions } from "@/hooks/useIndexPageActions";
+import { useAppState } from "@/hooks/useAppState";
 
 // Import components
 import MainLayout from "@/components/layout/MainLayout";
@@ -16,6 +17,7 @@ import { emptyConvenente } from "@/types/convenente";
 
 const Index = () => {
   const { signOut } = useAuth();
+  const { loadAppState, saveAppState } = useAppState();
   
   const {
     modalOpen,
@@ -66,6 +68,39 @@ const Index = () => {
     setIsLoading
   });
 
+  // Load saved app state when component mounts
+  useEffect(() => {
+    const savedState = loadAppState();
+    
+    if (savedState.lastModalOpen) {
+      // Restore any previously open modals
+      if (savedState.lastModalOpen.convenente) {
+        setModalOpen(true);
+      }
+      if (savedState.lastModalOpen.importacao) {
+        setImportModalOpen(true);
+      }
+      if (savedState.lastModalOpen.cnabToApi) {
+        setCnabToApiModalOpen(true);
+      }
+      if (savedState.lastModalOpen.adminPanel) {
+        setAdminPanelOpen(true);
+      }
+    }
+  }, []);
+
+  // Save app state whenever modals change
+  useEffect(() => {
+    saveAppState({
+      lastModalOpen: {
+        convenente: modalOpen,
+        importacao: importModalOpen,
+        cnabToApi: cnabToApiModalOpen,
+        adminPanel: adminPanelOpen
+      }
+    });
+  }, [modalOpen, importModalOpen, cnabToApiModalOpen, adminPanelOpen]);
+
   const handleConvenenteClick = () => {
     setModalOpen(true);
   };
@@ -79,6 +114,9 @@ const Index = () => {
   };
 
   const handleLogoutClick = async () => {
+    // Clear app state before logout
+    saveAppState({});
+    
     await signOut();
     // Limpar todos os dados após logout
     setFormData({...emptyConvenente});
@@ -117,6 +155,9 @@ const Index = () => {
           onCnabToApiClick={() => setCnabToApiModalOpen(true)}
           onAdminPanelClick={() => setAdminPanelOpen(true)}
           onLogoutClick={async () => {
+            // Clear app state before logout
+            saveAppState({});
+            
             await signOut();
             // Limpar todos os dados após logout
             setFormData({...emptyConvenente});
