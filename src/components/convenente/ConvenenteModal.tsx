@@ -1,15 +1,10 @@
 
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { AlertCircle, Edit, Loader2, Plus, Save, Search, TrashIcon } from "lucide-react";
-import FormularioModerno from "@/components/FormularioModerno";
-import { ConvenenteData, emptyConvenente } from "@/types/convenente";
-import { formatCNPJ } from "@/utils/formValidation";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import ConvenenteCredentialsSection from "./ConvenenteCredentialsSection";
+import { ConvenenteData } from "@/types/convenente";
+import ConvenenteList from "./modal/ConvenenteList";
+import ActionButtons from "./modal/ActionButtons";
+import ConvenenteForm from "./modal/ConvenenteForm";
 
 type ConvenenteModalProps = {
   isOpen: boolean;
@@ -67,9 +62,6 @@ const ConvenenteModal = ({
     onSave();
   };
 
-  // Somente mostrar a aba de credenciais se houver um convenente selecionado
-  const showCredentialsTab = formMode === 'view' && currentConvenenteId !== null;
-
   // Determine if save button should be disabled
   const isSaveDisabled = !(formMode === 'create' || formMode === 'edit') || 
                         isLoading || 
@@ -84,133 +76,38 @@ const ConvenenteModal = ({
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Lista de convenentes */}
-          <div className="bg-white p-4 rounded-lg shadow-sm">
-            <div className="mb-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                <Input 
-                  placeholder="Buscar convenentes..." 
-                  className="pl-10 border-blue-200 focus:border-blue-500"
-                  value={searchTerm}
-                  onChange={onSearchChange}
-                />
-                {isSearching && (
-                  <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 animate-spin text-blue-500" size={18} />
-                )}
-              </div>
-            </div>
-            
-            <div className="h-[500px] overflow-y-auto">
-              {isLoading ? (
-                <div className="flex items-center justify-center h-full">
-                  Carregando...
-                </div>
-              ) : filteredConvenentes.length > 0 ? (
-                <ul className="space-y-2">
-                  {filteredConvenentes.map((convenente) => (
-                    <li 
-                      key={convenente.id}
-                      onClick={() => onSelectConvenente(convenente)}
-                      className={`p-3 rounded-lg cursor-pointer transition-colors ${
-                        currentConvenenteId === convenente.id 
-                          ? 'bg-blue-100 border border-blue-300' 
-                          : 'hover:bg-gray-100 border border-gray-200'
-                      }`}
-                    >
-                      <h3 className="font-medium text-blue-800">{convenente.razaoSocial}</h3>
-                      <p className="text-sm text-gray-500">
-                        CNPJ: {formatCNPJ(convenente.cnpj)}
-                      </p>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <div className="flex flex-col items-center justify-center h-full text-gray-500">
-                  <AlertCircle size={40} className="mb-2 text-blue-400" />
-                  {searchTerm ? (
-                    <p>Nenhum resultado para "{searchTerm}"</p>
-                  ) : (
-                    <p>Nenhum convenente cadastrado</p>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
+          <ConvenenteList
+            convenentes={convenentes}
+            filteredConvenentes={filteredConvenentes}
+            currentConvenenteId={currentConvenenteId}
+            isLoading={isLoading}
+            isSearching={isSearching}
+            searchTerm={searchTerm}
+            onSearchChange={onSearchChange}
+            onSelectConvenente={onSelectConvenente}
+          />
           
           {/* Formulário */}
           <div className="lg:col-span-2">
-            <div className="flex justify-between mb-4">
-              <div className="flex space-x-2">
-                <Button
-                  onClick={handleCreateNewClick}
-                  variant="outline"
-                  className={`flex items-center gap-1 ${formMode === 'create' ? 'bg-blue-100 border-blue-300 font-bold' : ''}`}
-                  disabled={formMode === 'create'}
-                >
-                  <Plus size={16} /> Novo
-                </Button>
-                <Button
-                  onClick={onEdit}
-                  variant="outline"
-                  className={`flex items-center gap-1 ${formMode === 'edit' ? 'bg-blue-100 border-blue-300 font-bold' : ''}`}
-                  disabled={formMode === 'edit' || !currentConvenenteId}
-                >
-                  <Edit size={16} /> Editar
-                </Button>
-                <Button
-                  onClick={onDelete}
-                  variant="outline"
-                  className="flex items-center gap-1 text-red-600 border-red-200 hover:bg-red-50"
-                  disabled={!currentConvenenteId}
-                >
-                  <TrashIcon size={16} /> Excluir
-                </Button>
-              </div>
-              {(formMode === 'create' || formMode === 'edit') && (
-                <Button
-                  onClick={handleSaveClick}
-                  variant="default"
-                  className="flex items-center gap-1 bg-green-600 hover:bg-green-700"
-                  disabled={isSaveDisabled}
-                >
-                  <Save size={16} /> Salvar
-                  {isLoading && <Loader2 className="ml-2 animate-spin" size={16} />}
-                </Button>
-              )}
-            </div>
+            <ActionButtons
+              formMode={formMode}
+              currentConvenenteId={currentConvenenteId}
+              isLoading={isLoading}
+              isSaveDisabled={isSaveDisabled}
+              onCreateNew={handleCreateNewClick}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              onSave={handleSaveClick}
+            />
             
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="mb-4">
-                <TabsTrigger value="dados">Dados Cadastrais</TabsTrigger>
-                {showCredentialsTab && (
-                  <TabsTrigger value="credenciais">Credenciais de API</TabsTrigger>
-                )}
-              </TabsList>
-              
-              <TabsContent value="dados" className="mt-0">
-                <ScrollArea className="h-[500px] pr-4">
-                  <div className="py-4">
-                    <FormularioModerno 
-                      onFormDataChange={onFormDataChange} 
-                      formMode={formMode}
-                      initialData={formData} 
-                    />
-                  </div>
-                </ScrollArea>
-              </TabsContent>
-              
-              {showCredentialsTab && (
-                <TabsContent value="credenciais" className="mt-0">
-                  <ScrollArea className="h-[500px] pr-4">
-                    <div className="py-4">
-                      <ConvenenteCredentialsSection 
-                        convenenteId={currentConvenenteId}
-                      />
-                    </div>
-                  </ScrollArea>
-                </TabsContent>
-              )}
-            </Tabs>
+            <ConvenenteForm
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              formData={formData}
+              formMode={formMode}
+              currentConvenenteId={currentConvenenteId}
+              onFormDataChange={onFormDataChange}
+            />
           </div>
         </div>
       </DialogContent>
