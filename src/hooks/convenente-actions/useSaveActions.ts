@@ -45,6 +45,7 @@ export const useSaveActions = (
         // Save new convenente
         console.log("Criando novo convenente:", formData);
         const savedConvenente = await createConvenente(formData);
+        console.log("Convenente salvo com sucesso:", savedConvenente);
         
         toast({
           title: "Convenente salvo",
@@ -63,6 +64,7 @@ export const useSaveActions = (
         // Update existing convenente
         console.log("Atualizando convenente existente:", currentConvenenteId, formData);
         const updatedConvenente = await updateConvenenteData(currentConvenenteId, formData);
+        console.log("Convenente atualizado com sucesso:", updatedConvenente);
         
         if (updatedConvenente) {
           toast({

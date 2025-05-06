@@ -19,11 +19,6 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
   const contactInfoRef = useRef<ContactInfoSectionRef>(null);
   
   console.log("FormularioModerno render - mode:", formMode, "initialData:", initialData);
-  
-  // Add effect to log whenever formMode changes
-  useEffect(() => {
-    console.log("FormularioModerno formMode changed to:", formMode);
-  }, [formMode]);
 
   const {
     cnpjInput,
@@ -43,13 +38,6 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
     initialData,
     contactInfoRef,
   });
-  
-  console.log("Current form state:", { 
-    formData,
-    errors,
-    mode: formMode,
-    loading: isLoading
-  });
 
   // Determine if fields should be editable based on formMode
   const isEditableMode = formMode === 'create' || formMode === 'edit';
@@ -57,11 +45,6 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
   return (
     <div className="bg-white p-6 rounded-lg dark:bg-background dark:text-foreground">
       <FormHeader />
-
-      {/* Current mode indicator for debugging */}
-      <div className="bg-blue-50 mb-4 p-2 rounded text-sm border border-blue-200">
-        <strong>Modo atual:</strong> {formMode} (Editável: {isEditableMode ? 'Sim' : 'Não'})
-      </div>
 
       {/* Informações Cadastrais da Empresa */}
       <CompanyInfoSection 

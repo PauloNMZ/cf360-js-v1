@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, ReactNode, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useIndexPage } from "@/hooks/useIndexPage";
@@ -32,11 +33,6 @@ export const IndexPageProvider = ({ children }: { children: ReactNode }) => {
     setCurrentConvenenteId: indexPage.setCurrentConvenenteId,
     setIsLoading: indexPage.setIsLoading
   });
-
-  // Debug mode changes
-  useEffect(() => {
-    console.log("IndexPageProvider - formMode changed to:", indexPage.formMode);
-  }, [indexPage.formMode]);
   
   // Load saved app state when component mounts
   React.useEffect(() => {
@@ -140,7 +136,10 @@ export const IndexPageProvider = ({ children }: { children: ReactNode }) => {
 
   // Function to save current form data
   const handleSaveClick = () => {
-    console.log("Save button clicked, current mode:", indexPage.formMode);
+    console.log("IndexPageProvider - handleSaveClick called with mode:", indexPage.formMode);
+    console.log("FormData:", indexPage.formData);
+    
+    // Directly call the handleSave function with the current form data
     indexPageActions.handleSave(indexPage.formData);
   };
 
