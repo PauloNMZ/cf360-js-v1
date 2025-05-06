@@ -39,43 +39,54 @@ export const useDeleteActions = (
   };
 
   const confirmDelete = async () => {
-    if (currentConvenenteId) {
-      try {
-        setIsDeleting(true);
-        setIsLoading(true);
+    if (!currentConvenenteId) {
+      setShowDeleteDialog(false);
+      return;
+    }
+    
+    try {
+      setIsDeleting(true);
+      setIsLoading(true);
+      
+      console.log("Iniciando exclusão do convenente:", currentConvenenteId);
+      const success = await removeConvenente(currentConvenenteId);
+      
+      if (success) {
+        console.log("Convenente excluído com sucesso");
         
-        const success = await removeConvenente(currentConvenenteId);
+        // Update list after successful deletion
+        const updatedConvenentes = await fetchConvenentes();
+        console.log("Lista atualizada:", updatedConvenentes.length, "convenentes");
         
-        if (success) {
-          toast({
-            title: "Convenente excluído",
-            description: "O convenente foi excluído com sucesso.",
-          });
-          
-          // Update list after successful deletion
-          const updatedConvenentes = await fetchConvenentes();
-          setConvenentes(updatedConvenentes);
-          setCurrentConvenenteId(null);
-          setFormData({...emptyConvenente});
-          setFormMode('view');
-          
-          // Only close the dialog after everything is done
-          setShowDeleteDialog(false);
-        } else {
-          throw new Error("Falha ao excluir convenente");
-        }
-      } catch (error) {
-        console.error("Erro ao excluir:", error);
+        setConvenentes(updatedConvenentes);
+        
+        // Clear selected convenente and form
+        const convenenteId = currentConvenenteId; // Store ID for logging
+        setCurrentConvenenteId(null);
+        setFormData({...emptyConvenente});
+        setFormMode('view');
+        
         toast({
-          title: "Erro ao excluir",
-          description: "Não foi possível excluir o convenente.",
-          variant: "destructive",
+          title: "Convenente excluído",
+          description: "O convenente foi excluído com sucesso.",
         });
-      } finally {
-        setIsDeleting(false);
-        setIsLoading(false);
+        
+        console.log("Operação concluída para convenente:", convenenteId);
+      } else {
+        throw new Error("Falha ao excluir convenente");
       }
-    } else {
+    } catch (error) {
+      console.error("Erro ao excluir:", error);
+      toast({
+        title: "Erro ao excluir",
+        description: "Não foi possível excluir o convenente.",
+        variant: "destructive",
+      });
+    } finally {
+      // Only close the dialog after all operations are complete
+      setIsDeleting(false);
+      setIsLoading(false);
+      // It's important to close the dialog last, after all state updates
       setShowDeleteDialog(false);
     }
   };

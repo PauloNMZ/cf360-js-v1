@@ -52,6 +52,8 @@ export const IndexPageModals = () => {
       <ConvenenteModal 
         isOpen={modalOpen}
         onOpenChange={(open) => {
+          // Don't close the modal if a deletion is in progress
+          if (isDeleting && !open) return;
           handleConvenenteModalOpenChange(open);
         }}
         convenentes={convenentes}
@@ -74,17 +76,26 @@ export const IndexPageModals = () => {
 
       <ImportacaoModal 
         isOpen={importModalOpen}
-        onOpenChange={(open) => setImportModalOpen(open)}
+        onOpenChange={(open) => {
+          if (isDeleting) return; // Prevent modal changes during deletion
+          setImportModalOpen(open);
+        }}
       />
 
       <CNABToAPIModal 
         isOpen={cnabToApiModalOpen}
-        onOpenChange={setCnabToApiModalOpen}
+        onOpenChange={(open) => {
+          if (isDeleting) return; // Prevent modal changes during deletion
+          setCnabToApiModalOpen(open);
+        }}
       />
 
       <AdminPanelModal 
         isOpen={adminPanelOpen}
-        onOpenChange={(open) => setAdminPanelOpen(open)}
+        onOpenChange={(open) => {
+          if (isDeleting) return; // Prevent modal changes during deletion
+          setAdminPanelOpen(open);
+        }}
       />
 
       <DeleteConvenenteDialog 

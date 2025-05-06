@@ -38,19 +38,21 @@ export const useIndexPageStateManager = ({
     }
   }, []);
 
-  // Save app state whenever modals change
+  // Save app state whenever modals change - but only if not deleting
   useEffect(() => {
-    saveAppState({
-      lastModalOpen: {
-        convenente: modalOpen,
-        importacao: importModalOpen,
-        cnabToApi: cnabToApiModalOpen,
-        adminPanel: adminPanelOpen
-      }
-    });
-  }, [modalOpen, importModalOpen, cnabToApiModalOpen, adminPanelOpen]);
+    if (!isDeleting) { // Don't save state during deletion process
+      saveAppState({
+        lastModalOpen: {
+          convenente: modalOpen,
+          importacao: importModalOpen,
+          cnabToApi: cnabToApiModalOpen,
+          adminPanel: adminPanelOpen
+        }
+      });
+    }
+  }, [modalOpen, importModalOpen, cnabToApiModalOpen, adminPanelOpen, isDeleting]);
   
-  // Load convenentes when modal is opened
+  // Load convenentes when modal is opened - but only if not deleting
   useEffect(() => {
     if (!isDeleting) { // Only load data if we're not currently deleting
       loadConvenenteData(modalOpen);

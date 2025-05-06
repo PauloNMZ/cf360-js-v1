@@ -35,7 +35,7 @@ export const useIndexPageData = (modalOpen: boolean) => {
     setCurrentConvenenteId: convenenteData.setCurrentConvenenteId,
     isLoading: convenenteData.isLoading,
     setIsLoading: convenenteData.setIsLoading,
-    isDeleting: false, // Add default isDeleting state
+    isDeleting: false, // Default isDeleting state
     
     // Functions from useConvenenteData
     handleSelectConvenente: convenenteData.handleSelectConvenente,

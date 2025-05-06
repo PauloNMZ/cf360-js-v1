@@ -49,6 +49,7 @@ const DeleteConvenenteDialog = ({
           <AlertDialogAction 
             onClick={(e) => {
               e.preventDefault();
+              e.stopPropagation();
               onDelete();
             }} 
             className="bg-red-600 hover:bg-red-700"
