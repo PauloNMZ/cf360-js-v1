@@ -4,7 +4,7 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { AppLogo } from "@/components/ui/AppLogo";
 import { useAuth } from "@/hooks/use-auth";
 import { getContentContainerStyle } from "@/utils/viewportUtils";
-import { CompanySettings } from "@/hooks/convenente/useCompanySettings";
+import { CompanySettings } from "@/types/companySettings"; // Fixed import
 
 type MainLayoutProps = {
   children: React.ReactNode;
