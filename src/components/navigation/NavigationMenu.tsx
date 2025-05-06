@@ -73,7 +73,7 @@ const NavigationMenu = ({
               <div>
                 <NavButton 
                   icon={<FileUp size={24} />} 
-                  label="CNAB to API" 
+                  label={<span className="text-xs">CNAB to API</span>} 
                   onClick={onCnabToApiClick} 
                 />
               </div>

@@ -3,7 +3,7 @@ import React from 'react';
 
 interface NavButtonProps {
   icon: React.ReactNode;
-  label: string;
+  label: React.ReactNode | string;
   onClick: () => void;
   className?: string;
 }
@@ -17,9 +17,11 @@ export const NavButton = ({ icon, label, onClick, className = "" }: NavButtonPro
       onClick={onClick}
     >
       <div className="flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900/50 rounded-full text-blue-700 dark:text-blue-300 shadow-sm">
-        {React.cloneElement(icon as React.ReactElement, { size: 28, strokeWidth: 1.5 })}
+        {React.cloneElement(icon as React.ReactElement, { size: 22, strokeWidth: 1.5 })}
       </div>
-      <span className="text-sm text-gray-800 dark:text-gray-200 text-center mt-3 font-medium tracking-wide">{label}</span>
+      <div className="text-sm text-gray-800 dark:text-gray-200 text-center mt-3 font-medium tracking-wide overflow-hidden px-1 w-full">
+        {label}
+      </div>
     </button>
   );
 };
