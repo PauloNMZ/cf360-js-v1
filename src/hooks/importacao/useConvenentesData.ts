@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from '@/components/ui/sonner';
-import { getConvenentes } from '@/services/convenenteService';
+import { getConvenentes } from '@/services/convenente/convenenteService';
 
 export const useConvenentesData = () => {
   const [convenentes, setConvenentes] = useState<Array<any>>([]);
