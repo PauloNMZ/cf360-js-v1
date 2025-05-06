@@ -3,7 +3,7 @@ import React from "react";
 import { NavButton } from "@/components/ui/NavButton";
 import { 
   Home, 
-  FileUp, 
+  CloudUpload, 
   Send, 
   RefreshCw, 
   FileText, 
@@ -57,7 +57,7 @@ const NavigationMenu = ({
             <TooltipTrigger asChild>
               <div>
                 <NavButton 
-                  icon={<FileUp size={24} />} 
+                  icon={<CloudUpload size={24} />} 
                   label="Planilha" 
                   onClick={onImportarPlanilhaClick} 
                 />
