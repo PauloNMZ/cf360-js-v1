@@ -48,13 +48,27 @@ export const useConvenenteForm = ({
     handleCNPJChange
   } = useCNPJSearch(formData, setFormData, setDataLoaded, setTouched, contactInfoRef);
 
+  // Debug log for formMode changes
+  useEffect(() => {
+    console.log(`useConvenenteForm: formMode changed to ${formMode}`, { 
+      initialData, 
+      formMode 
+    });
+  }, [formMode, initialData]);
+
   // Initialize form with provided data
   useEffect(() => {
+    console.log("useConvenenteForm: initialData effect running", { 
+      hasInitialData: Object.keys(initialData).length > 0,
+      formMode
+    });
+    
     if (initialData && Object.keys(initialData).length > 0) {
       setIsUpdating(true);
       setShouldSkipValidation(true);
       
       try {
+        console.log("Setting form data from initialData:", initialData);
         setFormData(prev => ({
           ...prev,
           ...initialData
@@ -85,6 +99,7 @@ export const useConvenenteForm = ({
   // Reset form if formMode is 'create'
   useEffect(() => {
     if (formMode === 'create') {
+      console.log("useConvenenteForm: Resetting form for create mode");
       setFormData({...emptyConvenente});
       resetTouch();
       resetErrors();

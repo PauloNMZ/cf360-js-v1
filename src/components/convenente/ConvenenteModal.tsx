@@ -57,9 +57,16 @@ const ConvenenteModal = ({
   }, [formMode]);
   
   // Handle create new click with improved debugging
-  const handleCreateNewClick = () => {
+  const handleCreateNewClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     console.log("Create New button clicked in ConvenenteModal");
     onCreateNew();
+    
+    // Add a timeout to check the mode after the click
+    setTimeout(() => {
+      console.log("Verifying form mode after Create New clicked...");
+    }, 100);
   };
 
   return (
@@ -131,7 +138,7 @@ const ConvenenteModal = ({
                 <Button
                   onClick={handleCreateNewClick}
                   variant="outline"
-                  className="flex items-center gap-1"
+                  className={`flex items-center gap-1 ${formMode === 'create' ? 'bg-blue-100 border-blue-300' : ''}`}
                   disabled={formMode === 'create'}
                 >
                   <Plus size={16} /> Novo
@@ -139,7 +146,7 @@ const ConvenenteModal = ({
                 <Button
                   onClick={onEdit}
                   variant="outline"
-                  className="flex items-center gap-1"
+                  className={`flex items-center gap-1 ${formMode === 'edit' ? 'bg-blue-100 border-blue-300' : ''}`}
                   disabled={formMode === 'edit' || !currentConvenenteId}
                 >
                   <Edit size={16} /> Editar
@@ -167,9 +174,6 @@ const ConvenenteModal = ({
             
             <ScrollArea className="h-[500px] pr-4">
               <div className="py-4">
-                <div className="bg-blue-50 mb-2 p-2 rounded text-sm">
-                  <strong>Modo atual:</strong> {formMode} (Editable: {formMode !== 'view' ? 'Sim' : 'Não'})
-                </div>
                 <FormularioModerno 
                   onFormDataChange={onFormDataChange} 
                   formMode={formMode}

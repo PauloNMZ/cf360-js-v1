@@ -51,9 +51,17 @@ const FormularioModerno = ({ onFormDataChange, formMode, initialData = {} }: For
     loading: isLoading
   });
 
+  // Determine if fields should be editable based on formMode
+  const isEditableMode = formMode === 'create' || formMode === 'edit';
+
   return (
     <div className="bg-white p-6 rounded-lg dark:bg-background dark:text-foreground">
       <FormHeader />
+
+      {/* Current mode indicator for debugging */}
+      <div className="bg-blue-50 mb-4 p-2 rounded text-sm border border-blue-200">
+        <strong>Modo atual:</strong> {formMode} (Editável: {isEditableMode ? 'Sim' : 'Não'})
+      </div>
 
       {/* Informações Cadastrais da Empresa */}
       <CompanyInfoSection 

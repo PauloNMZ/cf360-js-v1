@@ -32,22 +32,28 @@ export const useIndexPageActions = (
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const handleCreateNew = () => {
-    console.log("handleCreateNew called, setting formMode to 'create'");
+    console.log("handleCreateNew called");
     
-    // First clear any current selection
-    setCurrentConvenenteId(null);
-    
-    // Reset form data to empty object
+    // Reset form data to empty object FIRST
     const emptyData = {...emptyConvenente};
     console.log("Setting form data to empty:", emptyData);
     setFormData(emptyData);
     
-    // Set form mode to create AFTER resetting data
+    // Clear any current selection
+    setCurrentConvenenteId(null);
+    
+    // IMPORTANT: Set form mode to create AFTER resetting data
+    // This ensures the form is in create mode when it renders with the empty data
+    console.log("Setting formMode to 'create'");
     setFormMode('create');
-    console.log("Form mode should now be 'create'");
     
     // Reset form validity
     setFormValid(false);
+    
+    // Add a delay and log to verify the mode was set correctly
+    setTimeout(() => {
+      console.log("Checking formMode after timeout: should be 'create'");
+    }, 100);
     
     // Show toast to confirm action to user
     toast({
@@ -156,6 +162,7 @@ export const useIndexPageActions = (
       setCurrentConvenenteId(null);
       
       // Return to view mode
+      console.log("Form saved, returning to view mode");
       setFormMode('view');
     } catch (error) {
       console.error('Erro ao salvar convenente:', error);

@@ -105,6 +105,9 @@ export const IndexPageProvider = ({ children }: { children: ReactNode }) => {
       console.log("Modal closing - resetting form to view mode");
       indexPage.setFormData({...emptyConvenente});
       indexPage.setCurrentConvenenteId(null);
+      
+      // IMPORTANT: Set form mode last to avoid race conditions
+      console.log("Setting formMode back to 'view' on modal close");
       indexPage.setFormMode('view');
       indexPage.setFormValid(false);
     } else {
@@ -114,6 +117,7 @@ export const IndexPageProvider = ({ children }: { children: ReactNode }) => {
 
   // Function to save current form data
   const handleSaveClick = () => {
+    console.log("Save button clicked, current mode:", indexPage.formMode);
     indexPageActions.handleSave(indexPage.formData);
   };
 
