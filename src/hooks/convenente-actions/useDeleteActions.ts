@@ -23,6 +23,7 @@ export const useDeleteActions = (
 ) => {
   const { toast } = useToast();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = () => {
     if (!currentConvenenteId) {
@@ -39,21 +40,30 @@ export const useDeleteActions = (
 
   const confirmDelete = async () => {
     if (currentConvenenteId) {
-      setIsLoading(true);
       try {
-        await removeConvenente(currentConvenenteId);
+        setIsDeleting(true);
+        setIsLoading(true);
         
-        toast({
-          title: "Convenente excluído",
-          description: "O convenente foi excluído com sucesso.",
-        });
+        const success = await removeConvenente(currentConvenenteId);
         
-        // Update list and close dialog
-        const updatedConvenentes = await fetchConvenentes();
-        setConvenentes(updatedConvenentes);
-        setCurrentConvenenteId(null);
-        setFormData({...emptyConvenente});
-        setFormMode('view');
+        if (success) {
+          toast({
+            title: "Convenente excluído",
+            description: "O convenente foi excluído com sucesso.",
+          });
+          
+          // Update list after successful deletion
+          const updatedConvenentes = await fetchConvenentes();
+          setConvenentes(updatedConvenentes);
+          setCurrentConvenenteId(null);
+          setFormData({...emptyConvenente});
+          setFormMode('view');
+          
+          // Close the dialog after successful deletion
+          setShowDeleteDialog(false);
+        } else {
+          throw new Error("Falha ao excluir convenente");
+        }
       } catch (error) {
         console.error("Erro ao excluir:", error);
         toast({
@@ -62,17 +72,19 @@ export const useDeleteActions = (
           variant: "destructive",
         });
       } finally {
+        setIsDeleting(false);
         setIsLoading(false);
       }
+    } else {
+      setShowDeleteDialog(false);
     }
-    
-    setShowDeleteDialog(false);
   };
 
   return {
     showDeleteDialog,
     setShowDeleteDialog,
     handleDelete,
-    confirmDelete
+    confirmDelete,
+    isDeleting
   };
 };

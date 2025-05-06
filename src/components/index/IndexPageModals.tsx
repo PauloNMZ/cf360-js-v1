@@ -1,3 +1,4 @@
+
 import React from "react";
 import ConvenenteModal from "@/components/convenente/ConvenenteModal";
 import DeleteConvenenteDialog from "@/components/convenente/DeleteConvenenteDialog";
@@ -21,6 +22,7 @@ export const IndexPageModals = () => {
     // Dialogs
     showDeleteDialog,
     setShowDeleteDialog,
+    isDeleting,
     
     // Form states and data
     convenentes,
@@ -89,6 +91,7 @@ export const IndexPageModals = () => {
         isOpen={showDeleteDialog}
         onOpenChange={setShowDeleteDialog}
         onDelete={confirmDelete}
+        isDeleting={isDeleting}
       />
     </>
   );

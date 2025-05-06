@@ -12,6 +12,7 @@ export interface IndexPageState {
   setAdminPanelOpen: (open: boolean) => void;
   showDeleteDialog: boolean;
   setShowDeleteDialog: (show: boolean) => void;
+  isDeleting: boolean;
   formMode: 'view' | 'create' | 'edit';
   setFormMode: (mode: 'view' | 'create' | 'edit') => void;
   
@@ -47,6 +48,7 @@ export interface IndexPageActions {
   handleCreateNew: () => void;
   handleDelete: () => void;
   confirmDelete: () => void;
+  isDeleting: boolean;
 }
 
 // Define props for IndexPageEventHandlers

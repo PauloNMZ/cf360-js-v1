@@ -52,6 +52,7 @@ export const IndexPageProvider = ({ children }: { children: ReactNode }) => {
     ...eventHandlers,
     cnabToApiModalOpen,
     setCnabToApiModalOpen,
+    isDeleting: indexPageActions.isDeleting, // Expose the isDeleting state
   };
 
   return (

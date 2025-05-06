@@ -10,17 +10,20 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from "@/components/ui/alert-dialog";
+import { Loader2 } from "lucide-react";
 
 type DeleteConvenenteDialogProps = {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   onDelete: () => void;
+  isDeleting?: boolean;
 };
 
 const DeleteConvenenteDialog = ({
   isOpen,
   onOpenChange,
-  onDelete
+  onDelete,
+  isDeleting = false
 }: DeleteConvenenteDialogProps) => {
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
@@ -33,9 +36,23 @@ const DeleteConvenenteDialog = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancelar</AlertDialogCancel>
-          <AlertDialogAction onClick={onDelete} className="bg-red-600 hover:bg-red-700">
-            Excluir
+          <AlertDialogCancel disabled={isDeleting}>Cancelar</AlertDialogCancel>
+          <AlertDialogAction 
+            onClick={(e) => {
+              e.preventDefault();
+              onDelete();
+            }} 
+            className="bg-red-600 hover:bg-red-700"
+            disabled={isDeleting}
+          >
+            {isDeleting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Excluindo...
+              </>
+            ) : (
+              'Excluir'
+            )}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
