@@ -11,7 +11,6 @@ import {
   LogOut,
   Shield,
   LayoutDashboard,
-  Upload
 } from "lucide-react";
 import { 
   Tooltip,
@@ -73,7 +72,7 @@ const NavigationMenu = ({
             <TooltipTrigger asChild>
               <div>
                 <NavButton 
-                  icon={<Upload size={24} />} 
+                  icon={<FileUp size={24} />} 
                   label="CNAB to API" 
                   onClick={onCnabToApiClick} 
                 />
