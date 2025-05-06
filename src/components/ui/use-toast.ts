@@ -6,7 +6,8 @@ import { Toast } from "@/components/ui/toast"
 const TOAST_LIMIT = 5
 const TOAST_REMOVE_DELAY = 1000000
 
-type ToasterToastProps = Toast & {
+// Fix: Use 'typeof Toast' instead of just 'Toast'
+type ToasterToastProps = React.ComponentPropsWithoutRef<typeof Toast> & {
   id: string
   title?: React.ReactNode
   description?: React.ReactNode
