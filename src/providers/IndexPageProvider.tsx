@@ -5,6 +5,7 @@ import { useIndexPage } from "@/hooks/useIndexPage";
 import { useIndexPageActions } from "@/hooks/useIndexPageActions";
 import { useAppState } from "@/hooks/useAppState";
 import { emptyConvenente } from "@/types/convenente";
+import { useToast } from "@/hooks/use-toast";
 
 // Create context with a default value
 export const IndexPageContext = createContext<any>({});
@@ -13,6 +14,7 @@ export const IndexPageContext = createContext<any>({});
 export const IndexPageProvider = ({ children }: { children: ReactNode }) => {
   const { signOut } = useAuth();
   const { loadAppState, saveAppState } = useAppState();
+  const { toast } = useToast();
   
   // Get all the states and functions from our hooks
   const indexPage = useIndexPage();
