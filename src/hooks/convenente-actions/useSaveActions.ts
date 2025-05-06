@@ -46,7 +46,6 @@ export const useSaveActions = (
           description: "CNPJ é obrigatório.",
           variant: "destructive",
         });
-        saveInProgressRef.current = false;
         return;
       }
       
@@ -57,7 +56,6 @@ export const useSaveActions = (
           description: "Razão Social é obrigatória.",
           variant: "destructive",
         });
-        saveInProgressRef.current = false;
         return;
       }
       
@@ -84,10 +82,17 @@ export const useSaveActions = (
           const updatedConvenentes = await fetchConvenentes();
           setConvenentes(updatedConvenentes);
           
-          // Optional: Select the newly created convenente
-          if (savedConvenente && savedConvenente.id) {
-            setCurrentConvenenteId(savedConvenente.id);
-          }
+          // Return to view mode before selecting the new convenente
+          setFormMode('view');
+          
+          // Wait a bit before selecting the new item to avoid loops
+          setTimeout(() => {
+            // Optional: Select the newly created convenente
+            if (savedConvenente && savedConvenente.id) {
+              setCurrentConvenenteId(savedConvenente.id);
+            }
+          }, 300);
+          
         } else {
           // Update existing convenente
           console.log("Updating existing convenente:", currentConvenenteId);
@@ -102,6 +107,9 @@ export const useSaveActions = (
             // Update list
             const updatedConvenentes = await fetchConvenentes();
             setConvenentes(updatedConvenentes);
+            
+            // Return to view mode
+            setFormMode('view');
           } else {
             toast({
               title: "Erro ao atualizar",
@@ -110,19 +118,6 @@ export const useSaveActions = (
             });
           }
         }
-        
-        // Check if we're in the middle of a mode change
-        if (!modeChangeInProgressRef.current) {
-          modeChangeInProgressRef.current = true;
-          
-          // Return to view mode with delay to prevent race conditions
-          setTimeout(() => {
-            console.log("Form saved, returning to view mode");
-            setFormMode('view');
-            modeChangeInProgressRef.current = false;
-          }, 400);
-        }
-        
       } catch (error) {
         console.error('Erro ao salvar convenente:', error);
         toast({
@@ -137,7 +132,7 @@ export const useSaveActions = (
       // Release save lock after a delay
       setTimeout(() => {
         saveInProgressRef.current = false;
-      }, 800); // Increased delay to ensure full completion
+      }, 800);
     }
   };
 

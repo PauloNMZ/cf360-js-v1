@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ConvenenteData, emptyConvenente } from "@/types/convenente";
 
@@ -19,55 +19,77 @@ export const useCreateEditActions = (
   }
 ) => {
   const { toast } = useToast();
+  const actionInProgressRef = useRef<boolean>(false);
 
   const handleCreateNew = () => {
+    // Prevent duplicate actions
+    if (actionInProgressRef.current) {
+      console.log("Create action already in progress, skipping");
+      return;
+    }
+    
+    actionInProgressRef.current = true;
     console.log("handleCreateNew called - STARTING CREATE FLOW");
     
-    // First set the mode to create - this ensures the form knows it should accept new input
-    console.log("Setting formMode to 'create'");
-    setFormMode('create');
-    
-    // Short delay to ensure mode change propagates
-    setTimeout(() => {
-      // Clear any current selection AFTER mode change
+    try {
+      // First clear any current selection
       setCurrentConvenenteId(null);
       console.log("Current convenente ID cleared");
       
-      // Reset form data to empty object AFTER mode change
+      // Reset form data to empty object
       const emptyData = {...emptyConvenente};
       console.log("Setting form data to empty:", emptyData);
       setFormData(emptyData);
       
-      // Reset form validity - in create mode, we'll validate as they type
+      // Reset form validity
       setFormValid(true);
       
-      // Add a delay and log to verify the mode was set correctly
-      setTimeout(() => {
-        console.log("VERIFICATION: Form mode should now be 'create'");
-      }, 100);
+      // AFTER data is reset, change the mode
+      console.log("Setting formMode to 'create'");
+      setFormMode('create');
       
       // Show toast to confirm action to user
       toast({
         title: "Modo de inclusão",
         description: "Você está no modo de inclusão de um novo convenente.",
       });
-    }, 50);
+    } finally {
+      // Release action lock after a delay
+      setTimeout(() => {
+        actionInProgressRef.current = false;
+      }, 500);
+    }
   };
 
   const handleEdit = () => {
-    if (!currentConvenenteId) {
-      toast({
-        title: "Nenhum convenente selecionado",
-        description: "Selecione um convenente da lista para editar.",
-        variant: "destructive",
-      });
+    // Prevent duplicate actions
+    if (actionInProgressRef.current) {
+      console.log("Edit action already in progress, skipping");
       return;
     }
     
-    console.log("handleEdit called, setting formMode to 'edit'");
-    setFormMode('edit');
-    console.log("Form mode should now be 'edit'");
-    setFormValid(true); // Assume the existing data is valid when editing
+    actionInProgressRef.current = true;
+    
+    try {
+      if (!currentConvenenteId) {
+        toast({
+          title: "Nenhum convenente selecionado",
+          description: "Selecione um convenente da lista para editar.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      console.log("handleEdit called, setting formMode to 'edit'");
+      setFormMode('edit');
+      console.log("Form mode should now be 'edit'");
+      setFormValid(true); // Assume the existing data is valid when editing
+    } finally {
+      // Release action lock after a delay
+      setTimeout(() => {
+        actionInProgressRef.current = false;
+      }, 500);
+    }
   };
 
   return {

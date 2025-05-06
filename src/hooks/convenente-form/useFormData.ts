@@ -16,14 +16,15 @@ export const useFormData = ({ initialData, formMode, userEditingRef }: UseFormDa
   const [shouldSkipValidation, setShouldSkipValidation] = useState(false);
   const [lastFormMode, setLastFormMode] = useState<'view' | 'create' | 'edit'>(formMode);
   
-  // Add a ref to track if we've already applied initial data
+  // Track if we've already applied initial data to prevent loops
   const initialDataAppliedRef = useRef(false);
   const formModeChangeTimeRef = useRef<number>(0);
+  const lastInitialDataRef = useRef<string>("");
 
   // Add an effect to track form mode changes for debugging
   useEffect(() => {
     if (formMode !== lastFormMode) {
-      console.log(`useFormData: formMode changed from ${lastFormMode} to ${formMode}`);
+      console.log(`Form mode changed from ${lastFormMode} to ${formMode}`);
       setLastFormMode(formMode);
       
       // Track when the form mode changed
@@ -32,11 +33,12 @@ export const useFormData = ({ initialData, formMode, userEditingRef }: UseFormDa
       // Reset the initialDataApplied flag when switching to create mode
       if (formMode === 'create') {
         initialDataAppliedRef.current = false;
+        lastInitialDataRef.current = "";
       }
     }
   }, [formMode, lastFormMode]);
 
-  // Initialize form with provided data
+  // Initialize form with provided data - with safeguards against loops
   useEffect(() => {
     // Skip if we've recently changed form modes (within past 500ms)
     if (Date.now() - formModeChangeTimeRef.current < 500) {
@@ -46,18 +48,21 @@ export const useFormData = ({ initialData, formMode, userEditingRef }: UseFormDa
     
     const hasInitialData = initialData && Object.keys(initialData || {}).length > 0;
     
+    // Create a fingerprint of the initial data to detect changes
+    const dataFingerprint = hasInitialData ? JSON.stringify(initialData) : "";
+    
+    // Check if this is the same data we've already processed
+    if (dataFingerprint === lastInitialDataRef.current && initialDataAppliedRef.current) {
+      console.log("Same initial data detected, preventing loop");
+      return;
+    }
+    
     console.log("useFormData: initialData effect running", { 
       hasInitialData,
       formMode,
       isUserEditing: userEditingRef.current,
       dataAlreadyApplied: initialDataAppliedRef.current
     });
-    
-    // Prevent unnecessary re-application of the same data
-    if (hasInitialData && initialDataAppliedRef.current && formMode !== 'create') {
-      console.log("Initial data already applied, skipping");
-      return;
-    }
     
     // Skip if user is actively editing a field (prevents data reset during typing)
     if (userEditingRef && userEditingRef.current) {
@@ -76,8 +81,10 @@ export const useFormData = ({ initialData, formMode, userEditingRef }: UseFormDa
           ...initialData
         }));
         
+        // Update our tracking refs
         setDataLoaded(true);
         initialDataAppliedRef.current = true;
+        lastInitialDataRef.current = dataFingerprint;
       } finally {
         setIsUpdating(false);
         // Give a short delay before re-enabling validation
@@ -86,16 +93,17 @@ export const useFormData = ({ initialData, formMode, userEditingRef }: UseFormDa
     }
   }, [initialData, userEditingRef, formMode]);
 
-  // Reset form if formMode is 'create'
+  // Reset form if formMode changes to 'create'
   useEffect(() => {
     if (formMode === 'create' && lastFormMode !== 'create') {
-      console.log("useFormData: Resetting form for create mode");
+      console.log("Resetting form for create mode");
       
       // Only reset if user is not actively editing
       if (!userEditingRef.current) {
         setFormData({...emptyConvenente});
         setDataLoaded(false);
         initialDataAppliedRef.current = false;
+        lastInitialDataRef.current = "";
       } else {
         console.log("Skipping form reset as user is actively editing");
       }
