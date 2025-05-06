@@ -1,3 +1,4 @@
+
 import React from "react";
 import { NavButton } from "@/components/ui/NavButton";
 import { 
@@ -42,7 +43,7 @@ const NavigationMenu = ({
               <div>
                 <NavButton 
                   icon={<Home size={24} />} 
-                  label="Convenente" 
+                  label="Empresa" 
                   onClick={onConvenenteClick} 
                 />
               </div>
