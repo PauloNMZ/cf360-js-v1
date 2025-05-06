@@ -87,7 +87,7 @@ const NavigationMenu = ({
             <TooltipTrigger asChild>
               <div>
                 <NavButton 
-                  icon={<Send size={24} />} 
+                  icon={<CloudUpload size={24} />} 
                   label="Remessa" 
                   onClick={() => {}} 
                 />
