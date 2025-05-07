@@ -16,20 +16,29 @@ export const useMainNavHandlers = ({
   isActionAllowed: () => boolean;
   actionInProgressRef: MutableRefObject<boolean>;
   navigationInProgressRef: MutableRefObject<boolean>; // Novo parâmetro
-  resetDeletionState?: () => void; // Função para resetar estado
+  resetDeletionState: () => void; // Função para resetar estado - agora requerida
   signOut: () => void;
 }) => {
   const { toast } = useToast();
   
   // Helper para prevenir navegações duplicadas
   const safeNavigate = (action: () => void) => {
+    // Sempre resetar o estado de exclusão antes de qualquer navegação
+    // Isso impede que estados travados persistam entre navegações
+    try {
+      console.log("Navegação: Resetando estado de exclusão proativamente");
+      resetDeletionState();
+    } catch (error) {
+      console.error("Erro ao resetar estado durante navegação:", error);
+    }
+    
     // Se já estiver navegando, impedir nova ação
     if (navigationInProgressRef.current) {
       console.log("Navegação bloqueada: Operação já em andamento");
       return;
     }
     
-    // Se não for permitido navegar, impedir ação
+    // Se não for permitido navegar, impedir ação mas limpar estado mesmo assim
     if (!isActionAllowed()) {
       console.log("Navegação bloqueada: Operação não permitida");
       return;
@@ -39,18 +48,14 @@ export const useMainNavHandlers = ({
       // Marcar que uma navegação está em andamento
       navigationInProgressRef.current = true;
       
-      // Resetar estado de exclusão se necessário para evitar problemas na nova tela
-      if (resetDeletionState) {
-        console.log("Resetando estado de exclusão antes da navegação");
-        resetDeletionState();
-      }
-      
       // Executar a ação de navegação
       action();
       
     } finally {
-      // Resetar a flag de navegação após um pequeno delay
+      // Garantir que o estado de exclusão esteja limpo após a ação
       setTimeout(() => {
+        resetDeletionState();
+        // Resetar a flag de navegação após um pequeno delay
         navigationInProgressRef.current = false;
       }, 500);
     }
@@ -86,32 +91,39 @@ export const useMainNavHandlers = ({
 
   const handleLogoutClick = () => {
     // Navegação especial para logout que deve funcionar mesmo com operações pendentes
-    safeNavigate(async () => {
+    try {
+      console.log("Navegação: Iniciando logout");
+      
+      // Sempre resetar estado de exclusão antes de logout - com tratamento de erro
       try {
-        console.log("Navegação: Iniciando logout");
-        
-        // Sempre resetar estado de exclusão antes de logout
-        if (resetDeletionState) {
-          resetDeletionState();
-        }
-        
-        // Fechar todos os modais antes de fazer logout
-        indexPage.setModalOpen(false);
-        indexPage.setImportModalOpen(false);
-        setCnabToApiModalOpen(false);
-        indexPage.setAdminPanelOpen(false);
-        
-        // Executar logout
-        await signOut();
-      } catch (error) {
-        console.error("Erro durante o logout:", error);
-        toast({
-          title: "Erro ao sair",
-          description: "Ocorreu um problema ao tentar sair do sistema.",
-          variant: "destructive",
-        });
+        resetDeletionState();
+      } catch (e) {
+        console.error("Erro ao limpar estado antes do logout:", e);
       }
-    });
+      
+      // Fechar todos os modais antes de fazer logout
+      indexPage.setModalOpen(false);
+      indexPage.setImportModalOpen(false);
+      setCnabToApiModalOpen(false);
+      indexPage.setAdminPanelOpen(false);
+      
+      // Pequeno delay antes do logout para garantir limpeza de estado
+      setTimeout(async () => {
+        try {
+          // Executar logout
+          await signOut();
+        } catch (error) {
+          console.error("Erro durante o logout:", error);
+          toast({
+            title: "Erro ao sair",
+            description: "Ocorreu um problema ao tentar sair do sistema.",
+            variant: "destructive",
+          });
+        }
+      }, 100);
+    } catch (error) {
+      console.error("Erro no processo de logout:", error);
+    }
   };
 
   return {

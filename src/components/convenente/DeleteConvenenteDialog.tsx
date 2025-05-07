@@ -28,14 +28,16 @@ const DeleteConvenenteDialog = ({
   // Track if delete has been triggered to prevent multiple clicks
   const deleteTriggeredRef = useRef(false);
   
-  // Reset delete triggered state when modal closes
+  // Reset delete triggered state when modal closes or opens
   useEffect(() => {
-    if (!isOpen) {
-      setTimeout(() => {
-        deleteTriggeredRef.current = false;
-      }, 500);
+    // Sempre resetar o estado quando o modal abre ou fecha
+    deleteTriggeredRef.current = false;
+    
+    // Se o modal está fechando, garantir que isDeleting não permaneça true
+    if (!isOpen && isDeleting) {
+      console.log("DeleteDialog: Dialog fechando durante exclusão, poderia causar problema");
     }
-  }, [isOpen]);
+  }, [isOpen, isDeleting]);
   
   // Reset delete triggered state when deleting state changes to false
   useEffect(() => {
@@ -44,19 +46,32 @@ const DeleteConvenenteDialog = ({
     }
   }, [isDeleting]);
 
-  // Nova validação de timeout para evitar estados travados
+  // Timeout de segurança para evitar diálogos travados
   useEffect(() => {
+    let timeoutId: number | undefined;
+    
     // Se estiver deletando, configurar um timeout de segurança
     if (isDeleting) {
-      const timeoutId = setTimeout(() => {
+      timeoutId = window.setTimeout(() => {
         // Se a exclusão estiver em andamento por muito tempo, forçar fechamento
         console.log("DeleteDialog: Tempo limite de exclusão excedido, fechando diálogo");
         if (isOpen) {
           onOpenChange(false);
+          // Adicionando notificação para o usuário
+          const errorMsg = document.createElement('div');
+          errorMsg.innerHTML = 'A operação demorou muito tempo. Tente novamente.';
+          errorMsg.style.cssText = 'position:fixed;top:10px;right:10px;background:red;color:white;padding:10px;border-radius:5px;z-index:9999;';
+          document.body.appendChild(errorMsg);
+          
+          setTimeout(() => {
+            document.body.removeChild(errorMsg);
+          }, 5000);
         }
-      }, 15000); // 15 segundos é muito tempo para uma exclusão
+      }, 10000); // 10 segundos é tempo suficiente para uma exclusão
       
-      return () => clearTimeout(timeoutId);
+      return () => {
+        if (timeoutId !== undefined) clearTimeout(timeoutId);
+      };
     }
   }, [isDeleting, isOpen, onOpenChange]);
 
@@ -65,23 +80,32 @@ const DeleteConvenenteDialog = ({
     e.preventDefault();
     e.stopPropagation();
     
-    // Prevent multiple delete triggers
+    // Prevenir múltiplos cliques
     if (isDeleting || deleteTriggeredRef.current) {
-      console.log("DeleteDialog: Delete already in progress or triggered, ignoring click");
+      console.log("DeleteDialog: Delete já em progresso ou disparado, ignorando clique");
       return;
     }
     
-    console.log("DeleteDialog: Delete button clicked - triggering deletion");
+    console.log("DeleteDialog: Botão delete clicado - iniciando exclusão");
     deleteTriggeredRef.current = true;
-    onDelete();
+    
+    // Chamar onDelete com um pequeno delay para evitar problemas de sincronização de estado
+    setTimeout(() => {
+      onDelete();
+    }, 10);
   };
 
   return (
     <AlertDialog open={isOpen} onOpenChange={(open) => {
-      // Prevent closing during deletion
+      // Impedir fechamento durante exclusão
       if (isDeleting && !open) {
-        console.log("DeleteDialog: Prevented dialog close during deletion");
+        console.log("DeleteDialog: Impedido fechamento do diálogo durante exclusão");
         return;
+      }
+      
+      // Se estiver fechando o diálogo, garantir que deleteTriggeredRef seja resetado
+      if (!open) {
+        deleteTriggeredRef.current = false;
       }
       
       onOpenChange(open);

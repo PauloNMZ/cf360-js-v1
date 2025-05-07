@@ -5,6 +5,7 @@ import { useModalHandlers } from "./event-handlers/useModalHandlers";
 import { useActionHandlers } from "./event-handlers/useActionHandlers";
 import { useMainNavHandlers } from "./event-handlers/useMainNavHandlers";
 import { IndexPageActionProps } from "@/providers/types";
+import { useToast } from "@/hooks/use-toast";
 
 export const useIndexPageEventHandlers = ({
   indexPage,
@@ -12,6 +13,7 @@ export const useIndexPageEventHandlers = ({
   setCnabToApiModalOpen
 }: IndexPageActionProps) => {
   const { signOut } = useAuth();
+  const { toast } = useToast();
   
   // Adicionar referência para rastrear o estado de roteamento
   const navigationInProgressRef = useRef(false);
@@ -30,16 +32,40 @@ export const useIndexPageEventHandlers = ({
     actionInProgressRef
   });
   
+  // Função segura para resetar o estado de exclusão
+  const safeResetDeletionState = () => {
+    if (indexPageActions.resetDeletionState) {
+      console.log("Resetando estado de exclusão explicitamente");
+      try {
+        indexPageActions.resetDeletionState();
+      } catch (error) {
+        console.error("Erro ao resetar estado de exclusão:", error);
+        toast({
+          title: "Aviso",
+          description: "Ocorreu um erro ao limpar o estado. Tente recarregar a página.",
+          variant: "destructive",
+        });
+      }
+    } else {
+      console.log("Função resetDeletionState não disponível");
+    }
+  };
+  
   // Get navigation handlers
   const navigationHandlers = useMainNavHandlers({
     indexPage,
     setCnabToApiModalOpen,
     isActionAllowed,
     actionInProgressRef,
-    navigationInProgressRef,  // Passar a referência para o hook de navegação
-    resetDeletionState: indexPageActions.resetDeletionState, // Passar a função de reset
+    navigationInProgressRef,
+    resetDeletionState: safeResetDeletionState, // Passar nossa função segura de reset
     signOut
   });
+
+  // Adicionar um handler de cleanup explícito que pode ser chamado quando necessário
+  const handleStateCleanup = () => {
+    safeResetDeletionState();
+  };
 
   return {
     // Modal handlers
@@ -48,6 +74,9 @@ export const useIndexPageEventHandlers = ({
     
     // Save handler
     handleSaveClick,
+    
+    // Cleanup handler
+    handleStateCleanup,
     
     // Navigation handlers
     ...navigationHandlers
