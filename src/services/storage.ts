@@ -15,5 +15,8 @@ export const STORAGE_KEYS = {
     THEME: 'settings.theme',
     DISPLAY: 'settings.display',
     COMPANY: 'settings.company'
-  }
+  },
+  // Add new keys for CNAB processing
+  CNAB240_OUTPUT_DIRECTORY: 'cnab240.outputDirectory',
+  REMESSA_SEQUENCE: 'cnab240.remessaSequence'
 };

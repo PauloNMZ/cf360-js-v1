@@ -40,11 +40,10 @@ const NavigationMenu = ({
   // Determine if actions are allowed
   const actionsDisabled = isDeleting || isLoading;
   
-  // Create safe handler wrappers
-  const handleSafeClick = (handler: () => void) => (e: React.MouseEvent) => {
+  // Create safe handler wrappers that return a function with no parameters
+  const handleSafeClick = (handler: () => void) => () => {
     if (actionsDisabled) {
       console.log("Navigation action blocked: Operation in progress");
-      e.preventDefault();
       return;
     }
     handler();
