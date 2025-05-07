@@ -16,7 +16,8 @@ export interface IndexPageContextType {
   setCnabToApiModalOpen: (open: boolean) => void;
   showDeleteDialog: boolean;
   setShowDeleteDialog: (show: boolean) => void;
-  isDeleting: boolean; // Added isDeleting property
+  isDeleting: boolean;
+  resetDeletionState?: () => void;
   
   // Form states and data
   formMode: 'view' | 'create' | 'edit';

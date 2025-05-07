@@ -1,5 +1,5 @@
 
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ConvenenteData, emptyConvenente } from "@/types/convenente";
 import { removeConvenente, fetchConvenentes } from "@/services/convenente/convenenteService";
@@ -25,19 +25,21 @@ export const useDeleteActions = (
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   
-  // Use refs to prevent state update race conditions
+  // Track deletion state with refs to avoid stale closures
   const isDeletingRef = useRef(false);
-  const deletionInProgressRef = useRef(false);
+  const currentIdRef = useRef<string | null>(null);
   const apiCallCompleteRef = useRef(false);
   
-  // Clean up all refs before new deletion attempt
-  const resetDeletionState = () => {
+  // Reset all state tracking variables
+  const resetDeletionState = useCallback(() => {
+    console.log("Delete action: Resetting deletion state");
     isDeletingRef.current = false;
-    deletionInProgressRef.current = false;
     apiCallCompleteRef.current = false;
-  };
+    setIsDeleting(false);
+    setIsLoading(false);
+  }, [setIsLoading]);
 
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     if (!currentConvenenteId) {
       toast({
         title: "Nenhum convenente selecionado",
@@ -47,81 +49,79 @@ export const useDeleteActions = (
       return;
     }
     
-    // Reset all deletion state to avoid any previous stale state
-    resetDeletionState();
+    // Store the current ID in ref for use throughout the deletion process
+    currentIdRef.current = currentConvenenteId;
     
-    console.log("Delete action: Opening delete confirmation dialog");
+    console.log("Delete action: Opening delete confirmation dialog for ID:", currentConvenenteId);
     setShowDeleteDialog(true);
-  };
+  }, [currentConvenenteId, toast]);
 
-  const confirmDelete = async () => {
-    if (!currentConvenenteId) {
-      console.log("Delete action: No convenente selected, closing dialog");
+  const confirmDelete = useCallback(async () => {
+    if (!currentIdRef.current && !currentConvenenteId) {
+      console.log("Delete action: No convenente ID found, aborting deletion");
       setShowDeleteDialog(false);
       return;
     }
     
-    // Set all flags to indicate deletion is starting
+    // Use the ID from ref or current state
+    const idToDelete = currentIdRef.current || currentConvenenteId;
+    console.log("Delete action: Starting deletion for ID:", idToDelete);
+    
+    // Set deletion flags first to prevent UI interaction
     isDeletingRef.current = true;
-    deletionInProgressRef.current = true;
+    setIsDeleting(true);
+    setIsLoading(true);
     
     try {
-      // Flag deletion in progress FIRST, before any other operations
-      console.log("Delete action: Setting isDeleting flag to true");
-      setIsDeleting(true);
-      setIsLoading(true);
-      
-      console.log("Delete action: Starting deletion process for:", currentConvenenteId);
-      
-      // Store the ID for use after deletion
-      const convenenteIdToDelete = currentConvenenteId;
-      
-      // Call API to delete the convenente with added timeout for reliability
       console.log("Delete action: Calling API to remove convenente");
-      const apiPromise = removeConvenente(convenenteIdToDelete);
       
-      // Create a timeout promise
-      const timeoutPromise = new Promise<boolean>((resolve) => {
-        // Ensure we give the API enough time to complete
+      // Create a timeout promise to handle API timeout
+      const timeoutPromise = new Promise((_, reject) => {
         setTimeout(() => {
-          console.log("Delete action: API call timeout reached");
           if (!apiCallCompleteRef.current) {
-            resolve(false);
+            reject(new Error("API call timeout"));
           }
-        }, 20000); // 20 second timeout - increased for reliability
+        }, 30000); // 30 second timeout
       });
       
-      // Race the API call against the timeout
-      const success = await Promise.race([
-        apiPromise.then(result => {
+      // Execute the deletion API call
+      const apiPromise = removeConvenente(idToDelete as string)
+        .then(result => {
           apiCallCompleteRef.current = true;
           return result;
-        }),
-        timeoutPromise
-      ]);
+        });
+      
+      // Race the promises - whichever completes first
+      const success = await Promise.race([apiPromise, timeoutPromise])
+        .catch(error => {
+          console.error("Delete action: API error:", error);
+          return false;
+        });
       
       console.log("Delete action: API call completed, success:", success);
       
       if (success) {
+        // After successful deletion, get updated list
         console.log("Delete action: Fetching updated convenentes list");
-        // Update list after successful deletion
-        const updatedConvenentes = await fetchConvenentes();
-        console.log("Delete action: Fetched updated convenentes list, count:", updatedConvenentes.length);
+        const updatedConvenentes = await fetchConvenentes()
+          .catch(error => {
+            console.error("Delete action: Error fetching updated list:", error);
+            return [];
+          });
         
-        // Update state in specific order to avoid UI issues
-        console.log("Delete action: Updating application state after successful deletion");
-        setConvenentes(updatedConvenentes);
+        console.log("Delete action: Updating application state after deletion");
+        
+        // Update state in specific sequence
         setCurrentConvenenteId(null);
         setFormData({...emptyConvenente});
         setFormMode('view');
+        setConvenentes(updatedConvenentes);
         
-        // Show success message after a short delay to ensure UI has updated
-        setTimeout(() => {
-          toast({
-            title: "Convenente excluído",
-            description: "O convenente foi excluído com sucesso.",
-          });
-        }, 500);
+        // Show success message
+        toast({
+          title: "Convenente excluído",
+          description: "O convenente foi excluído com sucesso.",
+        });
       } else {
         throw new Error("Falha ao excluir convenente");
       }
@@ -129,36 +129,33 @@ export const useDeleteActions = (
       console.error("Delete action: Error during deletion:", error);
       toast({
         title: "Erro ao excluir",
-        description: "Não foi possível excluir o convenente.",
+        description: "Não foi possível excluir o convenente. Por favor, tente novamente.",
         variant: "destructive",
       });
     } finally {
-      // Flag that deletion process is complete
-      deletionInProgressRef.current = false;
+      console.log("Delete action: Cleanup after deletion process");
       
-      // Sequence of state updates is critical to prevent race conditions
-      
-      // First clear general loading state
-      console.log("Delete action: Clearing isLoading state");
-      setIsLoading(false);
-      
-      // Use setTimeout for reliable state updates in the correct sequence
+      // Use setTimeout to ensure state updates happen in sequence
       setTimeout(() => {
-        console.log("Delete action: Clearing isDeleting flag");
-        setIsDeleting(false);
-        isDeletingRef.current = false;
+        console.log("Delete action: Clearing loading state");
+        setIsLoading(false);
         
-        // Close the dialog only after ALL operations are complete
         setTimeout(() => {
-          // Only close the dialog if we're not already in a new deletion process
-          if (!deletionInProgressRef.current) {
+          console.log("Delete action: Clearing deletion state");
+          isDeletingRef.current = false;
+          setIsDeleting(false);
+          
+          setTimeout(() => {
             console.log("Delete action: Closing delete dialog");
             setShowDeleteDialog(false);
-          }
-        }, 800);
-      }, 1000);
+            
+            // Reset the stored ID ref
+            currentIdRef.current = null;
+          }, 500);
+        }, 500);
+      }, 500);
     }
-  };
+  }, [currentConvenenteId, setConvenentes, setCurrentConvenenteId, setFormData, setFormMode, setIsLoading, toast]);
 
   return {
     showDeleteDialog,
@@ -166,6 +163,7 @@ export const useDeleteActions = (
     handleDelete,
     confirmDelete,
     isDeleting,
-    setIsDeleting
+    setIsDeleting,
+    resetDeletionState
   };
 };

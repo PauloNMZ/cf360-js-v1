@@ -36,7 +36,7 @@ export const IndexPageProvider = ({ children }: { children: ReactNode }) => {
     setFormValid: indexPage.setFormValid,
     setCurrentConvenenteId: indexPage.setCurrentConvenenteId,
     loadConvenenteData: indexPage.loadConvenenteData,
-    isDeleting: indexPageActions.isDeleting // Pass isDeleting to state manager
+    isDeleting: indexPageActions.isDeleting
   });
 
   // Get event handlers
@@ -53,7 +53,8 @@ export const IndexPageProvider = ({ children }: { children: ReactNode }) => {
     ...eventHandlers,
     cnabToApiModalOpen,
     setCnabToApiModalOpen,
-    isDeleting: indexPageActions.isDeleting, // Explicitly include isDeleting
+    isDeleting: indexPageActions.isDeleting,
+    resetDeletionState: indexPage.resetDeletionState
   };
 
   return (

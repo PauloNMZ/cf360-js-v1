@@ -39,39 +39,49 @@ export const useIndexPageStateManager = ({
   
   // Load saved app state when component mounts, but not during deletion
   useEffect(() => {
+    // Skip application state loading during deletion
     if (isDeletingRef.current) {
-      // Skip loading app state during deletion process
       console.log("IndexPageStateManager: Skipping app state loading during deletion");
       return;
     }
     
-    const savedState = loadAppState();
-    console.log("IndexPageStateManager: Loaded app state", savedState);
+    try {
+      const savedState = loadAppState();
+      console.log("IndexPageStateManager: Loaded app state", savedState);
+      
+      // Could implement additional state restoration logic here if needed
+    } catch (error) {
+      console.error("IndexPageStateManager: Error loading app state", error);
+    }
   }, [loadAppState]);
 
   // Save app state whenever modals change, but ONLY if not deleting
   useEffect(() => {
+    // Don't save state during deletion to prevent corruption
     if (isDeletingRef.current) { 
-      // Don't save state during deletion process to prevent inconsistent state
       console.log("IndexPageStateManager: Skipping app state saving during deletion");
       return;
     }
     
-    console.log("IndexPageStateManager: Saving app state");
-    saveAppState({
-      lastModalOpen: {
-        convenente: modalOpen,
-        importacao: importModalOpen,
-        cnabToApi: cnabToApiModalOpen,
-        adminPanel: adminPanelOpen
-      }
-    });
+    try {
+      console.log("IndexPageStateManager: Saving app state");
+      saveAppState({
+        lastModalOpen: {
+          convenente: modalOpen,
+          importacao: importModalOpen,
+          cnabToApi: cnabToApiModalOpen,
+          adminPanel: adminPanelOpen
+        }
+      });
+    } catch (error) {
+      console.error("IndexPageStateManager: Error saving app state", error);
+    }
   }, [modalOpen, importModalOpen, cnabToApiModalOpen, adminPanelOpen, saveAppState]);
   
   // Load convenentes when modal is opened, but ONLY if not deleting
   useEffect(() => {
+    // Don't load data during deletion to prevent state conflicts
     if (isDeletingRef.current) { 
-      // Don't load data during deletion process
       console.log("IndexPageStateManager: Skipping data loading during deletion");
       return;
     }

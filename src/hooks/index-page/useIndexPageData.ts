@@ -1,5 +1,5 @@
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useConvenenteData } from "../convenente/useConvenenteData";
 import { useConvenenteSearch } from "../convenente/useConvenenteSearch";
 
@@ -14,6 +14,14 @@ export const useIndexPageData = (modalOpen: boolean) => {
   // Initialize isDeleting state with ref for tracking
   const [isDeleting, setIsDeleting] = useState(false);
   const isDeletingRef = useRef(false);
+  
+  // Reset deletion state function (for unsticking stuck states)
+  const resetDeletionState = useCallback(() => {
+    console.log("useIndexPageData: Resetting deletion state");
+    setIsDeleting(false);
+    isDeletingRef.current = false;
+    convenenteData.setIsLoading(false);
+  }, [convenenteData]);
   
   // Update ref when deletion state changes to avoid stale closures
   useEffect(() => {
@@ -55,6 +63,7 @@ export const useIndexPageData = (modalOpen: boolean) => {
     setIsLoading: convenenteData.setIsLoading,
     isDeleting,
     setIsDeleting,
+    resetDeletionState,
     
     // Functions from useConvenenteData
     handleSelectConvenente: convenenteData.handleSelectConvenente,
