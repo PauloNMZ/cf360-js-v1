@@ -105,6 +105,11 @@ export const IndexPageModals = () => {
     return () => clearTimeout(checkDeletionTimeout);
   }, [isDeleting, resetDeletionState]);
 
+  // Fix for the type error in handleSelectConvenente
+  const onSelectConvenente = (convenente: any) => {
+    handleSelectConvenente(convenente, "view");
+  };
+
   return (
     <>
       <ConvenenteModal 
@@ -120,7 +125,7 @@ export const IndexPageModals = () => {
         isSearching={isSearching}
         searchTerm={searchTerm}
         onSearchChange={handleSearchChange}
-        onSelectConvenente={handleSelectConvenente}
+        onSelectConvenente={onSelectConvenente}
         onCreateNew={handleCreateNew}
         onEdit={handleEdit}
         onDelete={handleDelete}
