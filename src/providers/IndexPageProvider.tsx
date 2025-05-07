@@ -3,7 +3,7 @@ import React, { createContext, ReactNode, useState } from "react";
 import { IndexPageContext } from "@/contexts/IndexPageContext";
 import { useIndexPage } from "@/hooks/useIndexPage";
 import { useIndexPageActions } from "@/hooks/useIndexPageActions";
-import { useIndexPageEventHandlers } from "./IndexPageEventHandlers";
+import { useIndexPageEventHandlers } from "@/hooks/useIndexPageEventHandlers";
 import { useIndexPageStateManager } from "./IndexPageStateManager";
 
 // Create provider
