@@ -54,7 +54,7 @@ export const IndexPageProvider = ({ children }: { children: ReactNode }) => {
     cnabToApiModalOpen,
     setCnabToApiModalOpen,
     isDeleting: indexPageActions.isDeleting,
-    resetDeletionState: indexPage.resetDeletionState
+    resetDeletionState: indexPageActions.resetDeletionState // Ensure this is passed down
   };
 
   return (

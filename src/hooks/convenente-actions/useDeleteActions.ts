@@ -39,6 +39,21 @@ export const useDeleteActions = (
     setIsLoading(false);
   }, [setIsLoading]);
 
+  // Clean reset function to ensure proper application state after deletion
+  const performCleanStateReset = useCallback(() => {
+    // First reset the UI loading states
+    setIsLoading(false);
+    setIsDeleting(false);
+    
+    // Then reset deletion tracking refs
+    isDeletingRef.current = false;
+    apiCallCompleteRef.current = false;
+    
+    // Finally close dialog and reset ID refs
+    setShowDeleteDialog(false);
+    currentIdRef.current = null;
+  }, [setIsLoading]);
+
   const handleDelete = useCallback(() => {
     if (!currentConvenenteId) {
       toast({
@@ -111,17 +126,22 @@ export const useDeleteActions = (
         
         console.log("Delete action: Updating application state after deletion");
         
-        // Update state in specific sequence
+        // Update state in specific sequence - IMPORTANT: this order matters!
+        setConvenentes(updatedConvenentes);
         setCurrentConvenenteId(null);
         setFormData({...emptyConvenente});
         setFormMode('view');
-        setConvenentes(updatedConvenentes);
         
         // Show success message
         toast({
           title: "Convenente excluído",
           description: "O convenente foi excluído com sucesso.",
         });
+        
+        // Clean reset after a short delay to ensure state updates are processed
+        setTimeout(() => {
+          performCleanStateReset();
+        }, 300);
       } else {
         throw new Error("Falha ao excluir convenente");
       }
@@ -132,30 +152,11 @@ export const useDeleteActions = (
         description: "Não foi possível excluir o convenente. Por favor, tente novamente.",
         variant: "destructive",
       });
-    } finally {
-      console.log("Delete action: Cleanup after deletion process");
       
-      // Use setTimeout to ensure state updates happen in sequence
-      setTimeout(() => {
-        console.log("Delete action: Clearing loading state");
-        setIsLoading(false);
-        
-        setTimeout(() => {
-          console.log("Delete action: Clearing deletion state");
-          isDeletingRef.current = false;
-          setIsDeleting(false);
-          
-          setTimeout(() => {
-            console.log("Delete action: Closing delete dialog");
-            setShowDeleteDialog(false);
-            
-            // Reset the stored ID ref
-            currentIdRef.current = null;
-          }, 500);
-        }, 500);
-      }, 500);
+      // Even in case of error, we need to reset state properly
+      performCleanStateReset();
     }
-  }, [currentConvenenteId, setConvenentes, setCurrentConvenenteId, setFormData, setFormMode, setIsLoading, toast]);
+  }, [currentConvenenteId, setConvenentes, setCurrentConvenenteId, setFormData, setFormMode, setIsLoading, toast, performCleanStateReset]);
 
   return {
     showDeleteDialog,

@@ -19,39 +19,102 @@ export const useIndexPageEventHandlers = ({
   const modalStateChangingRef = useRef(false);
   const saveActionInProgressRef = useRef(false);
   const editStateChangingRef = useRef(false);
+  const actionInProgressRef = useRef(false);
+  
+  // Helper to prevent actions during unstable states
+  const isActionAllowed = () => {
+    if (indexPageActions.isDeleting || actionInProgressRef.current) {
+      console.log("Action blocked: Operation in progress");
+      return false;
+    }
+    return true;
+  };
 
-  // Create handlers
+  // Create handlers with protection
   const handleConvenenteClick = () => {
-    indexPage.setModalOpen(true);
+    if (!isActionAllowed()) return;
+    
+    actionInProgressRef.current = true;
+    try {
+      indexPage.setModalOpen(true);
+    } finally {
+      setTimeout(() => {
+        actionInProgressRef.current = false;
+      }, 100);
+    }
   };
 
   const handleImportarPlanilhaClick = () => {
-    indexPage.setImportModalOpen(true);
+    if (!isActionAllowed()) return;
+    
+    actionInProgressRef.current = true;
+    try {
+      indexPage.setImportModalOpen(true);
+    } finally {
+      setTimeout(() => {
+        actionInProgressRef.current = false;
+      }, 100);
+    }
   };
 
   const handleCnabToApiClick = () => {
-    setCnabToApiModalOpen(true);
+    if (!isActionAllowed()) return;
+    
+    actionInProgressRef.current = true;
+    try {
+      setCnabToApiModalOpen(true);
+    } finally {
+      setTimeout(() => {
+        actionInProgressRef.current = false;
+      }, 100);
+    }
   };
 
   const handleLogoutClick = async () => {
-    // Clear app state before logout
-    saveAppState({});
+    if (!isActionAllowed()) return;
     
-    await signOut();
-    // Clear all data after logout
-    indexPage.setFormData({...emptyConvenente});
-    indexPage.setCurrentConvenenteId(null);
+    actionInProgressRef.current = true;
+    try {
+      // Store only essential state before logout
+      // IMPORTANT: Don't clear all state with saveAppState({})
+      saveAppState({
+        lastModalOpen: {
+          convenente: false,
+          importacao: false,
+          cnabToApi: false,
+          adminPanel: false
+        }
+      });
+      
+      await signOut();
+      
+      // Clear all data after logout
+      indexPage.setFormData({...emptyConvenente});
+      indexPage.setCurrentConvenenteId(null);
+    } finally {
+      setTimeout(() => {
+        actionInProgressRef.current = false;
+      }, 100);
+    }
   };
 
   const handleAdminPanelClick = () => {
-    indexPage.setAdminPanelOpen(true);
+    if (!isActionAllowed()) return;
+    
+    actionInProgressRef.current = true;
+    try {
+      indexPage.setAdminPanelOpen(true);
+    } finally {
+      setTimeout(() => {
+        actionInProgressRef.current = false;
+      }, 100);
+    }
   };
 
   // Improved function to handle edit mode
   const handleEdit = () => {
-    // Prevent re-entrant calls
-    if (editStateChangingRef.current) {
-      console.log("Edit mode change already in progress, ignoring request");
+    if (!isActionAllowed() || editStateChangingRef.current) {
+      console.log("Edit mode change blocked: Operation in progress");
       return;
     }
     
@@ -74,9 +137,9 @@ export const useIndexPageEventHandlers = ({
 
   // Improved function to handle opening/closing the convenente modal
   const handleConvenenteModalOpenChange = (open: boolean) => {
-    // Prevent re-entrant changes
-    if (modalStateChangingRef.current) {
-      console.log("Modal state already changing, ignoring request");
+    // Prevent re-entrant changes or during deletion
+    if (indexPageActions.isDeleting || modalStateChangingRef.current) {
+      console.log("Modal state change blocked: Operation in progress");
       return;
     }
     
@@ -108,9 +171,9 @@ export const useIndexPageEventHandlers = ({
 
   // Function to save current form data with anti-loop protection
   const handleSaveClick = () => {
-    // Prevent multiple save attempts
-    if (saveActionInProgressRef.current) {
-      console.log("Save action already in progress, ignoring duplicate request");
+    // Prevent multiple save attempts or during deletion
+    if (indexPageActions.isDeleting || saveActionInProgressRef.current) {
+      console.log("Save action blocked: Operation in progress");
       return;
     }
 

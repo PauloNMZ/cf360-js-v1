@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from "react";
 import ConvenenteModal from "@/components/convenente/ConvenenteModal";
 import DeleteConvenenteDialog from "@/components/convenente/DeleteConvenenteDialog";
@@ -49,6 +50,7 @@ export const IndexPageModals = () => {
   // Track deletion state with refs
   const isDeletingRef = useRef(isDeleting);
   const deletionInProgressRef = useRef(false);
+  const deletionCompletedRef = useRef(false);
 
   // Track deletion state changes
   useEffect(() => {
@@ -57,10 +59,17 @@ export const IndexPageModals = () => {
     
     if (isDeleting) {
       deletionInProgressRef.current = true;
+      deletionCompletedRef.current = false;
     } else if (deletionInProgressRef.current) {
       // Deletion just completed
       console.log("IndexPageModals: Deletion process completed");
       deletionInProgressRef.current = false;
+      deletionCompletedRef.current = true;
+      
+      // Reset completed flag after short delay
+      setTimeout(() => {
+        deletionCompletedRef.current = false;
+      }, 1000);
     }
   }, [isDeleting]);
   
@@ -91,8 +100,8 @@ export const IndexPageModals = () => {
   
   // Protection for select convenente
   const handleProtectedSelectConvenente = (convenente: any) => {
-    if (isDeletingRef.current) {
-      console.log("IndexPageModals: Blocked convenente selection during deletion");
+    if (isDeletingRef.current || deletionCompletedRef.current) {
+      console.log("IndexPageModals: Blocked convenente selection during/after deletion");
       return;
     }
     

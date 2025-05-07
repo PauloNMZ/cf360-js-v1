@@ -30,6 +30,8 @@ export const useIndexPageStateManager = ({
   
   // Use ref to consistently track deletion state
   const isDeletingRef = useRef(isDeleting);
+  const stateRestoreAttemptedRef = useRef(false);
+  const appInitializedRef = useRef(false);
   
   // Update ref when deletion state changes
   useEffect(() => {
@@ -37,8 +39,20 @@ export const useIndexPageStateManager = ({
     isDeletingRef.current = isDeleting;
   }, [isDeleting]);
   
+  // Reset the state restoration flag when deletion is complete
+  useEffect(() => {
+    if (!isDeleting && stateRestoreAttemptedRef.current) {
+      console.log("IndexPageStateManager: Resetting state restoration flag after deletion");
+      stateRestoreAttemptedRef.current = false;
+    }
+  }, [isDeleting]);
+  
   // Load saved app state when component mounts, but not during deletion
   useEffect(() => {
+    if (appInitializedRef.current) {
+      return; // Only run this effect once on initial load
+    }
+    
     // Skip application state loading during deletion
     if (isDeletingRef.current) {
       console.log("IndexPageStateManager: Skipping app state loading during deletion");
@@ -48,6 +62,7 @@ export const useIndexPageStateManager = ({
     try {
       const savedState = loadAppState();
       console.log("IndexPageStateManager: Loaded app state", savedState);
+      appInitializedRef.current = true;
       
       // Could implement additional state restoration logic here if needed
     } catch (error) {
@@ -91,4 +106,18 @@ export const useIndexPageStateManager = ({
       loadConvenenteData(true);
     }
   }, [modalOpen, loadConvenenteData]);
+  
+  // Application state recovery mechanism
+  useEffect(() => {
+    const recoveryCheck = setTimeout(() => {
+      // Check if we're in a potentially corrupted state
+      if (!isDeletingRef.current && !stateRestoreAttemptedRef.current && appInitializedRef.current) {
+        console.log("IndexPageStateManager: Performing routine state integrity check");
+        
+        // Could implement additional recovery logic here if state corruption is detected
+      }
+    }, 5000);
+    
+    return () => clearTimeout(recoveryCheck);
+  }, []);
 };

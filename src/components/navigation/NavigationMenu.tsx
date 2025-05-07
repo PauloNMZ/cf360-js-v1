@@ -18,6 +18,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useIndexPageContext } from "@/hooks/useIndexPageContext";
 
 type NavigationMenuProps = {
   onConvenenteClick: () => void;
@@ -34,6 +35,21 @@ const NavigationMenu = ({
   onAdminPanelClick,
   onLogoutClick
 }: NavigationMenuProps) => {
+  const { isDeleting, isLoading } = useIndexPageContext();
+  
+  // Determine if actions are allowed
+  const actionsDisabled = isDeleting || isLoading;
+  
+  // Create safe handler wrappers
+  const handleSafeClick = (handler: () => void) => (e: React.MouseEvent) => {
+    if (actionsDisabled) {
+      console.log("Navigation action blocked: Operation in progress");
+      e.preventDefault();
+      return;
+    }
+    handler();
+  };
+
   return (
     <TooltipProvider>
       <div className="flex justify-center mb-10">
@@ -44,7 +60,8 @@ const NavigationMenu = ({
                 <NavButton 
                   icon={<Home size={24} />} 
                   label="Empresa" 
-                  onClick={onConvenenteClick} 
+                  onClick={handleSafeClick(onConvenenteClick)}
+                  disabled={actionsDisabled}
                 />
               </div>
             </TooltipTrigger>
@@ -59,7 +76,8 @@ const NavigationMenu = ({
                 <NavButton 
                   icon={<FileSpreadsheet size={24} />} 
                   label="Planilha" 
-                  onClick={onImportarPlanilhaClick} 
+                  onClick={handleSafeClick(onImportarPlanilhaClick)}
+                  disabled={actionsDisabled}
                 />
               </div>
             </TooltipTrigger>
@@ -74,7 +92,8 @@ const NavigationMenu = ({
                 <NavButton 
                   icon={<Send size={24} />} 
                   label="CNAB2API" 
-                  onClick={onCnabToApiClick} 
+                  onClick={handleSafeClick(onCnabToApiClick)}
+                  disabled={actionsDisabled}
                 />
               </div>
             </TooltipTrigger>
@@ -89,7 +108,8 @@ const NavigationMenu = ({
                 <NavButton 
                   icon={<CloudUpload size={24} />} 
                   label="Remessa" 
-                  onClick={() => {}} 
+                  onClick={handleSafeClick(() => {})}
+                  disabled={actionsDisabled}
                 />
               </div>
             </TooltipTrigger>
@@ -104,7 +124,8 @@ const NavigationMenu = ({
                 <NavButton 
                   icon={<RefreshCw size={24} />} 
                   label="Retornos" 
-                  onClick={() => {}} 
+                  onClick={handleSafeClick(() => {})}
+                  disabled={actionsDisabled}
                 />
               </div>
             </TooltipTrigger>
@@ -119,7 +140,8 @@ const NavigationMenu = ({
                 <NavButton 
                   icon={<FileText size={24} />} 
                   label="Comprovantes" 
-                  onClick={() => {}} 
+                  onClick={handleSafeClick(() => {})}
+                  disabled={actionsDisabled}
                 />
               </div>
             </TooltipTrigger>
@@ -134,7 +156,8 @@ const NavigationMenu = ({
                 <NavButton 
                   icon={<Search size={24} />} 
                   label="Consultas" 
-                  onClick={() => {}} 
+                  onClick={handleSafeClick(() => {})}
+                  disabled={actionsDisabled} 
                 />
               </div>
             </TooltipTrigger>
@@ -149,7 +172,8 @@ const NavigationMenu = ({
                 <NavButton 
                   icon={<Shield size={24} />} 
                   label="Setup" 
-                  onClick={onAdminPanelClick} 
+                  onClick={handleSafeClick(onAdminPanelClick)}
+                  disabled={actionsDisabled}
                 />
               </div>
             </TooltipTrigger>
@@ -164,8 +188,9 @@ const NavigationMenu = ({
                 <NavButton 
                   icon={<LogOut size={24} />} 
                   label="Sair" 
-                  onClick={onLogoutClick} 
-                  className="bg-red-50 dark:bg-red-950 hover:bg-red-100 dark:hover:bg-red-900 border-red-200 dark:border-red-800"
+                  onClick={handleSafeClick(onLogoutClick)} 
+                  disabled={actionsDisabled}
+                  className={`bg-red-50 dark:bg-red-950 hover:bg-red-100 dark:hover:bg-red-900 border-red-200 dark:border-red-800 ${actionsDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                 />
               </div>
             </TooltipTrigger>
