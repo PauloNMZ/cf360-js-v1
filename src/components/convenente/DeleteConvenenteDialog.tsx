@@ -25,98 +25,51 @@ const DeleteConvenenteDialog = ({
   onDelete,
   isDeleting = false
 }: DeleteConvenenteDialogProps) => {
-  // Local state to ensure we can control the dialog properly
-  const [internalOpen, setInternalOpen] = useState(isOpen);
-  const isDeletingRef = useRef(isDeleting);
+  // Track if delete has been triggered to prevent multiple clicks
   const deleteTriggeredRef = useRef(false);
   
-  // Track open state to prevent unexpected changes
+  // Reset delete triggered state when modal closes
   useEffect(() => {
-    console.log("DeleteDialog: External open state changed to:", isOpen);
-    
-    // If deleting is in progress and dialog is being closed, prevent it
-    if (isDeletingRef.current && !isOpen) {
-      console.log("DeleteDialog: Preventing dialog close during deletion");
-      return;
+    if (!isOpen) {
+      setTimeout(() => {
+        deleteTriggeredRef.current = false;
+      }, 500);
     }
-    
-    setInternalOpen(isOpen);
   }, [isOpen]);
   
-  // Update deleting ref when prop changes
+  // Reset delete triggered state when deleting state changes to false
   useEffect(() => {
-    console.log("DeleteDialog: isDeleting changed to:", isDeleting);
-    isDeletingRef.current = isDeleting;
-    
-    // When deletion starts, force open the dialog
-    if (isDeleting && !internalOpen) {
-      console.log("DeleteDialog: Forcing dialog to open during deletion");
-      setInternalOpen(true);
-      // Sync with parent component
-      if (!isOpen) {
-        onOpenChange(true);
-      }
+    if (!isDeleting) {
+      deleteTriggeredRef.current = false;
     }
-  }, [isDeleting, internalOpen, isOpen, onOpenChange]);
-  
-  // Handle dialog open state changes with protection
-  const handleOpenChange = (open: boolean) => {
-    console.log("DeleteDialog: Request to change dialog state to:", open);
-    
-    // Prevent closing dialog during deletion process
-    if (isDeletingRef.current && !open) {
-      console.log("DeleteDialog: Blocked dialog close during deletion");
-      return;
-    }
-    
-    // Update internal state
-    setInternalOpen(open);
-    
-    // Only propagate the change if not deleting
-    if (!isDeletingRef.current) {
-      console.log("DeleteDialog: Propagating open state change to parent");
-      onOpenChange(open);
-    }
-  };
-  
+  }, [isDeleting]);
+
   // Handle delete with event protection
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
     // Prevent multiple delete triggers
-    if (isDeletingRef.current || deleteTriggeredRef.current) {
-      console.log("DeleteDialog: Delete already in progress, ignoring click");
+    if (isDeleting || deleteTriggeredRef.current) {
+      console.log("DeleteDialog: Delete already in progress or triggered, ignoring click");
       return;
     }
     
     console.log("DeleteDialog: Delete button clicked - triggering deletion");
     deleteTriggeredRef.current = true;
-    
-    // Set a timeout to reset the triggered flag if deletion doesn't start
-    setTimeout(() => {
-      if (!isDeletingRef.current) {
-        deleteTriggeredRef.current = false;
-      }
-    }, 5000);
-    
-    // Call the delete handler
     onDelete();
-  };
-  
-  // Prevent cancel during deletion
-  const handleCancel = (e: React.MouseEvent) => {
-    if (isDeletingRef.current) {
-      e.preventDefault();
-      e.stopPropagation();
-      console.log("DeleteDialog: Cancel blocked during deletion");
-      return;
-    }
-    console.log("DeleteDialog: Cancel allowed");
   };
 
   return (
-    <AlertDialog open={internalOpen} onOpenChange={handleOpenChange}>
+    <AlertDialog open={isOpen} onOpenChange={(open) => {
+      // Prevent closing during deletion
+      if (isDeleting && !open) {
+        console.log("DeleteDialog: Prevented dialog close during deletion");
+        return;
+      }
+      
+      onOpenChange(open);
+    }}>
       <AlertDialogContent className="sm:max-w-[425px]">
         <AlertDialogHeader>
           <AlertDialogTitle>
@@ -131,7 +84,6 @@ const DeleteConvenenteDialog = ({
         <AlertDialogFooter>
           <AlertDialogCancel 
             disabled={isDeleting} 
-            onClick={handleCancel}
             className={isDeleting ? "opacity-50 cursor-not-allowed" : ""}
           >
             Cancelar

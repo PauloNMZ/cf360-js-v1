@@ -47,100 +47,80 @@ export const IndexPageModals = () => {
     handleFormDataChange,
   } = useIndexPageContext();
 
-  // Track deletion state with refs
-  const isDeletingRef = useRef(isDeleting);
-  const deletionInProgressRef = useRef(false);
+  // Track deletion state
+  const prevDeletingRef = useRef(isDeleting);
   const deletionCompletedRef = useRef(false);
 
+  // Special handler for delete confirmation to prevent duplicate triggers
+  const handleConfirmDelete = () => {
+    if (isDeleting) {
+      console.log("IndexPageModals: Delete operation already in progress");
+      return;
+    }
+    
+    console.log("IndexPageModals: Confirming delete");
+    confirmDelete();
+  };
+  
   // Track deletion state changes
   useEffect(() => {
-    console.log("IndexPageModals: isDeleting state changed to:", isDeleting);
-    isDeletingRef.current = isDeleting;
-    
-    if (isDeleting) {
-      deletionInProgressRef.current = true;
-      deletionCompletedRef.current = false;
-    } else if (deletionInProgressRef.current) {
-      // Deletion just completed
-      console.log("IndexPageModals: Deletion process completed");
-      deletionInProgressRef.current = false;
-      deletionCompletedRef.current = true;
+    // Only log when deletion state actually changes
+    if (prevDeletingRef.current !== isDeleting) {
+      console.log("IndexPageModals: isDeleting changed from", prevDeletingRef.current, "to", isDeleting);
+      prevDeletingRef.current = isDeleting;
       
-      // Reset completed flag after short delay
-      setTimeout(() => {
-        deletionCompletedRef.current = false;
-      }, 1000);
+      // If deletion just completed, set cleanup flag
+      if (prevDeletingRef.current && !isDeleting) {
+        deletionCompletedRef.current = true;
+        console.log("IndexPageModals: Deletion completed, cleanup flag set");
+        
+        // Ensure dialog is closed after deletion completes
+        if (showDeleteDialog) {
+          setTimeout(() => {
+            console.log("IndexPageModals: Auto-closing delete dialog after completion");
+            setShowDeleteDialog(false);
+          }, 200);
+        }
+        
+        // Reset deletion completed flag after delay
+        setTimeout(() => {
+          deletionCompletedRef.current = false;
+        }, 1000);
+      }
     }
-  }, [isDeleting]);
+  }, [isDeleting, showDeleteDialog, setShowDeleteDialog]);
   
-  // Create a protected modal change handler
-  const handleProtectedModalOpenChange = (open: boolean, currentlyOpen: boolean, setOpen: (o: boolean) => void) => {
-    // Prevent modal closing during deletion
-    if (isDeletingRef.current && !open) {
-      console.log("IndexPageModals: Prevented modal closure during deletion");
-      return;
-    }
-    
-    // Otherwise proceed with modal state change
-    console.log("IndexPageModals: Changing modal state to:", open);
-    setOpen(open);
-  };
-
-  // Special handler for main convenente modal
-  const handleMainModalOpenChange = (open: boolean) => {
-    // Block closing during deletion
-    if (isDeletingRef.current && !open) {
-      console.log("IndexPageModals: Blocked convenente modal close during deletion");
-      return;
-    }
-    
-    console.log("IndexPageModals: Changing convenente modal state to:", open);
-    handleConvenenteModalOpenChange(open);
-  };
-  
-  // Protection for select convenente
-  const handleProtectedSelectConvenente = (convenente: any) => {
-    if (isDeletingRef.current || deletionCompletedRef.current) {
-      console.log("IndexPageModals: Blocked convenente selection during/after deletion");
-      return;
-    }
-    
-    handleSelectConvenente(convenente, formMode);
-  };
-  
-  // Clean up any stuck deletion state if needed
+  // Clean up any stuck deletion state
   useEffect(() => {
     const checkDeletionTimeout = setTimeout(() => {
-      if (isDeletingRef.current && resetDeletionState) {
+      if (isDeleting && resetDeletionState) {
+        // If deletion has been in progress for too long
         console.log("IndexPageModals: Checking for stuck deletion state");
         
-        // If the delete dialog is closed but isDeleting is still true
-        if (!showDeleteDialog && isDeletingRef.current) {
-          console.log("IndexPageModals: Detected stuck deletion state, resetting");
-          resetDeletionState();
-        }
+        // Consider adding an auto-reset after a very long timeout (e.g., 60 seconds)
+        // This is a safety measure to prevent permanent UI freezing
       }
-    }, 10000); // Check after 10 seconds
+    }, 60000); // Check after 1 minute
     
     return () => clearTimeout(checkDeletionTimeout);
-  }, [isDeleting, showDeleteDialog, resetDeletionState]);
+  }, [isDeleting, resetDeletionState]);
 
   return (
     <>
       <ConvenenteModal 
         isOpen={modalOpen}
-        onOpenChange={handleMainModalOpenChange}
+        onOpenChange={handleConvenenteModalOpenChange}
         convenentes={convenentes}
         filteredConvenentes={filteredConvenentes}
         currentConvenenteId={currentConvenenteId}
         formData={formData}
         formMode={formMode}
         formValid={formValid}
-        isLoading={isLoading || isDeleting} // Show loading during deletion
+        isLoading={isLoading || isDeleting} 
         isSearching={isSearching}
         searchTerm={searchTerm}
         onSearchChange={handleSearchChange}
-        onSelectConvenente={handleProtectedSelectConvenente}
+        onSelectConvenente={handleSelectConvenente}
         onCreateNew={handleCreateNew}
         onEdit={handleEdit}
         onDelete={handleDelete}
@@ -151,37 +131,41 @@ export const IndexPageModals = () => {
       <ImportacaoModal 
         isOpen={importModalOpen}
         onOpenChange={(open) => {
-          handleProtectedModalOpenChange(open, importModalOpen, setImportModalOpen);
+          // Prevent modal closure during deletion
+          if (isDeleting && !open) {
+            return;
+          }
+          setImportModalOpen(open);
         }}
       />
 
       <CNABToAPIModal 
         isOpen={cnabToApiModalOpen}
         onOpenChange={(open) => {
-          handleProtectedModalOpenChange(open, cnabToApiModalOpen, setCnabToApiModalOpen);
+          // Prevent modal closure during deletion
+          if (isDeleting && !open) {
+            return;
+          }
+          setCnabToApiModalOpen(open);
         }}
       />
 
       <AdminPanelModal 
         isOpen={adminPanelOpen}
         onOpenChange={(open) => {
-          handleProtectedModalOpenChange(open, adminPanelOpen, setAdminPanelOpen);
+          // Prevent modal closure during deletion
+          if (isDeleting && !open) {
+            return;
+          }
+          setAdminPanelOpen(open);
         }}
       />
 
+      {/* Make sure the delete dialog is only shown once */}
       <DeleteConvenenteDialog 
         isOpen={showDeleteDialog}
-        onOpenChange={(open) => {
-          // Special handling for delete dialog to prevent closure during deletion
-          if (isDeletingRef.current && !open) {
-            console.log("IndexPageModals: Blocked delete dialog close during deletion");
-            return;
-          }
-          
-          console.log("IndexPageModals: Setting delete dialog to:", open);
-          setShowDeleteDialog(open);
-        }}
-        onDelete={confirmDelete}
+        onOpenChange={setShowDeleteDialog}
+        onDelete={handleConfirmDelete}
         isDeleting={isDeleting}
       />
     </>
