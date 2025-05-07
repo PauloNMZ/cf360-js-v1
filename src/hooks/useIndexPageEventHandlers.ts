@@ -13,6 +13,9 @@ export const useIndexPageEventHandlers = ({
 }: IndexPageActionProps) => {
   const { signOut } = useAuth();
   
+  // Adicionar referência para rastrear o estado de roteamento
+  const navigationInProgressRef = useRef(false);
+  
   // Get action helpers
   const { isActionAllowed, handleSaveClick, actionInProgressRef } = useActionHandlers({
     indexPage,
@@ -33,6 +36,8 @@ export const useIndexPageEventHandlers = ({
     setCnabToApiModalOpen,
     isActionAllowed,
     actionInProgressRef,
+    navigationInProgressRef,  // Passar a referência para o hook de navegação
+    resetDeletionState: indexPageActions.resetDeletionState, // Passar a função de reset
     signOut
   });
 

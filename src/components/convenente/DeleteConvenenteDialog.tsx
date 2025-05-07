@@ -44,6 +44,22 @@ const DeleteConvenenteDialog = ({
     }
   }, [isDeleting]);
 
+  // Nova validação de timeout para evitar estados travados
+  useEffect(() => {
+    // Se estiver deletando, configurar um timeout de segurança
+    if (isDeleting) {
+      const timeoutId = setTimeout(() => {
+        // Se a exclusão estiver em andamento por muito tempo, forçar fechamento
+        console.log("DeleteDialog: Tempo limite de exclusão excedido, fechando diálogo");
+        if (isOpen) {
+          onOpenChange(false);
+        }
+      }, 15000); // 15 segundos é muito tempo para uma exclusão
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [isDeleting, isOpen, onOpenChange]);
+
   // Handle delete with event protection
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault();
