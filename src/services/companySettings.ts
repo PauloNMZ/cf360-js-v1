@@ -6,7 +6,7 @@ const COMPANY_SETTINGS_KEY = 'gerapag_company_settings';
 // Default company settings
 export const DEFAULT_SETTINGS: CompanySettings = { 
   logoUrl: '', 
-  companyName: 'Gerador de Pagamentos' 
+  companyName: 'ConnectPag' 
 };
 
 // Get company settings from localStorage

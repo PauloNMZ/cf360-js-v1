@@ -11,7 +11,7 @@ type MainLayoutProps = {
   companySettings?: CompanySettings; // Make it optional
 };
 
-const MainLayout = ({ children, companySettings = { logoUrl: '', companyName: 'Gerador de Pagamentos' } }: MainLayoutProps) => {
+const MainLayout = ({ children, companySettings = { logoUrl: '', companyName: 'ConnectPag' } }: MainLayoutProps) => {
   const { user } = useAuth();
   
   // Define header and footer heights
@@ -64,7 +64,7 @@ const MainLayout = ({ children, companySettings = { logoUrl: '', companyName: 'G
           <div className="flex items-center gap-4">
             <ThemeToggle />
             <div className="text-right">
-              <p className="text-sm">GeraPag 1.01</p>
+              <p className="text-sm">ConnectPag 1.01</p>
             </div>
           </div>
         </div>

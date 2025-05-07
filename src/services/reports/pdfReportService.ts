@@ -118,7 +118,7 @@ export const generatePDFReport = async (reportData: ReportData): Promise<Blob> =
   doc.text("Observações:", 15, obsY);
   doc.setFont(undefined, 'normal');
   doc.setFontSize(9);
-  doc.text("Este relatório foi gerado automaticamente pelo sistema de Remessas.", 15, obsY + 7);
+  doc.text("Este relatório foi gerado automaticamente pelo sistema ConnectPag.", 15, obsY + 7);
   doc.text("Em caso de dúvidas, entre em contato com o departamento financeiro.", 15, obsY + 14);
   
   // Add page numbers
