@@ -92,7 +92,7 @@ const DeleteConvenenteDialog = ({
     // Chamar onDelete com um pequeno delay para evitar problemas de sincronização de estado
     setTimeout(() => {
       onDelete();
-    }, 10);
+    }, 50);
   };
 
   return (

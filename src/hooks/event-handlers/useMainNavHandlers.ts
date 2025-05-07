@@ -1,26 +1,24 @@
 
 import { MutableRefObject } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 export const useMainNavHandlers = ({
   indexPage,
   setCnabToApiModalOpen,
   isActionAllowed,
   actionInProgressRef,
-  navigationInProgressRef, // Nova referência para controlar navegação
-  resetDeletionState,      // Função para resetar estado de exclusão
+  navigationInProgressRef,
+  resetDeletionState,
   signOut
 }: {
   indexPage: any;
   setCnabToApiModalOpen: (open: boolean) => void;
   isActionAllowed: () => boolean;
   actionInProgressRef: MutableRefObject<boolean>;
-  navigationInProgressRef: MutableRefObject<boolean>; // Novo parâmetro
-  resetDeletionState: () => void; // Função para resetar estado - agora requerida
+  navigationInProgressRef: MutableRefObject<boolean>;
+  resetDeletionState: () => void;
   signOut: () => void;
 }) => {
-  const { toast } = useToast();
-  
   // Helper para prevenir navegações duplicadas
   const safeNavigate = (action: () => void) => {
     // Sempre resetar o estado de exclusão antes de qualquer navegação
@@ -38,12 +36,6 @@ export const useMainNavHandlers = ({
       return;
     }
     
-    // Se não for permitido navegar, impedir ação mas limpar estado mesmo assim
-    if (!isActionAllowed()) {
-      console.log("Navegação bloqueada: Operação não permitida");
-      return;
-    }
-    
     try {
       // Marcar que uma navegação está em andamento
       navigationInProgressRef.current = true;
@@ -57,7 +49,7 @@ export const useMainNavHandlers = ({
         resetDeletionState();
         // Resetar a flag de navegação após um pequeno delay
         navigationInProgressRef.current = false;
-      }, 500);
+      }, 300);
     }
   };
 

@@ -26,12 +26,21 @@ const NavigationMenu = ({
   const actionsDisabled = isDeleting || isLoading;
   
   // Create safe handler wrappers that return a function with no parameters
-  const handleSafeClick = (handler: () => void) => () => {
+  const handleSafeClick = (handler: () => void) => (event: React.MouseEvent) => {
+    // Prevenir comportamento padrão para maior segurança
+    event.preventDefault();
+    
     if (actionsDisabled) {
       console.log("Navigation action blocked: Operation in progress");
       return;
     }
-    handler();
+    
+    console.log("Executing navigation handler");
+    try {
+      handler();
+    } catch (e) {
+      console.error("Erro ao executar handler de navegação:", e);
+    }
   };
 
   // Map handler names to actual handler functions
@@ -48,18 +57,23 @@ const NavigationMenu = ({
     <TooltipProvider>
       <div className="flex justify-center mb-10">
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-9 gap-4 max-w-6xl mx-auto">
-          {navigationItems.map((item, index) => (
-            <NavigationItem
-              key={index}
-              icon={item.icon}
-              label={item.label}
-              tooltipText={item.tooltipText}
-              onClick={handleSafeClick(handlers[item.handler as keyof typeof handlers])}
-              disabled={actionsDisabled}
-              className={item.className}
-              tooltipClassName={item.tooltipClassName}
-            />
-          ))}
+          {navigationItems.map((item, index) => {
+            // Obter o handler correto ou usar o handler vazio
+            const handler = handlers[item.handler as keyof typeof handlers] || handlers.emptyHandler;
+            
+            return (
+              <NavigationItem
+                key={index}
+                icon={item.icon}
+                label={item.label}
+                tooltipText={item.tooltipText}
+                onClick={handleSafeClick(handler)}
+                disabled={actionsDisabled}
+                className={item.className}
+                tooltipClassName={item.tooltipClassName}
+              />
+            );
+          })}
         </div>
       </div>
     </TooltipProvider>

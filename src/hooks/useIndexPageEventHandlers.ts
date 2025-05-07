@@ -1,11 +1,11 @@
 
-import { useRef } from "react";
+import { useRef, useCallback } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useModalHandlers } from "./event-handlers/useModalHandlers";
 import { useActionHandlers } from "./event-handlers/useActionHandlers";
 import { useMainNavHandlers } from "./event-handlers/useMainNavHandlers";
 import { IndexPageActionProps } from "@/providers/types";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 export const useIndexPageEventHandlers = ({
   indexPage,
@@ -13,7 +13,6 @@ export const useIndexPageEventHandlers = ({
   setCnabToApiModalOpen
 }: IndexPageActionProps) => {
   const { signOut } = useAuth();
-  const { toast } = useToast();
   
   // Adicionar referência para rastrear o estado de roteamento
   const navigationInProgressRef = useRef(false);
@@ -33,7 +32,7 @@ export const useIndexPageEventHandlers = ({
   });
   
   // Função segura para resetar o estado de exclusão
-  const safeResetDeletionState = () => {
+  const safeResetDeletionState = useCallback(() => {
     if (indexPageActions.resetDeletionState) {
       console.log("Resetando estado de exclusão explicitamente");
       try {
@@ -49,7 +48,7 @@ export const useIndexPageEventHandlers = ({
     } else {
       console.log("Função resetDeletionState não disponível");
     }
-  };
+  }, [indexPageActions]);
   
   // Get navigation handlers
   const navigationHandlers = useMainNavHandlers({
@@ -58,14 +57,14 @@ export const useIndexPageEventHandlers = ({
     isActionAllowed,
     actionInProgressRef,
     navigationInProgressRef,
-    resetDeletionState: safeResetDeletionState, // Passar nossa função segura de reset
+    resetDeletionState: safeResetDeletionState,
     signOut
   });
 
   // Adicionar um handler de cleanup explícito que pode ser chamado quando necessário
-  const handleStateCleanup = () => {
+  const handleStateCleanup = useCallback(() => {
     safeResetDeletionState();
-  };
+  }, [safeResetDeletionState]);
 
   return {
     // Modal handlers
