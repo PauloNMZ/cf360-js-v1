@@ -25,18 +25,23 @@ const DeleteConvenenteDialog = ({
   onDelete,
   isDeleting = false
 }: DeleteConvenenteDialogProps) => {
-  // Strictly prevent closing the dialog while deleting
+  // This prevents any closing of the dialog during deletion process
   const handleOpenChange = (open: boolean) => {
-    // If trying to close during deletion, prevent it
+    // If trying to close while deletion is in progress, prevent it
     if (isDeleting && !open) {
+      console.log("Prevented dialog close during deletion");
       return;
     }
-    onOpenChange(open);
+    
+    // Only allow state changes if we're not in the middle of deleting
+    if (!isDeleting) {
+      onOpenChange(open);
+    }
   };
 
   return (
     <AlertDialog open={isOpen} onOpenChange={handleOpenChange}>
-      <AlertDialogContent>
+      <AlertDialogContent className="sm:max-w-[425px]">
         <AlertDialogHeader>
           <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
           <AlertDialogDescription>
@@ -45,12 +50,29 @@ const DeleteConvenenteDialog = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isDeleting}>Cancelar</AlertDialogCancel>
+          <AlertDialogCancel 
+            disabled={isDeleting} 
+            onClick={(e) => {
+              if (isDeleting) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log("Cancel button clicked during deletion - preventing action");
+                return;
+              }
+            }}
+          >
+            Cancelar
+          </AlertDialogCancel>
           <AlertDialogAction 
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              onDelete();
+              if (!isDeleting) {
+                console.log("Delete button clicked - triggering delete");
+                onDelete();
+              } else {
+                console.log("Delete already in progress - ignoring click");
+              }
             }} 
             className="bg-red-600 hover:bg-red-700"
             disabled={isDeleting}

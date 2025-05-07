@@ -60,7 +60,13 @@ export const IndexPageModals = () => {
     <>
       <ConvenenteModal 
         isOpen={modalOpen}
-        onOpenChange={(open) => handleConvenenteModalOpenChange(open)}
+        onOpenChange={(open) => {
+          if (isDeleting && !open) {
+            console.log("Preventing main modal close during deletion");
+            return;
+          }
+          handleConvenenteModalOpenChange(open);
+        }}
         convenentes={convenentes}
         filteredConvenentes={filteredConvenentes}
         currentConvenenteId={currentConvenenteId}
@@ -75,6 +81,8 @@ export const IndexPageModals = () => {
           // Prevent selecting convenentes during deletion
           if (!isDeleting) {
             handleSelectConvenente(convenente, formMode);
+          } else {
+            console.log("Selection prevented during deletion");
           }
         }}
         onCreateNew={handleCreateNew}

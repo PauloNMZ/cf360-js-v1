@@ -45,23 +45,23 @@ export const useDeleteActions = (
     }
     
     try {
-      // Set deletion status FIRST before any other operations
+      // Set deletion state first to block UI
       setIsDeleting(true);
-      setIsLoading(true);
+      console.log("Starting deletion process for:", currentConvenenteId);
       
-      console.log("Iniciando exclusão do convenente:", currentConvenenteId);
-      const convenenteIdToDelete = currentConvenenteId; // Store ID for later use
+      // Store the ID for use after deletion
+      const convenenteIdToDelete = currentConvenenteId;
       
+      // Call API to delete the convenente
       const success = await removeConvenente(convenenteIdToDelete);
+      console.log("Delete API call completed, success:", success);
       
       if (success) {
-        console.log("Convenente excluído com sucesso");
-        
         // Update list after successful deletion
         const updatedConvenentes = await fetchConvenentes();
-        console.log("Lista atualizada:", updatedConvenentes.length, "convenentes");
+        console.log("Fetched updated convenente list, count:", updatedConvenentes.length);
         
-        // Update state in proper sequence
+        // Update state
         setConvenentes(updatedConvenentes);
         setCurrentConvenenteId(null);
         setFormData({...emptyConvenente});
@@ -71,24 +71,28 @@ export const useDeleteActions = (
           title: "Convenente excluído",
           description: "O convenente foi excluído com sucesso.",
         });
-        
-        console.log("Operação concluída para convenente:", convenenteIdToDelete);
       } else {
         throw new Error("Falha ao excluir convenente");
       }
     } catch (error) {
-      console.error("Erro ao excluir:", error);
+      console.error("Error during deletion:", error);
       toast({
         title: "Erro ao excluir",
         description: "Não foi possível excluir o convenente.",
         variant: "destructive",
       });
     } finally {
-      // IMPORTANT: Only update these states after all other operations are complete
-      // and only close the dialog at the very end
+      // Only close the dialog after all operations are completed
+      // This sequence is critical - first, complete all operations
+      // Then update loading state
       setIsLoading(false);
-      setIsDeleting(false);
-      setShowDeleteDialog(false);
+      
+      // Finally update deletion state and dialog state with a small delay
+      // to ensure React has processed the other state updates first
+      setTimeout(() => {
+        setIsDeleting(false);
+        setShowDeleteDialog(false);
+      }, 100);
     }
   };
 
@@ -97,6 +101,7 @@ export const useDeleteActions = (
     setShowDeleteDialog,
     handleDelete,
     confirmDelete,
-    isDeleting
+    isDeleting,
+    setIsDeleting
   };
 };
