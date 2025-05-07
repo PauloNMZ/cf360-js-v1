@@ -49,6 +49,7 @@ export interface IndexPageActions {
   handleDelete: () => void;
   confirmDelete: () => void;
   isDeleting: boolean;
+  resetDeletionState?: () => void; // Adicionado esta propriedade opcional
 }
 
 // Define props for IndexPageEventHandlers
