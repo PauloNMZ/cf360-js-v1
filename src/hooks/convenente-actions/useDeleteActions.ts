@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ConvenenteData, emptyConvenente } from "@/types/convenente";
 import { removeConvenente, fetchConvenentes } from "@/services/convenente/convenenteService";
@@ -24,6 +24,18 @@ export const useDeleteActions = (
   const { toast } = useToast();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  
+  // Use refs to prevent state update race conditions
+  const isDeletingRef = useRef(false);
+  const deletionInProgressRef = useRef(false);
+  const apiCallCompleteRef = useRef(false);
+  
+  // Clean up all refs before new deletion attempt
+  const resetDeletionState = () => {
+    isDeletingRef.current = false;
+    deletionInProgressRef.current = false;
+    apiCallCompleteRef.current = false;
+  };
 
   const handleDelete = () => {
     if (!currentConvenenteId) {
@@ -35,6 +47,9 @@ export const useDeleteActions = (
       return;
     }
     
+    // Reset all deletion state to avoid any previous stale state
+    resetDeletionState();
+    
     console.log("Delete action: Opening delete confirmation dialog");
     setShowDeleteDialog(true);
   };
@@ -45,6 +60,10 @@ export const useDeleteActions = (
       setShowDeleteDialog(false);
       return;
     }
+    
+    // Set all flags to indicate deletion is starting
+    isDeletingRef.current = true;
+    deletionInProgressRef.current = true;
     
     try {
       // Flag deletion in progress FIRST, before any other operations
@@ -59,15 +78,26 @@ export const useDeleteActions = (
       
       // Call API to delete the convenente with added timeout for reliability
       console.log("Delete action: Calling API to remove convenente");
-      const success = await Promise.race([
-        removeConvenente(convenenteIdToDelete),
-        new Promise<boolean>((resolve) => {
-          // Ensure we give the API enough time to complete
-          setTimeout(() => {
-            console.log("Delete action: API call timeout reached");
+      const apiPromise = removeConvenente(convenenteIdToDelete);
+      
+      // Create a timeout promise
+      const timeoutPromise = new Promise<boolean>((resolve) => {
+        // Ensure we give the API enough time to complete
+        setTimeout(() => {
+          console.log("Delete action: API call timeout reached");
+          if (!apiCallCompleteRef.current) {
             resolve(false);
-          }, 15000); // 15 second timeout
-        })
+          }
+        }, 20000); // 20 second timeout - increased for reliability
+      });
+      
+      // Race the API call against the timeout
+      const success = await Promise.race([
+        apiPromise.then(result => {
+          apiCallCompleteRef.current = true;
+          return result;
+        }),
+        timeoutPromise
       ]);
       
       console.log("Delete action: API call completed, success:", success);
@@ -91,7 +121,7 @@ export const useDeleteActions = (
             title: "Convenente excluído",
             description: "O convenente foi excluído com sucesso.",
           });
-        }, 100);
+        }, 500);
       } else {
         throw new Error("Falha ao excluir convenente");
       }
@@ -103,6 +133,9 @@ export const useDeleteActions = (
         variant: "destructive",
       });
     } finally {
+      // Flag that deletion process is complete
+      deletionInProgressRef.current = false;
+      
       // Sequence of state updates is critical to prevent race conditions
       
       // First clear general loading state
@@ -113,13 +146,17 @@ export const useDeleteActions = (
       setTimeout(() => {
         console.log("Delete action: Clearing isDeleting flag");
         setIsDeleting(false);
+        isDeletingRef.current = false;
         
         // Close the dialog only after ALL operations are complete
         setTimeout(() => {
-          console.log("Delete action: Closing delete dialog");
-          setShowDeleteDialog(false);
-        }, 300);
-      }, 500);
+          // Only close the dialog if we're not already in a new deletion process
+          if (!deletionInProgressRef.current) {
+            console.log("Delete action: Closing delete dialog");
+            setShowDeleteDialog(false);
+          }
+        }, 800);
+      }, 1000);
     }
   };
 

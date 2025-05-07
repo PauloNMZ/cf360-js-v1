@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useConvenenteData } from "../convenente/useConvenenteData";
 import { useConvenenteSearch } from "../convenente/useConvenenteSearch";
 
@@ -11,30 +11,32 @@ export const useIndexPageData = (modalOpen: boolean) => {
   const convenenteData = useConvenenteData();
   const searchState = useConvenenteSearch(convenenteData.convenentes);
   
-  // Initialize isDeleting state with proper logging
+  // Initialize isDeleting state with ref for tracking
   const [isDeleting, setIsDeleting] = useState(false);
+  const isDeletingRef = useRef(false);
   
-  // Log isDeleting state changes for debugging
+  // Update ref when deletion state changes to avoid stale closures
   useEffect(() => {
     console.log("useIndexPageData: isDeleting state changed to:", isDeleting);
+    isDeletingRef.current = isDeleting;
   }, [isDeleting]);
   
   // Load convenentes when modal is opened, but not during deletion
   useEffect(() => {
-    if (modalOpen && !isDeleting) {
+    if (modalOpen && !isDeletingRef.current) {
       console.log("useIndexPageData: Loading convenente data, isDeleting =", isDeleting);
       convenenteData.loadConvenenteData(true);
-    } else if (isDeleting) {
+    } else if (isDeletingRef.current) {
       console.log("useIndexPageData: Skipping data load during deletion");
     }
   }, [modalOpen, isDeleting, convenenteData]);
 
   // Reset form data when modal is closed, but not during deletion
   useEffect(() => {
-    if (!modalOpen && !isDeleting) {
+    if (!modalOpen && !isDeletingRef.current) {
       console.log("useIndexPageData: Resetting form data, isDeleting =", isDeleting);
       convenenteData.resetFormData();
-    } else if (isDeleting) {
+    } else if (isDeletingRef.current) {
       console.log("useIndexPageData: Skipping form reset during deletion");
     }
   }, [modalOpen, isDeleting, convenenteData]);

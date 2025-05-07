@@ -1,5 +1,5 @@
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import ConvenenteModal from "@/components/convenente/ConvenenteModal";
 import DeleteConvenenteDialog from "@/components/convenente/DeleteConvenenteDialog";
 import ImportacaoModal from "@/components/importacao/ImportacaoModal";
@@ -46,15 +46,19 @@ export const IndexPageModals = () => {
     handleFormDataChange,
   } = useIndexPageContext();
 
-  // Log deletion state changes for debugging
+  // Track deletion state with a ref to avoid stale closure issues
+  const isDeletingRef = useRef(isDeleting);
+
+  // Log deletion state changes and update ref for tracking
   useEffect(() => {
     console.log("IndexPageModals: isDeleting state changed to:", isDeleting);
+    isDeletingRef.current = isDeleting;
   }, [isDeleting]);
 
   // Create a special modal change handler that respects isDeleting state
   const handleModalOpenChange = (open: boolean, currentlyOpen: boolean, setOpen: (o: boolean) => void) => {
     // Prevent closing any modal if a deletion is in progress
-    if (isDeleting && !open && currentlyOpen) {
+    if (isDeletingRef.current && !open && currentlyOpen) {
       console.log("IndexPageModals: Preventing modal close during deletion");
       return;
     }
@@ -67,7 +71,7 @@ export const IndexPageModals = () => {
       <ConvenenteModal 
         isOpen={modalOpen}
         onOpenChange={(open) => {
-          if (isDeleting && !open) {
+          if (isDeletingRef.current && !open) {
             console.log("IndexPageModals: Preventing main modal close during deletion");
             return;
           }
@@ -86,7 +90,7 @@ export const IndexPageModals = () => {
         onSearchChange={handleSearchChange}
         onSelectConvenente={(convenente) => {
           // Prevent selecting convenentes during deletion
-          if (!isDeleting) {
+          if (!isDeletingRef.current) {
             handleSelectConvenente(convenente, formMode);
           } else {
             console.log("IndexPageModals: Selection prevented during deletion");
@@ -124,7 +128,7 @@ export const IndexPageModals = () => {
         isOpen={showDeleteDialog}
         onOpenChange={(open) => {
           // Special handling for delete dialog to prevent closure during deletion
-          if (isDeleting && !open) {
+          if (isDeletingRef.current && !open) {
             console.log("IndexPageModals: Preventing delete dialog close during deletion");
             return;
           }

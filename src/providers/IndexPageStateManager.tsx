@@ -1,5 +1,5 @@
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useAppState } from "@/hooks/useAppState";
 import { ConvenenteData } from "@/types/convenente";
 
@@ -28,14 +28,18 @@ export const useIndexPageStateManager = ({
 }) => {
   const { loadAppState, saveAppState } = useAppState();
   
-  // Log deletion state for debugging
+  // Use ref to consistently track deletion state
+  const isDeletingRef = useRef(isDeleting);
+  
+  // Update ref when deletion state changes
   useEffect(() => {
     console.log("IndexPageStateManager: isDeleting state is", isDeleting);
+    isDeletingRef.current = isDeleting;
   }, [isDeleting]);
   
   // Load saved app state when component mounts, but not during deletion
   useEffect(() => {
-    if (isDeleting) {
+    if (isDeletingRef.current) {
       // Skip loading app state during deletion process
       console.log("IndexPageStateManager: Skipping app state loading during deletion");
       return;
@@ -43,11 +47,11 @@ export const useIndexPageStateManager = ({
     
     const savedState = loadAppState();
     console.log("IndexPageStateManager: Loaded app state", savedState);
-  }, [isDeleting, loadAppState]);
+  }, [loadAppState]);
 
   // Save app state whenever modals change, but ONLY if not deleting
   useEffect(() => {
-    if (isDeleting) { 
+    if (isDeletingRef.current) { 
       // Don't save state during deletion process to prevent inconsistent state
       console.log("IndexPageStateManager: Skipping app state saving during deletion");
       return;
@@ -62,11 +66,11 @@ export const useIndexPageStateManager = ({
         adminPanel: adminPanelOpen
       }
     });
-  }, [modalOpen, importModalOpen, cnabToApiModalOpen, adminPanelOpen, isDeleting, saveAppState]);
+  }, [modalOpen, importModalOpen, cnabToApiModalOpen, adminPanelOpen, saveAppState]);
   
   // Load convenentes when modal is opened, but ONLY if not deleting
   useEffect(() => {
-    if (isDeleting) { 
+    if (isDeletingRef.current) { 
       // Don't load data during deletion process
       console.log("IndexPageStateManager: Skipping data loading during deletion");
       return;
@@ -76,5 +80,5 @@ export const useIndexPageStateManager = ({
       console.log("IndexPageStateManager: Loading convenente data");
       loadConvenenteData(true);
     }
-  }, [modalOpen, loadConvenenteData, isDeleting]);
+  }, [modalOpen, loadConvenenteData]);
 };

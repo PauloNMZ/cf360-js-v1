@@ -1,5 +1,4 @@
-
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,30 +24,59 @@ const DeleteConvenenteDialog = ({
   onDelete,
   isDeleting = false
 }: DeleteConvenenteDialogProps) => {
-  // This useEffect ensures the dialog cannot be closed during deletion
+  // Keep reference to initial state to prevent unwanted effects during deletion
+  const isDeletingRef = useRef(isDeleting);
+  
   useEffect(() => {
-    if (isDeleting) {
-      console.log("DeleteDialog: Deletion in progress, forcing dialog to stay open");
-      // Force the dialog to stay open when deletion starts
-      if (!isOpen) {
-        onOpenChange(true);
-      }
+    console.log("DeleteDialog: isDeleting changed to:", isDeleting);
+    isDeletingRef.current = isDeleting;
+    
+    // Force dialog to stay open when deletion starts
+    if (isDeleting && !isOpen) {
+      console.log("DeleteDialog: Forcing dialog to stay open during deletion");
+      onOpenChange(true);
     }
   }, [isDeleting, isOpen, onOpenChange]);
 
   // Enhanced handleOpenChange to completely block dialog closing during deletion
   const handleOpenChange = (open: boolean) => {
+    console.log("DeleteDialog: Attempt to change dialog state to:", open, "isDeleting:", isDeleting);
+    
     // If trying to close while deletion is in progress, prevent it
-    if (isDeleting && !open) {
+    if (isDeletingRef.current && !open) {
       console.log("DeleteDialog: Prevented dialog close during deletion process");
       return;
     }
     
     // Only allow state changes if we're not in the middle of deleting
-    if (!isDeleting) {
+    if (!isDeletingRef.current) {
       console.log("DeleteDialog: Changing dialog state to:", open);
       onOpenChange(open);
     }
+  };
+
+  // Handle delete button click with proper event prevention
+  const handleDelete = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!isDeletingRef.current) {
+      console.log("DeleteDialog: Delete button clicked - triggering deletion");
+      onDelete();
+    } else {
+      console.log("DeleteDialog: Delete already in progress - ignoring click");
+    }
+  };
+
+  // Handle cancel button click with proper event prevention
+  const handleCancel = (e: React.MouseEvent) => {
+    if (isDeletingRef.current) {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log("DeleteDialog: Cancel button clicked during deletion - preventing action");
+      return;
+    }
+    console.log("DeleteDialog: Cancel button clicked - allowing default action");
   };
 
   return (
@@ -67,29 +95,12 @@ const DeleteConvenenteDialog = ({
         <AlertDialogFooter>
           <AlertDialogCancel 
             disabled={isDeleting} 
-            onClick={(e) => {
-              if (isDeleting) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log("DeleteDialog: Cancel button clicked during deletion - preventing action");
-                return;
-              }
-              console.log("DeleteDialog: Cancel button clicked - allowing default action");
-            }}
+            onClick={handleCancel}
           >
             Cancelar
           </AlertDialogCancel>
           <AlertDialogAction 
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              if (!isDeleting) {
-                console.log("DeleteDialog: Delete button clicked - triggering deletion");
-                onDelete();
-              } else {
-                console.log("DeleteDialog: Delete already in progress - ignoring click");
-              }
-            }} 
+            onClick={handleDelete} 
             className="bg-red-600 hover:bg-red-700 focus:ring-red-500"
             disabled={isDeleting}
           >
