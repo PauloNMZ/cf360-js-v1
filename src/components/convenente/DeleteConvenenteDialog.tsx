@@ -117,21 +117,7 @@ const DeleteConvenenteDialog = ({
 
   return (
     <AlertDialog open={internalOpen} onOpenChange={handleOpenChange}>
-      <AlertDialogContent 
-        className="sm:max-w-[425px]"
-        onPointerDownOutside={e => {
-          // Prevent closing dialog by clicking outside during deletion
-          if (isDeletingRef.current) {
-            e.preventDefault();
-          }
-        }}
-        onEscapeKeyDown={e => {
-          // Prevent closing dialog with escape key during deletion
-          if (isDeletingRef.current) {
-            e.preventDefault();
-          }
-        }}
-      >
+      <AlertDialogContent className="sm:max-w-[425px]">
         <AlertDialogHeader>
           <AlertDialogTitle>
             {isDeleting ? "Excluindo..." : "Confirmar exclusão"}
