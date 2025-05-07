@@ -11,22 +11,33 @@ export const useIndexPageData = (modalOpen: boolean) => {
   const convenenteData = useConvenenteData();
   const searchState = useConvenenteSearch(convenenteData.convenentes);
   
-  // Initialize isDeleting state
+  // Initialize isDeleting state with proper logging
   const [isDeleting, setIsDeleting] = useState(false);
   
-  // Load convenentes when modal is opened
+  // Log isDeleting state changes for debugging
   useEffect(() => {
-    if (!isDeleting) { // Don't load data during deletion
-      convenenteData.loadConvenenteData(modalOpen);
+    console.log("useIndexPageData: isDeleting state changed to:", isDeleting);
+  }, [isDeleting]);
+  
+  // Load convenentes when modal is opened, but not during deletion
+  useEffect(() => {
+    if (modalOpen && !isDeleting) {
+      console.log("useIndexPageData: Loading convenente data, isDeleting =", isDeleting);
+      convenenteData.loadConvenenteData(true);
+    } else if (isDeleting) {
+      console.log("useIndexPageData: Skipping data load during deletion");
     }
-  }, [modalOpen, isDeleting]);
+  }, [modalOpen, isDeleting, convenenteData]);
 
-  // Reset form data when modal is closed
+  // Reset form data when modal is closed, but not during deletion
   useEffect(() => {
-    if (!modalOpen && !isDeleting) { // Don't reset during deletion
+    if (!modalOpen && !isDeleting) {
+      console.log("useIndexPageData: Resetting form data, isDeleting =", isDeleting);
       convenenteData.resetFormData();
+    } else if (isDeleting) {
+      console.log("useIndexPageData: Skipping form reset during deletion");
     }
-  }, [modalOpen, isDeleting]);
+  }, [modalOpen, isDeleting, convenenteData]);
 
   return {
     // Form and data states from useConvenenteData
@@ -40,8 +51,8 @@ export const useIndexPageData = (modalOpen: boolean) => {
     setCurrentConvenenteId: convenenteData.setCurrentConvenenteId,
     isLoading: convenenteData.isLoading,
     setIsLoading: convenenteData.setIsLoading,
-    isDeleting, // Expose isDeleting state
-    setIsDeleting, // Expose setter
+    isDeleting,
+    setIsDeleting,
     
     // Functions from useConvenenteData
     handleSelectConvenente: convenenteData.handleSelectConvenente,

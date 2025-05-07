@@ -35,64 +35,91 @@ export const useDeleteActions = (
       return;
     }
     
+    console.log("Delete action: Opening delete confirmation dialog");
     setShowDeleteDialog(true);
   };
 
   const confirmDelete = async () => {
     if (!currentConvenenteId) {
+      console.log("Delete action: No convenente selected, closing dialog");
       setShowDeleteDialog(false);
       return;
     }
     
     try {
-      // Set deletion state first to block UI
+      // Flag deletion in progress FIRST, before any other operations
+      console.log("Delete action: Setting isDeleting flag to true");
       setIsDeleting(true);
-      console.log("Starting deletion process for:", currentConvenenteId);
+      setIsLoading(true);
+      
+      console.log("Delete action: Starting deletion process for:", currentConvenenteId);
       
       // Store the ID for use after deletion
       const convenenteIdToDelete = currentConvenenteId;
       
-      // Call API to delete the convenente
-      const success = await removeConvenente(convenenteIdToDelete);
-      console.log("Delete API call completed, success:", success);
+      // Call API to delete the convenente with added timeout for reliability
+      console.log("Delete action: Calling API to remove convenente");
+      const success = await Promise.race([
+        removeConvenente(convenenteIdToDelete),
+        new Promise<boolean>((resolve) => {
+          // Ensure we give the API enough time to complete
+          setTimeout(() => {
+            console.log("Delete action: API call timeout reached");
+            resolve(false);
+          }, 15000); // 15 second timeout
+        })
+      ]);
+      
+      console.log("Delete action: API call completed, success:", success);
       
       if (success) {
+        console.log("Delete action: Fetching updated convenentes list");
         // Update list after successful deletion
         const updatedConvenentes = await fetchConvenentes();
-        console.log("Fetched updated convenente list, count:", updatedConvenentes.length);
+        console.log("Delete action: Fetched updated convenentes list, count:", updatedConvenentes.length);
         
-        // Update state
+        // Update state in specific order to avoid UI issues
+        console.log("Delete action: Updating application state after successful deletion");
         setConvenentes(updatedConvenentes);
         setCurrentConvenenteId(null);
         setFormData({...emptyConvenente});
         setFormMode('view');
         
-        toast({
-          title: "Convenente excluído",
-          description: "O convenente foi excluído com sucesso.",
-        });
+        // Show success message after a short delay to ensure UI has updated
+        setTimeout(() => {
+          toast({
+            title: "Convenente excluído",
+            description: "O convenente foi excluído com sucesso.",
+          });
+        }, 100);
       } else {
         throw new Error("Falha ao excluir convenente");
       }
     } catch (error) {
-      console.error("Error during deletion:", error);
+      console.error("Delete action: Error during deletion:", error);
       toast({
         title: "Erro ao excluir",
         description: "Não foi possível excluir o convenente.",
         variant: "destructive",
       });
     } finally {
-      // Only close the dialog after all operations are completed
-      // This sequence is critical - first, complete all operations
-      // Then update loading state
+      // Sequence of state updates is critical to prevent race conditions
+      
+      // First clear general loading state
+      console.log("Delete action: Clearing isLoading state");
       setIsLoading(false);
       
-      // Finally update deletion state and dialog state with a small delay
-      // to ensure React has processed the other state updates first
+      // Use setTimeout for reliable state updates in the correct sequence
       setTimeout(() => {
+        console.log("Delete action: Clearing isDeleting flag");
         setIsDeleting(false);
-        setShowDeleteDialog(false);
-      }, 100);
+        
+        // Close the dialog only after ALL operations are complete
+        setTimeout(() => {
+          console.log("Delete action: Closing delete dialog");
+          setShowDeleteDialog(false);
+        }, 300);
+      }, 500);
     }
   };
 

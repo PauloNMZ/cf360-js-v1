@@ -28,30 +28,32 @@ export const useIndexPageStateManager = ({
 }) => {
   const { loadAppState, saveAppState } = useAppState();
   
-  // Load saved app state when component mounts
+  // Log deletion state for debugging
+  useEffect(() => {
+    console.log("IndexPageStateManager: isDeleting state is", isDeleting);
+  }, [isDeleting]);
+  
+  // Load saved app state when component mounts, but not during deletion
   useEffect(() => {
     if (isDeleting) {
       // Skip loading app state during deletion process
-      console.log("Skipping app state loading during deletion");
+      console.log("IndexPageStateManager: Skipping app state loading during deletion");
       return;
     }
     
     const savedState = loadAppState();
-    
-    if (savedState.lastModalOpen) {
-      // We don't need to restore modals here as the parent component
-      // will handle this logic
-    }
-  }, [isDeleting]);
+    console.log("IndexPageStateManager: Loaded app state", savedState);
+  }, [isDeleting, loadAppState]);
 
-  // Save app state whenever modals change - but ONLY if not deleting
+  // Save app state whenever modals change, but ONLY if not deleting
   useEffect(() => {
     if (isDeleting) { 
       // Don't save state during deletion process to prevent inconsistent state
-      console.log("Skipping app state saving during deletion");
+      console.log("IndexPageStateManager: Skipping app state saving during deletion");
       return;
     }
     
+    console.log("IndexPageStateManager: Saving app state");
     saveAppState({
       lastModalOpen: {
         convenente: modalOpen,
@@ -60,16 +62,19 @@ export const useIndexPageStateManager = ({
         adminPanel: adminPanelOpen
       }
     });
-  }, [modalOpen, importModalOpen, cnabToApiModalOpen, adminPanelOpen, isDeleting]);
+  }, [modalOpen, importModalOpen, cnabToApiModalOpen, adminPanelOpen, isDeleting, saveAppState]);
   
-  // Load convenentes when modal is opened - but ONLY if not deleting
+  // Load convenentes when modal is opened, but ONLY if not deleting
   useEffect(() => {
     if (isDeleting) { 
       // Don't load data during deletion process
-      console.log("Skipping data loading during deletion");
+      console.log("IndexPageStateManager: Skipping data loading during deletion");
       return;
     }
     
-    loadConvenenteData(modalOpen);
+    if (modalOpen) {
+      console.log("IndexPageStateManager: Loading convenente data");
+      loadConvenenteData(true);
+    }
   }, [modalOpen, loadConvenenteData, isDeleting]);
 };

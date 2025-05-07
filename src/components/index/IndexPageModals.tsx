@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import ConvenenteModal from "@/components/convenente/ConvenenteModal";
 import DeleteConvenenteDialog from "@/components/convenente/DeleteConvenenteDialog";
 import ImportacaoModal from "@/components/importacao/ImportacaoModal";
@@ -21,7 +21,7 @@ export const IndexPageModals = () => {
     // Dialogs
     showDeleteDialog,
     setShowDeleteDialog,
-    isDeleting, // Make sure isDeleting is used from context
+    isDeleting,
     
     // Form states and data
     convenentes,
@@ -46,13 +46,19 @@ export const IndexPageModals = () => {
     handleFormDataChange,
   } = useIndexPageContext();
 
+  // Log deletion state changes for debugging
+  useEffect(() => {
+    console.log("IndexPageModals: isDeleting state changed to:", isDeleting);
+  }, [isDeleting]);
+
   // Create a special modal change handler that respects isDeleting state
   const handleModalOpenChange = (open: boolean, currentlyOpen: boolean, setOpen: (o: boolean) => void) => {
     // Prevent closing any modal if a deletion is in progress
     if (isDeleting && !open && currentlyOpen) {
-      console.log("Preventing modal close during deletion");
+      console.log("IndexPageModals: Preventing modal close during deletion");
       return;
     }
+    console.log("IndexPageModals: Changing modal state to:", open);
     setOpen(open);
   };
 
@@ -62,9 +68,10 @@ export const IndexPageModals = () => {
         isOpen={modalOpen}
         onOpenChange={(open) => {
           if (isDeleting && !open) {
-            console.log("Preventing main modal close during deletion");
+            console.log("IndexPageModals: Preventing main modal close during deletion");
             return;
           }
+          console.log("IndexPageModals: Handling main modal state change");
           handleConvenenteModalOpenChange(open);
         }}
         convenentes={convenentes}
@@ -82,7 +89,7 @@ export const IndexPageModals = () => {
           if (!isDeleting) {
             handleSelectConvenente(convenente, formMode);
           } else {
-            console.log("Selection prevented during deletion");
+            console.log("IndexPageModals: Selection prevented during deletion");
           }
         }}
         onCreateNew={handleCreateNew}
@@ -118,9 +125,10 @@ export const IndexPageModals = () => {
         onOpenChange={(open) => {
           // Special handling for delete dialog to prevent closure during deletion
           if (isDeleting && !open) {
-            console.log("Preventing delete dialog close during deletion");
+            console.log("IndexPageModals: Preventing delete dialog close during deletion");
             return;
           }
+          console.log("IndexPageModals: Setting delete dialog state to:", open);
           setShowDeleteDialog(open);
         }}
         onDelete={confirmDelete}
