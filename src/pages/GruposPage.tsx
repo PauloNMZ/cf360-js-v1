@@ -48,8 +48,15 @@ const GruposPage = () => {
 
   const handleSubmitGroup = async (data: Partial<NewGroup>) => {
     try {
+      // Fix: Ensure required field 'nome' is always present
+      if (!data.nome && isCreating) {
+        toast.error("O nome do grupo é obrigatório");
+        return;
+      }
+      
       if (isCreating) {
-        await addGroup(data);
+        // Make sure nome exists as it's required by the type
+        await addGroup(data as Omit<NewGroup, "user_id">);
         toast.success("Grupo criado com sucesso");
       } else if (currentGroup) {
         await editGroup(currentGroup.id, data);
