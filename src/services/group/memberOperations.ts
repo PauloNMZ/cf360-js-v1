@@ -60,3 +60,50 @@ export const removeGroupMember = async (memberId: string): Promise<void> => {
     throw error;
   }
 };
+
+// Get a specific member by ID
+export const getGroupMemberById = async (memberId: string): Promise<GroupMember | null> => {
+  try {
+    const { data, error } = await supabase
+      .from('favorecidos_grupos')
+      .select('*')
+      .eq('id', memberId)
+      .single();
+      
+    if (error) {
+      if (error.code === 'PGRST116') {
+        // No rows found
+        return null;
+      }
+      console.error('Error fetching group member:', error);
+      throw new Error(error.message);
+    }
+    
+    return data;
+  } catch (error) {
+    console.error('Error in getGroupMemberById:', error);
+    throw error;
+  }
+};
+
+// Update a group member
+export const updateGroupMember = async (memberId: string, updates: Partial<NewGroupMember>): Promise<GroupMember> => {
+  try {
+    const { data, error } = await supabase
+      .from('favorecidos_grupos')
+      .update(updates)
+      .eq('id', memberId)
+      .select()
+      .single();
+      
+    if (error) {
+      console.error('Error updating group member:', error);
+      throw new Error(error.message);
+    }
+    
+    return data;
+  } catch (error) {
+    console.error('Error in updateGroupMember:', error);
+    throw error;
+  }
+};
