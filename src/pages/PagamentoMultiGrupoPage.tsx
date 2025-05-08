@@ -1,6 +1,4 @@
-
 import React, { useState, useEffect } from "react";
-import SidebarLayout from "@/components/layout/SidebarLayout";
 import { Group } from "@/types/group";
 import { useGroupOperations } from "@/services/group/hooks";
 import { toast } from "sonner";
@@ -44,29 +42,27 @@ const PagamentoMultiGrupoPage = () => {
   };
 
   return (
-    <SidebarLayout>
-      <div className="h-full">
-        <h1 className="text-2xl font-bold mb-6">Pagamento Multi-Grupos</h1>
-        
-        <div className="grid grid-cols-1 gap-6">
-          <GroupSelectionCard 
-            groups={groups}
-            selectedGroups={selectedGroups}
-            isLoading={isLoadingGroups}
-            onSelectGroup={handleSelectGroup}
-            onSelectAll={handleToggleAllGroups}
-          />
+    <div className="h-full">
+      <h1 className="text-2xl font-bold mb-6">Pagamento Multi-Grupos</h1>
+      
+      <div className="grid grid-cols-1 gap-6">
+        <GroupSelectionCard 
+          groups={groups}
+          selectedGroups={selectedGroups}
+          isLoading={isLoadingGroups}
+          onSelectGroup={handleSelectGroup}
+          onSelectAll={handleToggleAllGroups}
+        />
 
-          <FileOptionsCard 
-            fileOption={fileOption}
-            isProcessing={isProcessing}
-            selectedGroups={selectedGroups}
-            onFileOptionChange={setFileOption}
-            onGeneratePayments={generatePayments}
-          />
-        </div>
+        <FileOptionsCard 
+          fileOption={fileOption}
+          isProcessing={isProcessing}
+          selectedGroups={selectedGroups}
+          onFileOptionChange={setFileOption}
+          onGeneratePayments={generatePayments}
+        />
       </div>
-    </SidebarLayout>
+    </div>
   );
 };
 

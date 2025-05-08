@@ -11,6 +11,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/hooks/use-theme";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import SidebarLayout from "@/components/layout/SidebarLayout";
 import "./App.css";
 
 function App() {
@@ -21,10 +22,12 @@ function App() {
           <Routes>
             <Route path="/auth" element={<Auth />} />
             <Route element={<ProtectedRoute />}>
-              <Route path="/" element={<Index />} />
-              <Route path="/grupos" element={<GruposPage />} />
-              <Route path="/pagamentos/grupo" element={<PagamentoGrupoPage />} />
-              <Route path="/pagamentos/multi-grupo" element={<PagamentoMultiGrupoPage />} />
+              <Route element={<SidebarLayout />}>
+                <Route path="/" element={<Index />} />
+                <Route path="/grupos" element={<GruposPage />} />
+                <Route path="/pagamentos/grupo" element={<PagamentoGrupoPage />} />
+                <Route path="/pagamentos/multi-grupo" element={<PagamentoMultiGrupoPage />} />
+              </Route>
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

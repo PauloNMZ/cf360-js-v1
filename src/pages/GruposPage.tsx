@@ -1,6 +1,4 @@
-
 import React, { useState } from "react";
-import SidebarLayout from "@/components/layout/SidebarLayout";
 import GruposListaView from "@/components/grupos/GruposListaView";
 import GrupoModal from "@/components/grupos/GrupoModal";
 import DeleteGrupoDialog from "@/components/grupos/DeleteGrupoDialog";
@@ -87,41 +85,39 @@ const GruposPage = () => {
   };
 
   return (
-    <SidebarLayout>
-      <div className="h-full">
-        <h1 className="text-2xl font-bold mb-6">Gerenciamento de Grupos</h1>
-        
-        {showMembersView && currentGroup ? (
-          <GrupoMembrosView 
-            grupo={currentGroup} 
-            onBack={handleBackFromMembers} 
-          />
-        ) : (
-          <GruposListaView 
-            onCreateClick={handleCreateClick}
-            onEditClick={handleEditClick}
-            onDeleteClick={handleDeleteClick}
-            onManageMembers={handleManageMembers}
-          />
-        )}
-
-        <GrupoModal 
-          isOpen={modalOpen}
-          onClose={() => setModalOpen(false)}
-          onSubmit={handleSubmitGroup}
-          title={isCreating ? "Criar Novo Grupo" : "Editar Grupo"}
-          grupo={currentGroup}
+    <div className="h-full">
+      <h1 className="text-2xl font-bold mb-6">Gerenciamento de Grupos</h1>
+      
+      {showMembersView && currentGroup ? (
+        <GrupoMembrosView 
+          grupo={currentGroup} 
+          onBack={handleBackFromMembers} 
         />
-
-        <DeleteGrupoDialog 
-          isOpen={deleteDialogOpen}
-          onClose={() => setDeleteDialogOpen(false)}
-          onConfirm={handleConfirmDelete}
-          grupo={currentGroup}
-          isDeleting={isDeleting}
+      ) : (
+        <GruposListaView 
+          onCreateClick={handleCreateClick}
+          onEditClick={handleEditClick}
+          onDeleteClick={handleDeleteClick}
+          onManageMembers={handleManageMembers}
         />
-      </div>
-    </SidebarLayout>
+      )}
+
+      <GrupoModal 
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSubmit={handleSubmitGroup}
+        title={isCreating ? "Criar Novo Grupo" : "Editar Grupo"}
+        grupo={currentGroup}
+      />
+
+      <DeleteGrupoDialog 
+        isOpen={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={handleConfirmDelete}
+        grupo={currentGroup}
+        isDeleting={isDeleting}
+      />
+    </div>
   );
 };
 
