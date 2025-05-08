@@ -128,6 +128,79 @@ export type Database = {
         }
         Relationships: []
       }
+      favorecidos_grupos: {
+        Row: {
+          criado_em: string
+          favorecido_id: string
+          grupo_id: string
+          id: string
+          valor: number | null
+        }
+        Insert: {
+          criado_em?: string
+          favorecido_id: string
+          grupo_id: string
+          id?: string
+          valor?: number | null
+        }
+        Update: {
+          criado_em?: string
+          favorecido_id?: string
+          grupo_id?: string
+          id?: string
+          valor?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorecidos_grupos_grupo_id_fkey"
+            columns: ["grupo_id"]
+            isOneToOne: false
+            referencedRelation: "grupos_favorecidos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      grupos_favorecidos: {
+        Row: {
+          atualizado_em: string
+          criado_em: string
+          data_pagamento: string | null
+          descricao: string | null
+          id: string
+          nome: string
+          tipo_servico_id: string | null
+          user_id: string
+        }
+        Insert: {
+          atualizado_em?: string
+          criado_em?: string
+          data_pagamento?: string | null
+          descricao?: string | null
+          id?: string
+          nome: string
+          tipo_servico_id?: string | null
+          user_id: string
+        }
+        Update: {
+          atualizado_em?: string
+          criado_em?: string
+          data_pagamento?: string | null
+          descricao?: string | null
+          id?: string
+          nome?: string
+          tipo_servico_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "grupos_favorecidos_tipo_servico_id_fkey"
+            columns: ["tipo_servico_id"]
+            isOneToOne: false
+            referencedRelation: "tipos_servico"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           first_name: string | null
@@ -146,6 +219,36 @@ export type Database = {
           id?: string
           last_name?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      tipos_servico: {
+        Row: {
+          atualizado_em: string
+          codigo: string
+          criado_em: string
+          descricao: string | null
+          id: string
+          nome: string
+          user_id: string
+        }
+        Insert: {
+          atualizado_em?: string
+          codigo: string
+          criado_em?: string
+          descricao?: string | null
+          id?: string
+          nome: string
+          user_id: string
+        }
+        Update: {
+          atualizado_em?: string
+          codigo?: string
+          criado_em?: string
+          descricao?: string | null
+          id?: string
+          nome?: string
+          user_id?: string
         }
         Relationships: []
       }
