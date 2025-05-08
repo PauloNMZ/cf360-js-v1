@@ -15,6 +15,7 @@ export interface NewGroup {
   tipo_servico_id?: string | null;
   descricao?: string | null;
   data_pagamento?: string | null;
+  user_id: string;
 }
 
 export interface GroupMember {

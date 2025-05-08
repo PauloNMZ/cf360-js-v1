@@ -51,6 +51,7 @@ export const getServiceTypeById = async (id: string): Promise<ServiceType | null
 // Create a new service type
 export const createServiceType = async (serviceType: NewServiceType): Promise<ServiceType> => {
   try {
+    // user_id is now included in NewServiceType interface
     const { data, error } = await supabase
       .from('tipos_servico')
       .insert(serviceType)
@@ -72,6 +73,7 @@ export const createServiceType = async (serviceType: NewServiceType): Promise<Se
 // Update a service type
 export const updateServiceType = async (id: string, serviceType: Partial<NewServiceType>): Promise<ServiceType> => {
   try {
+    // We're not updating user_id, so we don't need to worry about it here
     const { data, error } = await supabase
       .from('tipos_servico')
       .update(serviceType)
@@ -126,9 +128,17 @@ export const useServiceTypeOperations = () => {
     }
   };
   
-  const addServiceType = async (serviceType: NewServiceType) => {
+  const addServiceType = async (serviceType: Omit<NewServiceType, "user_id">) => {
     try {
-      const result = await createServiceType(serviceType);
+      const user = await supabase.auth.getUser();
+      if (!user.data.user) throw new Error("Usuário não autenticado");
+      
+      const serviceTypeWithUser = { 
+        ...serviceType,
+        user_id: user.data.user.id 
+      };
+      
+      const result = await createServiceType(serviceTypeWithUser);
       toast({
         title: "Tipo de serviço criado",
         description: `${serviceType.nome} foi adicionado com sucesso`,
@@ -144,7 +154,7 @@ export const useServiceTypeOperations = () => {
     }
   };
   
-  const editServiceType = async (id: string, serviceType: Partial<NewServiceType>) => {
+  const editServiceType = async (id: string, serviceType: Partial<Omit<NewServiceType, "user_id">>) => {
     try {
       const result = await updateServiceType(id, serviceType);
       toast({

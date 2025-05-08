@@ -13,4 +13,5 @@ export interface NewServiceType {
   codigo: string;
   nome: string;
   descricao?: string | null;
+  user_id: string;
 }

@@ -54,6 +54,7 @@ export const getGroupById = async (id: string): Promise<Group | null> => {
 // Create a new group
 export const createGroup = async (group: NewGroup): Promise<Group> => {
   try {
+    // user_id is now included in NewGroup interface
     const { data, error } = await supabase
       .from('grupos_favorecidos')
       .insert(group)
@@ -75,6 +76,7 @@ export const createGroup = async (group: NewGroup): Promise<Group> => {
 // Update a group
 export const updateGroup = async (id: string, group: Partial<NewGroup>): Promise<Group> => {
   try {
+    // We're not updating user_id, so we don't need to worry about it here
     const { data, error } = await supabase
       .from('grupos_favorecidos')
       .update(group)
@@ -214,9 +216,17 @@ export const useGroupOperations = () => {
     }
   };
   
-  const addGroup = async (group: NewGroup) => {
+  const addGroup = async (group: Omit<NewGroup, "user_id">) => {
     try {
-      const result = await createGroup(group);
+      const user = await supabase.auth.getUser();
+      if (!user.data.user) throw new Error("Usuário não autenticado");
+      
+      const groupWithUser = { 
+        ...group,
+        user_id: user.data.user.id 
+      };
+      
+      const result = await createGroup(groupWithUser);
       toast({
         title: "Grupo criado",
         description: `${group.nome} foi adicionado com sucesso`,
@@ -232,7 +242,7 @@ export const useGroupOperations = () => {
     }
   };
   
-  const editGroup = async (id: string, group: Partial<NewGroup>) => {
+  const editGroup = async (id: string, group: Partial<Omit<NewGroup, "user_id">>) => {
     try {
       const result = await updateGroup(id, group);
       toast({
