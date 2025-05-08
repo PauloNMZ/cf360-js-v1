@@ -1,12 +1,20 @@
 
 import { SidebarProvider, useSidebar } from "./sidebar-context";
 import { 
-  Sidebar, 
-  SidebarInset, 
-  SidebarTrigger, 
-  SidebarRail,
+  Sidebar 
+} from "./sidebar-component";
+import { 
+  SidebarInset 
+} from "./sidebar-inset";
+import { 
+  SidebarTrigger 
+} from "./sidebar-trigger";
+import { 
+  SidebarRail 
+} from "./sidebar-rail";
+import {
   SidebarWrapper
-} from "./sidebar-main";
+} from "./sidebar-wrapper";
 import {
   SidebarHeader,
   SidebarFooter,
