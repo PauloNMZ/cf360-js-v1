@@ -1,44 +1,13 @@
 
 import { EmpresaConfig, Favorecido, CNABWorkflowData } from '@/types/cnab240';
 import { validarCNPJ } from '@/utils/cnabUtils';
-import { inicializarVariaveis, formatarDadosEmpresa } from './utils/configUtils';
+import { formatarDadosEmpresa } from './utils/configUtils';
 import { gerarHeaderArquivo, gerarTrailerArquivo } from './generators/headerGenerators';
-import { processarLote, filtrarFavorecidosPorTipo } from './processors/batchProcessor';
+import { GeradorCNABBase } from './base/GeradorCNABBase';
+import { LoteProcessor } from './processors/loteProcessor';
 
 // Class for generating CNAB240 files
-export class GeradorCNAB240 {
-  private totalLinhasArquivo: number = 0;
-  private seqLote: number = 0;
-  private somaValoresBBcc: number = 0;
-  private somaValoresBBpoup: number = 0;
-  private somaValoresDemais: number = 0;
-  private config: EmpresaConfig;
-  private favorecidos: Favorecido[] = [];
-  private conteudoArquivo: string[] = [];
-  private nomeArquivo: string = "";
-
-  constructor() {
-    this.config = {
-      nomeEmpresa: "",
-      cnpj: "",
-      endereco: "",
-      agencia: "",
-      dvAgencia: "",
-      conta: "",
-      dvConta: "",
-      nrConvenio: "",
-      codProduto: "0126", // Fixed product code for BB
-      nrRemessa: "",
-      dataPagamento: "",
-      nrDocumento: ""
-    };
-  }
-
-  // Initialize variables with configuration data
-  public inicializarVariaveis(config: any): void {
-    this.config = inicializarVariaveis(config);
-  }
-
+export class GeradorCNAB240 extends GeradorCNABBase {
   // Main method to generate the remittance file
   public gerarArquivoRemessa(workflowData: CNABWorkflowData, favorecidos: Favorecido[]): Promise<Blob> {
     return new Promise((resolve, reject) => {
@@ -109,62 +78,27 @@ export class GeradorCNAB240 {
     });
   }
 
-  // Validate remittance data
-  private validarDadosRemessa(): boolean {
-    if (!this.config.nomeEmpresa || !this.config.cnpj) {
-      console.error("Nome da empresa ou CNPJ não informados");
-      return false;
-    }
-    return true;
-  }
-
   // Generate file content
   private gerarConteudoArquivo(): void {
     // Generate Header of the File
     this.gerarHeaderArquivo();
 
-    // Process recipients by type
-    this.processarFavorecidosPorTipo("01", "BB Conta Corrente");
-    this.processarFavorecidosPorTipo("05", "BB Poupança");
-    this.processarFavorecidosPorTipo("03", "Outros Bancos");
+    // Use the LoteProcessor to process all types of recipients
+    const loteProcessor = new LoteProcessor(
+      this.config, 
+      this.favorecidos, 
+      this.conteudoArquivo, 
+      this.totalLinhasArquivo
+    );
+    
+    loteProcessor.processarTodosOsTipos();
+    
+    // Update control variables
+    this.seqLote = loteProcessor.getSeqLote();
+    this.totalLinhasArquivo = loteProcessor.getTotalLinhasArquivo();
 
     // Generate Trailer of the File
     this.gerarTrailerArquivo();
-  }
-
-  // Process recipients by type
-  private processarFavorecidosPorTipo(tipoLancamento: string, descricaoTipo: string): void {
-    try {
-      // Filter recipients by type
-      const favorecidosFiltrados = filtrarFavorecidosPorTipo(this.favorecidos, tipoLancamento);
-
-      // Check if there are recipients of this type
-      if (favorecidosFiltrados.length === 0) {
-        console.log(`Nenhum favorecido do tipo ${descricaoTipo} encontrado.`);
-        return;
-      }
-
-      // Increment batch sequence
-      this.seqLote++;
-
-      // Process batch
-      const resultado = processarLote(this.config, favorecidosFiltrados, tipoLancamento, this.seqLote);
-      
-      // Add batch lines to file content
-      this.conteudoArquivo.push(...resultado.linhas);
-      
-      // Update line count
-      this.totalLinhasArquivo += resultado.linhas.length;
-
-      // Update sum of values according to type
-      switch (tipoLancamento) {
-        case "01": this.somaValoresBBcc = resultado.somaValores; break;
-        case "05": this.somaValoresBBpoup = resultado.somaValores; break;
-        case "03": this.somaValoresDemais = resultado.somaValores; break;
-      }
-    } catch (error) {
-      console.error(`Erro ao processar favorecidos do tipo ${descricaoTipo}:`, error);
-    }
   }
 
   // Generate the file header
@@ -180,24 +114,5 @@ export class GeradorCNAB240 {
     const totalLinhasComTrailer = this.totalLinhasArquivo + 1;
     const trailerArquivo = gerarTrailerArquivo(this.seqLote, totalLinhasComTrailer);
     this.escreverNoArquivo(trailerArquivo);
-  }
-
-  // Write to the file
-  private escreverNoArquivo(conteudo: string): void {
-    // Add content to the array
-    this.conteudoArquivo.push(conteudo);
-    
-    // Increment line counter
-    this.totalLinhasArquivo++;
-  }
-
-  // Get file name
-  public getNomeArquivo(): string {
-    return this.nomeArquivo;
-  }
-
-  // Get file content
-  public getConteudoArquivo(): string[] {
-    return this.conteudoArquivo;
   }
 }
