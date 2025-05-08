@@ -1,57 +1,70 @@
 
 import * as React from "react";
-import { Slot } from "@radix-ui/react-slot";
+import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
+import { ChevronDown } from "lucide-react";
+
+const sidebarMenuSubButtonVariants = cva(
+  "flex w-full items-center gap-2 rounded-md p-2 text-sm outline-none ring-sidebar-ring transition-all aria-disabled:pointer-events-none aria-disabled:opacity-50 text-sidebar-foreground aria-expanded:text-sidebar-foreground [&>svg]:size-4 [&>svg]:shrink-0 [&>svg:last-child]:ml-auto [&>svg:last-child]:transition-transform [&>svg:last-child]:aria-expanded:rotate-180 [&>span:last-child]:truncate",
+  {
+    variants: {
+      variant: {
+        default: "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+        outline:
+          "bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_0_1px_hsl(var(--sidebar-accent))]",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+);
+
+export interface SidebarMenuSubButtonProps
+  extends React.ComponentProps<"button"> {
+  variant?: "default" | "outline";
+}
 
 export function SidebarMenuSub({
   className,
   ...props
-}: React.ComponentProps<"ul">) {
+}: React.ComponentProps<"div">) {
   return (
-    <ul
+    <div
       data-sidebar="menu-sub"
-      className={cn(
-        "mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l border-sidebar-border px-2.5 py-0.5",
-        "group-data-[collapsible=icon]:hidden",
-        className
-      )}
+      className={cn("group relative", className)}
       {...props}
     />
   );
 }
 
-export function SidebarMenuSubItem({
-  ...props
-}: React.ComponentProps<"li">) {
-  return <li {...props} />;
-}
-
-interface SidebarMenuSubButtonProps extends React.ComponentProps<"a"> {
-  asChild?: boolean;
-  size?: "sm" | "md";
-  isActive?: boolean;
-}
-
 export function SidebarMenuSubButton({
-  asChild = false,
-  size = "md",
-  isActive,
   className,
+  variant = "default",
+  children,
   ...props
 }: SidebarMenuSubButtonProps) {
-  const Comp = asChild ? Slot : "a";
-
   return (
-    <Comp
+    <button
       data-sidebar="menu-sub-button"
-      data-size={size}
-      data-active={isActive}
+      className={cn(sidebarMenuSubButtonVariants({ variant }), className)}
+      {...props}
+    >
+      {children}
+      <ChevronDown className="h-4 w-4" />
+    </button>
+  );
+}
+
+export function SidebarMenuSubItem({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-sidebar="menu-sub-item"
       className={cn(
-        "flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 text-sidebar-foreground outline-none ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-sidebar-accent-foreground",
-        "data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground",
-        size === "sm" && "text-xs",
-        size === "md" && "text-sm",
-        "group-data-[collapsible=icon]:hidden",
+        "flex w-full flex-col gap-1 overflow-hidden transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down group-data-[collapsible=icon]:px-0",
         className
       )}
       {...props}
