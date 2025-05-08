@@ -7,5 +7,7 @@ export * from './utils/configUtils';
 export * from './utils/sequenceUtils';
 export * from './processors/batchProcessor';
 export * from './processors/loteProcessor';
+export * from './processors/tipoFavorecidoFilter';
+export * from './processors/loteGenerator';
 export * from './interfaces/IGeradorCNAB';
 export * from './base/GeradorCNABBase';

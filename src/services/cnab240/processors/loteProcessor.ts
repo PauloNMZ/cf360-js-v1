@@ -1,6 +1,6 @@
 
 import { Favorecido, EmpresaConfig } from '@/types/cnab240';
-import { filtrarFavorecidosPorTipo, processarLote } from './batchProcessor';
+import { filtrarFavorecidosPorTipo, processarLote, TIPO_LANCAMENTO } from './batchProcessor';
 
 export class LoteProcessor {
   private totalLinhasArquivo: number;
@@ -53,9 +53,9 @@ export class LoteProcessor {
 
       // Update sum of values according to type
       switch (tipoLancamento) {
-        case "01": this.somaValoresBBcc = resultado.somaValores; break;
-        case "05": this.somaValoresBBpoup = resultado.somaValores; break;
-        case "03": this.somaValoresDemais = resultado.somaValores; break;
+        case TIPO_LANCAMENTO.BB_CONTA_CORRENTE: this.somaValoresBBcc = resultado.somaValores; break;
+        case TIPO_LANCAMENTO.BB_POUPANCA: this.somaValoresBBpoup = resultado.somaValores; break;
+        case TIPO_LANCAMENTO.OUTROS_BANCOS: this.somaValoresDemais = resultado.somaValores; break;
       }
     } catch (error) {
       console.error(`Erro ao processar favorecidos do tipo ${descricaoTipo}:`, error);
@@ -63,10 +63,10 @@ export class LoteProcessor {
   }
 
   public processarTodosOsTipos(): void {
-    // Process recipients by type
-    this.processarFavorecidosPorTipo("01", "BB Conta Corrente");
-    this.processarFavorecidosPorTipo("05", "BB Poupança");
-    this.processarFavorecidosPorTipo("03", "Outros Bancos");
+    // Process recipients by type using the constants
+    this.processarFavorecidosPorTipo(TIPO_LANCAMENTO.BB_CONTA_CORRENTE, "BB Conta Corrente");
+    this.processarFavorecidosPorTipo(TIPO_LANCAMENTO.BB_POUPANCA, "BB Poupança");
+    this.processarFavorecidosPorTipo(TIPO_LANCAMENTO.OUTROS_BANCOS, "Outros Bancos");
   }
 
   public getSeqLote(): number {
