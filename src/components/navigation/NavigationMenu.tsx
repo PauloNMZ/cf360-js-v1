@@ -1,6 +1,5 @@
 
 import React from "react";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { useIndexPageContext } from "@/hooks/useIndexPageContext";
 import NavigationItem from "./NavigationItem";
 import { navigationItems } from "./NavigationConfig";
@@ -53,29 +52,27 @@ const NavigationMenu = ({
   };
 
   return (
-    <TooltipProvider>
-      <div className="flex justify-center mb-10">
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-9 gap-4 max-w-6xl mx-auto">
-          {navigationItems.map((item, index) => {
-            // Obter o handler correto ou usar o handler vazio
-            const handler = handlers[item.handler as keyof typeof handlers] || handlers.emptyHandler;
-            
-            return (
-              <NavigationItem
-                key={index}
-                icon={item.icon}
-                label={item.label}
-                tooltipText={item.tooltipText}
-                onClick={handleSafeClick(handler)}
-                disabled={actionsDisabled}
-                className={item.className}
-                tooltipClassName={item.tooltipClassName}
-              />
-            );
-          })}
-        </div>
+    <div className="flex justify-center mb-10">
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-9 gap-4 max-w-6xl mx-auto">
+        {navigationItems.map((item, index) => {
+          // Obter o handler correto ou usar o handler vazio
+          const handler = handlers[item.handler as keyof typeof handlers] || handlers.emptyHandler;
+          
+          return (
+            <NavigationItem
+              key={index}
+              icon={item.icon}
+              label={item.label}
+              tooltipText={item.tooltipText}
+              onClick={handleSafeClick(handler)}
+              disabled={actionsDisabled}
+              className={item.className}
+              tooltipClassName={item.tooltipClassName}
+            />
+          );
+        })}
       </div>
-    </TooltipProvider>
+    </div>
   );
 };
 

@@ -4,6 +4,7 @@ import NavigationMenu from "@/components/navigation/NavigationMenu";
 import { useIndexPageContext } from "@/hooks/useIndexPageContext";
 import { IndexPageModals } from "./IndexPageModals";
 import { DEFAULT_SETTINGS } from "@/services/companySettings";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const IndexPageContent = () => {
   const {
@@ -19,20 +20,22 @@ const IndexPageContent = () => {
   const safeCompanySettings = companySettings || DEFAULT_SETTINGS;
 
   return (
-    <div className="w-full px-4 py-6">
-      <div className="flex justify-between items-center mb-4">
-        <NavigationMenu 
-          onConvenenteClick={handleConvenenteClick}
-          onImportarPlanilhaClick={handleImportarPlanilhaClick}
-          onCnabToApiClick={handleCnabToApiClick}
-          onAdminPanelClick={handleAdminPanelClick}
-          onLogoutClick={handleLogoutClick}
-        />
-      </div>
+    <TooltipProvider>
+      <div className="w-full px-4 py-6">
+        <div className="flex justify-between items-center mb-4">
+          <NavigationMenu 
+            onConvenenteClick={handleConvenenteClick}
+            onImportarPlanilhaClick={handleImportarPlanilhaClick}
+            onCnabToApiClick={handleCnabToApiClick}
+            onAdminPanelClick={handleAdminPanelClick}
+            onLogoutClick={handleLogoutClick}
+          />
+        </div>
 
-      {/* Include all modals as a separate component */}
-      <IndexPageModals />
-    </div>
+        {/* Include all modals as a separate component */}
+        <IndexPageModals />
+      </div>
+    </TooltipProvider>
   );
 };
 
