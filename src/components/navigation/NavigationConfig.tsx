@@ -7,7 +7,6 @@ import {
   RefreshCw, 
   FileText, 
   Search, 
-  LogOut,
   Shield,
   FileSpreadsheet,
 } from "lucide-react";
@@ -21,14 +20,8 @@ export type NavigationItemConfig = {
   tooltipClassName?: string;
 };
 
-// Navigation configuration with all menu items
+// Navigation configuration with all menu items (removed the LogOut item)
 export const navigationItems: NavigationItemConfig[] = [
-  {
-    icon: <Home size={24} />,
-    label: "Empresa",
-    tooltipText: "Acesso ao cadastro e gerenciamento de convenentes",
-    handler: "onConvenenteClick"
-  },
   {
     icon: <FileSpreadsheet size={24} />,
     label: "Planilha",
@@ -70,13 +63,5 @@ export const navigationItems: NavigationItemConfig[] = [
     label: "Setup",
     tooltipText: "Configurações do sistema e parâmetros",
     handler: "onAdminPanelClick"
-  },
-  {
-    icon: <LogOut size={24} />,
-    label: "Sair",
-    tooltipText: "Encerrar sessão e sair do sistema",
-    handler: "onLogoutClick",
-    className: "bg-red-50 dark:bg-red-950 hover:bg-red-100 dark:hover:bg-red-900 border-red-200 dark:border-red-800",
-    tooltipClassName: "bg-red-50 dark:bg-red-900/80 border border-red-200 dark:border-red-800"
   }
 ];
