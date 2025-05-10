@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { FileSpreadsheet, FileText, UsersRound } from "lucide-react";
+import { FileText, UsersRound } from "lucide-react";
 import { 
   SidebarContent, 
   SidebarGroup, 
@@ -63,22 +63,6 @@ const SidebarNav = ({ handlerMap }: SidebarNavProps) => {
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={location.pathname === "/pagamentos/multi-grupo"}>
-                <Link to="/pagamentos/multi-grupo">
-                  <FileSpreadsheet />
-                  <span>Multi-grupos</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarGroupContent>
-      </SidebarGroup>
-
-      <SidebarGroup>
-        <SidebarGroupLabel>Gestão</SidebarGroupLabel>
-        <SidebarGroupContent>
-          <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton asChild isActive={location.pathname === "/grupos"}>
                 <Link to="/grupos">
