@@ -6,7 +6,7 @@ const SidebarHeader = () => {
   return (
     <Header className="border-b border-border/50">
       <div className="flex h-12 items-center px-6">
-        <span className="font-semibold">CNAB Manager</span>
+        <span className="font-semibold">Menu Principal</span>
       </div>
     </Header>
   );
