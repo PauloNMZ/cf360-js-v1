@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FileSpreadsheet, FileText, UsersRound } from "lucide-react";
@@ -25,21 +26,19 @@ const SidebarNav = ({ handlerMap }: SidebarNavProps) => {
         <SidebarGroupLabel>Principal</SidebarGroupLabel>
         <SidebarGroupContent>
           <SidebarMenu>
-            {/* Main navigation items - removing the duplicate item */}
-            {navigationItems
-              .filter(item => item.label !== "Empresa") // Remove the duplicate "Empresa" item
-              .map((item) => (
-                <SidebarMenuItem key={item.label}>
-                  <SidebarMenuButton 
-                    onClick={() => handlerMap[item.handler] ? handlerMap[item.handler]() : undefined}
-                    className={item.className || ""}
-                    tooltip={item.tooltipText}
-                  >
-                    {item.icon}
-                    <span>{item.label}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+            {/* Main navigation items */}
+            {navigationItems.map((item) => (
+              <SidebarMenuItem key={item.label}>
+                <SidebarMenuButton 
+                  onClick={() => handlerMap[item.handler] ? handlerMap[item.handler]() : undefined}
+                  className={item.className || ""}
+                  tooltip={item.tooltipText}
+                >
+                  {item.icon}
+                  <span>{item.label}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
           </SidebarMenu>
         </SidebarGroupContent>
       </SidebarGroup>

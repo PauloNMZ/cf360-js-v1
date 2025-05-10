@@ -27,10 +27,12 @@ const SidebarLayout = () => {
             <SidebarFooter onLogout={handleLogoutClick} />
           </Sidebar>
           <div className="flex-1 overflow-auto flex flex-col">
-            {/* Title Bar */}
+            {/* New Title Bar */}
             <header className="bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-800 dark:to-blue-950 text-white py-3 px-6 shadow-md">
               <div className="w-full mx-auto flex justify-between items-center">
-                <h1 className="text-2xl font-bold">Connect Pag</h1>
+                <div className="flex items-center gap-4">
+                  <h1 className="text-2xl font-bold">Connect Pag</h1>
+                </div>
                 <div className="flex items-center gap-4">
                   {user && (
                     <>
