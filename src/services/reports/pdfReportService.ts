@@ -1,5 +1,5 @@
 
-import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import { ReportData, RowData } from '@/types/importacao';
 import { formatarValorCurrency } from '@/utils/formatting/currencyUtils';
