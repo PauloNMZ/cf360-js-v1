@@ -3,6 +3,7 @@ import React from "react";
 import { useIndexPageContext } from "@/hooks/useIndexPageContext";
 import NavigationItem from "./NavigationItem";
 import { navigationItems } from "./NavigationConfig";
+import { useNavigate } from "react-router-dom";
 
 type NavigationMenuProps = {
   onConvenenteClick: () => void;
@@ -20,6 +21,7 @@ const NavigationMenu = ({
   onLogoutClick
 }: NavigationMenuProps) => {
   const { isDeleting, isLoading } = useIndexPageContext();
+  const navigate = useNavigate();
   
   // Determine if actions are allowed
   const actionsDisabled = isDeleting || isLoading;
@@ -51,12 +53,28 @@ const NavigationMenu = ({
     emptyHandler: () => {}
   };
 
+  // Handle navigation from item paths
+  const handlePathNavigation = (path?: string) => () => {
+    if (path && !actionsDisabled) {
+      navigate(path);
+    }
+  };
+
+  // Filter out submenu items for the main navigation display
+  const mainNavigationItems = navigationItems.filter(item => !item.submenu);
+
   return (
     <div className="flex justify-center mb-10">
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-9 gap-4 max-w-6xl mx-auto">
-        {navigationItems.map((item, index) => {
-          // Obter o handler correto ou usar o handler vazio
-          const handler = handlers[item.handler as keyof typeof handlers] || handlers.emptyHandler;
+        {mainNavigationItems.map((item, index) => {
+          // Get the correct handler or use path navigation
+          let clickHandler;
+          if (item.path) {
+            clickHandler = handleSafeClick(handlePathNavigation(item.path));
+          } else {
+            const handler = handlers[item.handler as keyof typeof handlers] || handlers.emptyHandler;
+            clickHandler = handleSafeClick(handler);
+          }
           
           return (
             <NavigationItem
@@ -64,7 +82,7 @@ const NavigationMenu = ({
               icon={item.icon}
               label={item.label}
               tooltipText={item.tooltipText}
-              onClick={handleSafeClick(handler)}
+              onClick={clickHandler}
               disabled={actionsDisabled}
               className={item.className}
               tooltipClassName={item.tooltipClassName}

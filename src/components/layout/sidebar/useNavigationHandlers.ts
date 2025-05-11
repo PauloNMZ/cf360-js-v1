@@ -1,5 +1,6 @@
 
 import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { useIndexPageContext } from "@/hooks/useIndexPageContext";
 import { useAuth } from "@/hooks/use-auth";
 import { useIndexPageActions } from "@/hooks/useIndexPageActions";
@@ -11,6 +12,7 @@ import { useMainNavHandlers } from "@/hooks/event-handlers/useMainNavHandlers";
 export const useNavigationHandlers = (
   setCnabToApiModalOpen: (open: boolean) => void
 ) => {
+  const navigate = useNavigate();
   const { signOut } = useAuth();
   const indexPage = useIndexPageContext();
   const indexPageActions = useIndexPageActions({
@@ -62,11 +64,27 @@ export const useNavigationHandlers = (
     onCnabToApiClick: navHandlers.handleCnabToApiClick,
     onAdminPanelClick: navHandlers.handleAdminPanelClick,
     onLogoutClick: navHandlers.handleLogoutClick,
-    emptyHandler: () => console.log("Esta funcionalidade ainda não foi implementada")
+    emptyHandler: () => {
+      console.log("Esta funcionalidade ainda não foi implementada");
+    }
+  };
+
+  // Helper function to navigate to a path
+  const navigateTo = (path: string) => {
+    if (!navigationInProgressRef.current) {
+      navigationInProgressRef.current = true;
+      resetDeletionState();
+      navigate(path);
+      
+      setTimeout(() => {
+        navigationInProgressRef.current = false;
+      }, 300);
+    }
   };
 
   return {
     handlerMap,
-    handleLogoutClick: navHandlers.handleLogoutClick
+    handleLogoutClick: navHandlers.handleLogoutClick,
+    navigateTo
   };
 };

@@ -36,7 +36,7 @@ const NavigationItem = ({
             />
           </div>
         </TooltipTrigger>
-        <TooltipContent className={tooltipClassName}>
+        <TooltipContent className={tooltipClassName} side="top">
           <p>{tooltipText}</p>
         </TooltipContent>
       </Tooltip>
