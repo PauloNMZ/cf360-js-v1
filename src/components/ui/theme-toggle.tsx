@@ -7,8 +7,17 @@ import { useSidebar } from "@/components/ui/sidebar";
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
-  const { state } = useSidebar();
-  const isCollapsed = state === "collapsed";
+  let isCollapsed = false;
+  let isSidebarAvailable = true;
+  
+  try {
+    // Try to use the sidebar hook, but don't fail if it's not available
+    const { state } = useSidebar();
+    isCollapsed = state === "collapsed";
+  } catch (error) {
+    // If we're outside of a SidebarProvider, we won't have access to the sidebar state
+    isSidebarAvailable = false;
+  }
   
   const toggleTheme = () => {
     const newTheme = theme === "dark" ? "light" : "dark";
@@ -32,7 +41,7 @@ export function ThemeToggle() {
           <span className="sr-only">Alternar tema</span>
         </Button>
       </TooltipTrigger>
-      <TooltipContent side={isCollapsed ? "right" : "bottom"} className="bg-gray-800 text-white">
+      <TooltipContent side={isSidebarAvailable && isCollapsed ? "right" : "bottom"} className="bg-gray-800 text-white">
         <p>{theme === "dark" ? "Modo claro" : "Modo escuro"}</p>
       </TooltipContent>
     </Tooltip>
