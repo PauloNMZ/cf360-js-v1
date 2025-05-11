@@ -2,7 +2,7 @@
 import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/hooks/use-theme";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useSidebar } from "@/components/ui/sidebar";
 
 export function ThemeToggle() {
@@ -24,26 +24,37 @@ export function ThemeToggle() {
     setTheme(newTheme);
   };
   
+  const button = (
+    <Button 
+      variant="ghost" 
+      size="icon" 
+      onClick={toggleTheme} 
+      className="rounded-md text-gray-500 hover:text-primary-blue hover:bg-primary-blue/10"
+    >
+      {theme === "dark" ? (
+        <Sun className="h-[1.2rem] w-[1.2rem]" />
+      ) : (
+        <Moon className="h-[1.2rem] w-[1.2rem]" />
+      )}
+      <span className="sr-only">Alternar tema</span>
+    </Button>
+  );
+  
+  // Simple button without tooltip for contexts where TooltipProvider might not be available
+  if (typeof window !== 'undefined' && window.location.pathname === '/auth') {
+    return button;
+  }
+  
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={toggleTheme} 
-          className="rounded-md text-gray-500 hover:text-primary-blue hover:bg-primary-blue/10"
-        >
-          {theme === "dark" ? (
-            <Sun className="h-[1.2rem] w-[1.2rem]" />
-          ) : (
-            <Moon className="h-[1.2rem] w-[1.2rem]" />
-          )}
-          <span className="sr-only">Alternar tema</span>
-        </Button>
-      </TooltipTrigger>
-      <TooltipContent side={isSidebarAvailable && isCollapsed ? "right" : "bottom"} className="bg-gray-800 text-white">
-        <p>{theme === "dark" ? "Modo claro" : "Modo escuro"}</p>
-      </TooltipContent>
-    </Tooltip>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          {button}
+        </TooltipTrigger>
+        <TooltipContent side={isSidebarAvailable && isCollapsed ? "right" : "bottom"} className="bg-gray-800 text-white">
+          <p>{theme === "dark" ? "Modo claro" : "Modo escuro"}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
