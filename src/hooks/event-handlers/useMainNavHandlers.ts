@@ -60,6 +60,13 @@ export const useMainNavHandlers = ({
     });
   };
 
+  const handleEmpresaClick = () => {
+    safeNavigate(() => {
+      console.log("Navegação: Indo para página de empresa");
+      // Não precisa fazer nada aqui, o roteamento será pela path
+    });
+  };
+
   const handleImportarPlanilhaClick = () => {
     safeNavigate(() => {
       console.log("Navegação: Abrindo modal de importação");
@@ -120,9 +127,11 @@ export const useMainNavHandlers = ({
 
   return {
     handleConvenenteClick,
+    handleEmpresaClick,
     handleImportarPlanilhaClick,
     handleCnabToApiClick,
     handleAdminPanelClick,
     handleLogoutClick
   };
 };
+

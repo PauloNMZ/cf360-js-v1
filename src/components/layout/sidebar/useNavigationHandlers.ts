@@ -60,6 +60,7 @@ export const useNavigationHandlers = (
   // Map navigation handler names to actual handler functions
   const handlerMap: Record<string, () => void> = {
     onConvenenteClick: navHandlers.handleConvenenteClick,
+    onEmpresaClick: navHandlers.handleEmpresaClick,
     onImportarPlanilhaClick: navHandlers.handleImportarPlanilhaClick,
     onCnabToApiClick: navHandlers.handleCnabToApiClick,
     onAdminPanelClick: navHandlers.handleAdminPanelClick,
@@ -88,3 +89,4 @@ export const useNavigationHandlers = (
     navigateTo
   };
 };
+

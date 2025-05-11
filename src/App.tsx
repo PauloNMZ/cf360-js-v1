@@ -6,6 +6,8 @@ import NotFound from "./pages/NotFound";
 import GruposPage from "./pages/GruposPage";
 import PagamentoGrupoPage from "./pages/PagamentoGrupoPage";
 import PagamentoMultiGrupoPage from "./pages/PagamentoMultiGrupoPage";
+import FavorecidosPage from "./pages/FavorecidosPage";
+import EmpresaPage from "./pages/EmpresaPage";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/hooks/use-theme";
@@ -31,7 +33,10 @@ function App() {
                 <Route path="/" element={<Index />} />
                 <Route path="/grupos" element={<GruposPage />} />
                 <Route path="/pagamentos/grupo" element={<PagamentoGrupoPage />} />
+                <Route path="/pagamentos/individual" element={<Index />} /> {/* Placeholder */}
                 <Route path="/pagamentos/multi-grupo" element={<PagamentoMultiGrupoPage />} />
+                <Route path="/favorecidos" element={<FavorecidosPage />} />
+                <Route path="/empresa" element={<EmpresaPage />} />
               </Route>
             </Route>
             <Route path="*" element={<NotFound />} />

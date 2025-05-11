@@ -37,13 +37,15 @@ export const navigationItems: NavigationItemConfig[] = [
     icon: <Building2 size={24} />,
     label: "Empresa",
     tooltipText: "Gerenciar informações da empresa",
-    handler: "onAdminPanelClick"
+    handler: "onEmpresaClick",
+    path: "/empresa"
   },
   {
     icon: <Users size={24} />,
     label: "Favorecidos",
-    tooltipText: "Gerenciar favorecidos e convenentes",
-    handler: "onConvenenteClick"
+    tooltipText: "Gerenciar favorecidos para pagamentos",
+    handler: "emptyHandler",
+    path: "/favorecidos"
   },
   {
     icon: <UsersRound size={24} />,
@@ -117,3 +119,4 @@ export const navigationItems: NavigationItemConfig[] = [
     handler: "onAdminPanelClick"
   }
 ];
+
