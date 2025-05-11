@@ -15,15 +15,17 @@ export const AppLogo: React.FC<AppLogoProps> = ({ size = 64, customLogoUrl }) =>
           <img 
             src={customLogoUrl} 
             alt="Company Logo" 
-            className="w-full h-full object-contain" 
+            className="w-full h-full object-contain rounded-md" 
             style={{ width: size, height: size }}
           />
         ) : (
-          <WalletCards 
-            size={size} 
-            strokeWidth={1.5} 
-            className="text-blue-600 drop-shadow-md"
-          />
+          <div className="p-1.5 bg-gradient-to-br from-primary-blue to-primary-magenta rounded-xl shadow-md">
+            <WalletCards 
+              size={size - 6} 
+              strokeWidth={1.5} 
+              className="text-white"
+            />
+          </div>
         )}
       </div>
     </div>

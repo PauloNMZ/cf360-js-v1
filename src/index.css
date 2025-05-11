@@ -1,5 +1,7 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -7,13 +9,13 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 210 40% 98%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
+    --primary: 221.2 83.2% 61.2%;
     --primary-foreground: 210 40% 98%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -69,7 +71,12 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
-    font-family: 'Ubuntu', sans-serif;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
   }
 }
 
@@ -91,17 +98,22 @@ div[role="dialog"] h2,
 .DialogHeader .text-2xl,
 .DialogHeader h3,
 button.NavButton span {
-  font-family: 'Ubuntu', sans-serif !important;
+  font-family: 'Poppins', sans-serif !important;
   font-weight: 600;
   letter-spacing: 0.02em;
 }
 
-/* Apply Ubuntu font to dialog titles */
+/* Apply Poppins font to dialog titles */
 [data-radix-popper-content-wrapper] h2,
 [data-radix-popper-content-wrapper] h3,
 [data-radix-popper-content-wrapper] .text-2xl {
-  font-family: 'Ubuntu', sans-serif !important;
+  font-family: 'Poppins', sans-serif !important;
   font-weight: 500;
+}
+
+/* Apply Inter to regular text */
+p, span, div, button, input, textarea, select, option {
+  font-family: 'Inter', sans-serif;
 }
 
 /* Toast Positioning */
@@ -111,4 +123,35 @@ button.NavButton span {
   right: 16px !important;
   top: auto !important;
   left: auto !important;
+}
+
+/* Glass morphism utility */
+.glass-morphism {
+  @apply backdrop-blur-xl bg-white/5 border border-white/10 shadow-lg;
+}
+
+/* Card styles */
+.dashboard-card {
+  @apply rounded-lg border bg-white dark:bg-gray-800 p-4 shadow-sm transition-all hover:shadow-md;
+}
+
+/* Stripe-inspired sidebar */
+.stripe-sidebar {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+.stripe-sidebar-collapsed {
+  @apply w-16;
+}
+
+.stripe-sidebar-expanded {
+  @apply w-64;
+}
+
+.sidebar-icon {
+  @apply flex items-center justify-center h-9 w-9 rounded-md transition-colors;
+}
+
+.sidebar-item {
+  @apply flex items-center space-x-3 px-3 py-2 rounded-md transition-colors;
 }
