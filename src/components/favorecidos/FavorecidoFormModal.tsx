@@ -149,14 +149,14 @@ const FavorecidoFormModal: React.FC<FavorecidoFormModalProps> = ({
           </FormField>
           <FormField name="grupoId" label="Grupo" className="w-full">
             <Select 
-              value={currentFavorecido.grupoId || ""}
-              onValueChange={(value) => handleSelectChange("grupoId", value)}
+              value={currentFavorecido.grupoId || "none"}
+              onValueChange={(value) => handleSelectChange("grupoId", value === "none" ? "" : value)}
             >
               <SelectTrigger id="grupoId">
                 <SelectValue placeholder="Selecione um grupo" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Nenhum</SelectItem>
+                <SelectItem value="none">Nenhum</SelectItem>
                 {/* Grupos seriam listados aqui */}
               </SelectContent>
             </Select>
