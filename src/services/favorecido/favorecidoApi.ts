@@ -64,9 +64,15 @@ export const searchFavorecidosByTerm = async (term: string): Promise<Array<Favor
  * Save a new favorecido
  */
 export const saveFavorecido = async (favorecido: FavorecidoData): Promise<FavorecidoData & { id: string }> => {
+  // Add the user_id to the favorecido object
+  const favorecidoWithUserId = {
+    ...favorecido,
+    user_id: (await supabase.auth.getUser()).data.user?.id
+  };
+
   const { data, error } = await supabase
     .from("favorecidos")
-    .insert([favorecido])
+    .insert([favorecidoWithUserId])
     .select()
     .single();
 
@@ -113,3 +119,4 @@ export const deleteFavorecido = async (id: string): Promise<boolean> => {
 
   return true;
 };
+
