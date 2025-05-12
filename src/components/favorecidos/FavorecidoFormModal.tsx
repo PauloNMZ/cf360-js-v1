@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
+import { FormField } from "@/components/ui/form-field";
 
 interface FavorecidoFormModalProps {
   open: boolean;
@@ -38,33 +39,32 @@ const FavorecidoFormModal: React.FC<FavorecidoFormModalProps> = ({
         </DialogHeader>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nome*</label>
+          <FormField name="nome" label="Nome" required className="w-full">
             <Input 
+              id="nome"
               name="nome"
               value={currentFavorecido.nome}
               onChange={handleInputChange}
               placeholder="Nome completo"
             />
-          </div>
+          </FormField>
 
           <div className="grid grid-cols-3 gap-3">
-            <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Inscrição*</label>
+            <FormField name="inscricao" label="Inscrição" required className="col-span-2">
               <Input 
+                id="inscricao"
                 name="inscricao"
                 value={currentFavorecido.inscricao}
                 onChange={handleInputChange}
                 placeholder="CPF ou CNPJ"
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+            </FormField>
+            <FormField name="tipoInscricao" label="Tipo" className="w-full">
               <Select 
                 value={currentFavorecido.tipoInscricao}
                 onValueChange={(value) => handleSelectChange("tipoInscricao", value)}
               >
-                <SelectTrigger>
+                <SelectTrigger id="tipoInscricao">
                   <SelectValue placeholder="Tipo" />
                 </SelectTrigger>
                 <SelectContent>
@@ -72,48 +72,47 @@ const FavorecidoFormModal: React.FC<FavorecidoFormModalProps> = ({
                   <SelectItem value="CNPJ">CNPJ</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
+            </FormField>
           </div>
         </div>
 
         <div className="grid grid-cols-3 gap-4 mt-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Banco</label>
+          <FormField name="banco" label="Banco" className="w-full">
             <Input 
+              id="banco"
               name="banco"
               value={currentFavorecido.banco}
               onChange={handleInputChange}
               placeholder="Nome do banco"
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Agência</label>
+          </FormField>
+          <FormField name="agencia" label="Agência" className="w-full">
             <Input 
+              id="agencia"
               name="agencia"
               value={currentFavorecido.agencia}
               onChange={handleInputChange}
               placeholder="0000"
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Conta</label>
+          </FormField>
+          <FormField name="conta" label="Conta" className="w-full">
             <Input 
+              id="conta"
               name="conta"
               value={currentFavorecido.conta}
               onChange={handleInputChange}
               placeholder="00000-0"
             />
-          </div>
+          </FormField>
         </div>
 
         <div className="grid grid-cols-3 gap-4 mt-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Tipo Chave PIX</label>
+          <FormField name="tipoChavePix" label="Tipo Chave PIX" className="w-full">
             <Select 
               value={currentFavorecido.tipoChavePix}
               onValueChange={(value) => handleSelectChange("tipoChavePix", value as any)}
             >
-              <SelectTrigger>
+              <SelectTrigger id="tipoChavePix">
                 <SelectValue placeholder="Tipo" />
               </SelectTrigger>
               <SelectContent>
@@ -124,22 +123,22 @@ const FavorecidoFormModal: React.FC<FavorecidoFormModalProps> = ({
                 <SelectItem value="ALEATORIA">Aleatória</SelectItem>
               </SelectContent>
             </Select>
-          </div>
-          <div className="col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Chave PIX</label>
+          </FormField>
+          <FormField name="chavePix" label="Chave PIX" className="col-span-2">
             <Input 
+              id="chavePix"
               name="chavePix"
               value={currentFavorecido.chavePix}
               onChange={handleInputChange}
               placeholder="Informe a chave PIX"
             />
-          </div>
+          </FormField>
         </div>
 
         <div className="grid grid-cols-2 gap-4 mt-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Valor Padrão (R$)</label>
+          <FormField name="valorPadrao" label="Valor Padrão (R$)" className="w-full">
             <Input 
+              id="valorPadrao"
               name="valorPadrao"
               type="number"
               step="0.01"
@@ -147,14 +146,13 @@ const FavorecidoFormModal: React.FC<FavorecidoFormModalProps> = ({
               onChange={handleInputChange}
               placeholder="0,00"
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Grupo</label>
+          </FormField>
+          <FormField name="grupoId" label="Grupo" className="w-full">
             <Select 
               value={currentFavorecido.grupoId || ""}
               onValueChange={(value) => handleSelectChange("grupoId", value)}
             >
-              <SelectTrigger>
+              <SelectTrigger id="grupoId">
                 <SelectValue placeholder="Selecione um grupo" />
               </SelectTrigger>
               <SelectContent>
@@ -162,7 +160,7 @@ const FavorecidoFormModal: React.FC<FavorecidoFormModalProps> = ({
                 {/* Grupos seriam listados aqui */}
               </SelectContent>
             </Select>
-          </div>
+          </FormField>
         </div>
 
         <div className="flex justify-end mt-6 gap-4">
