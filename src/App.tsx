@@ -15,37 +15,43 @@ import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import SidebarLayout from "@/components/layout/SidebarLayout";
 import { IndexPageProvider } from "@/providers/IndexPageProvider";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./App.css";
+
+// Create a client
+const queryClient = new QueryClient();
 
 function App() {
   return (
-    <ThemeProvider defaultTheme="light">
-      <BrowserRouter>
-        <AuthProvider>
-          <Routes>
-            <Route path="/auth" element={<Auth />} />
-            <Route element={<ProtectedRoute />}>
-              <Route element={
-                <IndexPageProvider>
-                  <SidebarLayout />
-                </IndexPageProvider>
-              }>
-                <Route path="/" element={<Index />} />
-                <Route path="/grupos" element={<GruposPage />} />
-                <Route path="/pagamentos/grupo" element={<PagamentoGrupoPage />} />
-                <Route path="/pagamentos/individual" element={<Index />} /> {/* Placeholder */}
-                <Route path="/pagamentos/multi-grupo" element={<PagamentoMultiGrupoPage />} />
-                <Route path="/favorecidos" element={<FavorecidosPage />} />
-                <Route path="/empresa" element={<EmpresaPage />} />
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider defaultTheme="light">
+        <BrowserRouter>
+          <AuthProvider>
+            <Routes>
+              <Route path="/auth" element={<Auth />} />
+              <Route element={<ProtectedRoute />}>
+                <Route element={
+                  <IndexPageProvider>
+                    <SidebarLayout />
+                  </IndexPageProvider>
+                }>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/grupos" element={<GruposPage />} />
+                  <Route path="/pagamentos/grupo" element={<PagamentoGrupoPage />} />
+                  <Route path="/pagamentos/individual" element={<Index />} /> {/* Placeholder */}
+                  <Route path="/pagamentos/multi-grupo" element={<PagamentoMultiGrupoPage />} />
+                  <Route path="/favorecidos" element={<FavorecidosPage />} />
+                  <Route path="/empresa" element={<EmpresaPage />} />
+                </Route>
               </Route>
-            </Route>
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          <SonnerToaster position="top-right" />
-          <Toaster />
-        </AuthProvider>
-      </BrowserRouter>
-    </ThemeProvider>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <SonnerToaster position="top-right" />
+            <Toaster />
+          </AuthProvider>
+        </BrowserRouter>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }
 
