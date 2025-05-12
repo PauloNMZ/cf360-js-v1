@@ -128,6 +128,65 @@ export type Database = {
         }
         Relationships: []
       }
+      favorecidos: {
+        Row: {
+          agencia: string | null
+          banco: string | null
+          chavepix: string | null
+          conta: string | null
+          dataatualizacao: string | null
+          datacriacao: string | null
+          grupoid: string | null
+          id: string
+          inscricao: string
+          nome: string
+          tipochavepix: string | null
+          tipoinscricao: string
+          user_id: string
+          valorpadrao: number | null
+        }
+        Insert: {
+          agencia?: string | null
+          banco?: string | null
+          chavepix?: string | null
+          conta?: string | null
+          dataatualizacao?: string | null
+          datacriacao?: string | null
+          grupoid?: string | null
+          id?: string
+          inscricao: string
+          nome: string
+          tipochavepix?: string | null
+          tipoinscricao: string
+          user_id: string
+          valorpadrao?: number | null
+        }
+        Update: {
+          agencia?: string | null
+          banco?: string | null
+          chavepix?: string | null
+          conta?: string | null
+          dataatualizacao?: string | null
+          datacriacao?: string | null
+          grupoid?: string | null
+          id?: string
+          inscricao?: string
+          nome?: string
+          tipochavepix?: string | null
+          tipoinscricao?: string
+          user_id?: string
+          valorpadrao?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorecidos_grupoid_fkey"
+            columns: ["grupoid"]
+            isOneToOne: false
+            referencedRelation: "grupos_favorecidos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       favorecidos_grupos: {
         Row: {
           criado_em: string

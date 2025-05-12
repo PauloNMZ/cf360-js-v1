@@ -6,6 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
  * Get all favorecidos for the current user
  */
 export const getFavorecidos = async (): Promise<Array<FavorecidoData & { id: string }>> => {
+  // Using 'from' with a string literal to bypass TypeScript's type checking
+  // since our new table isn't in the types yet
   const { data: favorecidos, error } = await supabase
     .from("favorecidos")
     .select("*")
@@ -16,7 +18,7 @@ export const getFavorecidos = async (): Promise<Array<FavorecidoData & { id: str
     throw new Error(`Erro ao buscar favorecidos: ${error.message}`);
   }
 
-  return favorecidos || [];
+  return favorecidos as Array<FavorecidoData & { id: string }> || [];
 };
 
 /**
@@ -34,7 +36,7 @@ export const getFavorecidoById = async (id: string): Promise<(FavorecidoData & {
     throw new Error(`Erro ao buscar favorecido: ${error.message}`);
   }
 
-  return data;
+  return data as (FavorecidoData & { id: string }) | null;
 };
 
 /**
@@ -57,7 +59,7 @@ export const searchFavorecidosByTerm = async (term: string): Promise<Array<Favor
     throw new Error(`Erro ao buscar favorecidos: ${error.message}`);
   }
 
-  return data || [];
+  return data as Array<FavorecidoData & { id: string }> || [];
 };
 
 /**
@@ -81,7 +83,7 @@ export const saveFavorecido = async (favorecido: FavorecidoData): Promise<Favore
     throw new Error(`Erro ao salvar favorecido: ${error.message}`);
   }
 
-  return data;
+  return data as FavorecidoData & { id: string };
 };
 
 /**
@@ -100,7 +102,7 @@ export const updateFavorecido = async (id: string, favorecido: FavorecidoData): 
     throw new Error(`Erro ao atualizar favorecido: ${error.message}`);
   }
 
-  return data;
+  return data as (FavorecidoData & { id: string }) | null;
 };
 
 /**
@@ -119,4 +121,3 @@ export const deleteFavorecido = async (id: string): Promise<boolean> => {
 
   return true;
 };
-

@@ -23,4 +23,3 @@ export const formatarValorCurrency = (valor: number): string => {
 
 // Export formatCurrency as an alias for formatarValorCurrency for backward compatibility
 export const formatCurrency = formatarValorCurrency;
-
