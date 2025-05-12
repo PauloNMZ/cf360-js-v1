@@ -4,7 +4,8 @@ import {
   saveFavorecido as apiSaveFavorecido, 
   updateFavorecido as apiUpdateFavorecido,
   deleteFavorecido as apiDeleteFavorecido,
-  getFavorecidos as apiGetFavorecidos
+  getFavorecidos as apiGetFavorecidos,
+  searchFavorecidosByTerm as apiSearchFavorecidosByTerm
 } from "./favorecidoApi";
 
 // Higher-level service functions
@@ -22,6 +23,10 @@ export const removeFavorecido = async (id: string): Promise<boolean> => {
 
 export const fetchFavorecidos = async (): Promise<Array<FavorecidoData & { id: string }>> => {
   return await apiGetFavorecidos();
+};
+
+export const searchFavorecidos = async (term: string): Promise<Array<FavorecidoData & { id: string }>> => {
+  return await apiSearchFavorecidosByTerm(term);
 };
 
 // Re-export the API functions for direct access if needed

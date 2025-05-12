@@ -1,106 +1,132 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { FavorecidoData, emptyFavorecido } from "@/types/favorecido";
 import { 
   getFavorecidos, 
   saveFavorecido, 
   updateFavorecido, 
-  deleteFavorecido 
+  deleteFavorecido,
+  searchFavorecidosByTerm
 } from "@/services/favorecido/favorecidoService";
 import { toast } from "sonner";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const useFavorecidos = () => {
-  const [favorecidos, setFavorecidos] = useState<Array<FavorecidoData & { id: string }>>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredFavorecidos, setFilteredFavorecidos] = useState<Array<FavorecidoData & { id: string }>>([]);
-  
   const [modalOpen, setModalOpen] = useState(false);
   const [currentFavorecido, setCurrentFavorecido] = useState<FavorecidoData>({...emptyFavorecido});
   const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [favorecidoToDelete, setFavorecidoToDelete] = useState<string | null>(null);
 
-  // Load favorecidos on mount
-  useEffect(() => {
-    loadFavorecidos();
-  }, []);
+  // Query to fetch favorecidos
+  const { 
+    data: favorecidos = [], 
+    isLoading: isLoadingFavorecidos,
+    refetch
+  } = useQuery({
+    queryKey: ['favorecidos'],
+    queryFn: getFavorecidos
+  });
 
-  // Filter favorecidos when search term changes
-  useEffect(() => {
-    if (searchTerm.trim() === "") {
-      setFilteredFavorecidos(favorecidos);
-    } else {
-      const term = searchTerm.toLowerCase();
-      setFilteredFavorecidos(favorecidos.filter(f => 
-        f.nome.toLowerCase().includes(term) || 
-        f.inscricao.toLowerCase().includes(term)
-      ));
+  // Query for searched favorecidos
+  const {
+    data: searchResults = [],
+    isLoading: isSearching,
+  } = useQuery({
+    queryKey: ['favorecidos', 'search', searchTerm],
+    queryFn: () => searchFavorecidosByTerm(searchTerm),
+    enabled: searchTerm.length > 0,
+  });
+
+  // Filtered favorecidos based on search term
+  const filteredFavorecidos = searchTerm.length > 0 ? searchResults : favorecidos;
+
+  // Mutation for creating/updating favorecidos
+  const { mutate: saveMutation, isPending: isSaving } = useMutation({
+    mutationFn: async (data: { favorecido: FavorecidoData; mode: 'create' | 'edit' }) => {
+      const { favorecido, mode } = data;
+      if (mode === 'create') {
+        return await saveFavorecido(favorecido);
+      } else {
+        if (!favorecido.id) throw new Error("Favorecido ID is required for updates");
+        return await updateFavorecido(favorecido.id, favorecido);
+      }
+    },
+    onSuccess: (_, variables) => {
+      const { mode } = variables;
+      toast.success(`Favorecido ${mode === 'create' ? 'criado' : 'atualizado'} com sucesso`);
+      queryClient.invalidateQueries({ queryKey: ['favorecidos'] });
+      setModalOpen(false);
+    },
+    onError: (error, variables) => {
+      const { mode } = variables;
+      console.error(`Erro ao ${mode === 'create' ? 'criar' : 'atualizar'} favorecido:`, error);
+      toast.error(`Erro ao ${mode === 'create' ? 'criar' : 'atualizar'} favorecido`);
     }
-  }, [searchTerm, favorecidos]);
+  });
 
-  const loadFavorecidos = async () => {
-    setIsLoading(true);
-    try {
-      const data = await getFavorecidos();
-      setFavorecidos(data);
-      setFilteredFavorecidos(data);
-    } catch (error) {
-      console.error("Erro ao carregar favorecidos:", error);
-      toast.error("Erro ao carregar favorecidos");
-    } finally {
-      setIsLoading(false);
+  // Mutation for deleting favorecidos
+  const { mutate: deleteMutation, isPending: isDeleting } = useMutation({
+    mutationFn: async (id: string) => {
+      return await deleteFavorecido(id);
+    },
+    onSuccess: () => {
+      toast.success("Favorecido excluído com sucesso");
+      queryClient.invalidateQueries({ queryKey: ['favorecidos'] });
+      setDeleteDialogOpen(false);
+      setFavorecidoToDelete(null);
+    },
+    onError: (error) => {
+      console.error("Erro ao excluir favorecido:", error);
+      toast.error("Erro ao excluir favorecido");
     }
-  };
+  });
 
+  // Create new favorecido
   const handleCreateNew = () => {
     setCurrentFavorecido({...emptyFavorecido});
     setFormMode('create');
     setModalOpen(true);
   };
 
+  // Edit favorecido
   const handleEdit = (favorecido: FavorecidoData & { id: string }) => {
     setCurrentFavorecido({...favorecido});
     setFormMode('edit');
     setModalOpen(true);
   };
 
+  // Delete favorecido
   const handleDelete = (id: string) => {
     setFavorecidoToDelete(id);
     setDeleteDialogOpen(true);
   };
 
+  // Confirm delete
   const confirmDelete = async () => {
     if (!favorecidoToDelete) return;
-    
-    setIsLoading(true);
-    try {
-      await deleteFavorecido(favorecidoToDelete);
-      toast.success("Favorecido excluído com sucesso");
-      loadFavorecidos();
-    } catch (error) {
-      console.error("Erro ao excluir favorecido:", error);
-      toast.error("Erro ao excluir favorecido");
-    } finally {
-      setIsLoading(false);
-      setDeleteDialogOpen(false);
-      setFavorecidoToDelete(null);
-    }
+    deleteMutation(favorecidoToDelete);
   };
 
+  // Handle input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setCurrentFavorecido(prev => ({ ...prev, [name]: value }));
   };
 
+  // Handle select change
   const handleSelectChange = (name: string, value: string) => {
     setCurrentFavorecido(prev => ({ ...prev, [name]: value }));
   };
 
+  // Handle search change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
 
+  // Save favorecido
   const handleSave = async () => {
     // Basic validation
     if (!currentFavorecido.nome.trim() || !currentFavorecido.inscricao.trim()) {
@@ -108,26 +134,10 @@ export const useFavorecidos = () => {
       return;
     }
 
-    setIsLoading(true);
-    try {
-      if (formMode === 'create') {
-        await saveFavorecido(currentFavorecido);
-        toast.success("Favorecido criado com sucesso");
-      } else {
-        if (!currentFavorecido.id) return;
-        await updateFavorecido(currentFavorecido.id, currentFavorecido);
-        toast.success("Favorecido atualizado com sucesso");
-      }
-      
-      loadFavorecidos();
-      setModalOpen(false);
-    } catch (error) {
-      console.error("Erro ao salvar favorecido:", error);
-      toast.error(`Erro ao ${formMode === 'create' ? 'criar' : 'atualizar'} favorecido`);
-    } finally {
-      setIsLoading(false);
-    }
+    saveMutation({ favorecido: currentFavorecido, mode: formMode });
   };
+
+  const isLoading = isLoadingFavorecidos || isSearching || isSaving || isDeleting;
 
   return {
     favorecidos,
@@ -149,5 +159,6 @@ export const useFavorecidos = () => {
     handleSave,
     setModalOpen,
     setDeleteDialogOpen,
+    refetch,
   };
 };
