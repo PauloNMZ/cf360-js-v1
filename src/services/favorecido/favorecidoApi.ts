@@ -1,13 +1,12 @@
 
 import { FavorecidoData } from "@/types/favorecido";
 import { supabase } from "@/integrations/supabase/client";
+import { dbRowToModel, modelToDbRow } from "./favorecidoAdapter";
 
 /**
  * Get all favorecidos for the current user
  */
 export const getFavorecidos = async (): Promise<Array<FavorecidoData & { id: string }>> => {
-  // Using 'from' with a string literal to bypass TypeScript's type checking
-  // since our new table isn't in the types yet
   const { data: favorecidos, error } = await supabase
     .from("favorecidos")
     .select("*")
@@ -18,7 +17,8 @@ export const getFavorecidos = async (): Promise<Array<FavorecidoData & { id: str
     throw new Error(`Erro ao buscar favorecidos: ${error.message}`);
   }
 
-  return favorecidos as Array<FavorecidoData & { id: string }> || [];
+  // Convert database rows to model objects
+  return favorecidos ? favorecidos.map(dbRowToModel) : [];
 };
 
 /**
@@ -36,7 +36,7 @@ export const getFavorecidoById = async (id: string): Promise<(FavorecidoData & {
     throw new Error(`Erro ao buscar favorecido: ${error.message}`);
   }
 
-  return data as (FavorecidoData & { id: string }) | null;
+  return data ? dbRowToModel(data) : null;
 };
 
 /**
@@ -59,22 +59,22 @@ export const searchFavorecidosByTerm = async (term: string): Promise<Array<Favor
     throw new Error(`Erro ao buscar favorecidos: ${error.message}`);
   }
 
-  return data as Array<FavorecidoData & { id: string }> || [];
+  return data ? data.map(dbRowToModel) : [];
 };
 
 /**
  * Save a new favorecido
  */
 export const saveFavorecido = async (favorecido: FavorecidoData): Promise<FavorecidoData & { id: string }> => {
+  // Convert model to database row format
+  const dbRow = modelToDbRow(favorecido);
+  
   // Add the user_id to the favorecido object
-  const favorecidoWithUserId = {
-    ...favorecido,
-    user_id: (await supabase.auth.getUser()).data.user?.id
-  };
+  dbRow.user_id = (await supabase.auth.getUser()).data.user?.id;
 
   const { data, error } = await supabase
     .from("favorecidos")
-    .insert([favorecidoWithUserId])
+    .insert([dbRow])
     .select()
     .single();
 
@@ -83,16 +83,19 @@ export const saveFavorecido = async (favorecido: FavorecidoData): Promise<Favore
     throw new Error(`Erro ao salvar favorecido: ${error.message}`);
   }
 
-  return data as FavorecidoData & { id: string };
+  return dbRowToModel(data);
 };
 
 /**
  * Update an existing favorecido
  */
 export const updateFavorecido = async (id: string, favorecido: FavorecidoData): Promise<(FavorecidoData & { id: string }) | null> => {
+  // Convert model to database row format
+  const dbRow = modelToDbRow(favorecido);
+
   const { data, error } = await supabase
     .from("favorecidos")
-    .update(favorecido)
+    .update(dbRow)
     .eq("id", id)
     .select()
     .single();
@@ -102,7 +105,7 @@ export const updateFavorecido = async (id: string, favorecido: FavorecidoData): 
     throw new Error(`Erro ao atualizar favorecido: ${error.message}`);
   }
 
-  return data as (FavorecidoData & { id: string }) | null;
+  return data ? dbRowToModel(data) : null;
 };
 
 /**
