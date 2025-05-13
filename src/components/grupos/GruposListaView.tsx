@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { useGroupOperations } from "@/services/group/hooks";
 import { Group } from "@/types/group";
-import { Plus, Edit, Trash2, Users } from "lucide-react";
+import { Plus, Edit, Trash2, Users, Search } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
 interface GruposListaViewProps {
@@ -22,24 +23,45 @@ const GruposListaView: React.FC<GruposListaViewProps> = ({
   onManageMembers
 }) => {
   const [groups, setGroups] = useState<Group[]>([]);
+  const [filteredGroups, setFilteredGroups] = useState<Group[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
   const { fetchGroups } = useGroupOperations();
 
   useEffect(() => {
     loadGroups();
   }, []);
 
+  useEffect(() => {
+    if (searchTerm.trim() === "") {
+      setFilteredGroups(groups);
+    } else {
+      const termo = searchTerm.trim().toLowerCase();
+      setFilteredGroups(
+        groups.filter((group) => 
+          group.nome.toLowerCase().includes(termo) || 
+          (group.descricao && group.descricao.toLowerCase().includes(termo))
+        )
+      );
+    }
+  }, [searchTerm, groups]);
+
   const loadGroups = async () => {
     setIsLoading(true);
     try {
       const data = await fetchGroups();
       setGroups(data);
+      setFilteredGroups(data);
     } catch (error) {
       console.error("Erro ao carregar grupos:", error);
       toast.error("Não foi possível carregar os grupos");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
   };
 
   return (
@@ -52,23 +74,42 @@ const GruposListaView: React.FC<GruposListaViewProps> = ({
         </Button>
       </CardHeader>
       <CardContent>
+        <div className="mb-4 relative">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Buscar por nome ou inscrição..."
+              className="pl-8"
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
+          </div>
+        </div>
+
         {isLoading ? (
           <div className="space-y-2">
             <Skeleton className="h-12 w-full" />
             <Skeleton className="h-12 w-full" />
             <Skeleton className="h-12 w-full" />
           </div>
-        ) : groups.length === 0 ? (
+        ) : filteredGroups.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-muted-foreground">Nenhum grupo encontrado</p>
-            <Button variant="outline" className="mt-4" onClick={onCreateClick}>
-              <Plus size={16} className="mr-1" />
-              Criar Novo Grupo
-            </Button>
+            {searchTerm.trim() !== "" ? (
+              <p className="text-muted-foreground">Nenhum grupo encontrado para "{searchTerm}"</p>
+            ) : (
+              <>
+                <p className="text-muted-foreground">Nenhum grupo encontrado</p>
+                <Button variant="outline" className="mt-4" onClick={onCreateClick}>
+                  <Plus size={16} className="mr-1" />
+                  Criar Novo Grupo
+                </Button>
+              </>
+            )}
           </div>
         ) : (
           <div className="space-y-2">
-            {groups.map((group) => (
+            {filteredGroups.map((group) => (
               <div 
                 key={group.id} 
                 className="flex items-center justify-between p-3 border rounded-md hover:bg-muted/50 transition-colors"
