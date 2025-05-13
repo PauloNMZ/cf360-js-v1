@@ -32,7 +32,7 @@ const GrupoForm: React.FC<GrupoFormProps> = ({
   const [formData, setFormData] = useState<Partial<NewGroup>>({
     nome: "",
     descricao: "",
-    tipo_servico_id: "",
+    tipo_servico_id: null,
     data_pagamento: null,
   });
   const [formValid, setFormValid] = useState(false);
@@ -47,7 +47,7 @@ const GrupoForm: React.FC<GrupoFormProps> = ({
       setFormData({
         nome: initialData.nome,
         descricao: initialData.descricao,
-        tipo_servico_id: initialData.tipo_servico_id || "",
+        tipo_servico_id: initialData.tipo_servico_id || null,
         data_pagamento: initialData.data_pagamento || null,
       });
     }
@@ -57,7 +57,7 @@ const GrupoForm: React.FC<GrupoFormProps> = ({
   }, [initialData]);
 
   useEffect(() => {
-    // Validate form
+    // Validate form - only the name field is required
     setFormValid(Boolean(formData.nome && formData.nome.trim()));
   }, [formData]);
 
@@ -74,7 +74,7 @@ const GrupoForm: React.FC<GrupoFormProps> = ({
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value || null }));
   };
 
   const handleDateChange = (date: Date | undefined) => {
@@ -119,8 +119,9 @@ const GrupoForm: React.FC<GrupoFormProps> = ({
         />
       </div>
 
+      {/* Optional fields */}
       <div className="space-y-2">
-        <Label htmlFor="tipo_servico_id">Tipo de Serviço</Label>
+        <Label htmlFor="tipo_servico_id">Tipo de Serviço (opcional)</Label>
         <select
           id="tipo_servico_id"
           name="tipo_servico_id"
@@ -138,7 +139,7 @@ const GrupoForm: React.FC<GrupoFormProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="data_pagamento">Data de Pagamento</Label>
+        <Label htmlFor="data_pagamento">Data de Pagamento (opcional)</Label>
         <Popover>
           <PopoverTrigger asChild>
             <Button

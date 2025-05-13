@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import GruposListaView from "@/components/grupos/GruposListaView";
 import GrupoModal from "@/components/grupos/GrupoModal";
@@ -46,18 +47,24 @@ const GruposPage = () => {
 
   const handleSubmitGroup = async (data: Partial<NewGroup>) => {
     try {
-      // Fix: Ensure required field 'nome' is always present
-      if (!data.nome && isCreating) {
+      // Ensure required field 'nome' is always present
+      if (!data.nome || !data.nome.trim()) {
         toast.error("O nome do grupo é obrigatório");
         return;
       }
       
+      // Remove any empty strings or convert them to null to avoid validation issues
+      const sanitizedData = {
+        ...data,
+        tipo_servico_id: data.tipo_servico_id || null,
+        data_pagamento: data.data_pagamento || null
+      };
+      
       if (isCreating) {
-        // Make sure nome exists as it's required by the type
-        await addGroup(data as Omit<NewGroup, "user_id">);
+        await addGroup(sanitizedData as Omit<NewGroup, "user_id">);
         toast.success("Grupo criado com sucesso");
       } else if (currentGroup) {
-        await editGroup(currentGroup.id, data);
+        await editGroup(currentGroup.id, sanitizedData);
         toast.success("Grupo atualizado com sucesso");
       }
       setModalOpen(false);
