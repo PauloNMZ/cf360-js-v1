@@ -10,6 +10,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
+import { FavorecidoData } from "@/types/favorecido";
+import { useFavorecidos } from "@/hooks/favorecidos/useFavorecidos";
 
 interface GrupoMembrosViewProps {
   grupo: Group;
@@ -50,6 +59,7 @@ const GrupoMembrosView: React.FC<GrupoMembrosViewProps> = ({ grupo, onBack }) =>
       });
       setIsAddDialogOpen(false);
       loadMembers();
+      toast.success("Favorecido adicionado ao grupo");
     } catch (error) {
       console.error("Erro ao adicionar membro ao grupo:", error);
       toast.error("Erro ao adicionar favorecido ao grupo");
@@ -152,6 +162,7 @@ const AddMemberDialog: React.FC<AddMemberDialogProps> = ({
 }) => {
   const [favorecidoId, setFavorecidoId] = useState("");
   const [valor, setValor] = useState<string>("");
+  const { favorecidos, isLoading } = useFavorecidos();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -171,14 +182,26 @@ const AddMemberDialog: React.FC<AddMemberDialogProps> = ({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="favorecidoId">ID do Favorecido</Label>
-            <Input
-              id="favorecidoId"
-              value={favorecidoId}
-              onChange={(e) => setFavorecidoId(e.target.value)}
-              placeholder="ID do Favorecido"
-              required
-            />
+            <Label htmlFor="favorecidoId">Nome do Favorecido</Label>
+            {isLoading ? (
+              <Skeleton className="h-10 w-full" />
+            ) : (
+              <Select
+                value={favorecidoId}
+                onValueChange={setFavorecidoId}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione um favorecido" />
+                </SelectTrigger>
+                <SelectContent>
+                  {favorecidos.map((favorecido) => (
+                    <SelectItem key={favorecido.id} value={favorecido.id}>
+                      {favorecido.nome}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="valor">Valor (opcional)</Label>
@@ -195,7 +218,7 @@ const AddMemberDialog: React.FC<AddMemberDialogProps> = ({
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
             </Button>
-            <Button type="submit">
+            <Button type="submit" disabled={!favorecidoId}>
               Adicionar
             </Button>
           </div>

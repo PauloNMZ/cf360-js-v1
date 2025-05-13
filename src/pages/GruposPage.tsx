@@ -15,6 +15,7 @@ const GruposPage = () => {
   const [currentGroup, setCurrentGroup] = useState<Group | undefined>(undefined);
   const [isCreating, setIsCreating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0); // Add refresh trigger state
 
   const { addGroup, editGroup, removeGroup } = useGroupOperations();
 
@@ -43,6 +44,8 @@ const GruposPage = () => {
   const handleBackFromMembers = () => {
     setShowMembersView(false);
     setCurrentGroup(undefined);
+    // Refresh the groups list when returning from members view
+    setRefreshTrigger(prev => prev + 1);
   };
 
   const handleSubmitGroup = async (data: Partial<NewGroup>) => {
@@ -63,9 +66,13 @@ const GruposPage = () => {
       if (isCreating) {
         await addGroup(sanitizedData as Omit<NewGroup, "user_id">);
         toast.success("Grupo criado com sucesso");
+        // Refresh the groups list after creating a new group
+        setRefreshTrigger(prev => prev + 1);
       } else if (currentGroup) {
         await editGroup(currentGroup.id, sanitizedData);
         toast.success("Grupo atualizado com sucesso");
+        // Refresh the groups list after updating a group
+        setRefreshTrigger(prev => prev + 1);
       }
       setModalOpen(false);
     } catch (error) {
@@ -81,6 +88,8 @@ const GruposPage = () => {
         await removeGroup(currentGroup.id);
         setDeleteDialogOpen(false);
         toast.success("Grupo excluído com sucesso");
+        // Refresh the groups list after deleting a group
+        setRefreshTrigger(prev => prev + 1);
       } catch (error) {
         console.error("Erro ao excluir grupo:", error);
         toast.error("Erro ao excluir grupo");
@@ -106,6 +115,7 @@ const GruposPage = () => {
           onEditClick={handleEditClick}
           onDeleteClick={handleDeleteClick}
           onManageMembers={handleManageMembers}
+          refreshTrigger={refreshTrigger}
         />
       )}
 

@@ -14,13 +14,15 @@ interface GruposListaViewProps {
   onEditClick: (group: Group) => void;
   onDeleteClick: (group: Group) => void;
   onManageMembers: (group: Group) => void;
+  refreshTrigger?: number;
 }
 
 const GruposListaView: React.FC<GruposListaViewProps> = ({
   onCreateClick,
   onEditClick,
   onDeleteClick,
-  onManageMembers
+  onManageMembers,
+  refreshTrigger = 0
 }) => {
   const [groups, setGroups] = useState<Group[]>([]);
   const [filteredGroups, setFilteredGroups] = useState<Group[]>([]);
@@ -28,9 +30,10 @@ const GruposListaView: React.FC<GruposListaViewProps> = ({
   const [searchTerm, setSearchTerm] = useState("");
   const { fetchGroups } = useGroupOperations();
 
+  // Effect that runs when component mounts or refreshTrigger changes
   useEffect(() => {
     loadGroups();
-  }, []);
+  }, [refreshTrigger]); // Added refreshTrigger dependency
 
   useEffect(() => {
     if (searchTerm.trim() === "") {
@@ -75,11 +78,11 @@ const GruposListaView: React.FC<GruposListaViewProps> = ({
       </CardHeader>
       <CardContent>
         <div className="mb-4 relative">
-          <div className="relative">
+          <div className="relative w-64"> {/* Reduced width to 16rem (64) */}
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Buscar por nome ou inscrição..."
+              placeholder="Buscar por nome ou descrição..." // Updated placeholder text
               className="pl-8"
               value={searchTerm}
               onChange={handleSearchChange}
