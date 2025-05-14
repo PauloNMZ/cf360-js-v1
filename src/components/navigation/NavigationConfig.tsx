@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 
 export type NavigationItemConfig = {
-  icon: React.ReactNode;
+  icon: React.ReactElement;
   label: string;
   tooltipText: string;
   handler: string;
@@ -82,7 +82,7 @@ export const navigationItems: NavigationItemConfig[] = [
       },
       {
         icon: <CloudUpload size={20} />,
-        label: "Importar CNAB",
+        label: "Converter CNAB",
         tooltipText: "Converter arquivo CNAB para requisição JSON para API",
         handler: "onCnabToApiClick"
       }
@@ -119,4 +119,3 @@ export const navigationItems: NavigationItemConfig[] = [
     handler: "onAdminPanelClick"
   }
 ];
-
