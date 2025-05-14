@@ -12,19 +12,19 @@ const SidebarHeader = () => {
   const isCollapsed = state === "collapsed";
 
   return (
-    <Header className="border-b border-border/50 py-2">
-      <div className="flex items-center px-2">
+    <Header className="py-4">
+      <div className="flex items-center px-6 pt-4">
         <div className={cn(
           "flex items-center transition-all duration-200",
           isCollapsed ? "justify-center w-full" : "justify-start"
         )}>
           <AppLogo 
-            size={isCollapsed ? 32 : 28} 
+            size={isCollapsed ? 32 : 34} 
             customLogoUrl={companySettings.logoUrl} 
           />
           {!isCollapsed && (
             <div className="ml-2 transition-opacity duration-200">
-              <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+              <h2 className="text-xl font-semibold text-primary-blue dark:text-primary-blue">
                 ConnectPag
               </h2>
             </div>

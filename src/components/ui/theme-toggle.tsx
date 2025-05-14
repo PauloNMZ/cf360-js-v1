@@ -24,36 +24,53 @@ export function ThemeToggle() {
     setTheme(newTheme);
   };
   
-  const button = (
-    <Button 
-      variant="ghost" 
-      size="icon" 
-      onClick={toggleTheme} 
-      className="rounded-md text-gray-500 hover:text-primary-blue hover:bg-primary-blue/10"
-    >
-      {theme === "dark" ? (
-        <Sun className="h-[1.2rem] w-[1.2rem]" />
-      ) : (
-        <Moon className="h-[1.2rem] w-[1.2rem]" />
-      )}
-      <span className="sr-only">Alternar tema</span>
-    </Button>
-  );
+  const isDark = theme === "dark";
   
-  // Simple button without tooltip for contexts where TooltipProvider might not be available
+  // Use in standalone mode (like in auth page)
   if (typeof window !== 'undefined' && window.location.pathname === '/auth') {
-    return button;
+    return (
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        onClick={toggleTheme} 
+        className="rounded-full bg-gray-100 dark:bg-slate-800 h-10 w-10"
+      >
+        {isDark ? (
+          <Sun className="h-5 w-5 text-yellow-500" strokeWidth={1.5} />
+        ) : (
+          <Moon className="h-5 w-5 text-gray-700" strokeWidth={1.5} />
+        )}
+        <span className="sr-only">Alternar tema</span>
+      </Button>
+    );
   }
   
+  // Full featured mode with tooltip if necessary
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          {button}
+          <button
+            onClick={toggleTheme}
+            className="group relative flex w-full items-center gap-4 rounded-lg px-4 py-3 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800/50 transition-all duration-300"
+          >
+            <div className="transition-transform duration-300 group-hover:translate-x-2">
+              {isDark ? (
+                <Sun className="h-7 w-7 text-gray-500 dark:text-gray-400" strokeWidth={1.5} />
+              ) : (
+                <Moon className="h-7 w-7 text-gray-500 dark:text-gray-400" strokeWidth={1.5} />
+              )}
+            </div>
+            {!isCollapsed && (
+              <span>{isDark ? 'Modo Claro' : 'Modo Escuro'}</span>
+            )}
+          </button>
         </TooltipTrigger>
-        <TooltipContent side={isSidebarAvailable && isCollapsed ? "right" : "bottom"} className="bg-gray-800 text-white">
-          <p>{theme === "dark" ? "Modo claro" : "Modo escuro"}</p>
-        </TooltipContent>
+        {isCollapsed && (
+          <TooltipContent side="right" className="bg-gray-800 text-white">
+            <p>{isDark ? "Modo Claro" : "Modo Escuro"}</p>
+          </TooltipContent>
+        )}
       </Tooltip>
     </TooltipProvider>
   );

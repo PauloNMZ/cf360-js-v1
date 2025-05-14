@@ -6,6 +6,8 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useTheme } from "@/hooks/use-theme";
+import { Sun, Moon } from "lucide-react";
 
 interface SidebarFooterProps {
   onLogout: () => void;
@@ -13,33 +15,36 @@ interface SidebarFooterProps {
 
 const SidebarFooter = ({ onLogout }: SidebarFooterProps) => {
   const { state } = useSidebar();
+  const { theme, setTheme } = useTheme();
   const isCollapsed = state === "collapsed";
+  const isDark = theme === "dark";
 
   return (
-    <Footer className="border-t p-3 border-border/50">
-      <div className={cn(
-        "flex items-center transition-all duration-200",
-        isCollapsed ? "justify-center" : "justify-between"
-      )}>
-        <ThemeToggle />
+    <Footer className="border-t border-border/20 px-4 pt-2 pb-4 mt-auto">
+      <div className="flex flex-col gap-2">
+        <button
+          onClick={() => setTheme(isDark ? "light" : "dark")}
+          className="group relative flex w-full items-center gap-4 rounded-lg px-4 py-3 text-base font-medium text-foreground hover:bg-gray-100 dark:hover:bg-slate-800/70"
+        >
+          <div className="transition-transform duration-300 group-hover:translate-x-2">
+            {isDark ? (
+              <Sun className="h-7 w-7 text-gray-500 dark:text-gray-400" strokeWidth={1.5} />
+            ) : (
+              <Moon className="h-7 w-7 text-gray-500 dark:text-gray-400" strokeWidth={1.5} />
+            )}
+          </div>
+          {!isCollapsed && <span>{isDark ? 'Modo Claro' : 'Modo Escuro'}</span>}
+        </button>
         
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button 
-              onClick={onLogout}
-              className={cn(
-                "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors",
-                isCollapsed ? "w-8 h-8 justify-center p-0" : ""
-              )}
-            >
-              <LogOut size={16} />
-              {!isCollapsed && <span>Sair</span>}
-            </button>
-          </TooltipTrigger>
-          <TooltipContent side="right" className="bg-gray-800 text-white">
-            <p>Sair do sistema</p>
-          </TooltipContent>
-        </Tooltip>
+        <button
+          onClick={onLogout}
+          className="group relative flex w-full items-center gap-4 rounded-lg px-4 py-3 text-base font-medium text-foreground hover:bg-gray-100 dark:hover:bg-slate-800/70"
+        >
+          <div className="transition-transform duration-300 group-hover:translate-x-2">
+            <LogOut className="h-7 w-7 text-gray-500 dark:text-gray-400" strokeWidth={1.5} />
+          </div>
+          {!isCollapsed && <span>Sair</span>}
+        </button>
       </div>
     </Footer>
   );

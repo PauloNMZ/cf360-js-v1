@@ -46,7 +46,10 @@ const SidebarLayout = () => {
     <TooltipProvider>
       <SidebarProvider defaultOpen={true}>
         <div className="flex min-h-screen w-full">
-          <Sidebar variant="floating" className="z-30 border-r border-border/30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
+          <Sidebar 
+            variant="sidebar" 
+            className="z-30 border-r border-border/20 bg-white/95 dark:bg-slate-950"
+          >
             <SidebarHeader />
             <SidebarNav handlerMap={handlerMap} />
             <SidebarFooter onLogout={handleLogoutClick} />
@@ -54,7 +57,7 @@ const SidebarLayout = () => {
           </Sidebar>
           <div className="flex-1 overflow-auto flex flex-col">
             {/* Title Bar with gradient using new colors */}
-            <header className="bg-gradient-to-r from-primary-blue to-primary-magenta dark:from-primary-blue/80 dark:to-primary-magenta/80 text-white py-3 px-6 shadow-md">
+            <header className="bg-white dark:bg-slate-900 border-b border-border/20 text-foreground py-3 px-6 shadow-sm">
               <div className="w-full mx-auto flex justify-between items-center">
                 <div className="ml-4">
                   <h1 className="text-2xl font-bold">Connect Pag</h1>
@@ -73,7 +76,7 @@ const SidebarLayout = () => {
             </header>
             
             {/* Content Area */}
-            <div className="flex-1 overflow-auto bg-gradient-to-br from-gray-50 to-white dark:from-slate-900 dark:to-slate-800">
+            <div className="flex-1 overflow-auto bg-gray-50 dark:bg-slate-900/95">
               <div className="container mx-auto p-4">
                 <Outlet />
               </div>
