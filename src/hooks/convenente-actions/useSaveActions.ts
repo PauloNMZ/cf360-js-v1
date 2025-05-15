@@ -27,20 +27,12 @@ export const useSaveActions = (
 ) => {
   const { toast } = useToast();
   const saveInProgressRef = useRef<boolean>(false);
-  const modeChangeInProgressRef = useRef<boolean>(false);
 
   const handleSave = async (formData: ConvenenteData) => {
-    // Prevent re-entrancy
-    if (saveInProgressRef.current) {
-      console.log("Save already in progress, ignoring duplicate request");
-      return;
-    }
-    
+    if (saveInProgressRef.current) return;
     saveInProgressRef.current = true;
-    
     try {
-      // Check for CNPJ
-      if (!formData.cnpj || formData.cnpj.trim() === '') {
+      if (!formData.cnpj?.trim()) {
         toast({
           title: "Dados incompletos",
           description: "CNPJ é obrigatório.",
@@ -48,9 +40,7 @@ export const useSaveActions = (
         });
         return;
       }
-      
-      // Check for Razão Social
-      if (!formData.razaoSocial || formData.razaoSocial.trim() === '') {
+      if (!formData.razaoSocial?.trim()) {
         toast({
           title: "Dados incompletos",
           description: "Razão Social é obrigatória.",
@@ -58,57 +48,38 @@ export const useSaveActions = (
         });
         return;
       }
-      
-      try {
-        console.log("Starting save process with data:", {
-          cnpj: formData.cnpj,
-          razaoSocial: formData.razaoSocial,
-          mode: currentConvenenteId ? 'update' : 'create'
-        });
-        
-        setIsLoading(true);
-        
-        if (currentConvenenteId === null) {
-          // Save new convenente
-          console.log("Creating new convenente");
+      setIsLoading(true);
+
+      if (currentConvenenteId === null) {
+        try {
           const savedConvenente = await createConvenente(formData);
-          
           toast({
             title: "Convenente salvo",
             description: `${formData.razaoSocial} foi cadastrado com sucesso.`,
           });
-          
-          // Update convenente list
           const updatedConvenentes = await fetchConvenentes();
           setConvenentes(updatedConvenentes);
-          
-          // Return to view mode before selecting the new convenente
           setFormMode('view');
-          
-          // Wait a bit before selecting the new item to avoid loops
           setTimeout(() => {
-            // Optional: Select the newly created convenente
-            if (savedConvenente && savedConvenente.id) {
-              setCurrentConvenenteId(savedConvenente.id);
-            }
+            if (savedConvenente?.id) setCurrentConvenenteId(savedConvenente.id);
           }, 300);
-          
-        } else {
-          // Update existing convenente
-          console.log("Updating existing convenente:", currentConvenenteId);
+        } catch (error: any) {
+          toast({
+            title: "Erro ao salvar convenente",
+            description: error?.message || "Falha ao salvar convenente. Verifique se está autenticado e tente novamente.",
+            variant: "destructive",
+          });
+        }
+      } else {
+        try {
           const updatedConvenente = await updateConvenenteData(currentConvenenteId, formData);
-          
           if (updatedConvenente) {
             toast({
               title: "Convenente atualizado",
               description: `${formData.razaoSocial} foi atualizado com sucesso.`,
             });
-            
-            // Update list
             const updatedConvenentes = await fetchConvenentes();
             setConvenentes(updatedConvenentes);
-            
-            // Return to view mode
             setFormMode('view');
           } else {
             toast({
@@ -117,19 +88,16 @@ export const useSaveActions = (
               variant: "destructive",
             });
           }
+        } catch (error: any) {
+          toast({
+            title: "Erro ao atualizar convenente",
+            description: error?.message || "Houve uma falha ao atualizar o convenente.",
+            variant: "destructive",
+          });
         }
-      } catch (error) {
-        console.error('Erro ao salvar convenente:', error);
-        toast({
-          title: "Erro ao salvar",
-          description: "Ocorreu um erro ao salvar o convenente.",
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
       }
     } finally {
-      // Release save lock after a delay
+      setIsLoading(false);
       setTimeout(() => {
         saveInProgressRef.current = false;
       }, 800);
@@ -137,6 +105,6 @@ export const useSaveActions = (
   };
 
   return {
-    handleSave
+    handleSave,
   };
 };
