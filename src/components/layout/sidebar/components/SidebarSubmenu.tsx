@@ -24,7 +24,7 @@ interface SidebarSubmenuProps {
 const SidebarSubmenu = ({ item, isCollapsed, handlerMap, isActive }: SidebarSubmenuProps) => {
   const { theme } = useTheme();
   const isDark = theme === "dark";
-  const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
+  const [openSubmenu, setOpenSubmenu] = React.useState<string | null>(null);
 
   const toggleSubmenu = (label: string) => {
     setOpenSubmenu(prev => prev === label ? null : label);
@@ -50,11 +50,11 @@ const SidebarSubmenu = ({ item, isCollapsed, handlerMap, isActive }: SidebarSubm
             isOpen ? "transform scale-y-100" : "transform scale-y-0"
           )}
         />
-        {/* Grupo que move ícone + label */}
+        {/* Icon+Label move together ONLY if open */}
         <div
           className={cn(
             "flex items-center gap-4 flex-1 transition-transform duration-300",
-            isOpen ? "translate-x-2" : "translate-x-0 group-hover:translate-x-2"
+            isOpen ? "translate-x-2" : ""
           )}
         >
           {React.cloneElement(item.icon, {

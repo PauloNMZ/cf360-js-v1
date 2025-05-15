@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -18,7 +17,6 @@ interface SidebarNavItemProps {
   isActive: (path?: string) => boolean;
 }
 
-// Agrupa ícone e texto para animar juntos!
 const SidebarNavItem = ({ item, isCollapsed, handlerMap, isActive }: SidebarNavItemProps) => {
   const { theme } = useTheme();
   const isDark = theme === "dark";
@@ -41,13 +39,11 @@ const SidebarNavItem = ({ item, isCollapsed, handlerMap, isActive }: SidebarNavI
             isActive(item.path) ? "transform scale-y-100" : "transform scale-y-0"
           )}
         />
-        {/* Grupo com icon + label desloca junto */}
+        {/* Icon+Label move together ONLY if active */}
         <div
           className={cn(
             "flex items-center gap-4 transition-transform duration-300",
-            isActive(item.path)
-              ? "translate-x-2"
-              : "translate-x-0 group-hover:translate-x-2"
+            isActive(item.path) ? "translate-x-2" : ""
           )}
         >
           {React.cloneElement(item.icon, {
@@ -70,7 +66,7 @@ const SidebarNavItem = ({ item, isCollapsed, handlerMap, isActive }: SidebarNavI
     );
   }
 
-  // Botão handler: anima também o grupo icon + label
+  // Botão handler: NÃO move no hover/active
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -78,12 +74,7 @@ const SidebarNavItem = ({ item, isCollapsed, handlerMap, isActive }: SidebarNavI
           onClick={handlerMap[item.handler!] ? handlerMap[item.handler!] : undefined}
           className="group relative flex w-full items-center gap-4 rounded-lg px-4 py-3 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800/50 transition-all duration-300"
         >
-          <div
-            className={cn(
-              "flex items-center gap-4 transition-transform duration-300",
-              "group-hover:translate-x-2"
-            )}
-          >
+          <div className="flex items-center gap-4 transition-transform duration-300">
             {React.cloneElement(item.icon, {
               className: "h-7 w-7 text-gray-500 dark:text-gray-400",
               strokeWidth: 1.5,
