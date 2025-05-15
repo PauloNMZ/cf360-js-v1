@@ -18,10 +18,11 @@ interface SidebarNavItemProps {
   isActive: (path?: string) => boolean;
 }
 
+// Agrupa ícone e texto para animar juntos!
 const SidebarNavItem = ({ item, isCollapsed, handlerMap, isActive }: SidebarNavItemProps) => {
   const { theme } = useTheme();
   const isDark = theme === "dark";
-  
+
   if (item.path) {
     return (
       <Link
@@ -40,14 +41,13 @@ const SidebarNavItem = ({ item, isCollapsed, handlerMap, isActive }: SidebarNavI
             isActive(item.path) ? "transform scale-y-100" : "transform scale-y-0"
           )}
         />
-        
-        {/* Icon with transition */}
+        {/* Grupo com icon + label desloca junto */}
         <div
           className={cn(
-            "transition-transform duration-300",
-            isActive(item.path) 
-              ? "transform translate-x-1" 
-              : "transform translate-x-0 group-hover:translate-x-1"
+            "flex items-center gap-4 transition-transform duration-300",
+            isActive(item.path)
+              ? "translate-x-2"
+              : "translate-x-0 group-hover:translate-x-2"
           )}
         >
           {React.cloneElement(item.icon, {
@@ -59,25 +59,18 @@ const SidebarNavItem = ({ item, isCollapsed, handlerMap, isActive }: SidebarNavI
             ),
             strokeWidth: 1.5,
           })}
+          {/* Label */}
+          {!isCollapsed && (
+            <span className="transition-colors duration-300">
+              {item.label}
+            </span>
+          )}
         </div>
-        
-        {/* Label with transition */}
-        {!isCollapsed && (
-          <span
-            className={cn(
-              "transition-all duration-300",
-              isActive(item.path) 
-                ? "transform translate-x-1" 
-                : "transform translate-x-0"
-            )}
-          >
-            {item.label}
-          </span>
-        )}
       </Link>
     );
   }
-  
+
+  // Botão handler: anima também o grupo icon + label
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -85,16 +78,18 @@ const SidebarNavItem = ({ item, isCollapsed, handlerMap, isActive }: SidebarNavI
           onClick={handlerMap[item.handler!] ? handlerMap[item.handler!] : undefined}
           className="group relative flex w-full items-center gap-4 rounded-lg px-4 py-3 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800/50 transition-all duration-300"
         >
-          {/* Icon with transition */}
-          <div className="transition-transform duration-300 group-hover:translate-x-1">
+          <div
+            className={cn(
+              "flex items-center gap-4 transition-transform duration-300",
+              "group-hover:translate-x-2"
+            )}
+          >
             {React.cloneElement(item.icon, {
               className: "h-7 w-7 text-gray-500 dark:text-gray-400",
               strokeWidth: 1.5,
             })}
+            {!isCollapsed && <span>{item.label}</span>}
           </div>
-          
-          {/* Label */}
-          {!isCollapsed && <span>{item.label}</span>}
         </button>
       </TooltipTrigger>
       {isCollapsed && (
