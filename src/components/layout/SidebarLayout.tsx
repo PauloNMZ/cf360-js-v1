@@ -49,7 +49,7 @@ const SidebarLayout = () => {
             <header className="bg-white dark:bg-slate-900 border-b border-border/20 text-foreground py-3 px-6 shadow-sm">
               <div className="w-full mx-auto flex justify-between items-center">
                 <div className="ml-4">
-                  <h1 className="text-2xl font-bold mx-[10px]">Connect Pag</h1>
+                  <h1 className="text-2xl font-bold mx-[40px]">Connect Pag</h1>
                 </div>
                 <div className="flex items-center gap-4">
                   {user && <>
