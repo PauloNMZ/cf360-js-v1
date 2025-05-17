@@ -23,12 +23,11 @@ export const useEmpresaActions = ({
     try {
       const saved = await createEmpresa(formData);
       if (saved) {
-        setCurrentEmpresaId(saved.id);
+        setCurrentEmpresaId(saved.id ?? null);
         setFormData(saved);
         setFormMode("view");
         toast({ title: "Empresa criada!", description: "Empresa cadastrada com sucesso." });
-        // opcional: recarregar lista
-        // fetchEmpresas e setEmpresas se necessário
+        // recarregar lista se necessário
       }
     } catch (error: any) {
       toast({
