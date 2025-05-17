@@ -1,15 +1,16 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { EmpresaData } from "@/types/empresa";
 
-// Helper to ensure value is ISO string (for Supabase)
+// Helper para garantir sempre string ISO para datas
 const toIsoString = (value: string | Date | undefined): string | undefined => {
   if (!value) return undefined;
   if (typeof value === "string") return value;
   return value.toISOString();
 };
 
-// Util: camelCase => snake_case para Supabase
-const toDb = (empresa: Partial<EmpresaData>, userId?: string) => ({
+// camelCase => snake_case para Supabase
+const toDb = (empresa: Partial<EmpresaData>, userId: string) => ({
   cnpj: empresa.cnpj,
   razao_social: empresa.razaoSocial,
   endereco: empresa.endereco,
@@ -27,7 +28,7 @@ const toDb = (empresa: Partial<EmpresaData>, userId?: string) => ({
   convenio_pag: empresa.convenioPag,
   data_criacao: toIsoString(empresa.dataCriacao),
   data_atualizacao: toIsoString(empresa.dataAtualizacao),
-  user_id: userId, // importante garantir que user_id é incluído
+  user_id: userId,
 });
 
 const fromDb = (data: any): EmpresaData => ({
@@ -60,10 +61,20 @@ export const createEmpresa = async (empresaData: Omit<EmpresaData, "id">) => {
   const userId = await getUserId();
   if (!userId) throw new Error("Usuário não autenticado!");
 
+  // Loga dados para debug (recebido do form)
+  console.log("[empresaService] Dados recebidos no cadastro:", empresaData);
+
+  // Monta payload para o Supabase
   const payload = toDb(empresaData, userId);
 
-  // Log para debug do payload enviado
-  console.log("Payload enviado para insert convenentes:", payload);
+  // Loga o payload no formato que irá para Supabase
+  console.log("[empresaService] Payload enviado para insert convenentes:", payload);
+
+  // Validação: campo obrigatório
+  if (!payload.cnpj || !payload.razao_social || !payload.user_id) {
+    console.error("[empresaService] Campos obrigatórios ausentes:", payload);
+    throw new Error("Campos obrigatórios não informados!");
+  }
 
   const { data, error } = await supabase
     .from("convenentes")
@@ -72,9 +83,14 @@ export const createEmpresa = async (empresaData: Omit<EmpresaData, "id">) => {
     .maybeSingle();
 
   if (error) {
-    console.error("Erro Supabase ao inserir empresa:", error);
+    // Log detalhado do erro do Supabase
+    console.error("[empresaService] Erro Supabase ao inserir empresa:", error);
+    if (error.details) console.error("Detalhes:", error.details);
+    if (error.hint) console.error("Hint:", error.hint);
     throw error;
   }
+  // Loga sucesso
+  console.log("[empresaService] Cadastro realizado com sucesso!", data);
   return data ? fromDb(data) : null;
 };
 
@@ -84,19 +100,25 @@ export const fetchEmpresas = async () => {
     .select("*")
     .order("razao_social", { ascending: true });
 
-  if (error) throw error;
+  if (error) {
+    console.error("[empresaService] Erro ao buscar empresas:", error);
+    throw error;
+  }
   return (data ?? []).map(fromDb);
 };
 
 export const updateEmpresa = async (id: string, empresaData: Partial<EmpresaData>) => {
   const { data, error } = await supabase
     .from("convenentes")
-    .update(toDb(empresaData))
+    .update(toDb(empresaData as EmpresaData, "")) // userId vazio por padrão no update
     .eq("id", id)
     .select()
     .maybeSingle();
 
-  if (error) throw error;
+  if (error) {
+    console.error("[empresaService] Erro ao atualizar empresa:", error);
+    throw error;
+  }
   return data ? fromDb(data) : null;
 };
 
@@ -106,5 +128,9 @@ export const deleteEmpresa = async (id: string) => {
     .delete()
     .eq("id", id);
 
-  if (error) throw error;
+  if (error) {
+    console.error("[empresaService] Erro ao deletar empresa:", error);
+    throw error;
+  }
 };
+
