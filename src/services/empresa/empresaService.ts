@@ -2,6 +2,13 @@
 import { supabase } from "@/integrations/supabase/client";
 import { EmpresaData } from "@/types/empresa";
 
+// Helper to ensure value is ISO string (for Supabase)
+const toIsoString = (value: string | Date | undefined): string | undefined => {
+  if (!value) return undefined;
+  if (typeof value === "string") return value;
+  return value.toISOString();
+};
+
 // Util: camelCase => snake_case para Supabase
 const toDb = (empresa: Partial<EmpresaData>) => ({
   cnpj: empresa.cnpj,
@@ -19,8 +26,8 @@ const toDb = (empresa: Partial<EmpresaData>) => ({
   conta: empresa.conta,
   chave_pix: empresa.chavePix,
   convenio_pag: empresa.convenioPag,
-  data_criacao: empresa.dataCriacao,
-  data_atualizacao: empresa.dataAtualizacao,
+  data_criacao: toIsoString(empresa.dataCriacao),
+  data_atualizacao: toIsoString(empresa.dataAtualizacao),
 });
 
 const fromDb = (data: any): EmpresaData => ({
