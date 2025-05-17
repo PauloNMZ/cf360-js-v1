@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { EmpresaData } from "@/types/empresa";
 
@@ -10,7 +9,7 @@ const toIsoString = (value: string | Date | undefined): string | undefined => {
 };
 
 // Util: camelCase => snake_case para Supabase
-const toDb = (empresa: Partial<EmpresaData>) => ({
+const toDb = (empresa: Partial<EmpresaData>, userId?: string) => ({
   cnpj: empresa.cnpj,
   razao_social: empresa.razaoSocial,
   endereco: empresa.endereco,
@@ -28,6 +27,7 @@ const toDb = (empresa: Partial<EmpresaData>) => ({
   convenio_pag: empresa.convenioPag,
   data_criacao: toIsoString(empresa.dataCriacao),
   data_atualizacao: toIsoString(empresa.dataAtualizacao),
+  user_id: userId, // importante garantir que user_id é incluído
 });
 
 const fromDb = (data: any): EmpresaData => ({
@@ -60,14 +60,21 @@ export const createEmpresa = async (empresaData: Omit<EmpresaData, "id">) => {
   const userId = await getUserId();
   if (!userId) throw new Error("Usuário não autenticado!");
 
-  const insertObj = { ...toDb(empresaData), user_id: userId };
+  const payload = toDb(empresaData, userId);
+
+  // Log para debug do payload enviado
+  console.log("Payload enviado para insert convenentes:", payload);
+
   const { data, error } = await supabase
     .from("convenentes")
-    .insert([insertObj])
+    .insert([payload])
     .select()
     .maybeSingle();
 
-  if (error) throw error;
+  if (error) {
+    console.error("Erro Supabase ao inserir empresa:", error);
+    throw error;
+  }
   return data ? fromDb(data) : null;
 };
 
