@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -18,31 +17,30 @@ interface SidebarSubmenuProps {
   };
   isCollapsed: boolean;
   handlerMap: Record<string, () => void>;
-  isActive: (path?: string) => boolean;
+  isActive: (path?: string, label?: string) => boolean;
+  activeMenuLabel?: string | null;
+  activeSubMenuPath?: string | null;
+  openSubmenuLabel?: string | null;
+  onSubmenuToggle?: (label: string) => void;
 }
 
-const SidebarSubmenu = ({ item, isCollapsed, handlerMap, isActive }: SidebarSubmenuProps) => {
+const SidebarSubmenu = ({ item, isCollapsed, handlerMap, isActive, activeMenuLabel, activeSubMenuPath, openSubmenuLabel, onSubmenuToggle }: SidebarSubmenuProps) => {
   const { theme } = useTheme();
   const isDark = theme === "dark";
-  const [openSubmenu, setOpenSubmenu] = React.useState<string | null>(null);
 
-  const toggleSubmenu = (label: string) => {
-    setOpenSubmenu(prev => prev === label ? null : label);
-  };
+  // Usar controle global de submenu aberto
+  const isOpen = openSubmenuLabel === item.label;
 
   // Verifica se algum dos subitens está ativo
-  const isParentActive = item.submenu?.some((subItem) => isActive(subItem.path)) ?? false;
-
-  // Substitui lógica anterior para abrir submenu: se algum item ativo, mantem aberto
-  const isOpen = openSubmenu === item.label || isParentActive;
+  const isParentActive = item.submenu?.some((subItem) => isActive(subItem.path, subItem.label)) ?? false;
 
   return (
     <div className="relative">
       <button
-        onClick={() => toggleSubmenu(item.label)}
+        onClick={() => onSubmenuToggle && onSubmenuToggle(item.label)}
         className={cn(
           "group relative flex w-full items-center gap-4 rounded-lg px-4 py-3 text-base font-medium transition-all duration-300",
-          isOpen || isParentActive
+          isOpen
             ? "bg-primary-blue/10 dark:bg-primary-blue/20 text-primary-blue dark:text-primary-magenta"
             : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800/50"
         )}
@@ -51,20 +49,20 @@ const SidebarSubmenu = ({ item, isCollapsed, handlerMap, isActive }: SidebarSubm
         <div
           className={cn(
             "absolute left-0 top-0 h-full w-1 rounded-l-lg bg-primary-blue dark:bg-primary-magenta transition-transform duration-300",
-            (isOpen || isParentActive) ? "transform scale-y-100" : "transform scale-y-0"
+            isOpen ? "transform scale-y-100" : "transform scale-y-0"
           )}
         />
         {/* Icon+Label move together ONLY if open */}
         <div
           className={cn(
             "flex items-center gap-4 flex-1 transition-transform duration-300",
-            (isOpen || isParentActive) ? "translate-x-2" : ""
+            isOpen ? "translate-x-2" : ""
           )}
         >
           {React.cloneElement(item.icon, {
             className: cn(
               "h-7 w-7 flex-shrink-0 transition-colors duration-300",
-              (isOpen || isParentActive)
+              isOpen
                 ? isDark ? "text-primary-magenta" : "text-primary-blue"
                 : "text-gray-500 dark:text-gray-400"
             ),
@@ -85,7 +83,7 @@ const SidebarSubmenu = ({ item, isCollapsed, handlerMap, isActive }: SidebarSubm
           <ChevronDown
             className={cn(
               "h-5 w-5 transition-transform duration-300",
-              (isOpen || isParentActive) ? "rotate-180" : ""
+              isOpen ? "rotate-180" : ""
             )}
           />
         )}

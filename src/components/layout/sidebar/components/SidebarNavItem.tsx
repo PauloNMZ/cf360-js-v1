@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -15,10 +14,12 @@ interface SidebarNavItemProps {
   };
   isCollapsed: boolean;
   handlerMap: Record<string, () => void>;
-  isActive: (path?: string) => boolean;
+  isActive: (path?: string, label?: string) => boolean;
+  activeMenuLabel?: string | null;
+  onAnyItemClick?: () => void;
 }
 
-const SidebarNavItem = ({ item, isCollapsed, handlerMap, isActive }: SidebarNavItemProps) => {
+const SidebarNavItem = ({ item, isCollapsed, handlerMap, isActive, activeMenuLabel, onAnyItemClick }: SidebarNavItemProps) => {
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
@@ -26,9 +27,10 @@ const SidebarNavItem = ({ item, isCollapsed, handlerMap, isActive }: SidebarNavI
     return (
       <Link
         to={item.path}
+        onClick={onAnyItemClick}
         className={cn(
           "group relative flex items-center gap-4 rounded-lg px-4 py-3 text-base font-medium transition-all duration-300",
-          isActive(item.path)
+          isActive(item.path, item.label)
             ? "bg-primary-blue/10 dark:bg-primary-blue/20 text-primary-blue dark:text-primary-magenta"
             : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800/50"
         )}
@@ -37,20 +39,20 @@ const SidebarNavItem = ({ item, isCollapsed, handlerMap, isActive }: SidebarNavI
         <div
           className={cn(
             "absolute left-0 top-0 h-full w-1 rounded-l-lg bg-primary-blue dark:bg-primary-magenta transition-transform duration-300",
-            isActive(item.path) ? "transform scale-y-100" : "transform scale-y-0"
+            isActive(item.path, item.label) ? "transform scale-y-100" : "transform scale-y-0"
           )}
         />
         {/* Icon+Label move together ONLY if active */}
         <div
           className={cn(
             "flex items-center gap-4 transition-transform duration-300",
-            isActive(item.path) ? "translate-x-2" : ""
+            isActive(item.path, item.label) ? "translate-x-2" : ""
           )}
         >
           {React.cloneElement(item.icon, {
             className: cn(
               "h-7 w-7 flex-shrink-0 transition-colors duration-300",
-              isActive(item.path)
+              isActive(item.path, item.label)
                 ? isDark ? "text-primary-magenta" : "text-primary-blue"
                 : "text-gray-500 dark:text-gray-400"
             ),

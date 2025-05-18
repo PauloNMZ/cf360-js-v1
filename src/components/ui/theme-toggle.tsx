@@ -1,4 +1,3 @@
-
 import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/hooks/use-theme";
@@ -45,25 +44,23 @@ export function ThemeToggle() {
     );
   }
   
-  // Full featured mode with tooltip if necessary
+  // Full featured mode with tooltip if necessary - Modified for Sidebar Footer
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
           <button
             onClick={toggleTheme}
-            className="group relative flex w-full items-center gap-4 rounded-lg px-4 py-3 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800/50 transition-all duration-300"
+            className="group flex w-full items-center gap-4 rounded-lg px-4 py-3 text-base font-medium text-foreground hover:bg-gray-100 dark:hover:bg-slate-800/70 justify-start"
           >
             <div className="transition-transform duration-300 group-hover:translate-x-2">
               {isDark ? (
-                <Sun className="h-7 w-7 text-gray-500 dark:text-gray-400" strokeWidth={1.5} />
+                <Sun className="h-6 w-6 text-yellow-400" strokeWidth={1.5} />
               ) : (
-                <Moon className="h-7 w-7 text-gray-500 dark:text-gray-400" strokeWidth={1.5} />
+                <Moon className="h-6 w-6 text-white" strokeWidth={1.5} />
               )}
             </div>
-            {!isCollapsed && (
-              <span>{isDark ? 'Modo Claro' : 'Modo Escuro'}</span>
-            )}
+            {!isCollapsed && <span className="ml-2 text-white">{isDark ? 'Modo Claro' : 'Modo Escuro'}</span>}
           </button>
         </TooltipTrigger>
         {isCollapsed && (

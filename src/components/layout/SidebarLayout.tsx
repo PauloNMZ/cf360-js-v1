@@ -4,7 +4,9 @@ import { SidebarProvider, Sidebar, useSidebar } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/use-auth";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, LogOut } from "lucide-react";
+import { useCompanySettings } from "@/hooks/convenente/useCompanySettings";
+import { AppLogo } from "@/components/ui/AppLogo";
 
 // Import our components
 import SidebarHeader from "./sidebar/SidebarHeader";
@@ -36,43 +38,66 @@ const SidebarLayout = () => {
   const [cnabToApiModalOpen, setCnabToApiModalOpen] = useState(false);
   const { handlerMap, handleLogoutClick } = useNavigationHandlers(setCnabToApiModalOpen);
   const { user } = useAuth();
+  const { companySettings } = useCompanySettings();
   
   return (
     <TooltipProvider>
       <SidebarProvider defaultOpen={true}>
-        <div className="flex min-h-screen w-full">
-          <Sidebar 
-            variant="sidebar" 
-            className="sticky top-0 h-screen z-40 border-r border-border/20 bg-white/95 dark:bg-slate-950"
-          >
-            <SidebarHeader />
-            <SidebarNav handlerMap={handlerMap} />
-            <SidebarFooter onLogout={handleLogoutClick} />
-            <CollapseButton />
-          </Sidebar>
-          
-          <div className="flex-1 overflow-auto flex flex-col">
-            <header className="bg-white dark:bg-slate-900 border-b border-border/20 text-foreground py-3 px-6 shadow-sm">
-              <div className="w-full mx-auto flex justify-between items-center">
-                <div className="ml-4">
-                  <h1 className="text-2xl font-bold text-center mx-[85px]">Connect Pag</h1>
-                </div>
-                <div className="flex items-center gap-4">
-                  {user && (
-                    <>
-                      <p className="text-sm hidden sm:block">{user.email}</p>
-                      <Avatar className="h-8 w-8 border-2 border-white">
-                        <AvatarFallback>{user?.email?.charAt(0).toUpperCase()}</AvatarFallback>
-                      </Avatar>
-                    </>
-                  )}
-                </div>
+        <div className="min-h-screen w-full bg-gray-50 dark:bg-slate-900/95">
+          {/* HEADER GLOBAL */}
+          <header className="bg-gradient-to-r from-[#2563eb] via-[#3b82f6] to-[#60a5fa] text-white py-5 px-8 shadow-lg">
+            <div className="flex items-center justify-between h-full px-4">
+              {/* Logo e Nome da Empresa */}
+              <div className="flex items-center gap-2">
+                <AppLogo 
+                  size={30} 
+                  customLogoUrl={companySettings?.logoUrl} 
+                  className="flex-shrink-0" // Garante que o logo não encolha
+                />
+                <span className="text-2xl font-semibold tracking-tight">
+                  ConnectPag
+                </span>
               </div>
-            </header>
-            
-            <div className="flex-1 overflow-auto bg-gray-50 dark:bg-slate-900/95">
-              <div className="container mx-auto p-4">
-                <Outlet />
+              {/* Email, Avatar e Sair */}
+              <div className="flex items-center gap-4">
+                {user && (
+                  <>
+                    <span className="text-base font-medium hidden sm:block">{user.email}</span>
+                    <Avatar className="h-10 w-10 border-2 border-white shadow">
+                      <AvatarFallback>{user?.email?.charAt(0).toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                    <button
+                      onClick={handleLogoutClick}
+                      className="flex items-center gap-2 px-4 py-2 rounded-md text-white font-semibold transition hover:bg-white/10"
+                      title="Sair"
+                    >
+                      <LogOut className="h-5 w-5" strokeWidth={2} />
+                      <span className="hidden md:inline">Sair</span>
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          </header>
+          <div className="flex">
+            <Sidebar 
+              variant="sidebar" 
+              className="sticky top-0 h-screen z-40 border-r border-border/20 bg-white/95 dark:bg-slate-950"
+            >
+              {/* SidebarHeader (if needed, currently empty) */}
+              {/* Content area that flexes and scrolls */}
+              <div className="flex flex-col flex-1 overflow-y-auto">
+                <SidebarNav handlerMap={handlerMap} />
+              </div>
+              {/* SidebarFooter (fixed at the bottom) */}
+              <SidebarFooter onLogout={handleLogoutClick} />
+              <CollapseButton />
+            </Sidebar>
+            <div className="flex-1 overflow-auto flex flex-col">
+              <div className="flex-1 overflow-auto">
+                <div className="container mx-auto p-4">
+                  <Outlet />
+                </div>
               </div>
             </div>
           </div>

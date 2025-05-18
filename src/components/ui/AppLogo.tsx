@@ -1,16 +1,17 @@
-
 import React from 'react';
 import { WalletCards } from 'lucide-react';
+import { cn } from '../../lib/utils';
 
 interface AppLogoProps {
   size?: number;
   customLogoUrl?: string;
+  className?: string;
 }
 
-export const AppLogo: React.FC<AppLogoProps> = ({ size = 64, customLogoUrl }) => {
+export const AppLogo: React.FC<AppLogoProps> = ({ size = 64, customLogoUrl, className }) => {
   return (
     <div className="flex items-center">
-      <div className="relative">
+      <div className={cn("relative", className)}>
         {customLogoUrl ? (
           <img 
             src={customLogoUrl} 

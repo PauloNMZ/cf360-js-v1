@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useLocation } from "react-router-dom";
 import { SidebarContent, SidebarGroup, SidebarGroupContent, useSidebar } from "@/components/ui/sidebar";
@@ -8,17 +7,52 @@ import SidebarSubmenu from "./components/SidebarSubmenu";
 
 interface SidebarNavProps {
   handlerMap: Record<string, () => void>;
+  className?: string;
 }
 
-const SidebarNav = ({ handlerMap }: SidebarNavProps) => {
+const SidebarNav = ({ handlerMap, className }: SidebarNavProps) => {
   const location = useLocation();
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
 
-  // Atualiza função para considerar também subrotas
-  const isActive = (path?: string) => {
-    if (!path) return false;
-    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+  // Estado global para submenu aberto
+  const [openSubmenuLabel, setOpenSubmenuLabel] = React.useState<string | null>(null);
+
+  // Descobre qual item ou subitem está ativo
+  let activeMenuLabel: string | null = null;
+  let activeSubMenuPath: string | null = null;
+
+  for (const item of navigationItems) {
+    if (item.submenu) {
+      for (const subItem of item.submenu) {
+        if (subItem.path && (location.pathname === subItem.path || location.pathname.startsWith(`${subItem.path}/`))) {
+          activeMenuLabel = item.label;
+          activeSubMenuPath = subItem.path;
+        }
+      }
+      // Se o submenu está aberto e nenhum subitem está ativo, considerar o menu pai como ativo
+      if (openSubmenuLabel === item.label && !activeSubMenuPath) {
+        activeMenuLabel = item.label;
+      }
+    } else if (item.path && (location.pathname === item.path || location.pathname.startsWith(`${item.path}/`))) {
+      activeMenuLabel = item.label;
+    }
+  }
+
+  // Função para saber se o item está ativo
+  const isActive = (path?: string, label?: string) => {
+    // Se um submenu está aberto e nenhum subitem está ativo, só o menu pai deve ficar ativo
+    if (openSubmenuLabel && !activeSubMenuPath) {
+      return label === openSubmenuLabel;
+    }
+    if (path) return location.pathname === path || location.pathname.startsWith(`${path}/`);
+    if (label) return activeMenuLabel === label;
+    return false;
+  };
+
+  // Função para abrir submenu
+  const handleSubmenuToggle = (label: string) => {
+    setOpenSubmenuLabel(prev => prev === label ? null : label);
   };
 
   return (
@@ -34,6 +68,10 @@ const SidebarNav = ({ handlerMap }: SidebarNavProps) => {
                   isCollapsed={isCollapsed}
                   handlerMap={handlerMap}
                   isActive={isActive}
+                  activeMenuLabel={activeMenuLabel}
+                  activeSubMenuPath={activeSubMenuPath}
+                  openSubmenuLabel={openSubmenuLabel}
+                  onSubmenuToggle={handleSubmenuToggle}
                 />
               ) : (
                 <SidebarNavItem
@@ -42,6 +80,8 @@ const SidebarNav = ({ handlerMap }: SidebarNavProps) => {
                   isCollapsed={isCollapsed}
                   handlerMap={handlerMap}
                   isActive={isActive}
+                  activeMenuLabel={activeMenuLabel}
+                  onAnyItemClick={() => setOpenSubmenuLabel(null)}
                 />
               )
             ))}

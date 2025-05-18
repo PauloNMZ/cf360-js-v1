@@ -1,11 +1,7 @@
-
 import React from "react";
 import { LogOut } from "lucide-react";
 import { SidebarFooter as Footer } from "@/components/ui/sidebar";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useSidebar } from "@/components/ui/sidebar";
-import { cn } from "@/lib/utils";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useTheme } from "@/hooks/use-theme";
 import { Sun, Moon } from "lucide-react";
 
