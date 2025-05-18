@@ -15,9 +15,10 @@ const SidebarNav = ({ handlerMap }: SidebarNavProps) => {
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
 
+  // Atualiza função para considerar também subrotas
   const isActive = (path?: string) => {
     if (!path) return false;
-    return location.pathname === path;
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
   };
 
   return (
