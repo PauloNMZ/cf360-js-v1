@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { ChevronLeft, ChevronRight, LogOut } from "lucide-react";
 import { useCompanySettings } from "@/hooks/convenente/useCompanySettings";
 import { AppLogo } from "@/components/ui/AppLogo";
+import { useIndexPageContext } from "@/hooks/useIndexPageContext";
 
 // Import our components
 import SidebarHeader from "./sidebar/SidebarHeader";
@@ -38,7 +39,8 @@ const SidebarLayout = () => {
   const [cnabToApiModalOpen, setCnabToApiModalOpen] = useState(false);
   const { handlerMap, handleLogoutClick } = useNavigationHandlers(setCnabToApiModalOpen);
   const { user } = useAuth();
-  const { companySettings } = useCompanySettings();
+  const { adminPanelOpen } = useIndexPageContext();
+  const { companySettings } = useCompanySettings(adminPanelOpen);
   
   return (
     <TooltipProvider>
@@ -48,9 +50,9 @@ const SidebarLayout = () => {
           <header className="bg-gradient-to-r from-[#2563eb] via-[#3b82f6] to-[#60a5fa] text-white py-5 px-8 shadow-lg">
             <div className="flex items-center justify-between h-full px-4">
               {/* Logo e Nome da Empresa */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 ml-[-8px]">
                 <AppLogo 
-                  size={30} 
+                  size={40}
                   customLogoUrl={companySettings?.logoUrl} 
                   className="flex-shrink-0" // Garante que o logo não encolha
                 />

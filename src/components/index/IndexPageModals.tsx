@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from "react";
 import ConvenenteModal from "@/components/convenente/ConvenenteModal";
 import DeleteConvenenteDialog from "@/components/convenente/DeleteConvenenteDialog";
@@ -45,6 +44,9 @@ export const IndexPageModals = () => {
     confirmDelete,
     handleSaveClick,
     handleFormDataChange,
+
+    // Company settings and actions
+    reloadSettings
   } = useIndexPageContext();
 
   // Track deletion state
@@ -163,6 +165,10 @@ export const IndexPageModals = () => {
             return;
           }
           setAdminPanelOpen(open);
+          // Recarrega as configurações da empresa quando o modal for fechado
+          if (!open && reloadSettings) {
+            reloadSettings();
+          }
         }}
       />
 

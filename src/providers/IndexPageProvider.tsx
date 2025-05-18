@@ -1,15 +1,16 @@
-
 import React, { createContext, ReactNode, useState } from "react";
 import { IndexPageContext } from "@/contexts/IndexPageContext";
 import { useIndexPage } from "@/hooks/useIndexPage";
 import { useIndexPageActions } from "@/hooks/useIndexPageActions";
 import { useIndexPageEventHandlers } from "@/hooks/useIndexPageEventHandlers";
 import { useIndexPageStateManager } from "./IndexPageStateManager";
+import { useCompanySettings } from "@/hooks/convenente/useCompanySettings";
 
 // Create provider
 export const IndexPageProvider = ({ children }: { children: ReactNode }) => {
   // Get all the states and functions from our hooks
   const indexPage = useIndexPage();
+  const { companySettings, reloadSettings } = useCompanySettings();
   
   // Add additional state for CNAB to API modal
   const [cnabToApiModalOpen, setCnabToApiModalOpen] = useState(false);
@@ -54,7 +55,9 @@ export const IndexPageProvider = ({ children }: { children: ReactNode }) => {
     cnabToApiModalOpen,
     setCnabToApiModalOpen,
     isDeleting: indexPageActions.isDeleting,
-    resetDeletionState: indexPageActions.resetDeletionState // Ensure this is passed down
+    resetDeletionState: indexPageActions.resetDeletionState, // Ensure this is passed down
+    companySettings, // Certifique-se de que companySettings também é passado
+    reloadSettings // Adicionando reloadSettings ao contexto
   };
 
   return (

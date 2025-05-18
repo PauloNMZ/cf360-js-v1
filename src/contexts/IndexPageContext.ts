@@ -1,4 +1,3 @@
-
 import { createContext } from "react";
 import { ConvenenteData } from "@/types/convenente";
 import { CompanySettings } from "@/types/companySettings";
@@ -41,6 +40,7 @@ export interface IndexPageContextType {
   
   // Company settings
   companySettings: CompanySettings | null;
+  reloadSettings?: (adminPanelOpen: boolean) => void;
   
   // Event handlers
   handleConvenenteClick: () => void;
