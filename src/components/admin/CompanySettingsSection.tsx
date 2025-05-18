@@ -1,4 +1,3 @@
-
 import React, { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,9 +30,11 @@ const CompanySettingsSection: React.FC<CompanySettingsProps> = ({
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm">
+    <div className="bg-background p-6 rounded-lg shadow-sm">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-bold text-blue-800">Configurações da Empresa</h3>
+        <h3 className="text-xl font-bold text-foreground">
+          Configurações da Empresa
+        </h3>
         <Button onClick={onBack} variant="outline" className="text-sm">
           Voltar
         </Button>
@@ -42,7 +43,7 @@ const CompanySettingsSection: React.FC<CompanySettingsProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Nome da Empresa
             </label>
             <Input
@@ -54,7 +55,7 @@ const CompanySettingsSection: React.FC<CompanySettingsProps> = ({
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Logo da Empresa
             </label>
             <div className="flex items-center gap-2">
@@ -73,7 +74,7 @@ const CompanySettingsSection: React.FC<CompanySettingsProps> = ({
                 <Upload size={16} /> Carregar
               </Button>
             </div>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               Recomendamos uma imagem quadrada com pelo menos 128x128 pixels.
             </p>
           </div>
@@ -87,8 +88,8 @@ const CompanySettingsSection: React.FC<CompanySettingsProps> = ({
         </div>
 
         <div className="flex flex-col items-center">
-          <div className="text-sm font-medium text-gray-700 mb-4">Pré-visualização do Logo</div>
-          <div className="border border-gray-200 rounded-lg p-6 bg-slate-50 flex flex-col items-center">
+          <div className="text-sm font-medium text-foreground mb-4">Pré-visualização do Logo</div>
+          <div className="border border-border rounded-lg p-6 bg-card flex flex-col items-center">
             <div className="mb-4">
               {logoPreview ? (
                 <div className="relative">
@@ -110,14 +111,14 @@ const CompanySettingsSection: React.FC<CompanySettingsProps> = ({
                 </div>
               )}
             </div>
-            <div className="text-xl font-bold text-center text-blue-800">
+            <div className="text-xl font-bold text-foreground">
               {companySettings.companyName}
             </div>
           </div>
           {logoPreview && (
             <Button
               variant="outline"
-              className="text-red-600 mt-4"
+              className="text-destructive mt-4"
               onClick={() => {
                 onCompanySettingChange({
                   target: { name: "logoUrl", value: "" },

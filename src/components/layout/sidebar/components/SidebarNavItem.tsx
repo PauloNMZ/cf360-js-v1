@@ -31,14 +31,14 @@ const SidebarNavItem = ({ item, isCollapsed, handlerMap, isActive, activeMenuLab
         className={cn(
           "group relative flex items-center gap-4 rounded-lg px-4 py-3 text-base font-medium transition-all duration-300",
           isActive(item.path, item.label)
-            ? "bg-primary-blue/10 dark:bg-primary-blue/20 text-primary-blue dark:text-primary-magenta"
+            ? "bg-primary-blue/10 dark:bg-[#0E1F46] text-primary-blue dark:text-[#FCFC30]"
             : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800/50"
         )}
       >
         {/* Active indicator bar */}
         <div
           className={cn(
-            "absolute left-0 top-0 h-full w-1 rounded-l-lg bg-primary-blue dark:bg-primary-magenta transition-transform duration-300",
+            "absolute left-0 top-0 h-full w-1 rounded-l-lg bg-primary-blue dark:bg-[#FCFC30] transition-transform duration-300",
             isActive(item.path, item.label) ? "transform scale-y-100" : "transform scale-y-0"
           )}
         />
@@ -53,7 +53,7 @@ const SidebarNavItem = ({ item, isCollapsed, handlerMap, isActive, activeMenuLab
             className: cn(
               "h-7 w-7 flex-shrink-0 transition-colors duration-300",
               isActive(item.path, item.label)
-                ? isDark ? "text-primary-magenta" : "text-primary-blue"
+                ? isDark ? "text-[#FCFC30]" : "text-primary-blue"
                 : "text-gray-500 dark:text-gray-400"
             ),
             strokeWidth: 1.5,

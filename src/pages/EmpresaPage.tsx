@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { 
   Dialog, 
@@ -72,7 +71,7 @@ const EmpresaPage = () => {
     setCurrentConvenenteId(null);
     setFormMode('create');
     setFormOpen(true);
-    setActiveTab('dados');
+    setActiveTab('dadosCadastrais');
   };
   
   const handleSelectConvenente = (convenente: ConvenenteData & { id: string }) => {
@@ -80,7 +79,7 @@ const EmpresaPage = () => {
     setFormData(convenente);
     setFormMode('view');
     setFormOpen(true);
-    setActiveTab('dados');
+    setActiveTab('dadosCadastrais');
   };
   
   const handleEditConvenente = () => {
@@ -136,56 +135,62 @@ const EmpresaPage = () => {
 
   return (
     <div className="container mx-auto py-6">
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-        <div className="bg-primary-blue/90 dark:bg-primary-blue/80 text-white p-4">
-          <h1 className="text-xl font-bold text-center">CADASTRO DE CONVENENTE</h1>
+      <div className="bg-card rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-secondary text-foreground p-4">
+          <h1 className="text-xl font-bold text-center">Cadastro da Empresa</h1>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 bg-background">
           {/* Coluna de Listagem de Convenentes */}
           <div className="md:col-span-1">
             <div className="mb-4 relative">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
                 <Input 
                   placeholder="Buscar convenentes..." 
-                  className="pl-10 border-blue-200 focus:border-blue-500"
+                  className="pl-10 border-border focus:border-primary bg-input text-foreground"
                   value={searchTerm}
                   onChange={handleSearchChange}
                 />
               </div>
             </div>
             
-            <div className="max-h-[500px] overflow-y-auto border border-gray-200 rounded-lg">
+            <div className="max-h-[500px] overflow-y-auto border border-border rounded-lg bg-background">
               {filteredConvenentes.length > 0 ? (
                 <ul className="space-y-2 p-2">
                   {filteredConvenentes.map((convenente) => (
                     <li 
                       key={convenente.id}
                       onClick={() => handleSelectConvenente(convenente)}
-                      className={`p-3 rounded-lg cursor-pointer transition-colors ${
-                        currentConvenenteId === convenente.id 
-                          ? 'bg-blue-100 border border-blue-300' 
-                          : 'hover:bg-gray-100 border border-gray-200'
+                      className={`p-3 rounded-lg cursor-pointer transition-colors border ${currentConvenenteId === convenente.id 
+                          ? 'bg-accent border-primary text-primary-foreground' 
+                          : 'hover:bg-accent/50 border-border text-foreground'
                       }`}
                     >
-                      <h3 className="font-medium text-blue-800">{convenente.razaoSocial}</h3>
-                      <p className="text-sm text-gray-500">
+                      <h3 className="font-medium">{convenente.razaoSocial}</h3>
+                      <p className="text-sm text-muted-foreground">
                         CNPJ: {formatCNPJ(convenente.cnpj)}
                       </p>
                     </li>
                   ))}
                 </ul>
               ) : (
-                <div className="flex flex-col items-center justify-center h-[200px] text-gray-500">
-                  <p>Nenhum resultado encontrado</p>
+                <div className="flex flex-col items-center justify-center h-full p-10 rounded-lg border border-dashed text-foreground bg-muted border-border">
+                  <h3 className="text-lg font-medium text-foreground mb-2">Nenhum convenente selecionado</h3>
+                  <p className="text-muted-foreground text-center mb-4">
+                    Selecione um convenente da lista ou crie um novo para visualizar os detalhes
+                  </p>
+                  <Button onClick={handleNewConvenente} className="bg-primary-blue hover:bg-primary-blue/90">
+                    <Plus size={16} className="mr-2" />
+                    Criar Novo Convenente
+                  </Button>
                 </div>
               )}
             </div>
             
             <Button 
               onClick={handleNewConvenente}
-              className="w-full mt-4 bg-blue-600 hover:bg-blue-700"
+              className="w-full mt-4"
             >
               <Plus size={16} className="mr-2" /> 
               Novo Convenente
@@ -195,9 +200,9 @@ const EmpresaPage = () => {
           {/* Coluna do Formulário ou Informações */}
           <div className="md:col-span-2">
             {currentConvenenteId ? (
-              <div className="bg-white p-4 rounded-lg border border-gray-200">
+              <div className="bg-card p-4 rounded-lg border border-border">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-bold text-primary-blue">
+                  <h2 className="text-xl font-bold text-foreground">
                     {formData.razaoSocial}
                   </h2>
                   <div className="flex gap-2">
@@ -222,7 +227,7 @@ const EmpresaPage = () => {
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4 text-foreground">
                   <div>
                     <strong>CNPJ:</strong> {formatCNPJ(formData.cnpj)}
                   </div>
@@ -246,19 +251,19 @@ const EmpresaPage = () => {
                 {/* Botão para exibir mais detalhes / formulário completo */}
                 <Button 
                   variant="outline" 
-                  className="mt-4 w-full"
+                  className="mt-4 w-full border-border text-foreground"
                   onClick={() => setFormOpen(true)}
                 >
                   Ver detalhes completos
                 </Button>
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center h-full p-10 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                <h3 className="text-lg font-medium text-gray-600 mb-2">Nenhum convenente selecionado</h3>
-                <p className="text-gray-500 text-center mb-4">
+              <div className="flex flex-col items-center justify-center h-full p-10 rounded-lg border border-dashed text-foreground bg-muted border-border">
+                <h3 className="text-lg font-medium text-foreground mb-2">Nenhum convenente selecionado</h3>
+                <p className="text-muted-foreground text-center mb-4">
                   Selecione um convenente da lista ou crie um novo para visualizar os detalhes
                 </p>
-                <Button onClick={handleNewConvenente} className="bg-blue-600 hover:bg-blue-700">
+                <Button onClick={handleNewConvenente} className="bg-primary-blue hover:bg-primary-blue/90">
                   <Plus size={16} className="mr-2" />
                   Criar Novo Convenente
                 </Button>
@@ -270,25 +275,21 @@ const EmpresaPage = () => {
       
       {/* Diálogo de Formulário Completo */}
       <Dialog open={formOpen} onOpenChange={setFormOpen}>
-        <DialogContent className="max-w-3xl">
-          <DialogHeader>
+        <DialogContent className="max-w-6xl p-0">
+          <DialogHeader className="p-6 pb-0">
             <DialogTitle className="text-center text-xl">
-              {formMode === 'create' ? 'CADASTRO DE CONVENENTE' : 'EDITAR CONVENENTE'}
+              {'Cadastro da Empresa'}
             </DialogTitle>
-            <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-              <X className="h-4 w-4" />
-              <span className="sr-only">Fechar</span>
-            </DialogClose>
           </DialogHeader>
           
-          <div className="mt-4">
+          <div className="p-6">
             <ConvenenteForm
               activeTab={activeTab}
               setActiveTab={setActiveTab}
-              formData={formData}
               formMode={formMode}
               currentConvenenteId={currentConvenenteId}
-              onFormDataChange={handleFormDataChange}
+              initialData={formData}
+              onSave={handleSaveConvenente}
             />
             
             {/* Botões de Ação */}

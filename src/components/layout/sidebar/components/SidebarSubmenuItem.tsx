@@ -25,7 +25,7 @@ const SidebarSubmenuItem = ({ subItem, isActive, handlerMap }: SidebarSubmenuIte
         className={cn(
           "group flex items-center rounded-md px-4 py-2 text-sm font-medium transition-all duration-200",
           isActive(subItem.path)
-            ? "bg-primary-blue/10 dark:bg-primary-blue/20 text-primary-blue dark:text-primary-magenta"
+            ? "bg-primary-blue/10 dark:bg-[#0E1F46] text-primary-blue dark:text-[#FCFC30]"
             : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800/50"
         )}
       >
@@ -39,7 +39,7 @@ const SidebarSubmenuItem = ({ subItem, isActive, handlerMap }: SidebarSubmenuIte
             className: cn(
               "mr-3 h-5 w-5",
               isActive(subItem.path)
-                ? isDark ? "text-primary-magenta" : "text-primary-blue"
+                ? isDark ? "text-[#FCFC30]" : "text-primary-blue"
                 : "text-gray-500 dark:text-gray-400"
             ),
             strokeWidth: 1.5,

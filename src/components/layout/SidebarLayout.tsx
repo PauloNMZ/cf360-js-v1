@@ -47,7 +47,7 @@ const SidebarLayout = () => {
       <SidebarProvider defaultOpen={true}>
         <div className="min-h-screen w-full bg-gray-50 dark:bg-slate-900/95">
           {/* HEADER GLOBAL */}
-          <header className="bg-gradient-to-r from-[#3b82f6] to-[#1e40af] text-white py-5 px-8 shadow-lg">
+          <header className="bg-gradient-to-r from-[#3b82f6] to-[#1e40af] dark:from-[#0E1F46] dark:to-[#0A1C3A] text-white py-5 px-8 shadow-lg">
             <div className="flex items-center justify-between h-full px-4">
               {/* Logo e Nome da Empresa */}
               <div className="flex items-center gap-2 ml-[-8px]">

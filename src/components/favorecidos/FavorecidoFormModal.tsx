@@ -1,4 +1,3 @@
-
 import React from "react";
 import { FavorecidoData } from "@/types/favorecido";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -34,7 +33,7 @@ const FavorecidoFormModal: React.FC<FavorecidoFormModalProps> = ({
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>
-            {formMode === 'create' ? 'Novo Favorecido' : 'Editar Favorecido'}
+            {'Cadastro da Empresa'}
           </DialogTitle>
         </DialogHeader>
 
