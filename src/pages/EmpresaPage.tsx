@@ -15,122 +15,96 @@ import ConvenenteForm from "@/components/convenente/modal/ConvenenteForm";
 import { formatCNPJ } from "@/utils/formValidation";
 import { toast } from "sonner";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { useEffect } from "react";
+import { fetchEmpresas, createEmpresa, updateEmpresa, deleteEmpresa } from "@/services/empresa/empresaService";
+import { EmpresaData, emptyEmpresa } from "@/types/empresa";
+import { useToast } from "@/hooks/use-toast";
 
 const EmpresaPage = () => {
-  // Estado para controle do formulário e operações
+  const { toast } = useToast();
+
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [formOpen, setFormOpen] = useState(false);
   const [formMode, setFormMode] = useState<'view' | 'create' | 'edit'>('view');
   const [activeTab, setActiveTab] = useState('dados');
-  const [currentConvenenteId, setCurrentConvenenteId] = useState<string | null>(null);
+  const [currentEmpresaId, setCurrentEmpresaId] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  
-  // Mock de dados para demonstração
-  const [convenentes, setConvenentes] = useState<Array<ConvenenteData & { id: string }>>([
-    {
-      id: "1",
-      cnpj: "23665071000109",
-      razaoSocial: "PADILHA RIBEIRO NEGOCIOS E SERVICOS LTDA",
-      endereco: "Rua Exemplo",
-      numero: "123",
-      complemento: "Sala 45",
-      uf: "SP",
-      cidade: "São Paulo",
-      contato: "João Silva",
-      fone: "1133334444",
-      celular: "11999998888",
-      email: "contato@padilharibeiro.com.br",
-      agencia: "1234",
-      conta: "56789-0",
-      chavePix: "23665071000109",
-      convenioPag: "12345"
-    }
-  ]);
-  
-  // Convenente selecionado para edição/visualização
-  const [formData, setFormData] = useState<ConvenenteData>(emptyConvenente);
-  
-  // Filtragem de convenentes baseada no termo de busca
-  const filteredConvenentes = convenentes.filter(convenente => 
-    convenente.razaoSocial.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    convenente.cnpj.includes(searchTerm.replace(/\D/g, ''))
+  const [empresas, setEmpresas] = useState<Array<EmpresaData & { id?: string }>>([]);
+  const [formData, setFormData] = useState<EmpresaData>(emptyEmpresa);
+
+  // Buscar empresas do backend
+  useEffect(() => {
+    setIsLoading(true);
+    fetchEmpresas().then(list => setEmpresas(list)).finally(() => setIsLoading(false));
+  }, []);
+
+  // Filtragem de empresas
+  const filteredEmpresas = empresas.filter(emp => 
+    emp.razaoSocial.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    emp.cnpj.includes(searchTerm.replace(/\D/g, ''))
   );
   
-  // Handlers
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-  };
-  
-  const handleFormDataChange = (data: ConvenenteData) => {
-    setFormData(data);
-  };
-  
-  const handleNewConvenente = () => {
-    setFormData(emptyConvenente);
-    setCurrentConvenenteId(null);
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value);
+
+  const handleFormDataChange = (data: EmpresaData) => setFormData(data);
+
+  const handleNewEmpresa = () => {
+    setFormData(emptyEmpresa);
+    setCurrentEmpresaId(null);
     setFormMode('create');
     setFormOpen(true);
     setActiveTab('dadosCadastrais');
   };
-  
-  const handleSelectConvenente = (convenente: ConvenenteData & { id: string }) => {
-    setCurrentConvenenteId(convenente.id);
-    setFormData(convenente);
+
+  const handleSelectEmpresa = (empresa: EmpresaData & { id?: string }) => {
+    setCurrentEmpresaId(empresa.id ?? null);
+    setFormData(empresa);
     setFormMode('view');
     setFormOpen(true);
     setActiveTab('dadosCadastrais');
   };
-  
-  const handleEditConvenente = () => {
-    setFormMode('edit');
-  };
-  
-  const handleDeleteClick = () => {
-    setDeleteDialogOpen(true);
-  };
-  
-  const handleDeleteConfirm = () => {
+
+  const handleEditEmpresa = () => setFormMode('edit');
+
+  const handleDeleteClick = () => setDeleteDialogOpen(true);
+
+  const handleDeleteConfirm = async () => {
+    if (!currentEmpresaId) return;
     setIsLoading(true);
-    
-    // Simulando operação de deleção
-    setTimeout(() => {
-      if (currentConvenenteId) {
-        setConvenentes(prev => prev.filter(c => c.id !== currentConvenenteId));
-        setFormOpen(false);
-        setCurrentConvenenteId(null);
-        toast.success("Convenente excluído com sucesso");
-      }
-      setIsLoading(false);
-      setDeleteDialogOpen(false);
-    }, 1000);
+    try {
+      await deleteEmpresa(currentEmpresaId);
+      setEmpresas(empresas.filter(e => e.id !== currentEmpresaId));
+      setFormOpen(false);
+      setCurrentEmpresaId(null);
+      toast({ title: "Empresa deletada com sucesso" });
+    } catch (err: any) {
+      toast({ title: "Erro ao deletar empresa", description: err?.message || "Falha ao deletar.", variant: "destructive" });
+    }
+    setIsLoading(false);
+    setDeleteDialogOpen(false);
   };
-  
-  const handleSaveConvenente = () => {
+
+  const handleSaveEmpresa = async () => {
     setIsLoading(true);
-    
-    // Simulando operação de salvamento
-    setTimeout(() => {
-      if (formMode === 'create') {
-        const newConvenente = {
-          ...formData,
-          id: Date.now().toString(), // Geração simples de ID para demo
-          dataCriacao: new Date().toISOString()
-        };
-        
-        setConvenentes(prev => [...prev, newConvenente]);
-        setCurrentConvenenteId(newConvenente.id);
-        toast.success("Convenente criado com sucesso");
-      } else {
-        setConvenentes(prev => 
-          prev.map(c => c.id === currentConvenenteId ? { ...formData, id: c.id } : c)
-        );
-        toast.success("Convenente atualizado com sucesso");
+    try {
+      let saved: EmpresaData | null = null;
+      if (formMode === "create") {
+        saved = await createEmpresa(formData);
+        if (saved) setEmpresas([...empresas, saved]);
+        toast({ title: "Empresa criada!", description: "Empresa cadastrada e convenente associado." });
+      } else if (formMode === "edit" && currentEmpresaId) {
+        saved = await updateEmpresa(currentEmpresaId, formData);
+        if (saved) setEmpresas(empresas.map(e => (e.id === saved!.id ? saved! : e)));
+        toast({ title: "Empresa atualizada!", description: "Empresa editada e convenente atualizado." });
       }
-      
-      setFormMode('view');
-      setIsLoading(false);
-    }, 1000);
+      if (saved?.id) setCurrentEmpresaId(saved.id);
+      setFormData(saved || formData);
+      setFormMode("view");
+    } catch (err: any) {
+      toast({ title: "Erro ao salvar empresa", description: err?.message || "Falha ao salvar.", variant: "destructive" });
+    }
+    setIsLoading(false);
   };
 
   return (
@@ -156,50 +130,50 @@ const EmpresaPage = () => {
             </div>
             
             <div className="max-h-[500px] overflow-y-auto border border-border rounded-lg bg-background">
-              {filteredConvenentes.length > 0 ? (
+              {filteredEmpresas.length > 0 ? (
                 <ul className="space-y-2 p-2">
-                  {filteredConvenentes.map((convenente) => (
+                  {filteredEmpresas.map((empresa) => (
                     <li 
-                      key={convenente.id}
-                      onClick={() => handleSelectConvenente(convenente)}
-                      className={`p-3 rounded-lg cursor-pointer transition-colors border ${currentConvenenteId === convenente.id 
+                      key={empresa.id}
+                      onClick={() => handleSelectEmpresa(empresa)}
+                      className={`p-3 rounded-lg cursor-pointer transition-colors border ${currentEmpresaId === empresa.id 
                           ? 'bg-accent border-primary text-primary-foreground' 
                           : 'hover:bg-accent/50 border-border text-foreground'
                       }`}
                     >
-                      <h3 className="font-medium">{convenente.razaoSocial}</h3>
+                      <h3 className="font-medium">{empresa.razaoSocial}</h3>
                       <p className="text-sm text-muted-foreground">
-                        CNPJ: {formatCNPJ(convenente.cnpj)}
+                        CNPJ: {formatCNPJ(empresa.cnpj)}
                       </p>
                     </li>
                   ))}
                 </ul>
               ) : (
                 <div className="flex flex-col items-center justify-center h-full p-10 rounded-lg border border-dashed text-foreground bg-muted border-border">
-                  <h3 className="text-lg font-medium text-foreground mb-2">Nenhum convenente selecionado</h3>
+                  <h3 className="text-lg font-medium text-foreground mb-2">Nenhuma empresa selecionada</h3>
                   <p className="text-muted-foreground text-center mb-4">
-                    Selecione um convenente da lista ou crie um novo para visualizar os detalhes
+                    Selecione uma empresa da lista ou crie uma nova para visualizar os detalhes
                   </p>
-                  <Button onClick={handleNewConvenente} className="bg-primary-blue hover:bg-primary-blue/90">
+                  <Button onClick={handleNewEmpresa} className="bg-primary-blue hover:bg-primary-blue/90">
                     <Plus size={16} className="mr-2" />
-                    Criar Novo Convenente
+                    Criar Nova Empresa
                   </Button>
                 </div>
               )}
             </div>
             
             <Button 
-              onClick={handleNewConvenente}
+              onClick={handleNewEmpresa}
               className="w-full mt-4"
             >
               <Plus size={16} className="mr-2" /> 
-              Novo Convenente
+              Nova Empresa
             </Button>
           </div>
           
           {/* Coluna do Formulário ou Informações */}
           <div className="md:col-span-2">
-            {currentConvenenteId ? (
+            {currentEmpresaId ? (
               <div className="bg-card p-4 rounded-lg border border-border">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-xl font-bold text-foreground">
@@ -209,7 +183,7 @@ const EmpresaPage = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={handleEditConvenente}
+                      onClick={handleEditEmpresa}
                       disabled={formMode === 'edit' || isLoading}
                     >
                       <Pencil size={16} className="mr-2" />
@@ -259,13 +233,13 @@ const EmpresaPage = () => {
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center h-full p-10 rounded-lg border border-dashed text-foreground bg-muted border-border">
-                <h3 className="text-lg font-medium text-foreground mb-2">Nenhum convenente selecionado</h3>
+                <h3 className="text-lg font-medium text-foreground mb-2">Nenhuma empresa selecionada</h3>
                 <p className="text-muted-foreground text-center mb-4">
-                  Selecione um convenente da lista ou crie um novo para visualizar os detalhes
+                  Selecione uma empresa da lista ou crie uma nova para visualizar os detalhes
                 </p>
-                <Button onClick={handleNewConvenente} className="bg-primary-blue hover:bg-primary-blue/90">
+                <Button onClick={handleNewEmpresa} className="bg-primary-blue hover:bg-primary-blue/90">
                   <Plus size={16} className="mr-2" />
-                  Criar Novo Convenente
+                  Criar Nova Empresa
                 </Button>
               </div>
             )}
@@ -287,9 +261,9 @@ const EmpresaPage = () => {
               activeTab={activeTab}
               setActiveTab={setActiveTab}
               formMode={formMode}
-              currentConvenenteId={currentConvenenteId}
+              currentConvenenteId={currentEmpresaId}
               initialData={formData}
-              onSave={handleSaveConvenente}
+              onSave={handleSaveEmpresa}
             />
             
             {/* Botões de Ação */}
@@ -303,7 +277,7 @@ const EmpresaPage = () => {
                     } else {
                       setFormMode('view');
                       // Recarregar dados originais
-                      const original = convenentes.find(c => c.id === currentConvenenteId);
+                      const original = empresas.find(c => c.id === currentEmpresaId);
                       if (original) setFormData(original);
                     }
                   }}
@@ -319,7 +293,7 @@ const EmpresaPage = () => {
                 </Button>
               ) : (
                 <Button 
-                  onClick={handleSaveConvenente}
+                  onClick={handleSaveEmpresa}
                   disabled={isLoading || !formData.cnpj || !formData.razaoSocial}
                   className="bg-primary-blue hover:bg-primary-blue/90"
                 >
@@ -359,4 +333,3 @@ const EmpresaPage = () => {
 };
 
 export default EmpresaPage;
-
