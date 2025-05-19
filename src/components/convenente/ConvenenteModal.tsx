@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ConvenenteData } from "@/types/convenente";
@@ -97,14 +96,14 @@ const ConvenenteModal = ({
               onDelete={onDelete}
               onSave={handleSaveClick}
             />
-            
+            {/* Remove onFormDataChange, only use the supported props */}
             <ConvenenteForm
               activeTab={activeTab}
               setActiveTab={setActiveTab}
               formMode={formMode}
               currentConvenenteId={currentConvenenteId}
               initialData={formData}
-              onFormDataChange={onFormDataChange}
+              onSave={onSave}
             />
           </div>
         </div>
@@ -114,4 +113,3 @@ const ConvenenteModal = ({
 };
 
 export default ConvenenteModal;
-

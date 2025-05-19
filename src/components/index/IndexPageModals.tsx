@@ -176,7 +176,7 @@ export const IndexPageModals = () => {
       <DeleteConvenenteDialog 
         isOpen={showDeleteDialog}
         onOpenChange={setShowDeleteDialog}
-        onDelete={handleConfirmDelete}
+        onDelete={() => handleConfirmDelete()}
         isDeleting={isDeleting}
       />
     </>
