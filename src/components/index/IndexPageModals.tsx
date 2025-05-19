@@ -175,7 +175,7 @@ export const IndexPageModals = () => {
       {/* Make sure the delete dialog is only shown once */}
       <DeleteConvenenteDialog 
         isOpen={showDeleteDialog}
-        onOpenChange={setShowDeleteDialog}
+        onOpenChange={(val) => setShowDeleteDialog(val)}
         onDelete={() => handleConfirmDelete()}
         isDeleting={isDeleting}
       />
