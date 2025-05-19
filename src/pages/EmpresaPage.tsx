@@ -15,7 +15,6 @@ import ConvenenteForm from "@/components/convenente/modal/ConvenenteForm";
 import { formatCNPJ } from "@/utils/formValidation";
 import { toast } from "sonner";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { useEffect } from "react";
 import { fetchEmpresas, createEmpresa, updateEmpresa, deleteEmpresa } from "@/services/empresa/empresaService";
 import { EmpresaData, emptyEmpresa } from "@/types/empresa";
 import { useToast } from "@/hooks/use-toast";

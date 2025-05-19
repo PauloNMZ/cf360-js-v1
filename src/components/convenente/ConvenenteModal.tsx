@@ -54,7 +54,6 @@ const ConvenenteModal = ({
     e.preventDefault();
     e.stopPropagation();
     onCreateNew();
-    // Quando criar um novo, voltar para a aba de dados
     setActiveTab("dados");
   };
 
@@ -62,7 +61,6 @@ const ConvenenteModal = ({
     onSave();
   };
 
-  // Determine if save button should be disabled
   const isSaveDisabled = !(formMode === 'create' || formMode === 'edit') || 
                         isLoading || 
                         (!formData.cnpj || !formData.razaoSocial);
@@ -103,9 +101,9 @@ const ConvenenteModal = ({
             <ConvenenteForm
               activeTab={activeTab}
               setActiveTab={setActiveTab}
-              formData={formData}
               formMode={formMode}
               currentConvenenteId={currentConvenenteId}
+              initialData={formData}
               onFormDataChange={onFormDataChange}
             />
           </div>
@@ -116,3 +114,4 @@ const ConvenenteModal = ({
 };
 
 export default ConvenenteModal;
+

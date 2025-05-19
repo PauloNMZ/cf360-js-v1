@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useConvenenteModal } from "../convenente/useConvenenteModal";
 import { useCompanySettings } from "../convenente/useCompanySettings";
@@ -13,7 +12,7 @@ export const useIndexPageModal = () => {
   
   // Reload company settings when admin panel is closed
   useEffect(() => {
-    companySettingsState.reloadSettings(modalState.adminPanelOpen);
+    companySettingsState.reloadSettings();
   }, [modalState.adminPanelOpen]);
 
   return {
