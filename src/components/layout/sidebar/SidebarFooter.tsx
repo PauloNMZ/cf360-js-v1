@@ -16,7 +16,7 @@ const SidebarFooter = ({ onLogout }: SidebarFooterProps) => {
   const isDark = theme === "dark";
 
   return (
-    <Footer className="border-t border-border/20 px-4 pt-2 pb-4 mt-auto">
+    <Footer className="border-t border-border/20 px-4 pt-2 pb-8 mt-auto">
       <div className="flex flex-col gap-2">
         <button
           onClick={() => setTheme(isDark ? "light" : "dark")}
