@@ -78,7 +78,7 @@ const ContactInfoSection = forwardRef<ContactInfoSectionRef, ContactInfoSectionP
   return (
     <div className="mb-8 px-4 md:px-0">
       <div className="mb-6">
-        <h2 className="text-xl font-bold text-blue-700 border-b-2 border-blue-200 pb-2 text-left dark:text-blue-400 dark:border-blue-800">
+        <h2 className="text-xl font-bold text-blue-700 border-b-2 border-border pb-2 text-left dark:text-blue-400">
           Informações de Contato
         </h2>
       </div>

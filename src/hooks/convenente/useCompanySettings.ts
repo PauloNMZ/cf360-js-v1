@@ -21,9 +21,9 @@ export const useCompanySettings = (adminPanelOpen?: boolean) => {
     // Verifica se adminPanelOpen foi definido (ou seja, o hook está sendo usado com o estado do modal)
     // E se o painel acabou de fechar (passou de true para false)
     if (adminPanelOpen !== undefined && !adminPanelOpen) {
-        const settings = getCompanySettings();
+      const settings = getCompanySettings();
         console.log("useCompanySettings: Painel fechado, recarregando configurações", settings);
-        setCompanySettings(settings);
+      setCompanySettings(settings);
     }
   }, [adminPanelOpen]); // Depende do estado do painel do admin
 

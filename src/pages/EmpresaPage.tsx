@@ -107,10 +107,11 @@ const EmpresaPage = () => {
   };
   
   const handleSaveConvenente = () => {
+    console.log("handleSaveConvenente called"); // Log para depuração
     setIsLoading(true);
     
-    // Simulando operação de salvamento
-    setTimeout(() => {
+    // Simulando operação de salvamento -> Substituir pela lógica real
+    // setTimeout(() => {
       if (formMode === 'create') {
         const newConvenente = {
           ...formData,
@@ -119,18 +120,19 @@ const EmpresaPage = () => {
         };
         
         setConvenentes(prev => [...prev, newConvenente]);
-        setCurrentConvenenteId(newConvenente.id);
+        setCurrentConvenenteId(newConvenente.id); // Seleciona o novo convenente após a criação
         toast.success("Convenente criado com sucesso");
-      } else {
+      } else { // formMode === 'edit'
         setConvenentes(prev => 
           prev.map(c => c.id === currentConvenenteId ? { ...formData, id: c.id } : c)
         );
         toast.success("Convenente atualizado com sucesso");
       }
       
-      setFormMode('view');
+      setFormMode('view'); // Voltar para modo de visualização após salvar
+      setFormOpen(false); // Fechar o modal
       setIsLoading(false);
-    }, 1000);
+    // }, 1000);
   };
 
   return (

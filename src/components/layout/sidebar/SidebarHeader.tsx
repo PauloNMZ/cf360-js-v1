@@ -19,7 +19,7 @@ const SidebarHeader = () => {
         )}>
           <AppLogo 
             size={isCollapsed ? 32 : 36} 
-            customLogoUrl={companySettings.logoUrl}
+            customLogoUrl={companySettings.logoUrl} 
             className="flex-shrink-0" 
           />
           {!isCollapsed && (
