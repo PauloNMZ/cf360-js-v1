@@ -80,7 +80,7 @@ export const IndexPageModals = () => {
         if (showDeleteDialog) {
           setTimeout(() => {
             console.log("IndexPageModals: Auto-closing delete dialog after completion");
-            setShowDeleteDialog(false);
+            setShowDeleteDialog(false); // FIX: Pass argument to function
           }, 200);
         }
         
