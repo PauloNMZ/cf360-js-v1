@@ -76,21 +76,13 @@ export const IndexPageModals = () => {
         deletionCompletedRef.current = true;
         console.log("IndexPageModals: Deletion completed, cleanup flag set");
         
-        // Ensure dialog is closed after deletion completes
-        if (showDeleteDialog) {
-          setTimeout(() => {
-            console.log("IndexPageModals: Auto-closing delete dialog after completion");
-            setShowDeleteDialog(false); // FIX: Pass argument to function
-          }, 200);
-        }
-        
         // Reset deletion completed flag after delay
         setTimeout(() => {
           deletionCompletedRef.current = false;
         }, 1000);
       }
     }
-  }, [isDeleting, showDeleteDialog, setShowDeleteDialog]);
+  }, [isDeleting]);
   
   // Clean up any stuck deletion state
   useEffect(() => {
