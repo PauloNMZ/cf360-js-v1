@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ConvenenteData } from "@/types/convenente";
@@ -54,7 +53,6 @@ const ConvenenteModal = ({
     e.preventDefault();
     e.stopPropagation();
     onCreateNew();
-    // Quando criar um novo, voltar para a aba de dados
     setActiveTab("dados");
   };
 
@@ -62,7 +60,6 @@ const ConvenenteModal = ({
     onSave();
   };
 
-  // Determine if save button should be disabled
   const isSaveDisabled = !(formMode === 'create' || formMode === 'edit') || 
                         isLoading || 
                         (!formData.cnpj || !formData.razaoSocial);
@@ -99,14 +96,14 @@ const ConvenenteModal = ({
               onDelete={onDelete}
               onSave={handleSaveClick}
             />
-            
+            {/* Remove onFormDataChange, only use the supported props */}
             <ConvenenteForm
               activeTab={activeTab}
               setActiveTab={setActiveTab}
-              formData={formData}
               formMode={formMode}
               currentConvenenteId={currentConvenenteId}
-              onFormDataChange={onFormDataChange}
+              initialData={formData}
+              onSave={onSave}
             />
           </div>
         </div>

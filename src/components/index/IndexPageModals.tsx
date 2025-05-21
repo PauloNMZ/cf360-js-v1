@@ -76,21 +76,13 @@ export const IndexPageModals = () => {
         deletionCompletedRef.current = true;
         console.log("IndexPageModals: Deletion completed, cleanup flag set");
         
-        // Ensure dialog is closed after deletion completes
-        if (showDeleteDialog) {
-          setTimeout(() => {
-            console.log("IndexPageModals: Auto-closing delete dialog after completion");
-            setShowDeleteDialog(false);
-          }, 200);
-        }
-        
         // Reset deletion completed flag after delay
         setTimeout(() => {
           deletionCompletedRef.current = false;
         }, 1000);
       }
     }
-  }, [isDeleting, showDeleteDialog, setShowDeleteDialog]);
+  }, [isDeleting]);
   
   // Clean up any stuck deletion state
   useEffect(() => {
@@ -175,8 +167,9 @@ export const IndexPageModals = () => {
       {/* Make sure the delete dialog is only shown once */}
       <DeleteConvenenteDialog 
         isOpen={showDeleteDialog}
-        onOpenChange={setShowDeleteDialog}
-        onDelete={handleConfirmDelete}
+        // Correction: always pass a boolean to onOpenChange
+        onOpenChange={(val) => setShowDeleteDialog(val)}
+        onDelete={() => handleConfirmDelete()}
         isDeleting={isDeleting}
       />
     </>
