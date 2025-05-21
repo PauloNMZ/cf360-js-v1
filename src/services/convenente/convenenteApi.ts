@@ -1,4 +1,3 @@
-
 import { supabase, searchConvenentes } from "@/integrations/supabase/client";
 import type { ConvenenteData } from "@/types/convenente";
 import { mapToCamelCase, mapToSnakeCase } from "./convenenteTransformers";
@@ -75,7 +74,8 @@ export const saveConvenente = async (convenente: ConvenenteData): Promise<Conven
     .single();
 
   if (error) {
-    throw new Error(error.message || "Erro ao salvar convenente");
+    console.error("Erro ao salvar convenente:", error);
+    throw new Error(error.message || error.details || "Erro ao salvar convenente");
   }
   return mapToCamelCase(data);
 };

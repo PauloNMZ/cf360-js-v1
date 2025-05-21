@@ -14,6 +14,7 @@ interface ConvenenteFormProps {
   formMode: 'view' | 'create' | 'edit';
   currentConvenenteId: string | null;
   onSave: (data: ConvenenteData) => void;
+  onChange?: (data: ConvenenteData) => void;
   initialData?: Partial<ConvenenteData>;
 }
 
@@ -23,6 +24,7 @@ const ConvenenteForm: React.FC<ConvenenteFormProps> = ({
   formMode,
   currentConvenenteId,
   onSave,
+  onChange,
   initialData = {}
 }) => {
   const contactInfoRef = useRef<ContactInfoSectionRef>(null);
@@ -43,7 +45,9 @@ const ConvenenteForm: React.FC<ConvenenteFormProps> = ({
     formMode, 
     initialData,
     contactInfoRef,
-    onFormDataChange: () => {}
+    onFormDataChange: (data) => {
+      if (onChange) onChange(data);
+    }
   });
 
   const showCredentialsTab = formMode === 'view' && currentConvenenteId !== null;

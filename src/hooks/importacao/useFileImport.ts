@@ -1,6 +1,5 @@
-
 import { useState } from 'react';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { toast } from '@/components/ui/sonner';
 import { PlanilhaData, RowData, EXPECTED_HEADERS } from '@/types/importacao';
 
@@ -26,29 +25,26 @@ export const useFileImport = () => {
     setLoading(true);
     try {
       const arrayBuffer = await file.arrayBuffer();
-      const workbook = XLSX.read(arrayBuffer);
-      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false });
-
-      // Check if there's data and headers
-      if (jsonData.length === 0) {
-        setErrorMessage("A planilha está vazia.");
-        setPlanilhaData(null);
-        setLoading(false);
-        return;
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.load(arrayBuffer);
+      
+      const worksheet = workbook.getWorksheet(1);
+      if (!worksheet) {
+        throw new Error("Planilha não encontrada");
       }
 
-      // Get the headers from the first row
-      const headers = (jsonData[0] as string[]).map(header => 
+      // Get headers from first row
+      const headers = worksheet.getRow(1).values as string[];
+      const formattedHeaders = headers.map(header => 
         header ? header.toString().trim().toUpperCase() : ''
       );
 
       // Validate headers against expected headers
       const missingColumns = EXPECTED_HEADERS.filter(
-        header => !headers.includes(header)
+        header => !formattedHeaders.includes(header)
       );
       
-      const extraColumns = headers.filter(
+      const extraColumns = formattedHeaders.filter(
         header => header && !EXPECTED_HEADERS.includes(header)
       );
 
@@ -60,19 +56,23 @@ export const useFileImport = () => {
         setErrorMessage(null);
       }
 
-      // Get the data rows (skip the header row)
-      const rows = jsonData.slice(1).map((row, index) => {
-        const obj: Record<string, any> = { id: index, selected: false };
-        (row as any[]).forEach((cell, idx) => {
-          if (headers[idx]) {
-            obj[headers[idx]] = cell;
+      // Get data rows
+      const rows: RowData[] = [];
+      worksheet.eachRow((row, rowNumber) => {
+        if (rowNumber === 1) return; // Skip header row
+        
+        const rowData: Record<string, any> = { id: rowNumber - 2, selected: false };
+        row.eachCell((cell, colNumber) => {
+          const header = formattedHeaders[colNumber - 1];
+          if (header) {
+            rowData[header] = cell.value;
           }
         });
-        return obj as RowData;
+        rows.push(rowData as RowData);
       });
 
       setPlanilhaData({
-        headers,
+        headers: formattedHeaders,
         rows,
         isValid,
         missingColumns,

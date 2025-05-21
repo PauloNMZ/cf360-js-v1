@@ -1,6 +1,5 @@
-
 import { useState } from 'react';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { toast } from '@/components/ui/sonner';
 
@@ -33,53 +32,57 @@ export const useValidationDialog = () => {
   };
 
   // Function to export validation errors to Excel
-  const handleExportErrors = () => {
+  const handleExportErrors = async () => {
     if (validationErrors.length === 0) {
       toast.warning("Não há erros para exportar.");
       return;
     }
 
     // Create a workbook with error data
-    const errorData = validationErrors.map((record, index) => {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Erros de Validação');
+
+    // Add headers
+    const headers = ['ID', 'Nome', 'Inscrição', 'Banco', 'Agência', 'Conta', 'Tipo', 'Valor', 'Erros'];
+    worksheet.addRow(headers);
+
+    // Add data
+    validationErrors.forEach((record, index) => {
       const errorsText = record.errors
         .map((e: any) => `${e.message}${e.expectedValue ? ` (Esperado: ${e.expectedValue}, Informado: ${e.actualValue})` : ''}`)
         .join('\n');
       
-      return {
-        'ID': index + 1,
-        'Nome': record.favorecido.nome,
-        'Inscrição': record.favorecido.inscricao,
-        'Banco': record.favorecido.banco,
-        'Agência': record.favorecido.agencia,
-        'Conta': record.favorecido.conta,
-        'Tipo': record.favorecido.tipo,
-        'Valor': record.favorecido.valor,
-        'Erros': errorsText
-      };
+      worksheet.addRow([
+        index + 1,
+        record.favorecido.nome,
+        record.favorecido.inscricao,
+        record.favorecido.banco,
+        record.favorecido.agencia,
+        record.favorecido.conta,
+        record.favorecido.tipo,
+        record.favorecido.valor,
+        errorsText
+      ]);
     });
 
-    const ws = XLSX.utils.json_to_sheet(errorData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Erros de Validação");
-    
-    // Auto-size columns
-    const colWidths = [
-      { wch: 5 }, // ID
-      { wch: 30 }, // Nome
-      { wch: 15 }, // Inscrição
-      { wch: 8 }, // Banco
-      { wch: 10 }, // Agência
-      { wch: 15 }, // Conta
-      { wch: 6 }, // Tipo
-      { wch: 12 }, // Valor
-      { wch: 80 }, // Erros
-    ];
-    
-    ws['!cols'] = colWidths;
+    // Set column widths
+    const colWidths = [5, 30, 15, 8, 10, 15, 6, 12, 80];
+    worksheet.columns.forEach((column, index) => {
+      column.width = colWidths[index];
+    });
+
+    // Style the header row
+    const headerRow = worksheet.getRow(1);
+    headerRow.font = { bold: true };
+    headerRow.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFE0E0E0' }
+    };
     
     // Generate Excel file
-    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    const fileData = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const buffer = await workbook.xlsx.writeBuffer();
+    const fileData = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     saveAs(fileData, `Erros_Validacao_${new Date().toISOString().slice(0, 10).replace(/-/g, '')}.xlsx`);
     
     toast.success("Arquivo de erros exportado com sucesso!");

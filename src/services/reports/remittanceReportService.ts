@@ -1,5 +1,4 @@
-
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { formatarValorCurrency } from '@/utils/formatting/currencyUtils';
 import { RowData } from '@/types/importacao';
@@ -52,44 +51,44 @@ export const generateRemittanceReport = async (
   const formattedTime = currentDate.toLocaleTimeString('pt-BR');
   
   // Create workbook and worksheet
-  const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.json_to_sheet(formattedData);
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet('Remessa Bancária');
   
-  // Set column widths for better readability
-  const colWidths = [
-    { wch: 5 },   // Seq
-    { wch: 40 },  // Nome
-    { wch: 18 },  // CPF/CNPJ
-    { wch: 7 },   // Banco
-    { wch: 10 },  // Agência
-    { wch: 15 },  // Conta
-    { wch: 10 },  // Tipo
-    { wch: 15 },  // Valor
-  ];
-  ws['!cols'] = colWidths;
+  // Add header information
+  worksheet.addRow([`Empresa: ${options.companyName}`]);
+  worksheet.addRow([`Data de Geração: ${formattedDate} ${formattedTime}`]);
+  worksheet.addRow([`Referência da Remessa: ${options.remittanceReference}`]);
+  worksheet.addRow([`Total de Registros: ${selectedRows.length}`]);
+  worksheet.addRow([`Valor Total: ${formatarValorCurrency(totalAmount)}`]);
+  worksheet.addRow([]); // Empty row
   
-  // Add header information (before the data)
-  XLSX.utils.sheet_add_aoa(ws, [
-    [`Empresa: ${options.companyName}`],
-    [`Data de Geração: ${formattedDate} ${formattedTime}`],
-    [`Referência da Remessa: ${options.remittanceReference}`],
-    [`Total de Registros: ${selectedRows.length}`],
-    [`Valor Total: ${formatarValorCurrency(totalAmount)}`],
-    [''],  // Empty row before the data
-  ], { origin: 'A1' });
+  // Add headers
+  const headers = Object.keys(formattedData[0]);
+  worksheet.addRow(headers);
   
-  // Adjust the origin of the data
-  ws['!ref'] = XLSX.utils.encode_range(
-    { r: 6, c: 0 },  // Starting after the header
-    { r: 6 + formattedData.length, c: 7 }
-  );
+  // Add data
+  formattedData.forEach(row => {
+    worksheet.addRow(Object.values(row));
+  });
   
-  // Add the worksheet to the workbook
-  XLSX.utils.book_append_sheet(wb, ws, "Remessa Bancária");
+  // Set column widths
+  worksheet.columns.forEach((column, index) => {
+    const widths = [5, 40, 18, 7, 10, 15, 10, 15];
+    column.width = widths[index];
+  });
+  
+  // Style the header row
+  const headerRow = worksheet.getRow(7);
+  headerRow.font = { bold: true };
+  headerRow.fill = {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: { argb: 'FFE0E0E0' }
+  };
   
   // Generate Excel file
-  const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-  const fileData = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const buffer = await workbook.xlsx.writeBuffer();
+  const fileData = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
   
   // Return the file so it can be attached to an email or saved
   return {

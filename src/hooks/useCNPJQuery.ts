@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 
 export type CNPJData = {
@@ -52,89 +51,108 @@ export const useCNPJQuery = ({ onSuccess, onError }: UseCNPJQueryProps = {}) => 
 
   const fetchCNPJ = async (cnpj: string) => {
     setError(null);
-    
     const cleanedCNPJ = cleanCNPJ(cnpj);
-    
-    // If we're already searching for this CNPJ, don't start a new search
     if (cleanedCNPJ === lastCNPJRef.current && isQueryRunning.current) {
       console.log("Same CNPJ search requested, ignoring duplicate");
       return { success: false, error: "Duplicate search" };
     }
-    
     lastCNPJRef.current = cleanedCNPJ;
-    
-    // Prevent multiple simultaneous queries
     if (isQueryRunning.current) {
       console.log("CNPJ query is already running. Aborting previous request.");
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
     }
-    
-    // Create new abort controller for this request
     abortControllerRef.current = new AbortController();
-    
     setIsLoading(true);
     isQueryRunning.current = true;
-    
     const currentQuery = ++queryCount.current;
     console.log(`Starting CNPJ fetch (${currentQuery}):`, cleanedCNPJ);
-    
+    // Função auxiliar para buscar na publica.cnpj.ws
+    const fetchFromPublicaCNPJ = async () => {
+      try {
+        const response = await fetch(`https://publica.cnpj.ws/cnpj/${cleanedCNPJ}`);
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Erro ao consultar CNPJ (publica.cnpj.ws)');
+        }
+        const responseData = await response.json();
+        // Adapta os campos para o formato esperado
+        const adaptedData: CNPJData = {
+          cnpj: responseData.estabelecimento?.cnpj || responseData.cnpj || cleanedCNPJ,
+          razao_social: responseData.razao_social || responseData.nome || '',
+          nome_fantasia: responseData.estabelecimento?.nome_fantasia || '',
+          logradouro: responseData.estabelecimento?.logradouro || '',
+          numero: responseData.estabelecimento?.numero || '',
+          complemento: responseData.estabelecimento?.complemento || '',
+          bairro: responseData.estabelecimento?.bairro || '',
+          municipio: responseData.estabelecimento?.cidade?.nome || '',
+          uf: responseData.estabelecimento?.estado?.sigla || '',
+          cep: responseData.estabelecimento?.cep || '',
+          telefone: responseData.estabelecimento?.ddd1 && responseData.estabelecimento?.telefone1 ? `${responseData.estabelecimento.ddd1}${responseData.estabelecimento.telefone1}` : '',
+          email: responseData.estabelecimento?.email || '',
+          ddd_telefone_1: responseData.estabelecimento?.ddd1 || '',
+          ddd_telefone_2: responseData.estabelecimento?.ddd2 || '',
+          qsa: responseData.socios?.map((s: any) => ({ nome_socio: s.nome, qualificacao_socio: s.qualificacao })) || [],
+        };
+        setData(adaptedData);
+        if (onSuccess) onSuccess(adaptedData);
+        return { success: true, data: adaptedData };
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido (publica.cnpj.ws)';
+        setError(errorMessage);
+        if (onError) onError(errorMessage);
+        return { success: false, error: errorMessage };
+      }
+    };
+    // Timeout para fallback
+    let timeoutId: NodeJS.Timeout | null = null;
+    let brasilapiResolved = false;
     try {
-      const response = await fetch(
-        `https://brasilapi.com.br/api/cnpj/v1/${cleanedCNPJ}`, 
-        { signal: abortControllerRef.current.signal }
-      );
-      
-      // If this isn't the latest query, ignore the result
-      if (currentQuery !== queryCount.current) {
-        console.log(`Query ${currentQuery} superseded, ignoring response`);
-        return { success: false, error: "Superseded" };
+      const brasilapiPromise = new Promise(async (resolve, reject) => {
+        try {
+          const response = await fetch(
+            `https://brasilapi.com.br/api/cnpj/v1/${cleanedCNPJ}`,
+            { signal: abortControllerRef.current.signal }
+          );
+          if (currentQuery !== queryCount.current) {
+            console.log(`Query ${currentQuery} superseded, ignoring response`);
+            return resolve({ success: false, error: "Superseded" });
+          }
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Erro ao consultar CNPJ');
+          }
+          const responseData: CNPJData = await response.json();
+          if (!responseData.razao_social || responseData.razao_social.trim() === '') {
+            throw new Error('CNPJ encontrado, mas sem razão social definida');
+          }
+          brasilapiResolved = true;
+          setData(responseData);
+          if (onSuccess) onSuccess(responseData);
+          resolve({ success: true, data: responseData });
+        } catch (error) {
+          resolve({ success: false, error });
+        }
+      });
+      // Timeout de 3 segundos para fallback
+      const timeoutPromise = new Promise((resolve) => {
+        timeoutId = setTimeout(() => resolve('timeout'), 3000);
+      });
+      const result = await Promise.race([brasilapiPromise, timeoutPromise]);
+      if (timeoutId) clearTimeout(timeoutId);
+      if (result === 'timeout' || (result && typeof result === 'object' && (result as any).success === false)) {
+        // Fallback para publica.cnpj.ws
+        return await fetchFromPublicaCNPJ();
       }
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao consultar CNPJ');
-      }
-      
-      const responseData: CNPJData = await response.json();
-      
-      // Verify we got a valid business name
-      if (!responseData.razao_social || responseData.razao_social.trim() === '') {
-        throw new Error('CNPJ encontrado, mas sem razão social definida');
-      }
-      
-      console.log(`Query ${currentQuery} successful with data:`, responseData.cnpj);
-      
-      setData(responseData);
-      
-      if (onSuccess) {
-        onSuccess(responseData);
-      }
-      
-      return { success: true, data: responseData };
+      return result;
     } catch (error) {
-      // If this is an abort error, don't report it
-      if ((error as any).name === 'AbortError') {
-        console.log('Request was aborted');
-        return { success: false, error: 'Request aborted' };
-      }
-      
-      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
-      setError(errorMessage);
-      
-      if (onError) {
-        onError(errorMessage);
-      }
-      
-      console.error("Erro na consulta de CNPJ:", error);
-      return { success: false, error: errorMessage };
+      // Fallback para publica.cnpj.ws
+      return await fetchFromPublicaCNPJ();
     } finally {
       setIsLoading(false);
-      // Reset the query flag with a small delay to prevent immediate re-triggering
       setTimeout(() => {
         if (currentQuery === queryCount.current) {
-          console.log(`Query ${currentQuery} complete, resetting flag`);
           isQueryRunning.current = false;
         }
       }, 500);
