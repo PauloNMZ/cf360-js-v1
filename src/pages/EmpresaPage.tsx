@@ -15,51 +15,35 @@ import ConvenenteForm from "@/components/convenente/modal/ConvenenteForm";
 import { formatCNPJ } from "@/utils/formValidation";
 import { toast } from "sonner";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { useConvenentes } from "@/hooks/useConvenentes";
+import { AlertMessage } from "@/components/ui/AlertMessage";
 
 const EmpresaPage = () => {
   // Estado para controle do formulário e operações
-  const [isLoading, setIsLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
   const [formOpen, setFormOpen] = useState(false);
   const [formMode, setFormMode] = useState<'view' | 'create' | 'edit'>('view');
   const [activeTab, setActiveTab] = useState('dados');
-  const [currentEmpresaId, setCurrentEmpresaId] = useState<string | null>(null);
+  const [currentConvenenteId, setCurrentConvenenteId] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  
-  // Mock de dados para demonstração
-  const [convenentes, setConvenentes] = useState<Array<ConvenenteData & { id: string }>>([
-    {
-      id: "1",
-      cnpj: "23665071000109",
-      razaoSocial: "PADILHA RIBEIRO NEGOCIOS E SERVICOS LTDA",
-      endereco: "Rua Exemplo",
-      numero: "123",
-      complemento: "Sala 45",
-      uf: "SP",
-      cidade: "São Paulo",
-      contato: "João Silva",
-      fone: "1133334444",
-      celular: "11999998888",
-      email: "contato@padilharibeiro.com.br",
-      agencia: "1234",
-      conta: "56789-0",
-      chavePix: "23665071000109",
-      convenioPag: "12345"
-    }
-  ]);
-  
-  // Convenente selecionado para edição/visualização
   const [formData, setFormData] = useState<ConvenenteData>(emptyConvenente);
+  const alertTimeoutRef = useRef<number | null>(null);
   
-  // Filtragem de convenentes baseada no termo de busca
-  const filteredConvenentes = convenentes.filter(convenente => 
-    convenente.razaoSocial.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    convenente.cnpj.includes(searchTerm.replace(/\D/g, ''))
-  );
+  // Hook para gerenciar convenentes
+  const {
+    convenentes,
+    isLoading,
+    handleSearch,
+    handleCreate,
+    handleUpdate,
+    handleDelete,
+    handleGetById,
+    alert,
+    setAlert
+  } = useConvenentes();
   
   // Handlers
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
+    handleSearch(e.target.value);
   };
   
   const handleFormDataChange = (data: ConvenenteData) => {
@@ -74,12 +58,18 @@ const EmpresaPage = () => {
     setActiveTab('dadosCadastrais');
   };
   
-  const handleSelectConvenente = (convenente: ConvenenteData & { id: string }) => {
-    setCurrentConvenenteId(convenente.id);
-    setFormData(convenente);
-    setFormMode('view');
-    setFormOpen(true);
-    setActiveTab('dadosCadastrais');
+  const handleSelectConvenente = async (convenente: ConvenenteData & { id: string }) => {
+    try {
+      const fullConvenente = await handleGetById(convenente.id);
+      if (fullConvenente) {
+        setCurrentConvenenteId(convenente.id);
+        setFormData(fullConvenente);
+        setFormMode('view');
+        setActiveTab('dadosCadastrais');
+      }
+    } catch (error) {
+      console.error('Erro ao carregar detalhes do convenente:', error);
+    }
   };
   
   const handleEditConvenente = () => {
@@ -90,48 +80,56 @@ const EmpresaPage = () => {
     setDeleteDialogOpen(true);
   };
   
-  const handleDeleteConfirm = () => {
-    setIsLoading(true);
-    
-    // Simulando operação de deleção
-    setTimeout(() => {
-      if (currentConvenenteId) {
-        setConvenentes(prev => prev.filter(c => c.id !== currentConvenenteId));
+  const handleDeleteConfirm = async () => {
+    if (currentConvenenteId) {
+      try {
+        await handleDelete(currentConvenenteId);
         setFormOpen(false);
         setCurrentConvenenteId(null);
-        toast.success("Convenente excluído com sucesso");
+      } catch (error) {
+        console.error('Erro ao excluir convenente:', error);
       }
-      setIsLoading(false);
-      setDeleteDialogOpen(false);
-    }, 1000);
+    }
+    setDeleteDialogOpen(false);
   };
   
-  const handleSaveConvenente = () => {
-    setIsLoading(true);
-    
-    // Simulando operação de salvamento
-    setTimeout(() => {
+  const handleSaveConvenente = async () => {
+    try {
       if (formMode === 'create') {
-        const newConvenente = {
-          ...formData,
-          id: Date.now().toString(), // Geração simples de ID para demo
-          dataCriacao: new Date().toISOString()
-        };
-        
-        setConvenentes(prev => [...prev, newConvenente]);
-        setCurrentConvenenteId(newConvenente.id);
-        toast.success("Convenente criado com sucesso");
-      } else {
-        setConvenentes(prev => 
-          prev.map(c => c.id === currentConvenenteId ? { ...formData, id: c.id } : c)
-        );
-        toast.success("Convenente atualizado com sucesso");
+        const newConvenente = await handleCreate(formData);
+        if (newConvenente) {
+          setFormOpen(false);
+          setCurrentConvenenteId(null);
+          setFormData(emptyConvenente);
+          setAlert({ type: 'success', message: 'Convenente criado com sucesso' });
+        }
+      } else if (formMode === 'edit' && currentConvenenteId) {
+        await handleUpdate(currentConvenenteId, formData);
+        setFormOpen(false);
+        setCurrentConvenenteId(null);
+        setFormData(emptyConvenente);
+        setAlert({ type: 'success', message: 'Convenente atualizado com sucesso' });
       }
-      
-      setFormMode('view');
-      setIsLoading(false);
-    }, 1000);
+    } catch (error) {
+      // O alerta de erro já é tratado no hook useConvenentes
+    }
   };
+
+  useEffect(() => {
+    if (alert && alert.type === 'success') {
+      if (alertTimeoutRef.current) window.clearTimeout(alertTimeoutRef.current);
+      console.log('Alerta de sucesso exibido, será limpo em 5s');
+      alertTimeoutRef.current = window.setTimeout(() => {
+        setAlert(null);
+        setCurrentConvenenteId(null);
+        setFormData(emptyConvenente);
+        console.log('Alerta de sucesso limpo automaticamente após 5s');
+      }, 5000);
+    }
+    return () => {
+      if (alertTimeoutRef.current) window.clearTimeout(alertTimeoutRef.current);
+    };
+  }, [alert]);
 
   return (
     <div className="container mx-auto py-6">
@@ -155,50 +153,54 @@ const EmpresaPage = () => {
             </div>
             
             <div className="max-h-[500px] overflow-y-auto border border-border rounded-lg bg-background">
-              {filteredConvenentes.length > 0 ? (
+              {isLoading ? (
+                <div className="flex items-center justify-center p-4">
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                </div>
+              ) : convenentes.length > 0 ? (
                 <ul className="space-y-2 p-2">
-                  {filteredConvenentes.map((convenente) => (
+                  {convenentes.map((convenente) => (
                     <li 
-                      key={empresa.id}
-                      onClick={() => handleSelectEmpresa(empresa)}
-                      className={`p-3 rounded-lg cursor-pointer transition-colors border ${currentEmpresaId === empresa.id 
+                      key={convenente.id}
+                      onClick={() => handleSelectConvenente(convenente)}
+                      className={`p-3 rounded-lg cursor-pointer transition-colors border ${currentConvenenteId === convenente.id 
                           ? 'bg-accent border-primary text-primary-foreground' 
                           : 'hover:bg-accent/50 border-border text-foreground'
                       }`}
                     >
-                      <h3 className="font-medium">{empresa.razaoSocial}</h3>
+                      <h3 className="font-medium">{convenente.razaoSocial}</h3>
                       <p className="text-sm text-muted-foreground">
-                        CNPJ: {formatCNPJ(empresa.cnpj)}
+                        CNPJ: {formatCNPJ(convenente.cnpj)}
                       </p>
                     </li>
                   ))}
                 </ul>
               ) : (
                 <div className="flex flex-col items-center justify-center h-full p-10 rounded-lg border border-dashed text-foreground bg-muted border-border">
-                  <h3 className="text-lg font-medium text-foreground mb-2">Nenhum convenente selecionado</h3>
+                  <h3 className="text-lg font-medium text-foreground mb-2">Nenhum convenente encontrado</h3>
                   <p className="text-muted-foreground text-center mb-4">
-                    Selecione um convenente da lista ou crie um novo para visualizar os detalhes
+                    Crie um novo convenente para começar
                   </p>
-                  <Button onClick={handleNewEmpresa} className="bg-primary-blue hover:bg-primary-blue/90">
+                  <Button onClick={handleNewConvenente} className="bg-primary-blue hover:bg-primary-blue/90">
                     <Plus size={16} className="mr-2" />
-                    Criar Nova Empresa
+                    Criar Novo Convenente
                   </Button>
                 </div>
               )}
             </div>
             
             <Button 
-              onClick={handleNewEmpresa}
+              onClick={handleNewConvenente}
               className="w-full mt-4"
             >
               <Plus size={16} className="mr-2" /> 
-              Nova Empresa
+              Novo Convenente
             </Button>
           </div>
           
           {/* Coluna do Formulário ou Informações */}
           <div className="md:col-span-2">
-            {currentEmpresaId ? (
+            {currentConvenenteId ? (
               <div className="bg-card p-4 rounded-lg border border-border">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-xl font-bold text-foreground">
@@ -208,7 +210,7 @@ const EmpresaPage = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={handleEditEmpresa}
+                      onClick={handleEditConvenente}
                       disabled={formMode === 'edit' || isLoading}
                     >
                       <Pencil size={16} className="mr-2" />
@@ -258,13 +260,13 @@ const EmpresaPage = () => {
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center h-full p-10 rounded-lg border border-dashed text-foreground bg-muted border-border">
-                <h3 className="text-lg font-medium text-foreground mb-2">Nenhuma empresa selecionada</h3>
+                <h3 className="text-lg font-medium text-foreground mb-2">Nenhum convenente selecionado</h3>
                 <p className="text-muted-foreground text-center mb-4">
-                  Selecione uma empresa da lista ou crie uma nova para visualizar os detalhes
+                  Selecione um convenente da lista ou crie um novo para visualizar os detalhes
                 </p>
-                <Button onClick={handleNewEmpresa} className="bg-primary-blue hover:bg-primary-blue/90">
+                <Button onClick={handleNewConvenente} className="bg-primary-blue hover:bg-primary-blue/90">
                   <Plus size={16} className="mr-2" />
-                  Criar Nova Empresa
+                  Criar Novo Convenente
                 </Button>
               </div>
             )}
@@ -301,9 +303,10 @@ const EmpresaPage = () => {
               activeTab={activeTab}
               setActiveTab={setActiveTab}
               formMode={formMode}
-              currentConvenenteId={currentEmpresaId}
+              currentConvenenteId={currentConvenenteId}
               initialData={formData}
               onSave={handleSaveConvenente}
+              onChange={setFormData}
             />
             
             {/* Botões de Ação */}
@@ -317,8 +320,11 @@ const EmpresaPage = () => {
                     } else {
                       setFormMode('view');
                       // Recarregar dados originais
-                      const original = convenentes.find(c => c.id === currentConvenenteId);
-                      if (original) setFormData(original);
+                      if (currentConvenenteId) {
+                        handleGetById(currentConvenenteId).then(data => {
+                          if (data) setFormData(data);
+                        });
+                      }
                     }
                   }}
                   disabled={isLoading}
@@ -333,7 +339,7 @@ const EmpresaPage = () => {
                 </Button>
               ) : (
                 <Button 
-                  onClick={handleSaveEmpresa}
+                  onClick={handleSaveConvenente}
                   disabled={isLoading || !formData.cnpj || !formData.razaoSocial}
                   className="bg-primary-blue hover:bg-primary-blue/90"
                 >
@@ -373,3 +379,4 @@ const EmpresaPage = () => {
 };
 
 export default EmpresaPage;
+
