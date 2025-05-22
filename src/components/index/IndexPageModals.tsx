@@ -79,6 +79,8 @@ export const IndexPageModals = () => {
         // Reset deletion completed flag after delay
         setTimeout(() => {
           deletionCompletedRef.current = false;
+          // FIX: Always close the delete dialog explicitly (with boolean)
+          setShowDeleteDialog(false);
         }, 1000);
       }
     }
@@ -93,6 +95,8 @@ export const IndexPageModals = () => {
         
         // Consider adding an auto-reset after a very long timeout (e.g., 60 seconds)
         // This is a safety measure to prevent permanent UI freezing
+        // FIX: Always close the delete dialog explicitly (with boolean)
+        setShowDeleteDialog(false);
       }
     }, 60000); // Check after 1 minute
     
@@ -175,3 +179,5 @@ export const IndexPageModals = () => {
     </>
   );
 };
+
+export default IndexPageModals;
