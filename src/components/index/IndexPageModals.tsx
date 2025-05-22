@@ -169,7 +169,7 @@ export const IndexPageModals = () => {
         isOpen={showDeleteDialog}
         // Correction: always pass a boolean to onOpenChange
         onOpenChange={(val) => setShowDeleteDialog(val)}
-        onDelete={() => handleConfirmDelete()}
+        onDelete={(_arg) => handleConfirmDelete()} // FIX: accept one argument to match expected signature
         isDeleting={isDeleting}
       />
     </>
