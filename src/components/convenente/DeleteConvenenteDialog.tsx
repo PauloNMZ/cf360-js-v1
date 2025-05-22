@@ -55,13 +55,13 @@ const DeleteConvenenteDialog = ({
         // Se a exclusão estiver em andamento por muito tempo, forçar fechamento
         console.log("DeleteDialog: Tempo limite de exclusão excedido, fechando diálogo");
         if (isOpen) {
+          // Always pass boolean
           onOpenChange(false);
           // Adicionando notificação para o usuário
           const errorMsg = document.createElement('div');
           errorMsg.innerHTML = 'A operação demorou muito tempo. Tente novamente.';
           errorMsg.style.cssText = 'position:fixed;top:10px;right:10px;background:red;color:white;padding:10px;border-radius:5px;z-index:9999;';
           document.body.appendChild(errorMsg);
-          
           setTimeout(() => {
             document.body.removeChild(errorMsg);
           }, 5000);
@@ -95,18 +95,19 @@ const DeleteConvenenteDialog = ({
   };
 
   return (
-    <AlertDialog open={isOpen} onOpenChange={(open) => {
+    <AlertDialog open={isOpen} onOpenChange={(open: boolean) => {
       // Impedir fechamento durante exclusão
       if (isDeleting && !open) {
         console.log("DeleteDialog: Impedido fechamento do diálogo durante exclusão");
         return;
       }
-      
+
       // Se estiver fechando o diálogo, garantir que deleteTriggeredRef seja resetado
       if (!open) {
         deleteTriggeredRef.current = false;
       }
-      
+
+      // Always pass boolean to parent
       onOpenChange(open);
     }}>
       <AlertDialogContent className="sm:max-w-[425px]">
