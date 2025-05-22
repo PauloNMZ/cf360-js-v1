@@ -17,15 +17,12 @@ import { toast } from "sonner";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useConvenentes } from "@/hooks/useConvenentes";
 import { AlertMessage } from "@/components/ui/AlertMessage";
+import { useIndexPageContext } from "@/hooks/useIndexPageContext";
 
 const EmpresaPage = () => {
   // Estado para controle do formulário e operações
   const [formOpen, setFormOpen] = useState(false);
-  const [formMode, setFormMode] = useState<'view' | 'create' | 'edit'>('view');
-  const [activeTab, setActiveTab] = useState('dados');
-  const [currentConvenenteId, setCurrentConvenenteId] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [formData, setFormData] = useState<ConvenenteData>(emptyConvenente);
   const alertTimeoutRef = useRef<number | null>(null);
   
   // Hook para gerenciar convenentes
@@ -35,19 +32,46 @@ const EmpresaPage = () => {
     handleSearch,
     handleCreate,
     handleUpdate,
-    handleDelete,
+    handleDelete: handleDeleteConvenente,
     handleGetById,
     alert,
     setAlert
   } = useConvenentes();
+
+  // Hook para gerenciar o contexto da página Index
+  const {
+    formMode,
+    setFormMode,
+    formData,
+    setFormData,
+    currentConvenenteId,
+    setCurrentConvenenteId,
+    setFormValid,
+    searchTerm,
+    filteredConvenentes,
+    isSearching,
+    handleSearchChange: handleSearchChangeContext,
+    handleConvenenteModalOpenChange,
+    handleSaveClick: handleSaveClickContext,
+    handleEdit: handleEditContext,
+    handleSelectConvenente: handleSelectConvenenteContext,
+    handleFormDataChange: handleFormDataChangeContext,
+    handleCreateNew: handleCreateNewContext,
+    handleDelete: handleDeleteContext,
+    confirmDelete: confirmDeleteContext,
+    activeTab,
+    setActiveTab,
+  } = useIndexPageContext();
   
   // Handlers
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     handleSearch(e.target.value);
+    handleSearchChangeContext(e);
   };
   
   const handleFormDataChange = (data: ConvenenteData) => {
     setFormData(data);
+    handleFormDataChangeContext(data);
   };
   
   const handleNewConvenente = () => {
@@ -60,56 +84,74 @@ const EmpresaPage = () => {
   
   const handleSelectConvenente = async (convenente: ConvenenteData & { id: string }) => {
     try {
-      const fullConvenente = await handleGetById(convenente.id);
+      // Atualiza o estado do contexto com os dados básicos imediatamente
+      setCurrentConvenenteId(convenente.id);
+      setFormData(convenente); 
+      setFormMode('view');
+      setActiveTab('dadosCadastrais');
+
+      // Busca os detalhes completos e atualiza o estado do contexto
+      const fullConvenente = await handleGetById(convenente.id); // Usar handleGetById do useConvenientes
       if (fullConvenente) {
-        setCurrentConvenenteId(convenente.id);
-        setFormData(fullConvenente);
-        setFormMode('view');
-        setActiveTab('dadosCadastrais');
+        setFormData(fullConvenente); // Atualiza com dados completos
+      } else {
+         // Lidar com o caso onde getConvenenteById retorna null/undefined
+         console.warn('handleGetById returned no data for id:', convenente.id);
+         // Manter os dados básicos ou limpar se preferir
       }
+
     } catch (error) {
-      console.error('Erro ao carregar detalhes do convenente:', error);
+      console.error('Erro ao carregar detalhes da empresa:', error);
+      // Resetar estado do contexto em caso de erro
+      setCurrentConvenenteId(null);
+      setFormData(emptyConvenente);
+      setAlert({ type: 'error', message: 'Erro ao carregar detalhes da empresa.' });
     }
   };
   
   const handleEditConvenente = () => {
     setFormMode('edit');
+    handleEditContext();
   };
   
   const handleDeleteClick = () => {
     setDeleteDialogOpen(true);
+    handleDeleteContext();
   };
   
   const handleDeleteConfirm = async () => {
     if (currentConvenenteId) {
       try {
-        await handleDelete(currentConvenenteId);
+        await handleDeleteConvenente(currentConvenenteId);
         setFormOpen(false);
         setCurrentConvenenteId(null);
+        setFormData(emptyConvenente);
       } catch (error) {
-        console.error('Erro ao excluir convenente:', error);
+        console.error('Erro ao excluir empresa:', error);
       }
     }
     setDeleteDialogOpen(false);
+    confirmDeleteContext();
   };
   
   const handleSaveConvenente = async () => {
     try {
       if (formMode === 'create') {
-        const newConvenente = await handleCreate(formData);
-        if (newConvenente) {
+        const newConveniente = await handleCreate(formData);
+        if (newConveniente) {
           setFormOpen(false);
           setCurrentConvenenteId(null);
           setFormData(emptyConvenente);
-          setAlert({ type: 'success', message: 'Convenente criado com sucesso' });
+          setAlert({ type: 'success', message: 'Empresa criada com sucesso' });
         }
       } else if (formMode === 'edit' && currentConvenenteId) {
         await handleUpdate(currentConvenenteId, formData);
         setFormOpen(false);
         setCurrentConvenenteId(null);
         setFormData(emptyConvenente);
-        setAlert({ type: 'success', message: 'Convenente atualizado com sucesso' });
+        setAlert({ type: 'success', message: 'Empresa atualizada com sucesso' });
       }
+      handleSaveClickContext();
     } catch (error) {
       // O alerta de erro já é tratado no hook useConvenentes
     }
@@ -129,7 +171,7 @@ const EmpresaPage = () => {
     return () => {
       if (alertTimeoutRef.current) window.clearTimeout(alertTimeoutRef.current);
     };
-  }, [alert]);
+  }, [alert, setCurrentConvenenteId, setFormData, setAlert]);
 
   return (
     <div className="container mx-auto py-6">
@@ -145,7 +187,7 @@ const EmpresaPage = () => {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
                 <Input 
-                  placeholder="Buscar convenentes..." 
+                  placeholder="Buscar empresas..." 
                   className="pl-10 border-border focus:border-primary bg-input text-foreground"
                   onChange={handleSearchChange}
                 />
@@ -183,7 +225,7 @@ const EmpresaPage = () => {
                   </p>
                   <Button onClick={handleNewConvenente} className="bg-primary-blue hover:bg-primary-blue/90">
                     <Plus size={16} className="mr-2" />
-                    Criar Novo Convenente
+                    Criar Nova Empresa
                   </Button>
                 </div>
               )}
@@ -194,7 +236,7 @@ const EmpresaPage = () => {
               className="w-full mt-4"
             >
               <Plus size={16} className="mr-2" /> 
-              Novo Convenente
+              Nova Empresa
             </Button>
           </div>
           
@@ -253,20 +295,19 @@ const EmpresaPage = () => {
                 <Button 
                   variant="outline" 
                   className="mt-4 w-full border-border text-foreground"
-                  onClick={() => setFormOpen(true)}
-                >
+                  onClick={() => setFormOpen(true)}>
                   Ver detalhes completos
                 </Button>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center h-full p-10 rounded-lg border border-dashed text-foreground bg-muted border-border">
-                <h3 className="text-lg font-medium text-foreground mb-2">Nenhum convenente selecionado</h3>
+                <h3 className="text-lg font-medium text-foreground mb-2">Nenhuma empresa selecionada</h3>
                 <p className="text-muted-foreground text-center mb-4">
-                  Selecione um convenente da lista ou crie um novo para visualizar os detalhes
+                  Selecione uma empresa da lista ou crie uma nova para visualizar os detalhes
                 </p>
                 <Button onClick={handleNewConvenente} className="bg-primary-blue hover:bg-primary-blue/90">
                   <Plus size={16} className="mr-2" />
-                  Criar Novo Convenente
+                  Criar Nova Empresa
                 </Button>
               </div>
             )}
@@ -287,14 +328,13 @@ const EmpresaPage = () => {
                 setCurrentConvenenteId(null);
                 setFormData(emptyConvenente);
                 console.log('Alerta limpo manualmente pelo usuário');
-              }}
-            />
+              }}/>
           )}
           <DialogHeader className="p-6 pb-0">
             <DialogTitle className="text-center text-xl">
-              {formMode === 'create' ? 'Novo Convenente' : 
-               formMode === 'edit' ? 'Editar Convenente' : 
-               'Detalhes do Convenente'}
+              {formMode === 'create' ? 'Nova Empresa' :
+               formMode === 'edit' ? 'Editar Empresa' :
+               'Detalhes da Empresa'}
             </DialogTitle>
           </DialogHeader>
           
@@ -306,8 +346,7 @@ const EmpresaPage = () => {
               currentConvenenteId={currentConvenenteId}
               initialData={formData}
               onSave={handleSaveConvenente}
-              onChange={setFormData}
-            />
+              onChange={setFormData}/>
             
             {/* Botões de Ação */}
             <div className="flex justify-end gap-4 mt-6">
@@ -327,26 +366,20 @@ const EmpresaPage = () => {
                       }
                     }
                   }}
-                  disabled={isLoading}
-                >
+                  disabled={isLoading}>
                   Cancelar
-                </Button>
-              )}
+                </Button>)}
               
               {formMode === 'view' ? (
-                <Button variant="outline" onClick={() => setFormOpen(false)}>
-                  Fechar
-                </Button>
+                <Button variant="outline" onClick={() => setFormOpen(false)}>Fechar</Button>
               ) : (
                 <Button 
                   onClick={handleSaveConvenente}
                   disabled={isLoading || !formData.cnpj || !formData.razaoSocial}
-                  className="bg-primary-blue hover:bg-primary-blue/90"
-                >
+                  className="bg-primary-blue hover:bg-primary-blue/90">
                   {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Salvar
-                </Button>
-              )}
+                </Button>)}
             </div>
           </div>
         </DialogContent>
@@ -358,7 +391,7 @@ const EmpresaPage = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja excluir este convenente? Esta ação não pode ser desfeita.
+              Tem certeza que deseja excluir esta empresa? Esta ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -366,16 +399,14 @@ const EmpresaPage = () => {
             <AlertDialogAction 
               onClick={handleDeleteConfirm}
               disabled={isLoading}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
               {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               Excluir
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
-  );
+    </div>);
 };
 
 export default EmpresaPage;

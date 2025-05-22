@@ -39,9 +39,11 @@ const SidebarLayout = () => {
   const [cnabToApiModalOpen, setCnabToApiModalOpen] = useState(false);
   const { handlerMap, handleLogoutClick } = useNavigationHandlers(setCnabToApiModalOpen);
   const { user } = useAuth();
-  const { adminPanelOpen } = useIndexPageContext();
+  const { adminPanelOpen, currentConvenenteId, formData } = useIndexPageContext();
   const { companySettings } = useCompanySettings(adminPanelOpen);
-  
+
+  console.log("SidebarLayout: Valores do contexto recebidos - ID:", currentConvenenteId, "Dados:", formData); // Log 4
+
   return (
     <TooltipProvider>
       <SidebarProvider defaultOpen={true}>
@@ -60,6 +62,13 @@ const SidebarLayout = () => {
                   ConnectPag
                 </span>
               </div>
+              {/* Nome e CNPJ da Empresa Selecionada */}
+              {currentConvenenteId && formData && (
+                <div className="flex flex-col items-end">
+                  <span className="text-lg font-semibold">{formData.razaoSocial}</span>
+                  <span className="text-sm">CNPJ: {formData.cnpj}</span>
+                </div>
+              )}
               {/* Email, Avatar e Sair */}
               <div className="flex items-center gap-4">
                 {user && (

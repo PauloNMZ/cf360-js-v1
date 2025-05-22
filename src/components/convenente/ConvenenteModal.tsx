@@ -68,7 +68,7 @@ const ConvenenteModal = ({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-6xl">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-center mb-6">Cadastro de Convenente</DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-center mb-6">Cadastro de Empresa</DialogTitle>
         </DialogHeader>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
