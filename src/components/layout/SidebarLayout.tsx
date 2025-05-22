@@ -8,13 +8,7 @@ import { ChevronLeft, ChevronRight, LogOut } from "lucide-react";
 import { useCompanySettings } from "@/hooks/convenente/useCompanySettings";
 import { AppLogo } from "@/components/ui/AppLogo";
 import { useIndexPageContext } from "@/hooks/useIndexPageContext";
-
-// Import our components
-import SidebarHeader from "./sidebar/SidebarHeader";
-import SidebarFooter from "./sidebar/SidebarFooter";
-import SidebarNav from "./sidebar/SidebarNav";
-import { useNavigationHandlers } from "./sidebar/useNavigationHandlers";
-import { Button } from "@/components/ui/button";
+import { formatCNPJ } from "@/utils/formValidation";
 
 // Custom collapse button component
 const CollapseButton = () => {
@@ -35,6 +29,13 @@ const CollapseButton = () => {
   );
 };
 
+// Import our components
+import SidebarHeader from "./sidebar/SidebarHeader";
+import SidebarFooter from "./sidebar/SidebarFooter";
+import SidebarNav from "./sidebar/SidebarNav";
+import { useNavigationHandlers } from "./sidebar/useNavigationHandlers";
+import { Button } from "@/components/ui/button";
+
 const SidebarLayout = () => {
   const [cnabToApiModalOpen, setCnabToApiModalOpen] = useState(false);
   const { handlerMap, handleLogoutClick } = useNavigationHandlers(setCnabToApiModalOpen);
@@ -54,19 +55,30 @@ const SidebarLayout = () => {
                 <AppLogo 
                   size={40}
                   customLogoUrl={companySettings?.logoUrl} 
-                  className="flex-shrink-0" // Garante que o logo não encolha
+                  className="flex-shrink-0"
                 />
                 <span className="text-2xl font-semibold tracking-tight">
                   ConnectPag
                 </span>
+                {/* Exibir nome e CNPJ da empresa, se houver */}
+                {currentConvenenteId && formData?.razaoSocial && formData?.cnpj && (
+                  <span
+                    className="ml-6 flex flex-col sm:flex-row items-start sm:items-center gap-x-2 text-base font-semibold whitespace-nowrap max-w-xs sm:max-w-md truncate"
+                  >
+                    <span className="truncate max-w-[150px] sm:max-w-[220px]" title={formData.razaoSocial}>
+                      {formData.razaoSocial}
+                    </span>
+                    <span className="hidden sm:inline text-xs font-normal text-slate-200/90 px-2">
+                      {/* barra divisora */}
+                      |
+                    </span>
+                    <span className="text-xs sm:text-sm font-medium text-slate-200/80">
+                      CNPJ: {formatCNPJ(formData.cnpj)}
+                    </span>
+                  </span>
+                )}
               </div>
-              {/* Nome e CNPJ da Empresa Selecionada */}
-              {currentConvenenteId && formData && (
-                <div className="flex flex-col items-end">
-                  <span className="text-lg font-semibold">{formData.razaoSocial}</span>
-                  <span className="text-sm">CNPJ: {formData.cnpj}</span>
-                </div>
-              )}
+              {/* Nome e CNPJ da Empresa Selecionada - mover daqui, pois agora aparece ao lado do ConnectPag */}
               {/* Email, Avatar e Sair */}
               <div className="flex items-center gap-4">
                 {user && (
