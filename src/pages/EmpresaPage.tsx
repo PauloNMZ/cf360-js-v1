@@ -84,28 +84,16 @@ const EmpresaPage = () => {
   
   const handleSelectConvenente = async (convenente: ConvenenteData & { id: string }) => {
     try {
-      // Atualiza o estado do contexto com os dados básicos imediatamente
-      setCurrentConvenenteId(convenente.id);
-      setFormData(convenente); 
-      setFormMode('view');
-      setActiveTab('dadosCadastrais');
-
-      // Busca os detalhes completos e atualiza o estado do contexto
-      const fullConvenente = await handleGetById(convenente.id); // Usar handleGetById do useConvenientes
+      const fullConvenente = await handleGetById(convenente.id);
       if (fullConvenente) {
-        setFormData(fullConvenente); // Atualiza com dados completos
-      } else {
-         // Lidar com o caso onde getConvenenteById retorna null/undefined
-         console.warn('handleGetById returned no data for id:', convenente.id);
-         // Manter os dados básicos ou limpar se preferir
+        setCurrentConvenenteId(convenente.id);
+        setFormData(fullConvenente);
+        setFormMode('view');
+        setActiveTab('dadosCadastrais');
+        handleSelectConvenenteContext(convenente, 'view');
       }
-
     } catch (error) {
       console.error('Erro ao carregar detalhes da empresa:', error);
-      // Resetar estado do contexto em caso de erro
-      setCurrentConvenenteId(null);
-      setFormData(emptyConvenente);
-      setAlert({ type: 'error', message: 'Erro ao carregar detalhes da empresa.' });
     }
   };
   

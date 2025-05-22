@@ -41,9 +41,7 @@ const SidebarLayout = () => {
   const { user } = useAuth();
   const { adminPanelOpen, currentConvenenteId, formData } = useIndexPageContext();
   const { companySettings } = useCompanySettings(adminPanelOpen);
-
-  console.log("SidebarLayout: Valores do contexto recebidos - ID:", currentConvenenteId, "Dados:", formData); // Log 4
-
+  
   return (
     <TooltipProvider>
       <SidebarProvider defaultOpen={true}>
