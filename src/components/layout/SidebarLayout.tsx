@@ -73,14 +73,10 @@ const SidebarLayout = () => {
                 {/* Exibir nome e CNPJ da empresa, se houver */}
                 {currentConvenenteId && formData?.razaoSocial && formData?.cnpj && (
                   <span
-                    className="ml-6 flex flex-col sm:flex-row items-start sm:items-center gap-x-2 text-base font-semibold whitespace-nowrap max-w-xs sm:max-w-md truncate"
+                    className="ml-12 flex flex-col items-start text-base font-semibold whitespace-nowrap max-w-md sm:max-w-xl truncate"
                   >
-                    <span className="truncate max-w-[150px] sm:max-w-[220px]" title={formData.razaoSocial}>
+                    <span className="truncate max-w-[250px] sm:max-w-[350px]" title={formData.razaoSocial}>
                       {formData.razaoSocial}
-                    </span>
-                    <span className="hidden sm:inline text-xs font-normal text-slate-200/90 px-2">
-                      {/* barra divisora */}
-                      |
                     </span>
                     <span className="text-xs sm:text-sm font-medium text-slate-200/80">
                       CNPJ: {formatCNPJ(formData.cnpj)}
