@@ -1,4 +1,3 @@
-
 import { useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ConvenenteData, emptyConvenente } from "@/types/convenente";
@@ -18,6 +17,7 @@ export const useModalHandlers = ({
 
   // Improved function to handle opening/closing the convenente modal
   const handleConvenenteModalOpenChange = (open: boolean) => {
+    console.log('useModalHandlers - handleConvenenteModalOpenChange - open:', open);
     // Prevent re-entrant changes or during deletion
     if (isDeleting || modalStateChangingRef.current) {
       console.log("Modal state change blocked: Operation in progress");

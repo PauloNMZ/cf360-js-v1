@@ -47,6 +47,10 @@ const ConvenenteModal = ({
   onFormDataChange,
 }: ConvenenteModalProps) => {
   
+  console.log('ConvenenteModal - formMode:', formMode);
+  console.log('ConvenenteModal - currentConvenenteId:', currentConvenenteId);
+  console.log('ConvenenteModal - formData:', formData);
+  
   const [activeTab, setActiveTab] = useState<string>("dados");
   
   const handleCreateNewClick = (e: React.MouseEvent) => {
@@ -81,7 +85,11 @@ const ConvenenteModal = ({
             isSearching={isSearching}
             searchTerm={searchTerm}
             onSearchChange={onSearchChange}
-            onSelectConvenente={onSelectConvenente}
+            onSelectConvenente={(convenente) => {
+              console.log('ConvenenteModal - onSelectConvenente - convenente:', convenente);
+              console.log('ConvenenteModal - onSelectConvenente - formMode:', formMode);
+              onSelectConvenente(convenente);
+            }}
           />
           
           {/* Formulário */}

@@ -54,7 +54,7 @@ export const IndexPageModals = () => {
   const deletionCompletedRef = useRef(false);
 
   // Special handler for delete confirmation to prevent duplicate triggers
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = (_?: any) => {
     if (isDeleting) {
       console.log("IndexPageModals: Delete operation already in progress");
       return;

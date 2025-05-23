@@ -24,6 +24,14 @@ const ConvenenteList: React.FC<ConvenenteListProps> = ({
   onSearchChange,
   onSelectConvenente,
 }) => {
+  console.log('ConvenenteList - filteredConvenentes:', filteredConvenentes);
+  console.log('ConvenenteList - currentConvenenteId:', currentConvenenteId);
+  
+  const handleSelectConvenente = (convenente: ConvenenteData & { id: string }) => {
+    console.log('ConvenenteList - handleSelectConvenente - convenente:', convenente);
+    onSelectConvenente(convenente);
+  };
+  
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm">
       <div className="mb-4">
@@ -48,22 +56,39 @@ const ConvenenteList: React.FC<ConvenenteListProps> = ({
           </div>
         ) : filteredConvenentes.length > 0 ? (
           <ul className="space-y-2">
-            {filteredConvenentes.map((convenente) => (
-              <li 
-                key={convenente.id}
-                onClick={() => onSelectConvenente(convenente)}
-                className={`p-3 rounded-lg cursor-pointer transition-colors ${
-                  currentConvenenteId === convenente.id 
-                    ? 'bg-blue-100 border border-blue-300' 
-                    : 'hover:bg-gray-100 border border-gray-200'
-                }`}
-              >
-                <h3 className="font-medium text-blue-800">{convenente.razaoSocial}</h3>
-                <p className="text-sm text-gray-500">
-                  CNPJ: {formatCNPJ(convenente.cnpj)}
-                </p>
-              </li>
-            ))}
+            {filteredConvenentes.map((convenente) => {
+              const isSelected = currentConvenenteId === convenente.id;
+              
+              console.log(`ConvenenteList - Item ${convenente.razaoSocial} (ID: ${convenente.id}) - isSelected: ${isSelected}`);
+              
+              return (
+                <li 
+                  key={convenente.id}
+                  onClick={() => {
+                    console.log('ConvenenteList - Clique registrado no item:', convenente.id);
+                    onSelectConvenente(convenente);
+                  }}
+                  className={`p-3 rounded-lg cursor-pointer transition-colors border ${
+                    isSelected
+                      ? 'bg-accent border-primary'
+                      : 'hover:bg-gray-100 border border-gray-200'
+                  }`}
+                >
+                  <h3 
+                    className={`font-medium ${
+                      isSelected
+                        ? 'text-[#5A8AF0]'
+                        : 'text-blue-800'
+                    }`}
+                  >
+                      {convenente.razaoSocial}
+                    </h3>
+                  <p className="text-sm text-gray-500">
+                    CNPJ: {formatCNPJ(convenente.cnpj)}
+                  </p>
+                </li>
+              );
+            })}
           </ul>
         ) : (
           <div className="flex flex-col items-center justify-center h-full text-gray-500">

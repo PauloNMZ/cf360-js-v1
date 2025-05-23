@@ -8,6 +8,7 @@ import { ChevronLeft, ChevronRight, LogOut } from "lucide-react";
 import { useCompanySettings } from "@/hooks/convenente/useCompanySettings";
 import { AppLogo } from "@/components/ui/AppLogo";
 import { useIndexPageContext } from "@/hooks/useIndexPageContext";
+import { formatCNPJ } from "@/utils/formValidation";
 
 // Import our components
 import SidebarHeader from "./sidebar/SidebarHeader";
@@ -42,6 +43,16 @@ const SidebarLayout = () => {
   const { adminPanelOpen, currentConvenenteId, formData } = useIndexPageContext();
   const { companySettings } = useCompanySettings(adminPanelOpen);
   
+  // Adicionar logs para debug
+  console.log('SidebarLayout - currentConvenenteId:', currentConvenenteId);
+  console.log('SidebarLayout - formData:', formData);
+  console.log('SidebarLayout - formData.razaoSocial:', formData?.razaoSocial);
+  console.log('SidebarLayout - formData.cnpj:', formData?.cnpj);
+  
+  // Verificar se os dados do convenente estão disponíveis
+  const hasConvenenteData = currentConvenenteId && formData && formData.razaoSocial && formData.cnpj;
+  console.log('SidebarLayout - hasConvenenteData:', hasConvenenteData);
+  
   return (
     <TooltipProvider>
       <SidebarProvider defaultOpen={true}>
@@ -54,19 +65,23 @@ const SidebarLayout = () => {
                 <AppLogo 
                   size={40}
                   customLogoUrl={companySettings?.logoUrl} 
-                  className="flex-shrink-0" // Garante que o logo não encolha
+                  className="flex-shrink-0"
                 />
                 <span className="text-2xl font-semibold tracking-tight">
                   ConnectPag
                 </span>
               </div>
+
               {/* Nome e CNPJ da Empresa Selecionada */}
-              {currentConvenenteId && formData && (
-                <div className="flex flex-col items-end">
-                  <span className="text-lg font-semibold">{formData.razaoSocial}</span>
-                  <span className="text-sm">CNPJ: {formData.cnpj}</span>
+              {hasConvenenteData && (
+                <div className="flex-1 flex items-center ml-6">
+                  <div className="flex flex-col">
+                    <span className="text-lg font-semibold">{formData.razaoSocial}</span>
+                    <span className="text-sm text-gray-200">CNPJ: {formatCNPJ(formData.cnpj)}</span>
+                  </div>
                 </div>
               )}
+
               {/* Email, Avatar e Sair */}
               <div className="flex items-center gap-4">
                 {user && (

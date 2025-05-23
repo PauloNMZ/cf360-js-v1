@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useConvenenteData } from "../convenente/useConvenenteData";
 import { useConvenenteSearch } from "../convenente/useConvenenteSearch";
@@ -36,16 +35,6 @@ export const useIndexPageData = (modalOpen: boolean) => {
       convenenteData.loadConvenenteData(true);
     } else if (isDeletingRef.current) {
       console.log("useIndexPageData: Skipping data load during deletion");
-    }
-  }, [modalOpen, isDeleting, convenenteData]);
-
-  // Reset form data when modal is closed, but not during deletion
-  useEffect(() => {
-    if (!modalOpen && !isDeletingRef.current) {
-      console.log("useIndexPageData: Resetting form data, isDeleting =", isDeleting);
-      convenenteData.resetFormData();
-    } else if (isDeletingRef.current) {
-      console.log("useIndexPageData: Skipping form reset during deletion");
     }
   }, [modalOpen, isDeleting, convenenteData]);
 

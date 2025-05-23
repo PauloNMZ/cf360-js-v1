@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { ConvenenteData, emptyConvenente } from "@/types/convenente";
 import { getConvenentes, getConvenenteById } from "@/services/convenente/convenenteApi";
@@ -45,20 +44,27 @@ export const useConvenenteData = () => {
   };
 
   const handleSelectConvenente = useCallback(async (convenente: ConvenenteData & { id: string }, formMode: 'view' | 'create' | 'edit') => {
+    console.log('handleSelectConvenente - convenente:', convenente);
+    console.log('handleSelectConvenente - formMode:', formMode);
+    
     // First set the mode back to view
     setCurrentConvenenteId(convenente.id);
+    console.log('handleSelectConvenente - currentConvenenteId set to:', convenente.id);
     
     try {
       setIsLoading(true);
       // Get complete convenente from database only if not in edit mode
       // For edit mode, use the data we already have
       setFormData(convenente);
+      console.log('handleSelectConvenente - formData set to:', convenente);
       
       // Only fetch if additional data is needed and not in edit mode
       if (formMode !== 'edit') {
         const completeConvenente = await getConvenenteById(convenente.id);
+        console.log('handleSelectConvenente - completeConvenente:', completeConvenente);
         if (completeConvenente) {
           setFormData(completeConvenente);
+          console.log('handleSelectConvenente - formData updated with completeConvenente:', completeConvenente);
         }
       }
     } catch (error) {
