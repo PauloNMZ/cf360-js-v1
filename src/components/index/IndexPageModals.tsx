@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from "react";
 import ConvenenteModal from "@/components/convenente/ConvenenteModal";
 import DeleteConvenenteDialog from "@/components/convenente/DeleteConvenenteDialog";
@@ -85,7 +84,7 @@ export const IndexPageModals = () => {
         }, 1000);
       }
     }
-  }, [isDeleting]);
+  }, [isDeleting, setShowDeleteDialog]);
   
   // Clean up any stuck deletion state
   useEffect(() => {
@@ -102,7 +101,7 @@ export const IndexPageModals = () => {
     }, 60000); // Check after 1 minute
     
     return () => clearTimeout(checkDeletionTimeout);
-  }, [isDeleting, resetDeletionState]);
+  }, [isDeleting, resetDeletionState, setShowDeleteDialog]);
 
   // Fix for the type error in handleSelectConvenente
   const onSelectConvenente = (convenente: any) => {
