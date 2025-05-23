@@ -138,7 +138,7 @@ const EmpresaPage = () => {
                 console.log('EmpresaPage - Item da lista clicado:', convenente.id);
                 handleSelectConvenente(convenente, 'view');
               }} className={`p-3 rounded-lg cursor-pointer transition-colors border ${currentConvenenteId === convenente.id ? 'bg-accent border-primary text-primary-foreground' : 'hover:bg-accent/50 border-border text-foreground'}`}>
-                      <h3 className="font-medium text-[t#5A8AF0] text-stone-600">{convenente.razaoSocial}</h3>
+                      <h3 className="font-medium text-[t#5A8AF0] text-gray-500">{convenente.razaoSocial}</h3>
                       <p className="text-sm text-muted-foreground">
                         CNPJ: {formatCNPJ(convenente.cnpj)}
                       </p>
