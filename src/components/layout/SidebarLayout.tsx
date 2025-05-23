@@ -25,7 +25,7 @@ const CollapseButton = () => {
     <Button 
       variant="ghost" 
       size="icon" 
-      onClick={toggleSidebar} 
+      onClick={toggleSidebar}
       className="absolute -right-3 top-20 h-6 w-6 rounded-full border bg-background shadow-sm"
     >
       {state === "collapsed" ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
@@ -70,17 +70,25 @@ const SidebarLayout = () => {
                 <span className="text-2xl font-semibold tracking-tight">
                   ConnectPag
                 </span>
+                {/* Exibir nome e CNPJ da empresa, se houver */}
+                {currentConvenenteId && formData?.razaoSocial && formData?.cnpj && (
+                  <span
+                    className="ml-6 flex flex-col sm:flex-row items-start sm:items-center gap-x-2 text-base font-semibold whitespace-nowrap max-w-xs sm:max-w-md truncate"
+                  >
+                    <span className="truncate max-w-[150px] sm:max-w-[220px]" title={formData.razaoSocial}>
+                      {formData.razaoSocial}
+                    </span>
+                    <span className="hidden sm:inline text-xs font-normal text-slate-200/90 px-2">
+                      {/* barra divisora */}
+                      |
+                    </span>
+                    <span className="text-xs sm:text-sm font-medium text-slate-200/80">
+                      CNPJ: {formatCNPJ(formData.cnpj)}
+                    </span>
+                  </span>
+                )}
               </div>
-
-              {/* Nome e CNPJ da Empresa Selecionada */}
-              {hasConvenenteData && (
-                <div className="flex-1 flex items-center ml-6">
-                  <div className="flex flex-col">
-                    <span className="text-lg font-semibold">{formData.razaoSocial}</span>
-                    <span className="text-sm text-gray-200">CNPJ: {formatCNPJ(formData.cnpj)}</span>
-                  </div>
-                </div>
-              )}
+              {/* Nome e CNPJ da Empresa Selecionada - mover daqui, pois agora aparece ao lado do ConnectPag */}
 
               {/* Email, Avatar e Sair */}
               <div className="flex items-center gap-4">
