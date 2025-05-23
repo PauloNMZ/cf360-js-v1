@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from "react";
 import ConvenenteModal from "@/components/convenente/ConvenenteModal";
 import DeleteConvenenteDialog from "@/components/convenente/DeleteConvenenteDialog";
@@ -173,7 +174,7 @@ export const IndexPageModals = () => {
         isOpen={showDeleteDialog}
         // Correction: always pass a boolean to onOpenChange
         onOpenChange={(val) => setShowDeleteDialog(val)}
-        onDelete={() => handleConfirmDelete()} // FIX: Pass handler matching the prop signature (no argument)
+        onDelete={handleConfirmDelete} // FIX: Pass handler matching the prop signature (no argument)
         isDeleting={isDeleting}
       />
     </>

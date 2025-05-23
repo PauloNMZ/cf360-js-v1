@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -12,23 +13,30 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useConvenentes } from "@/hooks/useConvenentes";
 import { AlertMessage } from "@/components/ui/AlertMessage";
 import { useIndexPageContext } from "@/hooks/useIndexPageContext";
+
 const EmpresaPage = () => {
   const [activeTab, setActiveTab] = useState('dados');
   const alertTimeoutRef = useRef<number | null>(null);
+  
+  // Coletar o contexto da página principal
   const {
+    modalOpen,
+    setModalOpen,
+    formMode,
+    setFormMode,
     currentConvenenteId,
     setCurrentConvenenteId,
     formData,
     setFormData,
-    formMode,
-    setFormMode,
-    handleSelectConvenente,
-    modalOpen,
-    setModalOpen,
     showDeleteDialog,
     setShowDeleteDialog,
+    handleEdit: contextHandleEdit,
+    handleSelectConvenente,
+    handleFormDataChange,
     isLoading: isContextLoading
   } = useIndexPageContext();
+  
+  // Hook local para operações com convenentes
   const {
     convenentes,
     isLoading: isCrudLoading,
@@ -40,29 +48,44 @@ const EmpresaPage = () => {
     alert,
     setAlert
   } = useConvenentes();
+  
   const isLoading = isContextLoading || isCrudLoading;
+  
   console.log('EmpresaPage - modalOpen:', modalOpen);
   console.log('EmpresaPage - currentConvenenteId:', currentConvenenteId);
   console.log('EmpresaPage - formData:', formData);
+  console.log('EmpresaPage - formMode:', formMode);
+  
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     handleSearch(e.target.value);
   };
-  const handleFormDataChange = (data: ConvenenteData) => {
-    setFormData(data);
-  };
+  
+  // Função para criar novo convenente
   const handleNewConvenente = () => {
+    // Resetar o estado do formulário
     setFormData(emptyConvenente);
     setCurrentConvenenteId(null);
     setFormMode('create');
     setModalOpen(true);
     setActiveTab('dados');
   };
+  
+  // Função para editar o convenente selecionado - CORREÇÃO AQUI
   const handleEditConvenente = () => {
-    setFormMode('edit');
+    if (currentConvenenteId) {
+      console.log('EmpresaPage - handleEditConvenente - Abrindo modal para edição');
+      setFormMode('edit');
+      setModalOpen(true); // Adicionado para garantir que o modal abra
+      setActiveTab('dadosCadastrais'); // Defina a aba ativa para "Dados Cadastrais"
+    }
   };
+  
+  // Função para requisitar exclusão
   const handleDeleteClick = () => {
     setShowDeleteDialog(true);
   };
+  
+  // Função para confirmar exclusão
   const handleDeleteConfirm = async () => {
     if (currentConvenenteId) {
       try {
@@ -75,6 +98,8 @@ const EmpresaPage = () => {
     }
     setShowDeleteDialog(false);
   };
+  
+  // Função para salvar convenente
   const handleSaveConvenente = async () => {
     try {
       if (formMode === 'create') {
@@ -102,6 +127,7 @@ const EmpresaPage = () => {
       // O alerta de erro já é tratado no hook useConvenentes
     }
   };
+  
   useEffect(() => {
     if (alert && alert.type === 'success') {
       if (alertTimeoutRef.current) window.clearTimeout(alertTimeoutRef.current);
@@ -115,6 +141,14 @@ const EmpresaPage = () => {
       if (alertTimeoutRef.current) window.clearTimeout(alertTimeoutRef.current);
     };
   }, [alert, setAlert]);
+
+  // Lógica para lidar com "Ver detalhes completos"
+  const handleViewDetails = () => {
+    setModalOpen(true);
+    // Garante que estamos no modo de visualização
+    setFormMode('view');
+  };
+
   return <div className="container mx-auto py-6">
       <div className="bg-card rounded-lg shadow-sm overflow-hidden">
         <div className="bg-secondary text-foreground p-4">
@@ -168,7 +202,12 @@ const EmpresaPage = () => {
                     {formData.razaoSocial}
                   </h2>
                   <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={handleEditConvenente} disabled={formMode === 'edit' || isLoading}>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={handleEditConvenente} 
+                      disabled={formMode === 'edit' || isLoading}
+                    >
                       <Pencil size={16} className="mr-2" />
                       Editar
                     </Button>
@@ -200,7 +239,11 @@ const EmpresaPage = () => {
                   </div>
                 </div>
                 
-                <Button variant="outline" className="mt-4 w-full border-border text-foreground" onClick={() => setModalOpen(true)}>
+                <Button 
+                  variant="outline" 
+                  className="mt-4 w-full border-border text-foreground" 
+                  onClick={handleViewDetails}
+                >
                   Ver detalhes completos
                 </Button>
               </div> : <div className="flex flex-col items-center justify-center h-full p-10 rounded-lg border border-dashed text-foreground bg-muted border-border">
@@ -231,7 +274,15 @@ const EmpresaPage = () => {
           </DialogHeader>
           
           <div className="p-6">
-            <ConvenenteForm activeTab={activeTab} setActiveTab={setActiveTab} formMode={formMode} currentConvenenteId={currentConvenenteId} initialData={formData} onSave={handleSaveConvenente} onChange={setFormData} />
+            <ConvenenteForm 
+              activeTab={activeTab} 
+              setActiveTab={setActiveTab} 
+              formMode={formMode} 
+              currentConvenenteId={currentConvenenteId} 
+              initialData={formData} 
+              onSave={handleSaveConvenente} 
+              onChange={handleFormDataChange} 
+            />
             
             <div className="flex justify-end gap-4 mt-6">
               {formMode !== 'view' && <Button variant="outline" onClick={() => {
@@ -279,4 +330,5 @@ const EmpresaPage = () => {
       </AlertDialog>
     </div>;
 };
+
 export default EmpresaPage;
