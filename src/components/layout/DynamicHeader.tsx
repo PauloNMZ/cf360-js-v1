@@ -1,7 +1,7 @@
 
 import React from "react";
 import { AppLogo } from '@/components/ui/AppLogo';
-import { TypographyMuted, TypographySmall } from '@/components/ui/typography';
+import { TypographyMuted } from '@/components/ui/typography';
 import { formatCNPJ } from "@/utils/formValidation";
 import { useCompanySettings } from '@/hooks/convenente/useCompanySettings';
 import { useIndexPageContext } from '@/hooks/useIndexPageContext';
@@ -32,7 +32,7 @@ const DynamicHeader: React.FC<DynamicHeaderProps> = ({ company }) => {
           {company && (
             <div className="ml-4 flex flex-col">
               <TypographyMuted className="text-white text-lg font-semibold">{company.razaoSocial}</TypographyMuted>
-              <TypographySmall className="text-gray-200">CNPJ: {formatCNPJ(company.cnpj)}</TypographySmall>
+              <span className="text-gray-200 text-sm">CNPJ: {formatCNPJ(company.cnpj)}</span>
             </div>
           )}
         </div>
