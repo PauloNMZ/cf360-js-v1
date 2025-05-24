@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { getCompanySettings, saveCompanySettings } from "@/services/companySettings";
 import { useToast } from "@/components/ui/use-toast";
 import AdminMenu from "@/components/admin/AdminMenu";
@@ -29,7 +30,6 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
     toggleAPIStatus
   } = useAPIManagement();
 
-  // ... keep existing code (bank connections state and handlers)
   const [bankConnections, setBankConnections] = useState([
     { 
       id: 1, 
@@ -37,7 +37,7 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
       clientId: 'eyJpZCI6IjY8&3NjZmOTctNmM5My0iLCJjb2RpZ29QdWJsaWNhZG9yIjowLCJjb2RpZ29Tb2Z0d2FyZSI6MTAzNTgxLCJzZXF1ZW5jaWFsSW5zdGFsYWNhbyI6Mn0', 
       clientSecret: 'eyJpZCI6ImI1ODgyZWYtYWJlNi00NTMwLWExNGQtMTdjZDZjZDU0NWEyMTBmMGYxZDEtIiwiY29kaWdvUHVibGljYWRvciI6MCwiY29kaWdvU29mdHdhcmUiOjEwMzU4MSwic2VxdWVuY2lhbEluc3RhbGFjYW8iOjIsInNlcXVlbmNpYWxDcmVkZW5jaWFsIjoyLCJhbWJpZW50ZSI6InByb2R1Y2FvIiwiaWF0IjoxNzQ2MDMzNzI2MDcwfQ',
       registrarToken: 'eyJpZCI6IjViOTIzMTM0LWZjZDktNDNhZS1hOWUxLWI2NDVlODJkMzM4NiIsImNvZGlnb1NvZnR3YXJlIjoxMDM1ODEsInNlcXVlbmNpYWxJbnN0YWxhY2FvIjowLCJzZXF1ZW5jaWFsVG9rZW4iOjEsImNvZGlnb1RpcG9Ub2tlbiI6MiwiYW1iaWVudGUiOiJwcm9kdWNhbyIsImlhdCI6MTc0NjAzMzcyNjAzMn0',
-      basic: 'ZXlKcFpDSTZJalkzTmpabU9UY3RObU01TXkwaUxDSmpiMlJwWjI5UWRXSnNhV05oWkc5eUlqb3dMQ0pqYjJScFoyOVRiMlowZDJGeVpTSTZNVEF6TlRneExDSnpaWEYxWlc1amFXRnNTVzV6ZEdGc1lXTmhieUk2TW4wOmV5SnBaQ0k2SW1JMU9EZ3laV1l0WVdKbE5pMDByVE13TFdFeE5HUXRNVGRqWkRaalpEVTBOV0V5TVRCbU1HWXhaREV0SWl3aVkyOWthV2R2VUhWaWJHbGpZV1J2Y2lJNk1Dd2lZMjlreFdkdlUyOW1kSGRoY21VaU9qRXdNelU0TVN3aWMyVnhkV1Z1WTJsaGJFbHVjM1RoYkdGamRXNWtJam95TENKaGJXSnBaVzUwWlNJNklsOXFZWEoxWlMxd2JHOWhaR3dpSUhzSw==',
+      basic: 'ZXlKcFpDSTZJalkzTmpabU9UY3RObU01TXkwaUxDSmpiMlJwWjI5UWRXSnNhV05oWkc5eUlqb3dMQ0pqYjJScFoyOVRiMlowZDJHeVpTSTZNVEF6TlRneExDSnpaWEYxWlc1amFXRnNTVzV6ZEdGc1lXTmhieUk2TW4wOmV5SnBaQ0k2SW1JMU9EZ3laV1l0WVdKbE5pMDByVE13TFdFeE5HUXRNVGRqWkRaalpEVTBOV0V5TVRCbU1HWXhaREV0SWl3aVkyOWthV2R2VUhWaWJHbGpZV1J2Y2lJNk1Dd2lZMjlreFdkdlUyOW1kSGRoY21VaU9qRXdNelU0TVN3aWMyVnhkV1Z1WTJsaGJFbHVjM1RoYkdGamRXNWtJam95TENKaGJXSnBaVzUwWlNJNklsOXFZWEoxWlMxd2JHOWhaR3dpSUhzSw==',
       userBBsia: 'user123',
       passwordBBsia: '********'
     }
@@ -62,7 +62,6 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
     passwordBBsia: ''
   });
 
-  // Load company settings on component mount
   useEffect(() => {
     const settings = getCompanySettings();
     setCompanySettings(settings);
@@ -95,7 +94,6 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
     setIsCreating(false);
   };
 
-  // ... keep existing code (all the bank connection handlers and company settings handlers)
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormValues(prev => ({
@@ -244,7 +242,6 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
         />
       )}
       
-      {/* Diálogo de confirmação para exclusão de conexão */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
