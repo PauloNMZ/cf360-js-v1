@@ -6,6 +6,8 @@ import AdminMenu from "@/components/admin/AdminMenu";
 import CompanySettingsSection from "@/components/admin/CompanySettingsSection";
 import BankConnectionsList from "@/components/admin/BankConnectionsList";
 import BankConnectionForm from "@/components/admin/BankConnectionForm";
+import APIManagementTable from "@/components/admin/api/APIManagementTable";
+import { useAPIManagement } from "@/hooks/admin/useAPIManagement";
 
 interface AdminPanelProps {
   onClose?: () => void;
@@ -15,6 +17,19 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
   const { toast } = useToast();
   const [showBankConnections, setShowBankConnections] = useState(false);
   const [showCompanySettings, setShowCompanySettings] = useState(false);
+  const [showAPIManagement, setShowAPIManagement] = useState(false);
+  
+  // API Management hook
+  const {
+    apis,
+    addAPI,
+    editAPI,
+    deleteAPI,
+    rotateCredentials,
+    toggleAPIStatus
+  } = useAPIManagement();
+
+  // ... keep existing code (bank connections state and handlers)
   const [bankConnections, setBankConnections] = useState([
     { 
       id: 1, 
@@ -42,7 +57,7 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
     clientId: 'eyJpZCI6IjY8&3NjZmOTctNmM5My0iLCJjb2RpZ29QdWJsaWNhZG9yIjowLCJjb2RpZ29Tb2Z0d2FyZSI6MTAzNTgxLCJzZXF1ZW5jaWFsSW5zdGFsYWNhbyI6Mn0',
     clientSecret: 'eyJpZCI6ImI1ODgyZWYtYWJlNi00NTMwLWExNGQtMTdjZDZjZDU0NWEyMTBmMGYxZDEtIiwiY29kaWdvUHVibGljYWRvciI6MCwiY29kaWdvU29mdHdhcmUiOjEwMzU4MSwic2VxdWVuY2lhbEluc3RhbGFjYW8iOjIsInNlcXVlbmNpYWxDcmVkZW5jaWFsIjoyLCJhbWJpZW50ZSI6InByb2R1Y2FvIiwiaWF0IjoxNzQ2MDMzNzI2MDcwfQ',
     registrarToken: 'eyJpZCI6IjViOTIzMTM0LWZjZDktNDNhZS1hOWUxLWI2NDVlODJkMzM4NiIsImNvZGlnb1NvZnR3YXJlIjoxMDM1ODEsInNlcXVlbmNpYWxJbnN0YWxhY2FvIjowLCJzZXF1ZW5jaWFsVG9rZW4iOjEsImNvZGlnb1RpcG9Ub2tlbiI6MiwiYW1iaWVudGUiOiJwcm9kdWNhbyIsImlhdCI6MTc0NjAzMzcyNjAzMn0',
-    basic: 'ZXlKcFpDSTZJalkzTmpabU9UY3RObU01TXkwaUxDSmpiMlJwWjI5UWRXSnNhV05oWkc5eUlqb3dMQ0pqYjJScFoyOVRiMlowZDJGeVpTSTZNVEF6TlRneExDSnpaWEYxWlc1amFXRnNTVzV6ZEdGc1lXTmhieUk2TW4wOmV5SnBaQ0k2SW1JMU9EZ3laV1l0WVdKbE5pMDByVE13TFdFeE5HUXRNVGRqWkRaalpEVTBOV0V5TVRCbU1HWXhaREV0SWl3aVkyOWthV2R2VUhWaWJHbGpZV1J2Y2lJNk1Dd2lZMjlreFdkdlUyOW1kSGRoY21VaU9qRXdNelU0TVN3aWMyVnhkV1Z1WTJsaGJFbHVjM1RoYkdGamRXNWtJam95TENKaGJXSnBaVzUwWlNJNklsOXFZWEoxWlMxd2JHOWhaR3dpSUhzSw==',
+    basic: 'ZXlKcFpDSTZJalkzTmpabU9UY3RObU01TXkwaUxDSmpiMlJwWjI5UWRXSnNhV05oWkc5eUlqb3dMQ0pqYjJScFoyOVRiMlowZDJHeVpTSTZNVEF6TlRneExDSnpaWEYxWlc1amFXRnNTVzV6ZEdGc1lXTmhieUk2TW4wOmV5SnBaQ0k2SW1JMU9EZ3laV1l0WVdKbE5pMDByVE13TFdFeE5HUXRNVGRqWkRaalpEVTBOV0V5TVRCbU1HWXhaREV0SWl3aVkyOWthV2R2VUhWaWJHbGpZV1J2Y2lJNk1Dd2lZMjlreFdkdlUyOW1kSGRoY21VaU9qRXdNelU0TVN3aWMyVnhkV1Z1WTJsaGJFbHVjM1RoYkdGamRXNWtJam95TENKaGJXSnBaVzUwWlNJNklsOXFZWEoxWlMxd2JHOWhaR3dpSUhzSw==',
     userBBsia: '',
     passwordBBsia: ''
   });
@@ -57,20 +72,30 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
   const handleBankConnectionsClick = () => {
     setShowBankConnections(true);
     setShowCompanySettings(false);
+    setShowAPIManagement(false);
   };
 
   const handleCompanySettingsClick = () => {
     setShowCompanySettings(true);
     setShowBankConnections(false);
+    setShowAPIManagement(false);
+  };
+
+  const handleAPIManagementClick = () => {
+    setShowAPIManagement(true);
+    setShowBankConnections(false);
+    setShowCompanySettings(false);
   };
 
   const handleBackToMenu = () => {
     setShowBankConnections(false);
     setShowCompanySettings(false);
+    setShowAPIManagement(false);
     setIsEditing(false);
     setIsCreating(false);
   };
 
+  // ... keep existing code (all the bank connection handlers and company settings handlers)
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormValues(prev => ({
@@ -111,7 +136,6 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
       title: "Configurações salvas",
       description: "As configurações da empresa foram atualizadas com sucesso.",
     });
-    // Voltar para o menu principal do AdminPanel após salvar
     handleBackToMenu();
   };
 
@@ -121,7 +145,7 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
       clientId: 'eyJpZCI6IjY8&3NjZmOTctNmM5My0iLCJjb2RpZ29QdWJsaWNhZG9yIjowLCJjb2RpZ29Tb2Z0d2FyZSI6MTAzNTgxLCJzZXF1ZW5jaWFsSW5zdGFsYWNhbyI6Mn0',
       clientSecret: 'eyJpZCI6ImI1ODgyZWYtYWJlNi00NTMwLWExNGQtMTdjZDZjZDU0NWEyMTBmMGYxZDEtIiwiY29kaWdvUHVibGljYWRvciI6MCwiY29kaWdvU29mdHdhcmUiOjEwMzU4MSwic2VxdWVuY2lhbEluc3RhbGFjYW8iOjIsInNlcXVlbmNpYWxDcmVkZW5jaWFsIjoyLCJhbWJpZW50ZSI6InByb2R1Y2FvIiwiaWF0IjoxNzQ2MDMzNzI2MDcwfQ',
       registrarToken: 'eyJpZCI6IjViOTIzMTM0LWZjZDktNDNhZS1hOWUxLWI2NDVlODJkMzM4NiIsImNvZGlnb1NvZnR3YXJlIjoxMDM1ODEsInNlcXVlbmNpYWxJbnN0YWxhY2FvIjowLCJzZXF1ZW5jaWFsVG9rZW4iOjEsImNvZGlnb1RpcG9Ub2tlbiI6MiwiYW1iaWVudGUiOiJwcm9kdWNhbyIsImlhdCI6MTc0NjAzMzcyNjAzMn0',
-      basic: 'ZXlKcFpDSTZJalkzTmpabU9UY3RObU01TXkwaUxDSmpiMlJwWjI5UWRXSnNhV05oWkc5eUlqb3dMQ0pqYjJScFoyOVRiMlowZDJGeVpTSTZNVEF6TlRneExDSnpaWEYxWlc1amFXRnNTVzV6ZEdGc1lXTmhieUk2TW4wOmV5SnBaQ0k2SW1JMU9EZ3laV1l0WVdKbE5pMDByVE13TFdFeE5HUXRNVGRqWkRaalpEVTBOV0V5TVRCbU1HWXhaREV0SWl3aVkyOWthV2R2VUhWaWJHbGpZV1J2Y2lJNk1Dd2lZMjlreFdkdlUyOW1kSGRoY21VaU9qRXdNelU0TVN3aWMyVnhkV1Z1WTJsaGJFbHVjM1RoYkdGamRXNWtJam95TENKaGJXSnBaVzUwWlNJNklsOXFZWEoxWlMxd2JHOWhaR3dpSUhzSw==',
+      basic: 'ZXlKcFpDSTZJalkzTmpabU9UY3RObU01TXkwaUxDSmpiMlJwWjI5UWRXSnNhV05oWkc5eUlqb3dMQ0pqYjJScFoyOVRiMlowZDJHeVpTSTZNVEF6TlRneExDSnpaWEYxWlc1amFXRnNTVzV6ZEdGc1lXTmhieUk2TW4wOmV5SnBaQ0k2SW1JMU9EZ3laV1l0WVdKbE5pMDByVE13TFdFeE5HUXRNVGRqWkRaalpEVTBOV0V5TVRCbU1HWXhaREV0SWl3aVkyOWthV2R2VUhWaWJHbGpZV1J2Y2lJNk1Dd2lZMjlreFdkdlUyOW1kSGRoY21VaU9qRXdNelU0TVN3aWMyVnhkV1Z1WTJsaGJFbHVjM1RoYkdGamRXNWtJam95TENKaGJXSnBaVzUwWlNJNklsOXFZWEoxWlMxd2JHOWhaR3dpSUhzSw==',
       userBBsia: '',
       passwordBBsia: ''
     });
@@ -130,12 +154,10 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
 
   const handleSave = () => {
     if (isEditing) {
-      // Update existing connection
       setBankConnections(prev => prev.map(conn => 
         conn.id === editConnection.id ? { ...formValues, id: conn.id } : conn
       ));
     } else {
-      // Create new connection
       const newId = bankConnections.length > 0 
         ? Math.max(...bankConnections.map(c => c.id)) + 1 
         : 1;
@@ -173,10 +195,11 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
 
   return (
     <div className="space-y-6">
-      {!showBankConnections && !showCompanySettings && !isEditing && !isCreating ? (
+      {!showBankConnections && !showCompanySettings && !showAPIManagement && !isEditing && !isCreating ? (
         <AdminMenu 
           onBankConnectionsClick={handleBankConnectionsClick}
           onCompanySettingsClick={handleCompanySettingsClick}
+          onAPIManagementClick={handleAPIManagementClick}
         />
       ) : showCompanySettings ? (
         <CompanySettingsSection
@@ -187,6 +210,22 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
           onSaveSettings={handleSaveCompanySettings}
           onBack={handleBackToMenu}
         />
+      ) : showAPIManagement ? (
+        <div>
+          <div className="mb-4">
+            <Button variant="outline" onClick={handleBackToMenu}>
+              ← Voltar ao Menu
+            </Button>
+          </div>
+          <APIManagementTable
+            apis={apis}
+            onAddAPI={addAPI}
+            onEditAPI={editAPI}
+            onDeleteAPI={deleteAPI}
+            onRotateCredentials={rotateCredentials}
+            onToggleStatus={toggleAPIStatus}
+          />
+        </div>
       ) : showBankConnections && !isEditing && !isCreating ? (
         <BankConnectionsList
           bankConnections={bankConnections}
