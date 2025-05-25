@@ -90,6 +90,7 @@ export const IndexPageModals = () => {
     const checkDeletionTimeout = setTimeout(() => {
       if (isDeleting && resetDeletionState) {
         console.log("IndexPageModals: Checking for stuck deletion state");
+        // Corrigir aqui, garantindo booleano como argumento:
         setShowDeleteDialog(false); // Passa false explicitamente
       }
     }, 60000); // Check after 1 minute
