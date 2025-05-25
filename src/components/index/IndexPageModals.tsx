@@ -167,7 +167,10 @@ export const IndexPageModals = () => {
 
       <DeleteConvenenteDialog 
         isOpen={showDeleteDialog}
-        onOpenChange={onDeleteDialogOpenChange}
+        onOpenChange={(open) => {
+          // Garante que sempre seja passado um argumento booleano.
+          onDeleteDialogOpenChange(typeof open === "boolean" ? open : false);
+        }}
         onDelete={handleConfirmDelete}
         isDeleting={isDeleting}
       />
