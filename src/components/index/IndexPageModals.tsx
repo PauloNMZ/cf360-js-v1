@@ -79,7 +79,7 @@ export const IndexPageModals = () => {
         // Reset deletion completed flag after delay
         setTimeout(() => {
           deletionCompletedRef.current = false;
-          setShowDeleteDialog(false); // Passa false explicitamente
+          setShowDeleteDialog(false); // Passa false explicitamente para evitar erro TS2554
         }, 1000);
       }
     }
