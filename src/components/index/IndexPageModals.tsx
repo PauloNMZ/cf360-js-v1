@@ -79,18 +79,18 @@ export const IndexPageModals = () => {
         // Reset deletion completed flag after delay
         setTimeout(() => {
           deletionCompletedRef.current = false;
-          setShowDeleteDialog(false); // fix: always call with argument
+          setShowDeleteDialog(false); // Passa false explicitamente
         }, 1000);
       }
     }
   }, [isDeleting, setShowDeleteDialog]);
-  
+
   // Clean up any stuck deletion state
   useEffect(() => {
     const checkDeletionTimeout = setTimeout(() => {
       if (isDeleting && resetDeletionState) {
         console.log("IndexPageModals: Checking for stuck deletion state");
-        setShowDeleteDialog(false); // fix: always call with argument
+        setShowDeleteDialog(false); // Passa false explicitamente
       }
     }, 60000); // Check after 1 minute
     
