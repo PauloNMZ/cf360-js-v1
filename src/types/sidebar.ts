@@ -1,15 +1,15 @@
 
-export interface SidebarModule {
-  name: string;
-  icon: string;
-  children?: SidebarModuleChild[];
-  path?: string;
-}
-
 export interface SidebarModuleChild {
   name: string;
   link: string;
   icon?: string;
+}
+
+export interface SidebarModule {
+  name: string;
+  icon: string; // Nome da string do ícone do lucide-react
+  path?: string; // Caminho direto do módulo, opcional
+  children?: SidebarModuleChild[]; // Submenus/tab children
 }
 
 export interface MainSidebarProps {
