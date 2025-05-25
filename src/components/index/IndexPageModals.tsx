@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from "react";
 import ConvenenteModal from "@/components/convenente/ConvenenteModal";
 import DeleteConvenenteDialog from "@/components/convenente/DeleteConvenenteDialog";
@@ -80,7 +79,7 @@ export const IndexPageModals = () => {
         // Reset deletion completed flag after delay
         setTimeout(() => {
           deletionCompletedRef.current = false;
-          setShowDeleteDialog(false);
+          setShowDeleteDialog(false); // fix: always call with argument
         }, 1000);
       }
     }
@@ -91,12 +90,19 @@ export const IndexPageModals = () => {
     const checkDeletionTimeout = setTimeout(() => {
       if (isDeleting && resetDeletionState) {
         console.log("IndexPageModals: Checking for stuck deletion state");
-        setShowDeleteDialog(false);
+        setShowDeleteDialog(false); // fix: always call with argument
       }
     }, 60000); // Check after 1 minute
     
     return () => clearTimeout(checkDeletionTimeout);
   }, [isDeleting, resetDeletionState, setShowDeleteDialog]);
+
+  // Defensive: NUNCA chame sem argumento
+  // Exemplo: se precisar passar para callback, garanta argumento default
+  // Exemplo de compatibilização (caso alguma lib não passe arg):
+  const onDeleteDialogOpenChange = (val?: boolean) => {
+    setShowDeleteDialog(typeof val === 'boolean' ? val : false);
+  };
 
   // Fix for the type error in handleSelectConvenente
   const onSelectConvenente = (convenente: any) => {
@@ -161,7 +167,7 @@ export const IndexPageModals = () => {
 
       <DeleteConvenenteDialog 
         isOpen={showDeleteDialog}
-        onOpenChange={(val) => setShowDeleteDialog(val)}
+        onOpenChange={onDeleteDialogOpenChange}
         onDelete={handleConfirmDelete}
         isDeleting={isDeleting}
       />
