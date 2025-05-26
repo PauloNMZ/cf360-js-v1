@@ -9,7 +9,7 @@ import { getIconComponent } from "./ModularNavigationConfig";
  * 
  * @param modules - Array de módulos conforme SidebarModule (ex: modularNavigationConfig)
  * @param iconSize - Tamanho dos ícones em px (opcional, padrão 20)
- * @returns Novo array de módulos idêntico, mas com `icon` substituído por React node
+ * @returns Novo array de módulos idêntico, mas com `icon` substituído por React node (apenas nos módulos principais)
  */
 export function getResolvedSidebarModules(
   modules: SidebarModule[],
@@ -19,17 +19,13 @@ export function getResolvedSidebarModules(
     // Resolve ícone do módulo principal
     const resolvedIcon = getIconComponent(module.icon, iconSize);
 
-    // Resolve ícones dos filhos, caso existam
+    // Os filhos *permanecem* tipo original (string ou undefined);
+    // evite transformar, já que SidebarModuleChild.icon é string
     let resolvedChildren: SidebarModuleChild[] | undefined = undefined;
     if (module.children && Array.isArray(module.children)) {
-      resolvedChildren = module.children.map((child) => {
-        // Se algum dia os filhos tiverem `icon` como string, resolvemos aqui
-        // (atualmente no ModularNavigationConfig só os módulos principais têm `icon`)
-        return {
-          ...child,
-          icon: child.icon ? getIconComponent(child.icon, iconSize) : undefined,
-        };
-      });
+      resolvedChildren = module.children.map((child) => ({
+        ...child, // mantém icon: string | undefined
+      }));
     }
 
     return {
