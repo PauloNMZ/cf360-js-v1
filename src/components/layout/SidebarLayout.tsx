@@ -109,7 +109,7 @@ const SidebarLayout = () => {
             </Sidebar>
             <div className="flex-1 overflow-auto flex flex-col">
               <div className="flex-1 overflow-auto">
-                <div className="container mx-auto p-4">
+                <div className="">
                   <Outlet />
                 </div>
               </div>

@@ -1,4 +1,3 @@
-
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -8,6 +7,7 @@ import PagamentoGrupoPage from "./pages/PagamentoGrupoPage";
 import PagamentoMultiGrupoPage from "./pages/PagamentoMultiGrupoPage";
 import FavorecidosPage from "./pages/FavorecidosPage";
 import EmpresaPage from "./pages/EmpresaPage";
+import PagamentosPage from "./pages/PagamentosPage";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/hooks/use-theme";
@@ -42,6 +42,7 @@ function App() {
                   <Route path="/pagamentos/multi-grupo" element={<PagamentoMultiGrupoPage />} />
                   <Route path="/favorecidos" element={<FavorecidosPage />} />
                   <Route path="/empresa" element={<EmpresaPage />} />
+                  <Route path="/financeiro/pagamentos" element={<PagamentosPage />} />
                 </Route>
               </Route>
               <Route path="*" element={<NotFound />} />

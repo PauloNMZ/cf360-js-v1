@@ -1,16 +1,23 @@
-
 import React from "react";
 import { 
   Home, 
   Building2, 
-  Users, 
-  UsersRound, 
-  CreditCard,
-  CloudUpload, 
-  RefreshCw, 
-  FileText, 
-  Search, 
+  FileText,
+  BarChart3,
+  Wallet,
   Settings,
+  Wrench,
+  Receipt,
+  ArrowUpDown,
+  FileSpreadsheet,
+  FileCode,
+  ReceiptText,
+  QrCode,
+  Webhook,
+  Bell,
+  Key,
+  Users,
+  Shield
 } from "lucide-react";
 
 export type NavigationItemConfig = {
@@ -28,8 +35,8 @@ export type NavigationItemConfig = {
 export const navigationItems: NavigationItemConfig[] = [
   {
     icon: <Home size={24} />,
-    label: "Dashboard",
-    tooltipText: "Painel principal do sistema",
+    label: "Home",
+    tooltipText: "Página inicial",
     handler: "emptyHandler",
     path: "/"
   },
@@ -41,81 +48,132 @@ export const navigationItems: NavigationItemConfig[] = [
     path: "/empresa"
   },
   {
-    icon: <Users size={24} />,
-    label: "Favorecidos",
-    tooltipText: "Gerenciar favorecidos para pagamentos",
+    icon: <FileText size={24} />,
+    label: "Documentação",
+    tooltipText: "Documentação do sistema",
     handler: "emptyHandler",
-    path: "/favorecidos"
+    path: "/documentacao"
   },
   {
-    icon: <UsersRound size={24} />,
-    label: "Grupos",
-    tooltipText: "Gerenciar grupos de pagamento",
+    icon: <BarChart3 size={24} />,
+    label: "Relatórios",
+    tooltipText: "Relatórios e análises",
     handler: "emptyHandler",
-    path: "/grupos"
+    path: "/relatorios"
   },
   {
-    icon: <CreditCard size={24} />,
-    label: "Pagamentos",
-    tooltipText: "Opções de pagamento",
+    icon: <Wallet size={24} />,
+    label: "Financeiro",
+    tooltipText: "Gestão financeira",
     handler: "emptyHandler",
     submenu: [
       {
-        icon: <Users size={20} />,
-        label: "Para Favorecidos",
-        tooltipText: "Pagamentos para favorecidos individuais",
+        icon: <ArrowUpDown size={20} />,
+        label: "Pagamentos",
+        tooltipText: "Gestão de pagamentos",
         handler: "emptyHandler",
-        path: "/pagamentos/individual"
+        path: "/financeiro/pagamentos"
       },
       {
-        icon: <UsersRound size={20} />,
-        label: "Por Grupo",
-        tooltipText: "Pagamentos por grupo",
+        icon: <Receipt size={20} />,
+        label: "Recebimentos",
+        tooltipText: "Gestão de recebimentos",
         handler: "emptyHandler",
-        path: "/pagamentos/grupo"
+        path: "/financeiro/recebimentos"
       },
       {
-        icon: <FileText size={20} />,
-        label: "Importar Planilha",
-        tooltipText: "Importação de planilhas para processamento",
-        handler: "onImportarPlanilhaClick"
-      },
-      {
-        icon: <CloudUpload size={20} />,
-        label: "Converter CNAB",
-        tooltipText: "Converter arquivo CNAB para requisição JSON para API",
-        handler: "onCnabToApiClick"
+        icon: <FileSpreadsheet size={20} />,
+        label: "Extratos e Conciliação",
+        tooltipText: "Extratos e conciliação bancária",
+        handler: "emptyHandler",
+        path: "/financeiro/extratos"
       }
     ]
   },
   {
-    icon: <CloudUpload size={24} />,
-    label: "Remessa",
-    tooltipText: "Envio de arquivos de remessa ao banco",
-    handler: "emptyHandler"
+    icon: <QrCode size={24} />,
+    label: "Gestão Pix",
+    tooltipText: "Gestão de PIX",
+    handler: "emptyHandler",
+    submenu: [
+      {
+        icon: <ReceiptText size={20} />,
+        label: "Cobranças PIX",
+        tooltipText: "Gestão de cobranças PIX",
+        handler: "emptyHandler",
+        path: "/pix/cobrancas"
+      },
+      {
+        icon: <FileCode size={20} />,
+        label: "PIX Automático",
+        tooltipText: "Configuração de PIX automático",
+        handler: "emptyHandler",
+        path: "/pix/automatico"
+      },
+      {
+        icon: <FileSpreadsheet size={20} />,
+        label: "Extrato PIX",
+        tooltipText: "Extrato de transações PIX",
+        handler: "emptyHandler",
+        path: "/pix/extrato"
+      },
+      {
+        icon: <Webhook size={20} />,
+        label: "Webhooks / Logs",
+        tooltipText: "Webhooks e logs de PIX",
+        handler: "emptyHandler",
+        path: "/pix/webhooks"
+      }
+    ]
   },
   {
-    icon: <RefreshCw size={24} />,
-    label: "Retorno",
-    tooltipText: "Processamento de arquivos de retorno bancário",
-    handler: "emptyHandler"
-  },
-  {
-    icon: <FileText size={24} />,
-    label: "Comprovantes",
-    tooltipText: "Visualização e download de comprovantes",
-    handler: "emptyHandler"
-  },
-  {
-    icon: <Search size={24} />,
-    label: "Consultas",
-    tooltipText: "Consulta de registros e operações",
-    handler: "emptyHandler"
+    icon: <Wrench size={24} />,
+    label: "Utilitários",
+    tooltipText: "Ferramentas e utilitários",
+    handler: "emptyHandler",
+    path: "/utilitarios"
   },
   {
     icon: <Settings size={24} />,
     label: "Configurações",
-    tooltipText: "Configurações do sistema e parâmetros",
-    handler: "onAdminPanelClick"
+    tooltipText: "Configurações do sistema",
+    handler: "emptyHandler",
+    submenu: [
+      {
+        icon: <Key size={20} />,
+        label: "APIs Cadastradas",
+        tooltipText: "Gerenciar APIs cadastradas",
+        handler: "emptyHandler",
+        path: "/configuracoes/apis"
+      },
+      {
+        icon: <Webhook size={20} />,
+        label: "Webhooks Bancários",
+        tooltipText: "Configurar webhooks bancários",
+        handler: "emptyHandler",
+        path: "/configuracoes/webhooks"
+      },
+      {
+        icon: <Bell size={20} />,
+        label: "Notificações e Alertas",
+        tooltipText: "Configurar notificações",
+        handler: "emptyHandler",
+        path: "/configuracoes/notificacoes"
+      },
+      {
+        icon: <Wallet size={20} />,
+        label: "Parâmetros Financeiros",
+        tooltipText: "Configurar parâmetros financeiros",
+        handler: "emptyHandler",
+        path: "/configuracoes/parametros"
+      },
+      {
+        icon: <Users size={20} />,
+        label: "Perfis e Permissões",
+        tooltipText: "Gerenciar perfis e permissões",
+        handler: "emptyHandler",
+        path: "/configuracoes/perfis"
+      }
+    ]
   }
 ];

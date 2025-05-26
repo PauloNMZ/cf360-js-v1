@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { FavorecidoData, emptyFavorecido } from "@/types/favorecido";
 import { 
@@ -19,6 +18,7 @@ export const useFavorecidos = () => {
   const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [favorecidoToDelete, setFavorecidoToDelete] = useState<string | null>(null);
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
 
   // Query to fetch favorecidos
   const { 
@@ -56,9 +56,9 @@ export const useFavorecidos = () => {
     },
     onSuccess: (_, variables) => {
       const { mode } = variables;
-      toast.success(`Favorecido ${mode === 'create' ? 'criado' : 'atualizado'} com sucesso`);
-      queryClient.invalidateQueries({ queryKey: ['favorecidos'] });
       setModalOpen(false);
+      setSuccessModalOpen(true);
+      queryClient.invalidateQueries({ queryKey: ['favorecidos'] });
     },
     onError: (error, variables) => {
       const { mode } = variables;
@@ -149,6 +149,7 @@ export const useFavorecidos = () => {
     formMode,
     deleteDialogOpen,
     favorecidoToDelete,
+    successModalOpen,
     handleCreateNew,
     handleEdit,
     handleDelete,
@@ -159,6 +160,7 @@ export const useFavorecidos = () => {
     handleSave,
     setModalOpen,
     setDeleteDialogOpen,
+    setSuccessModalOpen,
     refetch,
   };
 };
