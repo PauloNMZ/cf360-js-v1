@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -256,7 +255,7 @@ const PagamentosPage = () => {
               className={cn(
                 "flex items-center gap-2",
                 activeLancamentoTab === 'favorecidos' 
-                  ? "bg-[#ECF2FF] text-primary dark:bg-secondary dark:text-primary shadow hover:bg-[#ECF2FF] dark:hover:bg-secondary"
+                  ? "bg-[#ECF2FF] text-primary dark:bg-secondary dark:text-primary shadow border border-[#3986FF] hover:bg-[#ECF2FF] dark:hover:bg-secondary"
                   : "hover:bg-accent hover:text-accent-foreground"
               )}
             >
@@ -268,7 +267,7 @@ const PagamentosPage = () => {
               className={cn(
                 "flex items-center gap-2",
                 activeLancamentoTab === 'grupos' 
-                  ? "bg-[#ECF2FF] text-primary dark:bg-secondary dark:text-primary shadow hover:bg-[#ECF2FF] dark:hover:bg-secondary"
+                  ? "bg-[#ECF2FF] text-primary dark:bg-secondary dark:text-primary shadow border border-[#3986FF] hover:bg-[#ECF2FF] dark:hover:bg-secondary"
                   : "hover:bg-accent hover:text-accent-foreground"
               )}
             >
@@ -280,7 +279,7 @@ const PagamentosPage = () => {
               className={cn(
                 "flex items-center gap-2",
                 activeLancamentoTab === 'planilha' 
-                  ? "bg-[#ECF2FF] text-primary dark:bg-secondary dark:text-primary shadow hover:bg-[#ECF2FF] dark:hover:bg-secondary"
+                  ? "bg-[#ECF2FF] text-primary dark:bg-secondary dark:text-primary shadow border border-[#3986FF] hover:bg-[#ECF2FF] dark:hover:bg-secondary"
                   : "hover:bg-accent hover:text-accent-foreground"
               )}
             >
@@ -292,7 +291,7 @@ const PagamentosPage = () => {
               className={cn(
                 "flex items-center gap-2",
                 activeLancamentoTab === 'cnab' 
-                  ? "bg-[#ECF2FF] text-primary dark:bg-secondary dark:text-primary shadow hover:bg-[#ECF2FF] dark:hover:bg-secondary"
+                  ? "bg-[#ECF2FF] text-primary dark:bg-secondary dark:text-primary shadow border border-[#3986FF] hover:bg-[#ECF2FF] dark:hover:bg-secondary"
                   : "hover:bg-accent hover:text-accent-foreground"
               )}
             >
