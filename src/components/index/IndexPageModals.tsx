@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from "react";
 import ConvenenteModal from "@/components/convenente/ConvenenteModal";
 import DeleteConvenenteDialog from "@/components/convenente/DeleteConvenenteDialog";
@@ -79,7 +80,7 @@ export const IndexPageModals = () => {
         // Reset deletion completed flag after delay
         setTimeout(() => {
           deletionCompletedRef.current = false;
-          setShowDeleteDialog(false); // Pass false explicitly para evitar erro TS2554
+          setShowDeleteDialog(false);
         }, 1000);
       }
     }
@@ -90,19 +91,16 @@ export const IndexPageModals = () => {
     const checkDeletionTimeout = setTimeout(() => {
       if (isDeleting && resetDeletionState) {
         console.log("IndexPageModals: Checking for stuck deletion state");
-        // Corrigir aqui, garantindo booleano como argumento:
-        setShowDeleteDialog(false); // Passa false explicitamente
+        setShowDeleteDialog(false);
       }
     }, 60000); // Check after 1 minute
     
     return () => clearTimeout(checkDeletionTimeout);
   }, [isDeleting, resetDeletionState, setShowDeleteDialog]);
 
-  // Defensive: NUNCA chame sem argumento
-  // Exemplo: se precisar passar para callback, garanta argumento default
-  // Exemplo de compatibilização (caso alguma lib não passe arg):
-  const onDeleteDialogOpenChange = (val?: boolean) => {
-    setShowDeleteDialog(typeof val === 'boolean' ? val : false);
+  // Ensure we always pass a boolean to setShowDeleteDialog
+  const onDeleteDialogOpenChange = (val: boolean) => {
+    setShowDeleteDialog(val);
   };
 
   // Fix for the type error in handleSelectConvenente
@@ -168,10 +166,7 @@ export const IndexPageModals = () => {
 
       <DeleteConvenenteDialog 
         isOpen={showDeleteDialog}
-        onOpenChange={(open) => {
-          // Garante que sempre seja passado um argumento booleano.
-          onDeleteDialogOpenChange(typeof open === "boolean" ? open : false);
-        }}
+        onOpenChange={onDeleteDialogOpenChange}
         onDelete={handleConfirmDelete}
         isDeleting={isDeleting}
       />

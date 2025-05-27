@@ -1,3 +1,4 @@
+
 import React from "react";
 import { FavorecidoData } from "@/types/favorecido";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -61,7 +62,7 @@ const FavorecidosTable: React.FC<FavorecidosTableProps> = ({
             <TableHeader>
               <TableRow>
                 {onSelectionChange && (
-                  <TableHead className="w-[50px]">
+                  <TableHead className="w-[50px] font-semibold">
                     <Checkbox
                       checked={selectedFavorecidos.length === favorecidos.length}
                       onCheckedChange={handleSelectAll}
@@ -69,13 +70,13 @@ const FavorecidosTable: React.FC<FavorecidosTableProps> = ({
                     />
                   </TableHead>
                 )}
-                <TableHead>Nome</TableHead>
-                <TableHead>Inscrição</TableHead>
-                <TableHead>Tipo</TableHead>
-                <TableHead>Banco/Agência/Conta</TableHead>
-                <TableHead>Chave PIX</TableHead>
-                <TableHead>Valor Padrão</TableHead>
-                {showActions && <TableHead className="w-[100px]">Ações</TableHead>}
+                <TableHead className="font-semibold">Nome</TableHead>
+                <TableHead className="font-semibold">Inscrição</TableHead>
+                <TableHead className="font-semibold">Tipo</TableHead>
+                <TableHead className="font-semibold">Banco/Agência/Conta</TableHead>
+                <TableHead className="font-semibold">Chave PIX</TableHead>
+                <TableHead className="font-semibold">Valor Padrão</TableHead>
+                {showActions && <TableHead className="w-[100px] font-semibold">Ações</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>

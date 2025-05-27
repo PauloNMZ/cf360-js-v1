@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -254,8 +255,9 @@ const PagamentosPage = () => {
               onClick={() => setActiveLancamentoTab('favorecidos')}
               className={cn(
                 "flex items-center gap-2",
-                activeLancamentoTab === 'favorecidos' &&
-                  "bg-[#ECF2FF] text-primary dark:bg-secondary dark:text-primary shadow"
+                activeLancamentoTab === 'favorecidos' 
+                  ? "bg-[#ECF2FF] text-primary dark:bg-secondary dark:text-primary shadow hover:bg-[#ECF2FF] dark:hover:bg-secondary"
+                  : "hover:bg-accent hover:text-accent-foreground"
               )}
             >
               <User className="mr-2 h-4 w-4" /> Por Favorecidos
@@ -265,8 +267,9 @@ const PagamentosPage = () => {
               onClick={() => setActiveLancamentoTab('grupos')}
               className={cn(
                 "flex items-center gap-2",
-                activeLancamentoTab === 'grupos' &&
-                  "bg-[#ECF2FF] text-primary dark:bg-secondary dark:text-primary shadow"
+                activeLancamentoTab === 'grupos' 
+                  ? "bg-[#ECF2FF] text-primary dark:bg-secondary dark:text-primary shadow hover:bg-[#ECF2FF] dark:hover:bg-secondary"
+                  : "hover:bg-accent hover:text-accent-foreground"
               )}
             >
               <Users className="mr-2 h-4 w-4" /> Por Grupos
@@ -276,8 +279,9 @@ const PagamentosPage = () => {
               onClick={() => setActiveLancamentoTab('planilha')}
               className={cn(
                 "flex items-center gap-2",
-                activeLancamentoTab === 'planilha' &&
-                  "bg-[#ECF2FF] text-primary dark:bg-secondary dark:text-primary shadow"
+                activeLancamentoTab === 'planilha' 
+                  ? "bg-[#ECF2FF] text-primary dark:bg-secondary dark:text-primary shadow hover:bg-[#ECF2FF] dark:hover:bg-secondary"
+                  : "hover:bg-accent hover:text-accent-foreground"
               )}
             >
               <FileSpreadsheet className="mr-2 h-4 w-4" /> Importar Planilha
@@ -287,8 +291,9 @@ const PagamentosPage = () => {
               onClick={() => setActiveLancamentoTab('cnab')}
               className={cn(
                 "flex items-center gap-2",
-                activeLancamentoTab === 'cnab' &&
-                  "bg-[#ECF2FF] text-primary dark:bg-secondary dark:text-primary shadow"
+                activeLancamentoTab === 'cnab' 
+                  ? "bg-[#ECF2FF] text-primary dark:bg-secondary dark:text-primary shadow hover:bg-[#ECF2FF] dark:hover:bg-secondary"
+                  : "hover:bg-accent hover:text-accent-foreground"
               )}
             >
               <FileCode className="mr-2 h-4 w-4" /> Importar CNAB
