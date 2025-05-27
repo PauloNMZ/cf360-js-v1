@@ -187,13 +187,16 @@ const PagamentosPage = () => {
           "h-auto items-center",
           "space-x-2"
         )}>
+          {/** AQUI: Ajuste visual para active state */}
           <TabsTrigger
             value="transferencias"
             className={cn(
               "flex-1",
               "rounded-md px-3 py-2 text-sm font-medium",
               "bg-background text-muted-foreground",
-              "data-[state=active]:bg-accent data-[state=active]:text-accent-foreground",
+              "data-[state=active]:bg-[#ECF2FF] data-[state=active]:text-primary",
+              "dark:data-[state=active]:bg-secondary dark:data-[state=active]:text-primary",
+              "data-[state=active]:shadow",
               "hover:bg-muted hover:text-foreground"
             )}
           >
@@ -205,7 +208,9 @@ const PagamentosPage = () => {
               "flex-1",
               "rounded-md px-3 py-2 text-sm font-medium",
               "bg-background text-muted-foreground",
-              "data-[state=active]:bg-accent data-[state=active]:text-accent-foreground",
+              "data-[state=active]:bg-[#ECF2FF] data-[state=active]:text-primary",
+              "dark:data-[state=active]:bg-secondary dark:data-[state=active]:text-primary",
+              "data-[state=active]:shadow",
               "hover:bg-muted hover:text-foreground"
             )}
           >
@@ -217,7 +222,9 @@ const PagamentosPage = () => {
               "flex-1",
               "rounded-md px-3 py-2 text-sm font-medium",
               "bg-background text-muted-foreground",
-              "data-[state=active]:bg-accent data-[state=active]:text-accent-foreground",
+              "data-[state=active]:bg-[#ECF2FF] data-[state=active]:text-primary",
+              "dark:data-[state=active]:bg-secondary dark:data-[state=active]:text-primary",
+              "data-[state=active]:shadow",
               "hover:bg-muted hover:text-foreground"
             )}
           >
@@ -229,7 +236,9 @@ const PagamentosPage = () => {
               "flex-1",
               "rounded-md px-3 py-2 text-sm font-medium",
               "bg-background text-muted-foreground",
-              "data-[state=active]:bg-accent data-[state=active]:text-accent-foreground",
+              "data-[state=active]:bg-[#ECF2FF] data-[state=active]:text-primary",
+              "dark:data-[state=active]:bg-secondary dark:data-[state=active]:text-primary",
+              "data-[state=active]:shadow",
               "hover:bg-muted hover:text-foreground"
             )}
           >
@@ -275,4 +284,4 @@ const PagamentosPage = () => {
   );
 };
 
-export default PagamentosPage; 
+export default PagamentosPage;
