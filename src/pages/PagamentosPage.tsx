@@ -249,16 +249,48 @@ const PagamentosPage = () => {
         <TabsContent value="transferencias" className="space-y-4">
           <h2 className="text-xl font-semibold">Opções de Lançamento</h2>
           <div className="flex space-x-4">
-            <Button variant="outline" onClick={() => setActiveLancamentoTab('favorecidos')}>
+            <Button
+              variant="outline"
+              onClick={() => setActiveLancamentoTab('favorecidos')}
+              className={cn(
+                "flex items-center gap-2",
+                activeLancamentoTab === 'favorecidos' &&
+                  "bg-[#ECF2FF] text-primary dark:bg-secondary dark:text-primary shadow"
+              )}
+            >
               <User className="mr-2 h-4 w-4" /> Por Favorecidos
             </Button>
-            <Button variant="outline" onClick={() => setActiveLancamentoTab('grupos')}>
+            <Button
+              variant="outline"
+              onClick={() => setActiveLancamentoTab('grupos')}
+              className={cn(
+                "flex items-center gap-2",
+                activeLancamentoTab === 'grupos' &&
+                  "bg-[#ECF2FF] text-primary dark:bg-secondary dark:text-primary shadow"
+              )}
+            >
               <Users className="mr-2 h-4 w-4" /> Por Grupos
             </Button>
-            <Button variant="outline" onClick={() => setActiveLancamentoTab('planilha')}>
+            <Button
+              variant="outline"
+              onClick={() => setActiveLancamentoTab('planilha')}
+              className={cn(
+                "flex items-center gap-2",
+                activeLancamentoTab === 'planilha' &&
+                  "bg-[#ECF2FF] text-primary dark:bg-secondary dark:text-primary shadow"
+              )}
+            >
               <FileSpreadsheet className="mr-2 h-4 w-4" /> Importar Planilha
             </Button>
-            <Button variant="outline" onClick={() => setActiveLancamentoTab('cnab')}>
+            <Button
+              variant="outline"
+              onClick={() => setActiveLancamentoTab('cnab')}
+              className={cn(
+                "flex items-center gap-2",
+                activeLancamentoTab === 'cnab' &&
+                  "bg-[#ECF2FF] text-primary dark:bg-secondary dark:text-primary shadow"
+              )}
+            >
               <FileCode className="mr-2 h-4 w-4" /> Importar CNAB
             </Button>
           </div>
