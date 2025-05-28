@@ -29,8 +29,11 @@ const FavorecidosPage = () => {
     setDeleteDialogOpen,
   } = useFavorecidos();
 
-  // Debug log
-  console.log("FavorecidosPage - Filtered favorecidos count:", filteredFavorecidos.length);
+  // Debug logs
+  console.log("FavorecidosPage - modalOpen:", modalOpen);
+  console.log("FavorecidosPage - deleteDialogOpen:", deleteDialogOpen);
+  console.log("FavorecidosPage - currentFavorecido:", currentFavorecido);
+  console.log("FavorecidosPage - formMode:", formMode);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900/95">

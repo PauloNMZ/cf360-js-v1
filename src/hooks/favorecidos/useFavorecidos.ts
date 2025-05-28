@@ -93,15 +93,19 @@ export const useFavorecidos = () => {
 
   // Edit favorecido
   const handleEdit = (favorecido: FavorecidoData & { id: string }) => {
+    console.log("useFavorecidos - handleEdit called with:", favorecido);
     setCurrentFavorecido({...favorecido});
     setFormMode('edit');
     setModalOpen(true);
+    console.log("useFavorecidos - Modal should be opening, modalOpen set to true");
   };
 
   // Delete favorecido
   const handleDelete = (id: string) => {
+    console.log("useFavorecidos - handleDelete called with ID:", id);
     setFavorecidoToDelete(id);
     setDeleteDialogOpen(true);
+    console.log("useFavorecidos - Delete dialog should be opening, deleteDialogOpen set to true");
   };
 
   // Confirm delete
