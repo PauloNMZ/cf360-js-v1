@@ -1,3 +1,4 @@
+
 import React from "react";
 import { FavorecidoData } from "@/types/favorecido";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -113,7 +114,7 @@ const FavorecidosTable: React.FC<FavorecidosTableProps> = ({
             <TableHeader>
               <TableRow>
                 {onSelectionChange && (
-                  <TableHead className="w-[50px] font-semibold text-blue-600 bg-[#ecf2ff]">
+                  <TableHead className="table-header-checkbox">
                     <Checkbox 
                       checked={selectedFavorecidos.length === favorecidos.length} 
                       onCheckedChange={handleSelectAll} 
@@ -121,14 +122,14 @@ const FavorecidosTable: React.FC<FavorecidosTableProps> = ({
                     />
                   </TableHead>
                 )}
-                <TableHead className="font-semibold text-blue-600 bg-[#ecf2ff]">NOME</TableHead>
-                <TableHead className="font-semibold text-blue-600 bg-[#ecf2ff]">INSCRIÇÃO</TableHead>
-                <TableHead className="font-semibold text-blue-600 bg-[#ecf2ff]">TIPO</TableHead>
-                <TableHead className="font-semibold text-blue-600 bg-[#ecf2ff]">BANCO/AGÊNCIA/CONTA</TableHead>
-                <TableHead className="font-semibold text-blue-600 bg-[#ecf2ff]">CHAVE PIX</TableHead>
-                <TableHead className="font-semibold text-blue-600 bg-[#ecf2ff]">VALOR PADRÃO</TableHead>
+                <TableHead className="table-header-elegant">NOME</TableHead>
+                <TableHead className="table-header-elegant">INSCRIÇÃO</TableHead>
+                <TableHead className="table-header-elegant">TIPO</TableHead>
+                <TableHead className="table-header-elegant">BANCO/AGÊNCIA/CONTA</TableHead>
+                <TableHead className="table-header-elegant">CHAVE PIX</TableHead>
+                <TableHead className="table-header-elegant">VALOR PADRÃO</TableHead>
                 {showActions && (
-                  <TableHead className="w-[100px] font-semibold text-blue-600 bg-[#ecf2ff]">AÇÕES</TableHead>
+                  <TableHead className="table-header-actions">AÇÕES</TableHead>
                 )}
               </TableRow>
             </TableHeader>
