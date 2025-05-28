@@ -72,7 +72,6 @@ const FavorecidosPage = () => {
         </div>
 
         {/* Form Modal */}
-        {console.log("FavorecidosPage - Rendering FavorecidoFormModal with open:", modalOpen)}
         <FavorecidoFormModal
           open={modalOpen}
           onOpenChange={setModalOpen}
@@ -85,7 +84,6 @@ const FavorecidosPage = () => {
         />
 
         {/* Delete Confirmation Dialog */}
-        {console.log("FavorecidosPage - Rendering DeleteFavorecidoDialog with open:", deleteDialogOpen)}
         <DeleteFavorecidoDialog
           open={deleteDialogOpen}
           onOpenChange={setDeleteDialogOpen}
