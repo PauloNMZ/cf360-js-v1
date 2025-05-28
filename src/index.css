@@ -29,30 +29,28 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 221.2 83.2% 53.3%;
     --radius: 0.5rem;
-    --highlight-red: 0 84.2% 60.2%;
   }
 
   .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
-    --card: 217.2 32.6% 8.5%;
+    --card: 222.2 84% 6.5%;
     --card-foreground: 210 40% 98%;
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
     --primary: 217.2 91.2% 59.8%;
     --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 12.5%;
+    --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 12.5%;
+    --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 12.5%;
+    --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 15.5%;
-    --input: 217.2 32.6% 15.5%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.5% 48%;
-    --highlight-red: 0 84.2% 60.2%;
   }
 }
 
@@ -156,58 +154,4 @@ p, span, div, button, input, textarea, select, option {
 
 .sidebar-item {
   @apply flex items-center space-x-3 px-3 py-2 rounded-md transition-colors;
-}
-
-/* Red highlight utilities */
-.highlight-red {
-  border: 2px solid hsl(var(--highlight-red)) !important;
-  box-shadow: 0 0 0 1px hsl(var(--highlight-red)) !important;
-}
-
-.highlight-red-bg {
-  background-color: hsl(var(--highlight-red) / 0.1) !important;
-  border: 2px solid hsl(var(--highlight-red)) !important;
-}
-
-/* Table row highlighting */
-.table-row-highlighted {
-  background-color: hsl(var(--highlight-red) / 0.05) !important;
-  border: 2px solid hsl(var(--highlight-red)) !important;
-  position: relative;
-}
-
-.table-row-highlighted::before {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  border: 2px solid hsl(var(--highlight-red));
-  border-radius: 4px;
-  pointer-events: none;
-}
-
-/* Dark mode specific table styling */
-.dark .table-row-highlighted {
-  background-color: hsl(var(--highlight-red) / 0.1) !important;
-}
-
-/* Button highlighting */
-.button-highlighted {
-  background-color: hsl(var(--highlight-red) / 0.1) !important;
-  border: 2px solid hsl(var(--highlight-red)) !important;
-  color: hsl(var(--highlight-red)) !important;
-}
-
-/* Input highlighting */
-.input-highlighted {
-  border: 2px solid hsl(var(--highlight-red)) !important;
-  box-shadow: 0 0 0 1px hsl(var(--highlight-red)) !important;
-}
-
-/* Card highlighting */
-.card-highlighted {
-  border: 2px solid hsl(var(--highlight-red)) !important;
-  box-shadow: 0 4px 8px hsl(var(--highlight-red) / 0.2) !important;
 }
