@@ -66,9 +66,20 @@ ${convenente.chavePix ? `Chave PIX: ${convenente.chavePix}` : ''}
             <button
               onClick={e => {
                 e.stopPropagation();
+                onSelectConvenente(convenente, 'view');
+              }}
+              className="p-1.5 rounded-md bg-gray-700 hover:bg-gray-600 transition-colors"
+              title="Ver detalhes"
+            >
+              <Eye size={14} className="text-gray-300 hover:text-white" />
+            </button>
+            <button
+              onClick={e => {
+                e.stopPropagation();
                 handleCopyCardInfo(convenente);
               }}
               className="p-1.5 rounded-md bg-gray-700 hover:bg-gray-600 transition-colors"
+              title="Copiar informações"
             >
               <Copy size={14} className="text-gray-300 hover:text-white" />
             </button>
@@ -78,6 +89,7 @@ ${convenente.chavePix ? `Chave PIX: ${convenente.chavePix}` : ''}
                 onSelectConvenente(convenente, 'edit');
               }}
               className="p-1.5 rounded-md bg-gray-700 hover:bg-gray-600 transition-colors"
+              title="Editar"
             >
               <Pencil size={14} className="text-gray-300 hover:text-white" />
             </button>
@@ -88,13 +100,14 @@ ${convenente.chavePix ? `Chave PIX: ${convenente.chavePix}` : ''}
                 console.log('Delete clicked for', convenente.id);
               }}
               className="p-1.5 rounded-md bg-gray-700 hover:bg-red-600 transition-colors"
+              title="Excluir"
             >
               <Trash2 size={14} className="text-gray-300 hover:text-white" />
             </button>
           </div>
 
           {/* Header com nome da empresa */}
-          <div className="mb-4 pr-20">
+          <div className="mb-4 pr-32">
             <h3 className="font-bold text-white mb-1 truncate text-sm">
               {convenente.razaoSocial}
             </h3>
@@ -102,7 +115,7 @@ ${convenente.chavePix ? `Chave PIX: ${convenente.chavePix}` : ''}
           </div>
 
           {/* Informações principais */}
-          <div className="space-y-3 mb-6 flex-grow">
+          <div className="space-y-3 flex-grow">
             <div className="flex flex-col space-y-1">
               <span className="text-xs text-gray-400 uppercase tracking-wide font-medium">
                 CNPJ
@@ -129,22 +142,6 @@ ${convenente.chavePix ? `Chave PIX: ${convenente.chavePix}` : ''}
                   {convenente.chavePix}
                 </span>
               </div>}
-          </div>
-
-          {/* Botão centralizado na parte inferior */}
-          <div className="flex justify-center mt-auto">
-            <Button 
-              size="sm" 
-              style={{ backgroundColor: '#5D5E6A' }} 
-              className="hover:opacity-90 text-white border-0 px-6 py-2 text-xs font-medium transition-all flex items-center space-x-2" 
-              onClick={e => {
-                e.stopPropagation();
-                onSelectConvenente(convenente, 'view');
-              }}
-            >
-              <Eye size={14} />
-              <span>Ver detalhes da empresa</span>
-            </Button>
           </div>
 
           {/* Indicador de seleção */}
