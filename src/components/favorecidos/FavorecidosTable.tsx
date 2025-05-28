@@ -113,7 +113,7 @@ const FavorecidosTable: React.FC<FavorecidosTableProps> = ({
             <TableHeader>
               <TableRow>
                 {onSelectionChange && (
-                  <TableHead className="w-[50px] font-semibold">
+                  <TableHead className="w-[50px] font-semibold text-blue-600">
                     <Checkbox
                       checked={selectedFavorecidos.length === favorecidos.length}
                       onCheckedChange={handleSelectAll}
@@ -121,13 +121,13 @@ const FavorecidosTable: React.FC<FavorecidosTableProps> = ({
                     />
                   </TableHead>
                 )}
-                <TableHead className="font-semibold">Nome</TableHead>
-                <TableHead className="font-semibold">Inscrição</TableHead>
-                <TableHead className="font-semibold">Tipo</TableHead>
-                <TableHead className="font-semibold">Banco/Agência/Conta</TableHead>
-                <TableHead className="font-semibold">Chave PIX</TableHead>
-                <TableHead className="font-semibold">Valor Padrão</TableHead>
-                {showActions && <TableHead className="w-[100px] font-semibold">Ações</TableHead>}
+                <TableHead className="font-semibold text-blue-600">Nome</TableHead>
+                <TableHead className="font-semibold text-blue-600">Inscrição</TableHead>
+                <TableHead className="font-semibold text-blue-600">Tipo</TableHead>
+                <TableHead className="font-semibold text-blue-600">Banco/Agência/Conta</TableHead>
+                <TableHead className="font-semibold text-blue-600">Chave PIX</TableHead>
+                <TableHead className="font-semibold text-blue-600">Valor Padrão</TableHead>
+                {showActions && <TableHead className="w-[100px] font-semibold text-blue-600">Ações</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
