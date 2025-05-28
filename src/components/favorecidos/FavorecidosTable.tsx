@@ -121,13 +121,13 @@ const FavorecidosTable: React.FC<FavorecidosTableProps> = ({
                     />
                   </TableHead>
                 )}
-                <TableHead className="font-semibold text-blue-600">Nome</TableHead>
-                <TableHead className="font-semibold text-blue-600">Inscrição</TableHead>
-                <TableHead className="font-semibold text-blue-600">Tipo</TableHead>
-                <TableHead className="font-semibold text-blue-600">Banco/Agência/Conta</TableHead>
-                <TableHead className="font-semibold text-blue-600">Chave PIX</TableHead>
-                <TableHead className="font-semibold text-blue-600">Valor Padrão</TableHead>
-                {showActions && <TableHead className="w-[100px] font-semibold text-blue-600">Ações</TableHead>}
+                <TableHead className="font-semibold text-blue-600">NOME</TableHead>
+                <TableHead className="font-semibold text-blue-600">INSCRIÇÃO</TableHead>
+                <TableHead className="font-semibold text-blue-600">TIPO</TableHead>
+                <TableHead className="font-semibold text-blue-600">BANCO/AGÊNCIA/CONTA</TableHead>
+                <TableHead className="font-semibold text-blue-600">CHAVE PIX</TableHead>
+                <TableHead className="font-semibold text-blue-600">VALOR PADRÃO</TableHead>
+                {showActions && <TableHead className="w-[100px] font-semibold text-blue-600">AÇÕES</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
