@@ -11,6 +11,7 @@ import {
   Plus
 } from "lucide-react";
 import FavorecidoFormModal from '@/components/favorecidos/FavorecidoFormModal';
+import DeleteFavorecidoDialog from '@/components/favorecidos/DeleteFavorecidoDialog';
 import { useFavorecidos } from '@/hooks/favorecidos/useFavorecidos';
 import FavorecidoSearchBar, { EmptyState } from '@/components/favorecidos/FavorecidoSearchBar';
 import FavorecidosTable from '@/components/favorecidos/FavorecidosTable';
@@ -28,6 +29,9 @@ const LancamentoFavorecidos = () => {
     modalOpen,
     setModalOpen,
     handleCreateNew,
+    handleEdit,
+    handleDelete,
+    confirmDelete,
     handleInputChange,
     handleSelectChange,
     handleSave,
@@ -39,6 +43,8 @@ const LancamentoFavorecidos = () => {
     handleSearchChange,
     successModalOpen,
     setSuccessModalOpen,
+    deleteDialogOpen,
+    setDeleteDialogOpen,
   } = useFavorecidos();
 
   const [selectedFavorecido, setSelectedFavorecido] = useState<any>(null);
@@ -102,8 +108,8 @@ const LancamentoFavorecidos = () => {
           ) : filteredFavorecidos.length > 0 ? (
             <FavorecidosTable
               favorecidos={filteredFavorecidos}
-              onEdit={() => {}}
-              onDelete={() => {}}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
               onSelectFavorecido={handleSelectFavorecido}
               selectedFavorecidos={selectedFavorecidos}
               onSelectionChange={handleSelectionChange}
@@ -144,6 +150,13 @@ const LancamentoFavorecidos = () => {
         isLoading={isLoading}
       />
 
+      <DeleteFavorecidoDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={confirmDelete}
+        isDeleting={isLoading}
+      />
+
       <SuccessModal
         open={successModalOpen}
         onOpenChange={setSuccessModalOpen}
@@ -164,11 +177,11 @@ const PagamentosPage = () => {
       case 'favorecidos':
         return <LancamentoFavorecidos />;
       case 'grupos':
-        return <div>Formulário/Interface para Lançamento por Grupos</div>;
+        return <LancamentoGrupos />;
       case 'planilha':
-        return <div>Interface para Importar Planilha</div>;
+        return <ImportarPlanilha />;
       case 'cnab':
-        return <div>Interface para Importar CNAB</div>;
+        return <ImportarCNAB />;
       default:
         return (
           <p className="text-center text-muted-foreground">Selecione uma opção de lançamento acima.</p>
