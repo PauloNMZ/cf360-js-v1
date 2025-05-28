@@ -95,7 +95,7 @@ const FavorecidosTable: React.FC<FavorecidosTableProps> = ({
           <Table>
             <TableHeader>
               <TableRow>
-                {onSelectionChange && <TableHead className="w-[50px] font-semibold text-blue-600">
+                {onSelectionChange && <TableHead className="w-[50px] font-semibold text-blue-600 bg-[t#ECF2FF] bg-[#ecf2ff]">
                     <Checkbox checked={selectedFavorecidos.length === favorecidos.length} onCheckedChange={handleSelectAll} aria-label="Selecionar todos" />
                   </TableHead>}
                 <TableHead className="font-semibold text-blue-600 bg-[F] bg-[#ecf2ff]">NOME</TableHead>
