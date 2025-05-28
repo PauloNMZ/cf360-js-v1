@@ -59,9 +59,9 @@ const SidebarLayout = () => {
   console.log('SidebarLayout - hasConvenenteData:', hasConvenenteData);
   return <TooltipProvider>
       <SidebarProvider defaultOpen={true}>
-        <div className="min-h-screen w-full bg-gray-50 dark:bg-slate-900/95">
+        <div className="min-h-screen w-full bg-gray-50 dark:bg-slate-900">
           {/* HEADER GLOBAL */}
-          <header className="bg-gradient-to-r from-[#3b82f6] to-[#1e40af] dark:from-[#0E1F46] dark:to-[#0A1C3A] text-white py-5 px-8 shadow-lg">
+          <header className="bg-gradient-to-r from-[#3b82f6] to-[#1e40af] dark:from-[#0f172a] dark:to-[#1e293b] text-white py-5 px-8 shadow-lg">
             <div className="flex items-center justify-between h-full px-4">
               {/* Logo e Nome da Empresa */}
               <div className="flex items-center gap-2 ml-[-8px]">
@@ -97,7 +97,7 @@ const SidebarLayout = () => {
             </div>
           </header>
           <div className="flex h-[calc(100vh-96px)]">
-            <Sidebar variant="sidebar" className="sticky top-0 h-full z-40 border-r border-border/20 bg-white/95 dark:bg-slate-950">
+            <Sidebar variant="sidebar" className="sticky top-0 h-full z-40 border-r border-border/20 bg-white/95 dark:bg-slate-950/95">
               {/* SidebarHeader (if needed, currently empty) */}
               {/* Content area that flexes and scrolls */}
               <div className="flex flex-col flex-1 overflow-y-auto">
@@ -107,7 +107,7 @@ const SidebarLayout = () => {
               <SidebarFooter onLogout={handleLogoutClick} />
               <CollapseButton />
             </Sidebar>
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-slate-900">
               <div className="h-full">
                 <Outlet />
               </div>

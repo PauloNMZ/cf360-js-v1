@@ -14,18 +14,20 @@ const PagamentosTabs: React.FC<PagamentosTabsProps> = ({ children }) => {
         "mb-4",
         "flex justify-center",
         "h-auto items-center",
-        "space-x-2"
+        "space-x-2",
+        "bg-background dark:bg-card"
       )}>
         <TabsTrigger
           value="transferencias"
           className={cn(
             "flex-1",
             "rounded-md px-3 py-2 text-sm font-medium",
-            "bg-background text-muted-foreground",
+            "bg-background text-muted-foreground dark:bg-card dark:text-muted-foreground",
             "data-[state=active]:bg-[#ECF2FF] data-[state=active]:text-primary",
-            "dark:data-[state=active]:bg-secondary dark:data-[state=active]:text-primary",
+            "dark:data-[state=active]:bg-card dark:data-[state=active]:text-primary",
+            "dark:data-[state=active]:border-2 dark:data-[state=active]:border-red-500",
             "data-[state=active]:shadow",
-            "hover:bg-muted hover:text-foreground"
+            "hover:bg-muted hover:text-foreground dark:hover:bg-muted"
           )}
         >
           Transferências
@@ -35,11 +37,12 @@ const PagamentosTabs: React.FC<PagamentosTabsProps> = ({ children }) => {
           className={cn(
             "flex-1",
             "rounded-md px-3 py-2 text-sm font-medium",
-            "bg-background text-muted-foreground",
+            "bg-background text-muted-foreground dark:bg-card dark:text-muted-foreground",
             "data-[state=active]:bg-[#ECF2FF] data-[state=active]:text-primary",
-            "dark:data-[state=active]:bg-secondary dark:data-[state=active]:text-primary",
+            "dark:data-[state=active]:bg-card dark:data-[state=active]:text-primary",
+            "dark:data-[state=active]:border-2 dark:data-[state=active]:border-red-500",
             "data-[state=active]:shadow",
-            "hover:bg-muted hover:text-foreground"
+            "hover:bg-muted hover:text-foreground dark:hover:bg-muted"
           )}
         >
           Títulos
@@ -49,11 +52,12 @@ const PagamentosTabs: React.FC<PagamentosTabsProps> = ({ children }) => {
           className={cn(
             "flex-1",
             "rounded-md px-3 py-2 text-sm font-medium",
-            "bg-background text-muted-foreground",
+            "bg-background text-muted-foreground dark:bg-card dark:text-muted-foreground",
             "data-[state=active]:bg-[#ECF2FF] data-[state=active]:text-primary",
-            "dark:data-[state=active]:bg-secondary dark:data-[state=active]:text-primary",
+            "dark:data-[state=active]:bg-card dark:data-[state=active]:text-primary",
+            "dark:data-[state=active]:border-2 dark:data-[state=active]:border-red-500",
             "data-[state=active]:shadow",
-            "hover:bg-muted hover:text-foreground"
+            "hover:bg-muted hover:text-foreground dark:hover:bg-muted"
           )}
         >
           Guias
@@ -63,11 +67,12 @@ const PagamentosTabs: React.FC<PagamentosTabsProps> = ({ children }) => {
           className={cn(
             "flex-1",
             "rounded-md px-3 py-2 text-sm font-medium",
-            "bg-background text-muted-foreground",
+            "bg-background text-muted-foreground dark:bg-card dark:text-muted-foreground",
             "data-[state=active]:bg-[#ECF2FF] data-[state=active]:text-primary",
-            "dark:data-[state=active]:bg-secondary dark:data-[state=active]:text-primary",
+            "dark:data-[state=active]:bg-card dark:data-[state=active]:text-primary",
+            "dark:data-[state=active]:border-2 dark:data-[state=active]:border-red-500",
             "data-[state=active]:shadow",
-            "hover:bg-muted hover:text-foreground"
+            "hover:bg-muted hover:text-foreground dark:hover:bg-muted"
           )}
         >
           PIX
