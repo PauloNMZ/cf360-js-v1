@@ -99,7 +99,7 @@ const FavorecidosTable: React.FC<FavorecidosTableProps> = ({
                     <Checkbox checked={selectedFavorecidos.length === favorecidos.length} onCheckedChange={handleSelectAll} aria-label="Selecionar todos" />
                   </TableHead>}
                 <TableHead className="font-semibold text-blue-600 bg-[F] bg-[#ecf2ff]">NOME</TableHead>
-                <TableHead className="font-semibold text-blue-600">INSCRIÇÃO</TableHead>
+                <TableHead className="font-semibold text-blue-600 bg-[t] bg-[#ecf2ff]">INSCRIÇÃO</TableHead>
                 <TableHead className="font-semibold text-blue-600">TIPO</TableHead>
                 <TableHead className="font-semibold text-blue-600">BANCO/AGÊNCIA/CONTA</TableHead>
                 <TableHead className="font-semibold text-blue-600">CHAVE PIX</TableHead>
