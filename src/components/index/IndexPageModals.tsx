@@ -162,7 +162,7 @@ export const IndexPageModals = () => {
           }
           setAdminPanelOpen(open);
           if (!open && reloadSettings) {
-            reloadSettings();
+            reloadSettings(true);
           }
         }}
       />
