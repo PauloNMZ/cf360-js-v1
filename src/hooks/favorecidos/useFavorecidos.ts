@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { FavorecidoData, emptyFavorecido } from "@/types/favorecido";
 import { 
@@ -19,6 +20,15 @@ export const useFavorecidos = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [favorecidoToDelete, setFavorecidoToDelete] = useState<string | null>(null);
   const [successModalOpen, setSuccessModalOpen] = useState(false);
+
+  // Debug logs for modal states
+  console.log("useFavorecidos - Current states:", {
+    modalOpen,
+    deleteDialogOpen,
+    currentFavorecido: currentFavorecido.id,
+    formMode,
+    favorecidoToDelete
+  });
 
   // Query to fetch favorecidos
   const { 
@@ -86,9 +96,11 @@ export const useFavorecidos = () => {
 
   // Create new favorecido
   const handleCreateNew = () => {
+    console.log("useFavorecidos - handleCreateNew called");
     setCurrentFavorecido({...emptyFavorecido});
     setFormMode('create');
     setModalOpen(true);
+    console.log("useFavorecidos - After handleCreateNew, modalOpen should be true:", true);
   };
 
   // Edit favorecido
@@ -97,7 +109,7 @@ export const useFavorecidos = () => {
     setCurrentFavorecido({...favorecido});
     setFormMode('edit');
     setModalOpen(true);
-    console.log("useFavorecidos - Modal should be opening, modalOpen set to true");
+    console.log("useFavorecidos - After handleEdit, modalOpen should be true, currentFavorecido:", favorecido.nome);
   };
 
   // Delete favorecido
@@ -105,11 +117,12 @@ export const useFavorecidos = () => {
     console.log("useFavorecidos - handleDelete called with ID:", id);
     setFavorecidoToDelete(id);
     setDeleteDialogOpen(true);
-    console.log("useFavorecidos - Delete dialog should be opening, deleteDialogOpen set to true");
+    console.log("useFavorecidos - After handleDelete, deleteDialogOpen should be true");
   };
 
   // Confirm delete
   const confirmDelete = async () => {
+    console.log("useFavorecidos - confirmDelete called for favorecido:", favorecidoToDelete);
     if (!favorecidoToDelete) return;
     deleteMutation(favorecidoToDelete);
   };
@@ -132,6 +145,7 @@ export const useFavorecidos = () => {
 
   // Save favorecido
   const handleSave = async () => {
+    console.log("useFavorecidos - handleSave called");
     // Basic validation
     if (!currentFavorecido.nome.trim() || !currentFavorecido.inscricao.trim()) {
       toast.error("Nome e Inscrição são campos obrigatórios");

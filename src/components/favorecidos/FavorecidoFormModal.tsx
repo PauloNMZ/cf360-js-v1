@@ -28,6 +28,15 @@ const FavorecidoFormModal: React.FC<FavorecidoFormModalProps> = ({
   formMode,
   isLoading
 }) => {
+  // Debug logs for modal rendering
+  console.log("FavorecidoFormModal - Rendering with props:", {
+    open,
+    formMode,
+    currentFavorecidoId: currentFavorecido.id,
+    currentFavorecidoNome: currentFavorecido.nome,
+    isLoading
+  });
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
@@ -37,6 +46,7 @@ const FavorecidoFormModal: React.FC<FavorecidoFormModalProps> = ({
           </DialogTitle>
         </DialogHeader>
 
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           <FormField name="nome" label="Nome" required className="w-full">
             <Input 

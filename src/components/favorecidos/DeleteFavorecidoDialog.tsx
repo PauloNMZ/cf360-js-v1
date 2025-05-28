@@ -25,6 +25,12 @@ const DeleteFavorecidoDialog: React.FC<DeleteFavorecidoDialogProps> = ({
   onConfirm,
   isDeleting,
 }) => {
+  // Debug logs for dialog rendering
+  console.log("DeleteFavorecidoDialog - Rendering with props:", {
+    open,
+    isDeleting
+  });
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>

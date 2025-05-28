@@ -30,10 +30,12 @@ const FavorecidosPage = () => {
   } = useFavorecidos();
 
   // Debug logs
+  console.log("FavorecidosPage - Component rendered");
   console.log("FavorecidosPage - modalOpen:", modalOpen);
   console.log("FavorecidosPage - deleteDialogOpen:", deleteDialogOpen);
   console.log("FavorecidosPage - currentFavorecido:", currentFavorecido);
   console.log("FavorecidosPage - formMode:", formMode);
+  console.log("FavorecidosPage - filteredFavorecidos count:", filteredFavorecidos.length);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900/95">
@@ -70,6 +72,7 @@ const FavorecidosPage = () => {
         </div>
 
         {/* Form Modal */}
+        {console.log("FavorecidosPage - Rendering FavorecidoFormModal with open:", modalOpen)}
         <FavorecidoFormModal
           open={modalOpen}
           onOpenChange={setModalOpen}
@@ -82,6 +85,7 @@ const FavorecidosPage = () => {
         />
 
         {/* Delete Confirmation Dialog */}
+        {console.log("FavorecidosPage - Rendering DeleteFavorecidoDialog with open:", deleteDialogOpen)}
         <DeleteFavorecidoDialog
           open={deleteDialogOpen}
           onOpenChange={setDeleteDialogOpen}
