@@ -96,8 +96,8 @@ const SidebarLayout = () => {
               </div>
             </div>
           </header>
-          <div className="flex">
-            <Sidebar variant="sidebar" className="sticky top-0 h-screen z-40 border-r border-border/20 bg-white/95 dark:bg-slate-950">
+          <div className="flex h-[calc(100vh-96px)]">
+            <Sidebar variant="sidebar" className="sticky top-0 h-full z-40 border-r border-border/20 bg-white/95 dark:bg-slate-950">
               {/* SidebarHeader (if needed, currently empty) */}
               {/* Content area that flexes and scrolls */}
               <div className="flex flex-col flex-1 overflow-y-auto">
@@ -107,11 +107,9 @@ const SidebarLayout = () => {
               <SidebarFooter onLogout={handleLogoutClick} />
               <CollapseButton />
             </Sidebar>
-            <div className="flex-1 overflow-auto flex flex-col">
-              <div className="flex-1 overflow-auto">
-                <div className="">
-                  <Outlet />
-                </div>
+            <div className="flex-1 overflow-y-auto">
+              <div className="h-full">
+                <Outlet />
               </div>
             </div>
           </div>
