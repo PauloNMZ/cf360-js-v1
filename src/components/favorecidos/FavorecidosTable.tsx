@@ -102,7 +102,7 @@ const FavorecidosTable: React.FC<FavorecidosTableProps> = ({
                 <TableHead className="font-semibold text-blue-600 bg-[t] bg-[#ecf2ff]">INSCRIÇÃO</TableHead>
                 <TableHead className="font-semibold text-blue-600 bg-[#ecf2ff]">TIPO</TableHead>
                 <TableHead className="font-semibold text-blue-600 bg-[#ecf2ff]">BANCO/AGÊNCIA/CONTA</TableHead>
-                <TableHead className="font-semibold text-blue-600">CHAVE PIX</TableHead>
+                <TableHead className="font-semibold text-blue-600 bg-[#ecf2ff]">CHAVE PIX</TableHead>
                 <TableHead className="font-semibold text-blue-600">VALOR PADRÃO</TableHead>
                 {showActions && <TableHead className="w-[100px] font-semibold text-blue-600">AÇÕES</TableHead>}
               </TableRow>
