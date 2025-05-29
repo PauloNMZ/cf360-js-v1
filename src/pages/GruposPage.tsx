@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import GruposListaView from "@/components/grupos/GruposListaView";
 import GrupoModal from "@/components/grupos/GrupoModal";
@@ -7,7 +6,6 @@ import GrupoMembrosView from "@/components/grupos/GrupoMembrosView";
 import { useGroupOperations } from "@/services/group/hooks";
 import { Group, NewGroup } from "@/types/group";
 import { toast } from "sonner";
-
 const GruposPage = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -17,37 +15,35 @@ const GruposPage = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0); // Add refresh trigger state
 
-  const { addGroup, editGroup, removeGroup } = useGroupOperations();
-
+  const {
+    addGroup,
+    editGroup,
+    removeGroup
+  } = useGroupOperations();
   const handleCreateClick = () => {
     setCurrentGroup(undefined);
     setIsCreating(true);
     setModalOpen(true);
   };
-
   const handleEditClick = (group: Group) => {
     setCurrentGroup(group);
     setIsCreating(false);
     setModalOpen(true);
   };
-
   const handleDeleteClick = (group: Group) => {
     setCurrentGroup(group);
     setDeleteDialogOpen(true);
   };
-
   const handleManageMembers = (group: Group) => {
     setCurrentGroup(group);
     setShowMembersView(true);
   };
-
   const handleBackFromMembers = () => {
     setShowMembersView(false);
     setCurrentGroup(undefined);
     // Refresh the groups list when returning from members view
     setRefreshTrigger(prev => prev + 1);
   };
-
   const handleSubmitGroup = async (data: Partial<NewGroup>) => {
     try {
       // Ensure required field 'nome' is always present
@@ -55,14 +51,13 @@ const GruposPage = () => {
         toast.error("O nome do grupo é obrigatório");
         return;
       }
-      
+
       // Remove any empty strings or convert them to null to avoid validation issues
       const sanitizedData = {
         ...data,
         tipo_servico_id: data.tipo_servico_id || null,
         data_pagamento: data.data_pagamento || null
       };
-      
       if (isCreating) {
         await addGroup(sanitizedData as Omit<NewGroup, "user_id">);
         toast.success("Grupo criado com sucesso");
@@ -80,7 +75,6 @@ const GruposPage = () => {
       toast.error("Erro ao salvar grupo");
     }
   };
-
   const handleConfirmDelete = async () => {
     if (currentGroup) {
       setIsDeleting(true);
@@ -99,43 +93,14 @@ const GruposPage = () => {
       }
     }
   };
-
-  return (
-    <div className="h-full">
-      <h1 className="text-2xl font-bold mb-6">Gerenciamento de Grupos</h1>
+  return <div className="h-full">
       
-      {showMembersView && currentGroup ? (
-        <GrupoMembrosView 
-          grupo={currentGroup} 
-          onBack={handleBackFromMembers} 
-        />
-      ) : (
-        <GruposListaView 
-          onCreateClick={handleCreateClick}
-          onEditClick={handleEditClick}
-          onDeleteClick={handleDeleteClick}
-          onManageMembers={handleManageMembers}
-          refreshTrigger={refreshTrigger}
-        />
-      )}
+      
+      {showMembersView && currentGroup ? <GrupoMembrosView grupo={currentGroup} onBack={handleBackFromMembers} /> : <GruposListaView onCreateClick={handleCreateClick} onEditClick={handleEditClick} onDeleteClick={handleDeleteClick} onManageMembers={handleManageMembers} refreshTrigger={refreshTrigger} />}
 
-      <GrupoModal 
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onSubmit={handleSubmitGroup}
-        title={isCreating ? "Criar Novo Grupo" : "Editar Grupo"}
-        grupo={currentGroup}
-      />
+      <GrupoModal isOpen={modalOpen} onClose={() => setModalOpen(false)} onSubmit={handleSubmitGroup} title={isCreating ? "Criar Novo Grupo" : "Editar Grupo"} grupo={currentGroup} />
 
-      <DeleteGrupoDialog 
-        isOpen={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
-        onConfirm={handleConfirmDelete}
-        grupo={currentGroup}
-        isDeleting={isDeleting}
-      />
-    </div>
-  );
+      <DeleteGrupoDialog isOpen={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)} onConfirm={handleConfirmDelete} grupo={currentGroup} isDeleting={isDeleting} />
+    </div>;
 };
-
 export default GruposPage;
