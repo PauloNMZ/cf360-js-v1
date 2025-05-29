@@ -1,3 +1,4 @@
+
 import React from "react";
 import { 
   Home, 
@@ -12,13 +13,14 @@ import {
   FileSpreadsheet,
   FileCode,
   ReceiptText,
-  QrCode,
   Webhook,
   Bell,
   Key,
   Users,
   Shield
 } from "lucide-react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPix } from '@fortawesome/free-brands-svg-icons';
 
 export type NavigationItemConfig = {
   icon: React.ReactElement;
@@ -91,7 +93,7 @@ export const navigationItems: NavigationItemConfig[] = [
     ]
   },
   {
-    icon: <QrCode size={24} />,
+    icon: <FontAwesomeIcon icon={faPix} className="w-6 h-6" />,
     label: "Gestão Pix",
     tooltipText: "Gestão de PIX",
     handler: "emptyHandler",
