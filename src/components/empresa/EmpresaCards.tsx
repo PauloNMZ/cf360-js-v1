@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { ConvenenteData } from "@/types/convenente";
@@ -27,8 +26,8 @@ const EmpresaCards: React.FC<EmpresaCardsProps> = ({
     const cardText = `
 Empresa: ${convenente.razaoSocial}
 CNPJ: ${formatCNPJ(convenente.cnpj)}
-${convenente.agencia ? `Agência: ${convenente.agencia}` : ''}
-${convenente.conta ? `Conta: ${convenente.conta}` : ''}
+${convenente.agencia && convenente.conta ? `Agência: ${convenente.agencia}` : ''}
+${convenente.agencia && convenente.conta ? `Conta: ${convenente.conta}` : ''}
     `.trim();
 
     navigator.clipboard.writeText(cardText).then(() => {
@@ -58,7 +57,10 @@ ${convenente.conta ? `Conta: ${convenente.conta}` : ''}
   }
 
   return <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-      {convenentes.map(convenente => <div key={convenente.id} className={`bg-[#E2E8F0] dark:bg-gradient-to-br dark:from-gray-800 dark:to-gray-900 rounded-xl p-6 transition-all duration-300 hover:shadow-xl hover:scale-105 cursor-pointer flex flex-col relative ${currentConvenenteId === convenente.id ? 'border-2 border-blue-500 shadow-lg shadow-blue-500/20' : 'border-2 border-transparent hover:border-blue-500'}`} onClick={() => onSelectConvenente(convenente, 'view')}>
+      {convenentes.map(convenente => {
+        const hasAgenciaAndConta = convenente.agencia && convenente.conta;
+        
+        return <div key={convenente.id} className={`bg-[#E2E8F0] dark:bg-gradient-to-br dark:from-gray-800 dark:to-gray-900 rounded-xl p-6 transition-all duration-300 hover:shadow-xl hover:scale-105 cursor-pointer flex flex-col relative ${currentConvenenteId === convenente.id ? 'border-2 border-blue-500 shadow-lg shadow-blue-500/20' : 'border-2 border-transparent hover:border-blue-500'}`} onClick={() => onSelectConvenente(convenente, 'view')}>
           
           {/* Action icons */}
           <div className="absolute top-3 right-3 flex space-x-2">
@@ -113,36 +115,50 @@ ${convenente.conta ? `Conta: ${convenente.conta}` : ''}
             <div className="h-0.5 bg-gradient-to-r from-blue-500 to-blue-400 w-full rounded"></div>
           </div>
 
-          {/* Informações principais em 2 linhas */}
+          {/* Informações principais condicionais */}
           <div className="space-y-3 flex-grow">
-            <div className="flex flex-col space-y-2">
-              {/* Primeira linha: Labels */}
-              <div className="flex justify-between">
+            {hasAgenciaAndConta ? (
+              // Layout em 2 colunas quando tem agência e conta
+              <div className="flex flex-col space-y-2">
+                {/* Primeira linha: Labels */}
+                <div className="flex justify-between">
+                  <span className="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide font-medium">
+                    CNPJ
+                  </span>
+                  <span className="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide font-medium">
+                    Agência / Conta
+                  </span>
+                </div>
+                
+                {/* Segunda linha: Valores */}
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-900 dark:text-white font-mono text-sm">
+                    {formatCNPJ(convenente.cnpj)}
+                  </span>
+                  <span className="text-gray-900 dark:text-white font-mono text-sm text-right">
+                    {convenente.agencia} / {convenente.conta}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              // Layout simples quando não tem agência/conta
+              <div className="flex flex-col space-y-2">
                 <span className="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide font-medium">
                   CNPJ
                 </span>
-                <span className="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide font-medium">
-                  Agência / Conta
-                </span>
-              </div>
-              
-              {/* Segunda linha: Valores */}
-              <div className="flex justify-between items-center">
                 <span className="text-gray-900 dark:text-white font-mono text-sm">
                   {formatCNPJ(convenente.cnpj)}
                 </span>
-                <span className="text-gray-900 dark:text-white font-mono text-sm text-right">
-                  {convenente.agencia || 'N/A'} / {convenente.conta || 'N/A'}
-                </span>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Indicador de seleção */}
           {currentConvenenteId === convenente.id && <div className="absolute top-2 left-2">
               <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
             </div>}
-        </div>)}
+        </div>
+      })}
     </div>;
 };
 
