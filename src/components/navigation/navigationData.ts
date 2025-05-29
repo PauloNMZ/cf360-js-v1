@@ -1,4 +1,3 @@
-
 import { SidebarModule } from "@/types/sidebar";
 
 export const modularNavigationConfig: SidebarModule[] = [

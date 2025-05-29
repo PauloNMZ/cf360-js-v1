@@ -23,6 +23,8 @@ import { faPix } from '@fortawesome/free-brands-svg-icons';
 
 // Helper function to get icon component by name
 export const getIconComponent = (iconName: string, size: number = 20) => {
+  console.log(`🔍 Getting icon: ${iconName} with size: ${size}`);
+  
   const iconMap: Record<string, React.ReactElement> = {
     Home: <Home size={size} />,
     Building2: <Building2 size={size} />,
@@ -43,5 +45,13 @@ export const getIconComponent = (iconName: string, size: number = 20) => {
     FaPix: <FontAwesomeIcon icon={faPix} style={{ width: size, height: size }} />
   };
 
-  return iconMap[iconName] || <Settings size={size} />;
+  const selectedIcon = iconMap[iconName] || <Settings size={size} />;
+  
+  if (!iconMap[iconName]) {
+    console.warn(`⚠️ Icon not found: ${iconName}, using Settings as fallback`);
+  } else {
+    console.log(`✅ Icon found: ${iconName}`);
+  }
+
+  return selectedIcon;
 };
