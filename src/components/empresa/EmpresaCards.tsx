@@ -68,30 +68,30 @@ ${convenente.chavePix ? `Chave PIX: ${convenente.chavePix}` : ''}
                 e.stopPropagation();
                 onSelectConvenente(convenente, 'view');
               }}
-              className="p-1.5 rounded-md bg-gray-700 hover:bg-gray-600 transition-colors"
+              className="p-1.5 rounded-md bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors"
               title="Ver detalhes"
             >
-              <Eye size={14} className="text-gray-300 hover:text-white" />
+              <Eye size={14} className="text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white" />
             </button>
             <button
               onClick={e => {
                 e.stopPropagation();
                 handleCopyCardInfo(convenente);
               }}
-              className="p-1.5 rounded-md bg-gray-700 hover:bg-gray-600 transition-colors"
+              className="p-1.5 rounded-md bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors"
               title="Copiar informações"
             >
-              <Copy size={14} className="text-gray-300 hover:text-white" />
+              <Copy size={14} className="text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white" />
             </button>
             <button
               onClick={e => {
                 e.stopPropagation();
                 onSelectConvenente(convenente, 'edit');
               }}
-              className="p-1.5 rounded-md bg-gray-700 hover:bg-gray-600 transition-colors"
+              className="p-1.5 rounded-md bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors"
               title="Editar"
             >
-              <Pencil size={14} className="text-gray-300 hover:text-white" />
+              <Pencil size={14} className="text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white" />
             </button>
             <button
               onClick={e => {
@@ -99,10 +99,10 @@ ${convenente.chavePix ? `Chave PIX: ${convenente.chavePix}` : ''}
                 // Note: Delete functionality would need to be implemented in parent component
                 console.log('Delete clicked for', convenente.id);
               }}
-              className="p-1.5 rounded-md bg-gray-700 hover:bg-red-600 transition-colors"
+              className="p-1.5 rounded-md bg-gray-300 hover:bg-red-300 dark:bg-gray-700 dark:hover:bg-red-600 transition-colors"
               title="Excluir"
             >
-              <Trash2 size={14} className="text-gray-300 hover:text-white" />
+              <Trash2 size={14} className="text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white" />
             </button>
           </div>
 
