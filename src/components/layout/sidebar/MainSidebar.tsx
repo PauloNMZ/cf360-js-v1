@@ -73,7 +73,7 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
 
   // Function to render icon with PIX icon handling
   const renderIcon = (module: any) => {
-    // Check for PIX module using the correct icon identifier and name
+    // Check for PIX module
     const isPixModule = 
       module.name === "Gestão de PIX" || 
       module.name.includes("PIX") || 
@@ -83,7 +83,7 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
       return (
         <FontAwesomeIcon 
           icon={faPix} 
-          className={cn("w-5 h-5 text-current", isCollapsed && "w-6 h-6")}
+          className={isCollapsed ? "w-6 h-6" : "w-4 h-4 mr-2"}
         />
       );
     }
