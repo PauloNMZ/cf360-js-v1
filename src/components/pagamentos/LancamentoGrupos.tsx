@@ -12,6 +12,8 @@ import { toast } from "sonner";
 import { Calendar, Users, DollarSign, FileText, Send } from "lucide-react";
 
 const LancamentoGrupos = () => {
+  console.log("LancamentoGrupos component is rendering");
+  
   const [groups, setGroups] = useState<Group[]>([]);
   const [selectedGroupId, setSelectedGroupId] = useState<string>("");
   const [paymentDate, setPaymentDate] = useState<string>("");
@@ -19,20 +21,26 @@ const LancamentoGrupos = () => {
   const [description, setDescription] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingGroups, setIsLoadingGroups] = useState(true);
+  const [hasError, setHasError] = useState(false);
   
   const { fetchGroups, fetchGroupMembers } = useGroupOperations();
 
   useEffect(() => {
+    console.log("LancamentoGrupos useEffect triggered");
     loadGroups();
   }, []);
 
   const loadGroups = async () => {
+    console.log("Loading groups...");
     setIsLoadingGroups(true);
+    setHasError(false);
     try {
       const data = await fetchGroups();
+      console.log("Groups loaded:", data);
       setGroups(data);
     } catch (error) {
       console.error("Erro ao carregar grupos:", error);
+      setHasError(true);
       toast.error("Erro ao carregar grupos");
     } finally {
       setIsLoadingGroups(false);
@@ -41,6 +49,7 @@ const LancamentoGrupos = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Form submitted");
     
     if (!selectedGroupId) {
       toast.error("Selecione um grupo");
@@ -87,13 +96,29 @@ const LancamentoGrupos = () => {
 
   const selectedGroup = groups.find(g => g.id === selectedGroupId);
 
+  // Renderizar estado de erro
+  if (hasError) {
+    return (
+      <Card>
+        <CardContent className="pt-6">
+          <div className="text-center py-8">
+            <p className="text-destructive mb-4">Erro ao carregar a interface de lançamento por grupos</p>
+            <Button onClick={loadGroups}>Tentar Novamente</Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  console.log("LancamentoGrupos rendering main content");
+
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Users className="h-5 w-5" />
-            Formulário/Interface para Lançamento por Grupos
+            Lançamento por Grupos
           </CardTitle>
         </CardHeader>
         <CardContent>

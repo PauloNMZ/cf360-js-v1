@@ -1,11 +1,7 @@
 
 import React from 'react';
-import LancamentoGrupos from './LancamentoGrupos';
 
-// Componente para lançamento por grupos - agora implementado
-export { default as LancamentoGrupos } from './LancamentoGrupos';
-
-// Placeholders para as outras funcionalidades
+// Placeholders para as funcionalidades de importação
 export const ImportarPlanilha = () => {
   return (
     <div className="text-center py-8">
