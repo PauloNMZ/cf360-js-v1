@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ArrowRightLeft, FileText, Receipt } from "lucide-react";
+import { ArrowRightLeft, Barcode, Receipt } from "lucide-react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPix } from '@fortawesome/free-brands-svg-icons';
 import { cn } from "@/lib/utils";
@@ -23,7 +24,7 @@ const PagamentosTabs: React.FC<PagamentosTabsProps> = ({ children }) => {
           Transferências
         </TabsTrigger>
         <TabsTrigger value="titulos" className="flex-1">
-          <FileText className="w-4 h-4 mr-2" />
+          <Barcode className="w-4 h-4 mr-2" />
           Títulos
         </TabsTrigger>
         <TabsTrigger value="guias" className="flex-1">
@@ -56,3 +57,4 @@ const PagamentosTabs: React.FC<PagamentosTabsProps> = ({ children }) => {
 };
 
 export default PagamentosTabs;
+

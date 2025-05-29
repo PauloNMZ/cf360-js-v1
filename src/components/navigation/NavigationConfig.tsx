@@ -1,4 +1,3 @@
-
 import React from "react";
 import { 
   Home, 
@@ -12,7 +11,7 @@ import {
   ArrowUpDown,
   FileSpreadsheet,
   FileCode,
-  ReceiptText,
+  QrCode,
   Webhook,
   Bell,
   Key,
@@ -99,7 +98,7 @@ export const navigationItems: NavigationItemConfig[] = [
     handler: "emptyHandler",
     submenu: [
       {
-        icon: <ReceiptText size={20} />,
+        icon: <QrCode size={20} />,
         label: "Cobranças PIX",
         tooltipText: "Gestão de cobranças PIX",
         handler: "emptyHandler",
