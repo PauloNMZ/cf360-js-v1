@@ -31,15 +31,6 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
   
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
 
-  // Debug: Log modules on mount
-  useEffect(() => {
-    console.log('🔍 MainSidebar - Modules received:', modules.map(m => ({ 
-      name: m.name, 
-      icon: m.icon,
-      isPix: m.name.includes("PIX") || m.name.includes("Gestão de PIX")
-    })));
-  }, [modules]);
-
   const toggleModule = (moduleName: string) => {
     const newExpanded = new Set(expandedModules);
     if (newExpanded.has(moduleName)) {
@@ -80,20 +71,15 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
     return location.pathname === link || location.pathname.startsWith(`${link}/`);
   };
 
-  // Function to render icon with multiple PIX detection strategies
+  // Function to render icon with PIX icon handling
   const renderIcon = (module: any) => {
-    console.log(`🎨 Rendering icon for module: "${module.name}", icon: "${module.icon}"`);
-    
-    // Multiple strategies to detect PIX module
+    // Check for PIX module using the correct icon identifier and name
     const isPixModule = 
       module.name === "Gestão de PIX" || 
       module.name.includes("PIX") || 
-      module.icon === "FaPix";
-    
-    console.log(`🎯 Is PIX module? ${isPixModule}`);
+      module.icon === "PIX_ICON";
     
     if (isPixModule) {
-      console.log('✅ Rendering FontAwesome PIX icon');
       return (
         <FontAwesomeIcon 
           icon={faPix} 
@@ -103,9 +89,7 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
     }
     
     // Use the mapping system for other icons
-    const lucideIcon = getIconComponent(module.icon, isCollapsed ? 24 : 20);
-    console.log(`🔧 Using Lucide icon for ${module.name}`);
-    return lucideIcon;
+    return getIconComponent(module.icon, isCollapsed ? 24 : 20);
   };
 
   return (
