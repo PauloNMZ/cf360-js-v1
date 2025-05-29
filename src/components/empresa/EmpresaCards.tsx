@@ -29,7 +29,6 @@ Empresa: ${convenente.razaoSocial}
 CNPJ: ${formatCNPJ(convenente.cnpj)}
 ${convenente.agencia ? `Agência: ${convenente.agencia}` : ''}
 ${convenente.conta ? `Conta: ${convenente.conta}` : ''}
-${convenente.chavePix ? `Chave PIX: ${convenente.chavePix}` : ''}
     `.trim();
 
     navigator.clipboard.writeText(cardText).then(() => {
@@ -114,34 +113,29 @@ ${convenente.chavePix ? `Chave PIX: ${convenente.chavePix}` : ''}
             <div className="h-0.5 bg-gradient-to-r from-blue-500 to-blue-400 w-full rounded"></div>
           </div>
 
-          {/* Informações principais */}
+          {/* Informações principais em 2 linhas */}
           <div className="space-y-3 flex-grow">
-            <div className="flex flex-col space-y-1">
-              <span className="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide font-medium">
-                CNPJ
-              </span>
-              <span className="text-gray-900 dark:text-white font-mono text-sm">
-                {formatCNPJ(convenente.cnpj)}
-              </span>
-            </div>
-
-            {(convenente.agencia || convenente.conta) && <div className="flex flex-col space-y-1">
+            <div className="flex flex-col space-y-2">
+              {/* Primeira linha: Labels */}
+              <div className="flex justify-between">
+                <span className="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide font-medium">
+                  CNPJ
+                </span>
                 <span className="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide font-medium">
                   Agência / Conta
                 </span>
+              </div>
+              
+              {/* Segunda linha: Valores */}
+              <div className="flex justify-between items-center">
                 <span className="text-gray-900 dark:text-white font-mono text-sm">
+                  {formatCNPJ(convenente.cnpj)}
+                </span>
+                <span className="text-gray-900 dark:text-white font-mono text-sm text-right">
                   {convenente.agencia || 'N/A'} / {convenente.conta || 'N/A'}
                 </span>
-              </div>}
-
-            {convenente.chavePix && <div className="flex flex-col space-y-1">
-                <span className="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide font-medium">
-                  Chave PIX
-                </span>
-                <span className="text-gray-900 dark:text-white font-mono text-sm truncate">
-                  {convenente.chavePix}
-                </span>
-              </div>}
+              </div>
+            </div>
           </div>
 
           {/* Indicador de seleção */}
