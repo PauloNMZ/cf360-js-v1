@@ -1,7 +1,9 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ChevronRight, ChevronDown } from "lucide-react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPix } from '@fortawesome/free-brands-svg-icons';
 import { 
   Sidebar, 
   SidebarContent, 
@@ -13,7 +15,7 @@ import {
   useSidebar 
 } from "@/components/ui/sidebar";
 import { MainSidebarProps } from "@/types/sidebar";
-import { getIconComponent } from "@/components/navigation/ModularNavigationConfig";
+import { getIconComponent, testFontAwesome } from "@/components/navigation/ModularNavigationConfig";
 import { cn } from "@/lib/utils";
 
 const MainSidebar: React.FC<MainSidebarProps> = ({ 
@@ -28,6 +30,13 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
   const isCollapsed = state === "collapsed";
   
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
+
+  // Test FontAwesome on component mount
+  useEffect(() => {
+    console.log('🚀 MainSidebar mounted, testing FontAwesome...');
+    testFontAwesome();
+    console.log('📊 Modules received:', modules.map(m => ({ name: m.name, icon: m.icon })));
+  }, [modules]);
 
   const toggleModule = (moduleName: string) => {
     const newExpanded = new Set(expandedModules);
@@ -69,6 +78,29 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
     return location.pathname === link || location.pathname.startsWith(`${link}/`);
   };
 
+  // Function to render icon with fallback
+  const renderIcon = (module: any) => {
+    console.log(`🎨 Rendering icon for module: ${module.name}, icon: ${module.icon}`);
+    
+    // Special handling for PIX icon
+    if (module.icon === 'FaPix') {
+      console.log('🎯 Rendering PIX icon specifically');
+      try {
+        return (
+          <FontAwesomeIcon 
+            icon={faPix} 
+            style={{ width: isCollapsed ? 24 : 20, height: isCollapsed ? 24 : 20 }} 
+          />
+        );
+      } catch (error) {
+        console.error('❌ Error rendering PIX icon:', error);
+        return getIconComponent('Settings', isCollapsed ? 24 : 20);
+      }
+    }
+    
+    return getIconComponent(module.icon, isCollapsed ? 24 : 20);
+  };
+
   return (
     <Sidebar variant="sidebar" className="border-r border-border/20 bg-white/95 dark:bg-slate-950">
       <SidebarContent className="pt-4">
@@ -102,7 +134,7 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
                         "transition-transform duration-300",
                         isActive && "translate-x-2"
                       )}>
-                        {getIconComponent(module.icon, isCollapsed ? 24 : 20)}
+                        {renderIcon(module)}
                       </div>
                       
                       {!isCollapsed && (
