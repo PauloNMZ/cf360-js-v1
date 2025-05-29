@@ -4,7 +4,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ArrowRightLeft, FileText, Receipt } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Custom PIX Icon Component
+// Custom PIX Icon Component - Based on official PIX logo design
 const PixIcon = ({ className }: { className?: string }) => (
   <svg
     viewBox="0 0 24 24"
@@ -12,7 +12,7 @@ const PixIcon = ({ className }: { className?: string }) => (
     fill="currentColor"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm3.5 6L12 10.5 8.5 8 12 5.5 15.5 8zM8 9.5l1.5 1.5L8 12.5 6.5 11 8 9.5zm8 0L17.5 11 16 12.5l-1.5-1.5L16 9.5zm-4 2.5L15.5 16 12 18.5 8.5 16 12 12z"/>
+    <path d="M12 2L8 6H4v4l-2 2 2 2v4h4l4 4 4-4h4v-4l2-2-2-2V6h-4l-4-4zm0 3.17L14.83 8H16v1.17L17.17 10.5 16 11.83V13h-1.17L12 15.83 9.17 13H8v-1.17L6.83 10.5 8 9.17V8h1.17L12 5.17zm0 3.66L10.83 10H10v.83l-.83.67.83.67V13h.83L12 14.17 13.17 13H14v-.83l.83-.67-.83-.67V10h-.83L12 8.83z"/>
   </svg>
 );
 
