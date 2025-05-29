@@ -31,6 +31,15 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
   
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
 
+  // Debug: Log modules on mount
+  useEffect(() => {
+    console.log('🔍 MainSidebar - Modules received:', modules.map(m => ({ 
+      name: m.name, 
+      icon: m.icon,
+      isPix: m.name.includes("PIX") || m.name.includes("Gestão de PIX")
+    })));
+  }, [modules]);
+
   const toggleModule = (moduleName: string) => {
     const newExpanded = new Set(expandedModules);
     if (newExpanded.has(moduleName)) {
@@ -71,20 +80,32 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
     return location.pathname === link || location.pathname.startsWith(`${link}/`);
   };
 
-  // Function to render icon with direct PIX handling
+  // Function to render icon with multiple PIX detection strategies
   const renderIcon = (module: any) => {
-    // Direct handling for PIX icon like in PagamentosTabs
-    if (module.name === "Gestão de PIX") {
+    console.log(`🎨 Rendering icon for module: "${module.name}", icon: "${module.icon}"`);
+    
+    // Multiple strategies to detect PIX module
+    const isPixModule = 
+      module.name === "Gestão de PIX" || 
+      module.name.includes("PIX") || 
+      module.icon === "FaPix";
+    
+    console.log(`🎯 Is PIX module? ${isPixModule}`);
+    
+    if (isPixModule) {
+      console.log('✅ Rendering FontAwesome PIX icon');
       return (
         <FontAwesomeIcon 
           icon={faPix} 
-          className={cn("w-5 h-5", isCollapsed && "w-6 h-6")}
+          className={cn("w-5 h-5 text-current", isCollapsed && "w-6 h-6")}
         />
       );
     }
     
     // Use the mapping system for other icons
-    return getIconComponent(module.icon, isCollapsed ? 24 : 20);
+    const lucideIcon = getIconComponent(module.icon, isCollapsed ? 24 : 20);
+    console.log(`🔧 Using Lucide icon for ${module.name}`);
+    return lucideIcon;
   };
 
   return (

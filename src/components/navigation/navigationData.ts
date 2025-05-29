@@ -1,3 +1,4 @@
+
 import { SidebarModule } from "@/types/sidebar";
 
 export const modularNavigationConfig: SidebarModule[] = [
@@ -87,7 +88,7 @@ export const modularNavigationConfig: SidebarModule[] = [
   },
   {
     name: "Gestão de PIX",
-    icon: "FaPix",
+    icon: "PIX_ICON", // Mudando para um identificador específico
     children: [
       {
         name: "Cobranças PIX",
