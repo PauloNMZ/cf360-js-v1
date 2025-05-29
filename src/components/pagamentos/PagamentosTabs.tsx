@@ -16,60 +16,16 @@ const PagamentosTabs: React.FC<PagamentosTabsProps> = ({ children }) => {
         "h-auto items-center",
         "space-x-2"
       )}>
-        <TabsTrigger
-          value="transferencias"
-          className={cn(
-            "flex-1",
-            "rounded-md px-3 py-2 text-sm font-medium",
-            "bg-background text-muted-foreground",
-            "data-[state=active]:bg-[#ECF2FF] data-[state=active]:text-primary",
-            "dark:data-[state=active]:bg-secondary dark:data-[state=active]:text-primary",
-            "data-[state=active]:shadow",
-            "hover:bg-muted hover:text-foreground"
-          )}
-        >
+        <TabsTrigger value="transferencias" className="flex-1">
           Transferências
         </TabsTrigger>
-        <TabsTrigger
-          value="titulos"
-          className={cn(
-            "flex-1",
-            "rounded-md px-3 py-2 text-sm font-medium",
-            "bg-background text-muted-foreground",
-            "data-[state=active]:bg-[#ECF2FF] data-[state=active]:text-primary",
-            "dark:data-[state=active]:bg-secondary dark:data-[state=active]:text-primary",
-            "data-[state=active]:shadow",
-            "hover:bg-muted hover:text-foreground"
-          )}
-        >
+        <TabsTrigger value="titulos" className="flex-1">
           Títulos
         </TabsTrigger>
-        <TabsTrigger
-          value="guias"
-          className={cn(
-            "flex-1",
-            "rounded-md px-3 py-2 text-sm font-medium",
-            "bg-background text-muted-foreground",
-            "data-[state=active]:bg-[#ECF2FF] data-[state=active]:text-primary",
-            "dark:data-[state=active]:bg-secondary dark:data-[state=active]:text-primary",
-            "data-[state=active]:shadow",
-            "hover:bg-muted hover:text-foreground"
-          )}
-        >
+        <TabsTrigger value="guias" className="flex-1">
           Guias
         </TabsTrigger>
-        <TabsTrigger
-          value="pix"
-          className={cn(
-            "flex-1",
-            "rounded-md px-3 py-2 text-sm font-medium",
-            "bg-background text-muted-foreground",
-            "data-[state=active]:bg-[#ECF2FF] data-[state=active]:text-primary",
-            "dark:data-[state=active]:bg-secondary dark:data-[state=active]:text-primary",
-            "data-[state=active]:shadow",
-            "hover:bg-muted hover:text-foreground"
-          )}
-        >
+        <TabsTrigger value="pix" className="flex-1">
           PIX
         </TabsTrigger>
       </TabsList>
