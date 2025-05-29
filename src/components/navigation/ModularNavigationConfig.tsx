@@ -16,9 +16,10 @@ import {
   Bell,
   Shield,
   Key,
-  Banknote,
-  QrCode
+  Banknote
 } from "lucide-react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPix } from '@fortawesome/free-brands-svg-icons';
 import { SidebarModule } from "@/types/sidebar";
 
 export const modularNavigationConfig: SidebarModule[] = [
@@ -108,7 +109,7 @@ export const modularNavigationConfig: SidebarModule[] = [
   },
   {
     name: "Gestão de PIX",
-    icon: "QrCode",
+    icon: "FaPix",
     children: [
       {
         name: "Cobranças PIX",
@@ -197,7 +198,7 @@ export const getIconComponent = (iconName: string, size: number = 20) => {
     Shield: <Shield size={size} />,
     Key: <Key size={size} />,
     Banknote: <Banknote size={size} />,
-    QrCode: <QrCode size={size} />
+    FaPix: <FontAwesomeIcon icon={faPix} style={{ width: size, height: size }} />
   };
 
   return iconMap[iconName] || <Settings size={size} />;
