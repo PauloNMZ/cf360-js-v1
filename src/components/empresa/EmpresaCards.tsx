@@ -59,7 +59,7 @@ ${convenente.chavePix ? `Chave PIX: ${convenente.chavePix}` : ''}
   }
 
   return <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-      {convenentes.map(convenente => <div key={convenente.id} className={`bg-gradient-to-br from-gray-900 to-gray-800 dark:from-gray-800 dark:to-gray-900 rounded-xl p-6 transition-all duration-300 hover:shadow-xl hover:scale-105 cursor-pointer flex flex-col relative ${currentConvenenteId === convenente.id ? 'border-2 border-blue-500 shadow-lg shadow-blue-500/20' : 'border-2 border-transparent hover:border-blue-500'}`} onClick={() => onSelectConvenente(convenente, 'view')}>
+      {convenentes.map(convenente => <div key={convenente.id} className={`bg-[#E2E8F0] dark:bg-gradient-to-br dark:from-gray-800 dark:to-gray-900 rounded-xl p-6 transition-all duration-300 hover:shadow-xl hover:scale-105 cursor-pointer flex flex-col relative ${currentConvenenteId === convenente.id ? 'border-2 border-blue-500 shadow-lg shadow-blue-500/20' : 'border-2 border-transparent hover:border-blue-500'}`} onClick={() => onSelectConvenente(convenente, 'view')}>
           
           {/* Action icons */}
           <div className="absolute top-3 right-3 flex space-x-2">
@@ -108,7 +108,7 @@ ${convenente.chavePix ? `Chave PIX: ${convenente.chavePix}` : ''}
 
           {/* Header com nome da empresa */}
           <div className="mb-4 pr-32">
-            <h3 className="font-bold text-white mb-1 truncate text-sm">
+            <h3 className="font-bold text-gray-900 dark:text-white mb-1 truncate text-sm">
               {convenente.razaoSocial}
             </h3>
             <div className="h-0.5 bg-gradient-to-r from-blue-500 to-blue-400 w-full rounded"></div>
@@ -117,28 +117,28 @@ ${convenente.chavePix ? `Chave PIX: ${convenente.chavePix}` : ''}
           {/* Informações principais */}
           <div className="space-y-3 flex-grow">
             <div className="flex flex-col space-y-1">
-              <span className="text-xs text-gray-400 uppercase tracking-wide font-medium">
+              <span className="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide font-medium">
                 CNPJ
               </span>
-              <span className="text-white font-mono text-sm">
+              <span className="text-gray-900 dark:text-white font-mono text-sm">
                 {formatCNPJ(convenente.cnpj)}
               </span>
             </div>
 
             {(convenente.agencia || convenente.conta) && <div className="flex flex-col space-y-1">
-                <span className="text-xs text-gray-400 uppercase tracking-wide font-medium">
+                <span className="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide font-medium">
                   Agência / Conta
                 </span>
-                <span className="text-white font-mono text-sm">
+                <span className="text-gray-900 dark:text-white font-mono text-sm">
                   {convenente.agencia || 'N/A'} / {convenente.conta || 'N/A'}
                 </span>
               </div>}
 
             {convenente.chavePix && <div className="flex flex-col space-y-1">
-                <span className="text-xs text-gray-400 uppercase tracking-wide font-medium">
+                <span className="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide font-medium">
                   Chave PIX
                 </span>
-                <span className="text-white font-mono text-sm truncate">
+                <span className="text-gray-900 dark:text-white font-mono text-sm truncate">
                   {convenente.chavePix}
                 </span>
               </div>}

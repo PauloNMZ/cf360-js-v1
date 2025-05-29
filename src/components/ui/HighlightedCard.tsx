@@ -9,7 +9,7 @@ interface HighlightedCardProps {
 
 const HighlightedCard: React.FC<HighlightedCardProps> = ({ companyName, children }) => {
   return (
-    <Card className="bg-white dark:bg-[#0E1629] border-2 border-primary-blue/30 shadow-lg rounded-xl p-6 flex flex-col gap-3 max-w-md w-full mx-auto">
+    <Card className="bg-[#E2E8F0] dark:bg-[#0E1629] border-2 border-primary-blue/30 shadow-lg rounded-xl p-6 flex flex-col gap-3 max-w-md w-full mx-auto">
       <span
         style={{ color: "#5A8AF0" }}
         className="font-poppins text-xl font-bold tracking-tight mb-2"
