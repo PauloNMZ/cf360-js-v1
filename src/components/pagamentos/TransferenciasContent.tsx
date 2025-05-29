@@ -2,11 +2,10 @@
 import React, { useState } from 'react';
 import LancamentoButtons from './LancamentoButtons';
 import LancamentoFavorecidos from './LancamentoFavorecidos';
-import LancamentoGrupos from './LancamentoGrupos';
 import { ImportarPlanilha, ImportarCNAB } from './LancamentoPlaceholders';
 
 const TransferenciasContent = () => {
-  const [activeLancamentoTab, setActiveLancamentoTab] = useState<'favorecidos' | 'grupos' | 'planilha' | 'cnab' | null>(null);
+  const [activeLancamentoTab, setActiveLancamentoTab] = useState<'favorecidos' | 'planilha' | 'cnab' | null>(null);
 
   console.log("TransferenciasContent - activeLancamentoTab:", activeLancamentoTab);
 
@@ -17,9 +16,6 @@ const TransferenciasContent = () => {
       case 'favorecidos':
         console.log("Renderizando LancamentoFavorecidos");
         return <LancamentoFavorecidos />;
-      case 'grupos':
-        console.log("Renderizando LancamentoGrupos");
-        return <LancamentoGrupos />;
       case 'planilha':
         console.log("Renderizando ImportarPlanilha");
         return <ImportarPlanilha />;
