@@ -1,4 +1,4 @@
 
 // Re-export the navigation configuration and icon utilities
 export { modularNavigationConfig } from './navigationData';
-export { getIconComponent, testFontAwesome } from './iconMapping';
+export { getIconComponent } from './iconMapping';

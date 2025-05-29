@@ -15,7 +15,7 @@ import {
   useSidebar 
 } from "@/components/ui/sidebar";
 import { MainSidebarProps } from "@/types/sidebar";
-import { getIconComponent, testFontAwesome } from "@/components/navigation/ModularNavigationConfig";
+import { getIconComponent } from "@/components/navigation/ModularNavigationConfig";
 import { cn } from "@/lib/utils";
 
 const MainSidebar: React.FC<MainSidebarProps> = ({ 
@@ -30,13 +30,6 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
   const isCollapsed = state === "collapsed";
   
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
-
-  // Test FontAwesome on component mount
-  useEffect(() => {
-    console.log('🚀 MainSidebar mounted, testing FontAwesome...');
-    testFontAwesome();
-    console.log('📊 Modules received:', modules.map(m => ({ name: m.name, icon: m.icon })));
-  }, [modules]);
 
   const toggleModule = (moduleName: string) => {
     const newExpanded = new Set(expandedModules);
@@ -78,26 +71,19 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
     return location.pathname === link || location.pathname.startsWith(`${link}/`);
   };
 
-  // Function to render icon with fallback
+  // Function to render icon with direct PIX handling
   const renderIcon = (module: any) => {
-    console.log(`🎨 Rendering icon for module: ${module.name}, icon: ${module.icon}`);
-    
-    // Special handling for PIX icon
-    if (module.icon === 'FaPix') {
-      console.log('🎯 Rendering PIX icon specifically');
-      try {
-        return (
-          <FontAwesomeIcon 
-            icon={faPix} 
-            style={{ width: isCollapsed ? 24 : 20, height: isCollapsed ? 24 : 20 }} 
-          />
-        );
-      } catch (error) {
-        console.error('❌ Error rendering PIX icon:', error);
-        return getIconComponent('Settings', isCollapsed ? 24 : 20);
-      }
+    // Direct handling for PIX icon like in PagamentosTabs
+    if (module.name === "Gestão de PIX") {
+      return (
+        <FontAwesomeIcon 
+          icon={faPix} 
+          className={cn("w-5 h-5", isCollapsed && "w-6 h-6")}
+        />
+      );
     }
     
+    // Use the mapping system for other icons
     return getIconComponent(module.icon, isCollapsed ? 24 : 20);
   };
 
