@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { validateFavorecidos } from '@/services/cnab240/validationService';
 
@@ -34,6 +35,7 @@ export const useImportacao = () => {
 
   // Handle initial processing
   const handleProcessar = () => {
+    console.log("useImportacao - handleProcessar chamado");
     const result = fileImport.handleProcessar();
     if (result) {
       setShowTable(true);
@@ -44,11 +46,24 @@ export const useImportacao = () => {
 
   // Wrapper for verify errors function
   const handleVerifyErrors = () => {
+    console.log("useImportacao - handleVerifyErrors chamado");
+    console.log("useImportacao - tableOps.tableData length:", tableOps.tableData.length);
+    console.log("useImportacao - validateFavorecidos function:", typeof validateFavorecidos);
     validationDialog.handleVerifyErrors(validateFavorecidos, tableOps.tableData);
+  };
+
+  // Handle process selected function
+  const handleProcessSelected = () => {
+    console.log("useImportacao - handleProcessSelected chamado");
+    console.log("useImportacao - selected rows:", tableOps.getSelectedRows().length);
+    processWorkflow.handleProcessSelected();
   };
   
   // Handle PDF report generation
   const handleGenerateReport = async () => {
+    console.log("useImportacao - handleGenerateReport chamado");
+    console.log("useImportacao - cnabFileGenerated:", processWorkflow.cnabFileGenerated);
+    
     // Get company name if available
     let companyName = "Empresa";
     if (processWorkflow.workflow.convenente) {
@@ -103,7 +118,7 @@ export const useImportacao = () => {
     
     // Process handlers
     handleProcessar,
-    handleProcessSelected: processWorkflow.handleProcessSelected,
+    handleProcessSelected,
     handleGenerateReport,
     // Use the simpler version for PDFPreviewDialog
     handleSendEmailReport: pdfReportWithEmail.handleSendEmailReport,

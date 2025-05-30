@@ -45,6 +45,41 @@ export function TableView({
     if (!inscricao) return "";
     return formatCPFCNPJ(inscricao);
   };
+
+  // Adicionar logs de debugging para os botões
+  const handleVerifyErrorsClick = () => {
+    console.log("TableView - Botão Verificar Erros clicado");
+    console.log("TableView - tableData length:", tableData.length);
+    console.log("TableView - handleVerifyErrors function:", typeof handleVerifyErrors);
+    if (handleVerifyErrors) {
+      handleVerifyErrors();
+    } else {
+      console.error("TableView - handleVerifyErrors não está definido");
+    }
+  };
+
+  const handleProcessSelectedClick = () => {
+    console.log("TableView - Botão Processar Selecionados clicado");
+    console.log("TableView - tableData length:", tableData.length);
+    console.log("TableView - selected rows:", tableData.filter(row => row.selected).length);
+    console.log("TableView - handleProcessSelected function:", typeof handleProcessSelected);
+    if (handleProcessSelected) {
+      handleProcessSelected();
+    } else {
+      console.error("TableView - handleProcessSelected não está definido");
+    }
+  };
+
+  const handleGenerateReportClick = () => {
+    console.log("TableView - Botão Gerar Relatório clicado");
+    console.log("TableView - cnabFileGenerated:", cnabFileGenerated);
+    console.log("TableView - handleGenerateReport function:", typeof handleGenerateReport);
+    if (handleGenerateReport) {
+      handleGenerateReport();
+    } else {
+      console.error("TableView - handleGenerateReport não está definido");
+    }
+  };
   
   return <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -53,7 +88,7 @@ export function TableView({
         </Button>
 
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleVerifyErrors} className="flex items-center">
+          <Button variant="outline" onClick={handleVerifyErrorsClick} className="flex items-center">
             <FileCheck className="mr-2 h-4 w-4" />
             Verificar Erros
           </Button>
@@ -63,12 +98,12 @@ export function TableView({
               Exportar Erros
             </Button>}
 
-          <Button onClick={handleProcessSelected} className="flex items-center">
+          <Button onClick={handleProcessSelectedClick} className="flex items-center">
             <FileOutput className="mr-2 h-4 w-4" />
             Processar Selecionados
           </Button>
           
-          <Button onClick={handleGenerateReport} className="flex items-center" disabled={!cnabFileGenerated} title={!cnabFileGenerated ? "Gere o arquivo CNAB antes de visualizar o relatório" : "Gerar relatório PDF dos registros válidos"}>
+          <Button onClick={handleGenerateReportClick} className="flex items-center" disabled={!cnabFileGenerated} title={!cnabFileGenerated ? "Gere o arquivo CNAB antes de visualizar o relatório" : "Gerar relatório PDF dos registros válidos"}>
             <FileText className="mr-2 h-4 w-4" />
             Gerar Relatório
           </Button>

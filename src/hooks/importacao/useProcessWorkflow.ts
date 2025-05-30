@@ -14,15 +14,20 @@ export const useProcessWorkflow = (getSelectedRows: () => any[]) => {
 
   // Handle initial processing
   const handleProcessSelected = () => {
+    console.log("useProcessWorkflow - handleProcessSelected chamado");
     const selectedRows = getSelectedRows();
+    console.log("useProcessWorkflow - selectedRows length:", selectedRows.length);
     
     if (selectedRows.length === 0) {
+      console.log("useProcessWorkflow - Nenhum registro selecionado");
       toast.error("Nenhum registro selecionado para processamento.");
       return;
     }
 
+    console.log("useProcessWorkflow - Validando registros automaticamente...");
     // Automatically validate before proceeding
     const { errors } = validateFavorecidos(selectedRows);
+    console.log("useProcessWorkflow - Validação concluída, erros:", errors.length);
     
     // Reset workflow steps and open dialog
     workflowDialog.setWorkflow({
@@ -38,10 +43,13 @@ export const useProcessWorkflow = (getSelectedRows: () => any[]) => {
     // Reset CNAB file generation status
     cnabGeneration.setCnabFileGenerated(false);
     cnabGeneration.setCnabFileName('');
+    
+    console.log("useProcessWorkflow - Workflow dialog aberto");
   };
 
   // Handle save directory settings
   const handleSaveDirectorySettings = () => {
+    console.log("useProcessWorkflow - handleSaveDirectorySettings chamado");
     // First update the workflow with the directory dialog value
     workflowDialog.updateWorkflow('outputDirectory', directoryDialog.outputDirectory);
     // Then save settings
@@ -50,7 +58,10 @@ export const useProcessWorkflow = (getSelectedRows: () => any[]) => {
 
   // Final submission handler
   const handleSubmitWorkflow = async () => {
+    console.log("useProcessWorkflow - handleSubmitWorkflow chamado");
     const selectedRows = getSelectedRows();
+    console.log("useProcessWorkflow - Submetendo workflow para", selectedRows.length, "registros");
+    
     return cnabGeneration.handleSubmitWorkflow(
       selectedRows, 
       workflowDialog.workflow, 

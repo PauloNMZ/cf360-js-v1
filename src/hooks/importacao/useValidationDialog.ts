@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
@@ -10,12 +11,20 @@ export const useValidationDialog = () => {
   
   // Function to validate records and display errors
   const handleVerifyErrors = (validateFavorecidos: any, tableData: any[]) => {
+    console.log("useValidationDialog - handleVerifyErrors chamado");
+    console.log("useValidationDialog - tableData length:", tableData.length);
+    console.log("useValidationDialog - validateFavorecidos function:", typeof validateFavorecidos);
+    
     if (tableData.length === 0) {
+      console.log("useValidationDialog - Nenhum registro para validar");
       toast.error('Nenhum registro para validar. Importe uma planilha primeiro.');
       return;
     }
 
+    console.log("useValidationDialog - Executando validação...");
     const { errors, validRecordsCount, totalRecords } = validateFavorecidos(tableData);
+    console.log("useValidationDialog - Resultado da validação:", { errors: errors.length, validRecordsCount, totalRecords });
+    
     setValidationErrors(errors);
     setValidationPerformed(true);
     
@@ -33,6 +42,9 @@ export const useValidationDialog = () => {
 
   // Function to export validation errors to Excel
   const handleExportErrors = async () => {
+    console.log("useValidationDialog - handleExportErrors chamado");
+    console.log("useValidationDialog - validationErrors length:", validationErrors.length);
+    
     if (validationErrors.length === 0) {
       toast.warning("Não há erros para exportar.");
       return;
