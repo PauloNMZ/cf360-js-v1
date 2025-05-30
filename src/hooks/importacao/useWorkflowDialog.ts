@@ -76,6 +76,17 @@ export const useWorkflowDialog = (options: UseWorkflowDialogOptions = {}) => {
         [field]: value
       };
       console.log("useWorkflowDialog - workflow após atualização:", newWorkflow);
+      
+      // ADDED: Special logging for convenente updates
+      if (field === 'convenente') {
+        console.log("🎯 CONVENENTE UPDATED:");
+        console.log("  - Old convenente:", prev.convenente);
+        console.log("  - New convenente:", value);
+        console.log("  - New convenente type:", typeof value);
+        console.log("  - New convenente ID:", value?.id);
+        console.log("  - New convenente razaoSocial:", value?.razaoSocial);
+      }
+      
       return newWorkflow;
     });
   };

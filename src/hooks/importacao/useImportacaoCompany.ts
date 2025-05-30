@@ -31,11 +31,32 @@ export const useImportacaoCompany = (
       companyName = selectedConvenente.razaoSocial;
       companyCnpj = selectedConvenente.cnpj || "";
     }
-    // Priority 3: Workflow-selected convenente
-    else if (processWorkflow?.workflow?.convenente && convenentesData?.convenentes) {
-      const workflowConvenente = convenentesData.convenentes.find(
-        c => c.id === processWorkflow.workflow.convenente
-      );
+    // Priority 3: Workflow-selected convenente (FIXED: better checking)
+    else if (processWorkflow?.workflow?.convenente) {
+      console.log("🔍 Checking workflow convenente...");
+      console.log("workflow convenente type:", typeof processWorkflow.workflow.convenente);
+      console.log("workflow convenente value:", processWorkflow.workflow.convenente);
+      
+      let workflowConvenente = null;
+      
+      // Check if it's an object with data or just an ID
+      if (typeof processWorkflow.workflow.convenente === 'object' && processWorkflow.workflow.convenente.razaoSocial) {
+        // It's already the full object
+        workflowConvenente = processWorkflow.workflow.convenente;
+        console.log("✅ Workflow convenente is already a full object:", workflowConvenente);
+      } else if (convenentesData?.convenentes) {
+        // It's an ID, need to find the full object
+        const convenenteId = typeof processWorkflow.workflow.convenente === 'object' 
+          ? processWorkflow.workflow.convenente.id 
+          : processWorkflow.workflow.convenente;
+        
+        console.log("🔍 Looking for convenente with ID:", convenenteId);
+        console.log("Available convenentes:", convenentesData.convenentes.map(c => ({ id: c.id, razaoSocial: c.razaoSocial })));
+        
+        workflowConvenente = convenentesData.convenentes.find(c => c.id === convenenteId);
+        console.log("🔍 Found convenente:", workflowConvenente);
+      }
+      
       if (workflowConvenente && workflowConvenente.razaoSocial) {
         console.log("✅ Using workflow convenente:", workflowConvenente);
         companyName = workflowConvenente.razaoSocial;

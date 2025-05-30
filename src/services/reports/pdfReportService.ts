@@ -1,4 +1,3 @@
-
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import { ReportData, RowData } from '@/types/importacao';
@@ -21,11 +20,11 @@ export const generatePDFReport = async (reportData: ReportData): Promise<Blob> =
   doc.setDrawColor(0);
   doc.line(15, 25, 195, 25);
   
-  // Add header information with company name and CNPJ on separate lines
+  // Add header information with company name and FORMATTED CNPJ on separate lines
   doc.setFontSize(11);
   doc.setFont(undefined, 'normal');
   doc.text(`Empresa: ${reportData.empresaNome}`, 15, 35);
-  doc.text(`CNPJ: ${reportData.empresaCnpj}`, 15, 42);
+  doc.text(`CNPJ: ${formatarCpfCnpj(reportData.empresaCnpj)}`, 15, 42);
   doc.text(`Data de Geração: ${reportData.dataGeracao}`, 15, 49);
   doc.text(`Referência da Remessa: ${reportData.referencia}`, 15, 56);
   

@@ -1,7 +1,7 @@
-
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { formatarValorCurrency } from '@/utils/formatting/currencyUtils';
+import { formatarCpfCnpj } from '@/utils/formatting/cnabFormatters';
 import { RowData } from '@/types/importacao';
 
 interface ReportGenerationOptions {
@@ -56,9 +56,9 @@ export const generateRemittanceReport = async (
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Remessa Bancária');
   
-  // Add header information with company name and CNPJ on separate lines
+  // Add header information with company name and FORMATTED CNPJ on separate lines
   worksheet.addRow([`Empresa: ${options.companyName}`]);
-  worksheet.addRow([`CNPJ: ${options.companyCnpj}`]);
+  worksheet.addRow([`CNPJ: ${formatarCpfCnpj(options.companyCnpj)}`]);
   worksheet.addRow([`Data de Geração: ${formattedDate} ${formattedTime}`]);
   worksheet.addRow([`Referência da Remessa: ${options.remittanceReference}`]);
   worksheet.addRow([`Total de Registros: ${selectedRows.length}`]);
