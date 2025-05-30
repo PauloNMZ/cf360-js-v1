@@ -4,6 +4,31 @@ import ExcelJS from 'exceljs';
 import { toast } from '@/components/ui/sonner';
 import { PlanilhaData, RowData, EXPECTED_HEADERS } from '@/types/importacao';
 
+/**
+ * Safely converts Excel cell value to appropriate type
+ */
+const convertCellValue = (value: any, header: string): any => {
+  if (value === null || value === undefined) return '';
+  
+  // For specific fields that should be strings
+  if (['NOME', 'INSCRICAO', 'BANCO', 'AGENCIA', 'CONTA', 'TIPO'].includes(header)) {
+    return String(value).trim();
+  }
+  
+  // For VALOR field, ensure it's a number
+  if (header === 'VALOR') {
+    if (typeof value === 'number') return value;
+    if (typeof value === 'string') {
+      const cleanValue = value.replace(/[^\d.,]/g, '').replace(',', '.');
+      const parsed = parseFloat(cleanValue);
+      return isNaN(parsed) ? 0 : parsed;
+    }
+    return 0;
+  }
+  
+  return value;
+};
+
 export const useFileImport = () => {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -12,6 +37,7 @@ export const useFileImport = () => {
   const [tableData, setTableData] = useState<RowData[]>([]);
 
   const handleFileChange = (files: File[]) => {
+    console.log("useFileImport - handleFileChange called with files:", files);
     if (files.length > 0) {
       setFile(files[0]);
       setErrorMessage(null);
@@ -23,6 +49,7 @@ export const useFileImport = () => {
   };
 
   const validateFile = async (file: File) => {
+    console.log("useFileImport - validateFile called with file:", file.name);
     setLoading(true);
     try {
       const arrayBuffer = await file.arrayBuffer();
@@ -44,7 +71,7 @@ export const useFileImport = () => {
         .map(header => header ? header.toString().trim().toUpperCase() : '')
         .filter(header => header !== ''); // Remove empty headers
 
-      console.log("Headers extraídos:", headers);
+      console.log("useFileImport - Headers extraídos:", headers);
 
       // Validate headers against expected headers
       const missingColumns = EXPECTED_HEADERS.filter(
@@ -75,13 +102,15 @@ export const useFileImport = () => {
         headers.forEach((header, headerIndex) => {
           const cellIndex = headerIndex + 1; // Adjust for ExcelJS indexing (skip index 0)
           if (cellValues[cellIndex] !== undefined) {
-            rowData[header] = cellValues[cellIndex];
+            rowData[header] = convertCellValue(cellValues[cellIndex], header);
           }
         });
         
-        console.log(`Linha ${rowNumber}:`, rowData);
+        console.log(`useFileImport - Linha ${rowNumber} convertida:`, rowData);
         rows.push(rowData as RowData);
       });
+
+      console.log("useFileImport - Total rows processed:", rows.length);
 
       setPlanilhaData({
         headers,
@@ -98,7 +127,7 @@ export const useFileImport = () => {
         toast.success("Planilha validada com sucesso!");
       }
     } catch (error) {
-      console.error("Erro ao processar planilha:", error);
+      console.error("useFileImport - Erro ao processar planilha:", error);
       setErrorMessage("Erro ao processar a planilha. Verifique se o arquivo está em um formato válido (XLSX, XLS, CSV).");
       setPlanilhaData(null);
     } finally {
@@ -107,6 +136,10 @@ export const useFileImport = () => {
   };
 
   const handleProcessar = () => {
+    console.log("useFileImport - handleProcessar called");
+    console.log("useFileImport - planilhaData:", planilhaData);
+    console.log("useFileImport - tableData length:", tableData.length);
+    
     if (!planilhaData || !planilhaData.isValid) {
       toast.error("A planilha não é válida para processamento.");
       return;
