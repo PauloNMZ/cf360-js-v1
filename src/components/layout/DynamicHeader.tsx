@@ -17,8 +17,16 @@ const DynamicHeader: React.FC<DynamicHeaderProps> = ({ company }) => {
 
   // Update the selected header company in context whenever the company prop changes
   useEffect(() => {
-    console.log("DynamicHeader: Setting selected header company:", company);
+    console.log("=== DEBUG DynamicHeader - useEffect ===");
+    console.log("Setting selected header company:", company);
+    console.log("Company details:", {
+      razaoSocial: company?.razaoSocial,
+      cnpj: company?.cnpj
+    });
+    
     setSelectedHeaderCompany(company);
+    
+    console.log("Selected header company has been set in context");
   }, [company, setSelectedHeaderCompany]);
 
   return (

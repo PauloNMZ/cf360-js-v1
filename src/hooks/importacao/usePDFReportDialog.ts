@@ -33,10 +33,13 @@ export const usePDFReportDialog = () => {
     convenente: any,
     companyCnpj: string = ""
   ) => {
-    console.log("usePDFReportDialog - generateReport chamado com:");
+    console.log("=== DEBUG usePDFReportDialog - generateReport ===");
+    console.log("Parameters received:");
+    console.log("  - selectedRows length:", selectedRows.length);
     console.log("  - companyName:", companyName);
     console.log("  - companyCnpj:", companyCnpj);
     console.log("  - convenente:", convenente);
+    console.log("  - cnabFileGenerated:", cnabFileGenerated);
     
     if (selectedRows.length === 0) {
       toast.error("Nenhum registro selecionado para gerar relatório.", {
@@ -86,18 +89,36 @@ export const usePDFReportDialog = () => {
         return sum + (isNaN(value) ? 0 : value);
       }, 0);
       
-      // Use convenente name if available, otherwise use companyName
-      const empresaName = convenente?.razaoSocial || companyName;
-      const empresaCnpj = convenente?.cnpj || companyCnpj;
+      // Determine final company info with better priority logic
+      let finalCompanyName = "Empresa";
+      let finalCompanyCnpj = "";
       
-      console.log("usePDFReportDialog - Final empresa values:");
-      console.log("  - empresaName:", empresaName);
-      console.log("  - empresaCnpj:", empresaCnpj);
+      console.log("=== Determining final company info ===");
       
-      // Create report data with only valid records - now using separate fields
+      // Priority 1: Use convenente data if available and valid
+      if (convenente && convenente.razaoSocial && convenente.razaoSocial.trim() !== "") {
+        finalCompanyName = convenente.razaoSocial;
+        finalCompanyCnpj = convenente.cnpj || "";
+        console.log("✅ Using convenente data:", { finalCompanyName, finalCompanyCnpj });
+      }
+      // Priority 2: Use passed parameters if they are not defaults
+      else if (companyName && companyName !== "Empresa" && companyName.trim() !== "") {
+        finalCompanyName = companyName;
+        finalCompanyCnpj = companyCnpj || "";
+        console.log("✅ Using passed company parameters:", { finalCompanyName, finalCompanyCnpj });
+      }
+      else {
+        console.log("❌ No valid company data, using defaults:", { finalCompanyName, finalCompanyCnpj });
+      }
+      
+      console.log("=== Final company values for report ===");
+      console.log("finalCompanyName:", finalCompanyName);
+      console.log("finalCompanyCnpj:", finalCompanyCnpj);
+      
+      // Create report data with only valid records
       const pdfReportData: ReportData = {
-        empresaNome: empresaName,
-        empresaCnpj: empresaCnpj,
+        empresaNome: finalCompanyName,
+        empresaCnpj: finalCompanyCnpj,
         dataGeracao: formattedDate,
         referencia: remittanceReference,
         beneficiarios: validRecords,
@@ -105,14 +126,18 @@ export const usePDFReportDialog = () => {
         valorTotal: totalValue
       };
       
+      console.log("=== Created reportData ===");
+      console.log("reportData.empresaNome:", pdfReportData.empresaNome);
+      console.log("reportData.empresaCnpj:", pdfReportData.empresaCnpj);
+      
       // Store report data
       setReportData(pdfReportData);
       
       // For Excel report backup - use only valid records
       try {
         const reportOptions = {
-          companyName: empresaName,
-          companyCnpj: empresaCnpj,
+          companyName: finalCompanyName,
+          companyCnpj: finalCompanyCnpj,
           remittanceReference: remittanceReference,
           responsibleName: "Usuário do Sistema",
           department: "Financeiro"

@@ -40,10 +40,28 @@ export const useImportacaoHandlers = (
   
   // Handle PDF report generation
   const handleGenerateReport = async () => {
-    console.log("useImportacaoHandlers - handleGenerateReport chamado");
-    console.log("useImportacaoHandlers - cnabFileGenerated:", processWorkflow.cnabFileGenerated);
+    console.log("=== DEBUG useImportacaoHandlers - handleGenerateReport ===");
+    console.log("cnabFileGenerated:", processWorkflow.cnabFileGenerated);
+    console.log("selected rows count:", tableOps.getSelectedRows().length);
     
+    // Get company info using the improved function
     const { companyName, companyCnpj } = getCompanyInfo();
+    console.log("Company info from getCompanyInfo:");
+    console.log("  - companyName:", companyName);
+    console.log("  - companyCnpj:", companyCnpj);
+    
+    // Determine the convenente to use
+    let convenenteToUse = null;
+    
+    if (processWorkflow.workflow.convenente && convenentesData?.convenentes) {
+      convenenteToUse = convenentesData.convenentes.find(c => c.id === processWorkflow.workflow.convenente);
+      console.log("Found workflow convenente:", convenenteToUse);
+    } else if (selectedConvenente) {
+      convenenteToUse = selectedConvenente;
+      console.log("Using selected convenente:", convenenteToUse);
+    }
+    
+    console.log("Final convenente to use:", convenenteToUse);
     
     await pdfReportWithEmail.handleGenerateReport(
       tableOps.getSelectedRows(),
@@ -51,9 +69,7 @@ export const useImportacaoHandlers = (
       processWorkflow.cnabFileName,
       companyName,
       validateFavorecidos,
-      processWorkflow.workflow.convenente ? 
-        convenentesData.convenentes.find(c => c.id === processWorkflow.workflow.convenente) : 
-        selectedConvenente,
+      convenenteToUse,
       companyCnpj
     );
   };
