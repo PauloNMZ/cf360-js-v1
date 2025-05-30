@@ -1,3 +1,4 @@
+
 import { CNABWorkflowData, Favorecido } from "@/types/cnab240";
 
 // Define the expected column headers
@@ -97,9 +98,10 @@ export interface ValidationErrorsDialogProps {
   handleExportErrors?: () => void;
 }
 
-// PDF report types
+// PDF report types - UPDATED: Separated empresa into empresaNome and empresaCnpj
 export interface ReportData {
-  empresa: string;
+  empresaNome: string;
+  empresaCnpj: string;
   dataGeracao: string;
   referencia: string;
   beneficiarios: RowData[];

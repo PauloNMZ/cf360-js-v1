@@ -21,24 +21,25 @@ export const generatePDFReport = async (reportData: ReportData): Promise<Blob> =
   doc.setDrawColor(0);
   doc.line(15, 25, 195, 25);
   
-  // Add header information
+  // Add header information with company name and CNPJ on separate lines
   doc.setFontSize(11);
   doc.setFont(undefined, 'normal');
-  doc.text(`Empresa: ${reportData.empresa}`, 15, 35);
-  doc.text(`Data de Geração: ${reportData.dataGeracao}`, 15, 42);
-  doc.text(`Referência da Remessa: ${reportData.referencia}`, 15, 49);
+  doc.text(`Empresa: ${reportData.empresaNome}`, 15, 35);
+  doc.text(`CNPJ: ${reportData.empresaCnpj}`, 15, 42);
+  doc.text(`Data de Geração: ${reportData.dataGeracao}`, 15, 49);
+  doc.text(`Referência da Remessa: ${reportData.referencia}`, 15, 56);
   
-  // Add total value information - NEW LINE
+  // Add total value information
   const valorTotalFormatado = formatarValorCurrency(reportData.valorTotal);
-  doc.text(`Valor total dessa remessa: ${valorTotalFormatado} com ${reportData.totalRegistros} favorecidos`, 15, 56);
+  doc.text(`Valor total dessa remessa: ${valorTotalFormatado} com ${reportData.totalRegistros} favorecidos`, 15, 63);
   
-  // Add horizontal line - adjusted position to fit the new line
-  doc.line(15, 62, 195, 62);
+  // Add horizontal line - adjusted position
+  doc.line(15, 69, 195, 69);
   
   // Add BENEFICIÁRIOS text - adjusted position
   doc.setFontSize(12);
   doc.setFont(undefined, 'bold');
-  doc.text("BENEFICIÁRIOS:", 15, 72);
+  doc.text("BENEFICIÁRIOS:", 15, 79);
   
   // Define table columns
   const tableColumns = [
@@ -66,7 +67,7 @@ export const generatePDFReport = async (reportData: ReportData): Promise<Blob> =
   
   // Create the table with improved styling - adjusted starting position
   (doc as any).autoTable({
-    startY: 77, // Adjusted to fit after the new line
+    startY: 84, // Adjusted to fit after the new line
     head: [tableColumns.map(col => col.header)],
     body: tableData.map(row => tableColumns.map(col => row[col.dataKey])),
     theme: 'grid',

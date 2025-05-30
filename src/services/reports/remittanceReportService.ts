@@ -56,8 +56,9 @@ export const generateRemittanceReport = async (
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Remessa Bancária');
   
-  // Add header information with company name and CNPJ
-  worksheet.addRow([`Empresa: ${options.companyName} - CNPJ: ${options.companyCnpj}`]);
+  // Add header information with company name and CNPJ on separate lines
+  worksheet.addRow([`Empresa: ${options.companyName}`]);
+  worksheet.addRow([`CNPJ: ${options.companyCnpj}`]);
   worksheet.addRow([`Data de Geração: ${formattedDate} ${formattedTime}`]);
   worksheet.addRow([`Referência da Remessa: ${options.remittanceReference}`]);
   worksheet.addRow([`Total de Registros: ${selectedRows.length}`]);
@@ -79,8 +80,8 @@ export const generateRemittanceReport = async (
     column.width = widths[index];
   });
   
-  // Style the header row
-  const headerRow = worksheet.getRow(7);
+  // Style the header row (now at row 8 instead of 7)
+  const headerRow = worksheet.getRow(8);
   headerRow.font = { bold: true };
   headerRow.fill = {
     type: 'pattern',

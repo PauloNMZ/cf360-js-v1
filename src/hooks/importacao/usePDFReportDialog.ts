@@ -94,15 +94,10 @@ export const usePDFReportDialog = () => {
       console.log("  - empresaName:", empresaName);
       console.log("  - empresaCnpj:", empresaCnpj);
       
-      // Create report data with only valid records - including CNPJ in empresa field
-      const empresaDisplay = empresaCnpj 
-        ? `${empresaName} - CNPJ: ${empresaCnpj}`
-        : empresaName;
-      
-      console.log("usePDFReportDialog - empresaDisplay:", empresaDisplay);
-      
+      // Create report data with only valid records - now using separate fields
       const pdfReportData: ReportData = {
-        empresa: empresaDisplay,
+        empresaNome: empresaName,
+        empresaCnpj: empresaCnpj,
         dataGeracao: formattedDate,
         referencia: remittanceReference,
         beneficiarios: validRecords,
