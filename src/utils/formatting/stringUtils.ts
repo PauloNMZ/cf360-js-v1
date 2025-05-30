@@ -55,11 +55,11 @@ export const semAcento = (texto: string): string => {
 };
 
 // Format CPF (000.000.000-00) or CNPJ (00.000.000/0001-00)
-export const formatCPFCNPJ = (value: string): string => {
+export const formatCPFCNPJ = (value: string | number): string => {
   if (!value) return '';
   
-  // Remove all non-digit characters
-  const digits = value.replace(/\D/g, '');
+  // Convert to string and remove all non-digit characters
+  const digits = String(value).replace(/\D/g, '');
   
   if (digits.length <= 11) {
     // CPF formatting: 000.000.000-00
@@ -76,4 +76,3 @@ export const formatCPFCNPJ = (value: string): string => {
       .replace(/(\d{4})(\d)/, '$1-$2');
   }
 };
-
