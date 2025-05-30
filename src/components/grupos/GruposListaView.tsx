@@ -1,13 +1,13 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { useGroupOperations } from "@/services/group/hooks";
 import { Group } from "@/types/group";
-import { Plus, Edit, Trash2, Users, Search } from "lucide-react";
+import { Plus, Edit, Trash2, Users, Search, ArrowLeft } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 interface GruposListaViewProps {
   onCreateClick: () => void;
@@ -29,6 +29,7 @@ const GruposListaView: React.FC<GruposListaViewProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const { fetchGroups } = useGroupOperations();
+  const navigate = useNavigate();
 
   // Effect that runs when component mounts or refreshTrigger changes
   useEffect(() => {
@@ -67,10 +68,20 @@ const GruposListaView: React.FC<GruposListaViewProps> = ({
     setSearchTerm(e.target.value);
   };
 
+  const handleGoBack = () => {
+    navigate(-1);
+  };
+
   return (
     <Card className="w-full">
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Grupos de Favorecidos</CardTitle>
+        <div className="flex items-center gap-4">
+          <Button variant="outline" onClick={handleGoBack} className="flex items-center gap-2">
+            <ArrowLeft size={16} />
+            Voltar
+          </Button>
+          <CardTitle>Grupos de Favorecidos</CardTitle>
+        </div>
         <Button onClick={onCreateClick}>
           <Plus size={16} className="mr-1" />
           Novo Grupo
@@ -78,11 +89,11 @@ const GruposListaView: React.FC<GruposListaViewProps> = ({
       </CardHeader>
       <CardContent>
         <div className="mb-4 relative">
-          <div className="relative w-64"> {/* Reduced width to 16rem (64) */}
+          <div className="relative w-64">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Buscar por nome ou descrição..." // Updated placeholder text
+              placeholder="Buscar por nome ou descrição..."
               className="pl-8"
               value={searchTerm}
               onChange={handleSearchChange}
