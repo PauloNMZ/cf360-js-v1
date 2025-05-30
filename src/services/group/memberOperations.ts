@@ -9,7 +9,7 @@ export const getGroupMembers = async (groupId: string): Promise<GroupMember[]> =
       .from('favorecidos_grupos')
       .select(`
         *,
-        favorecidos!inner(
+        favorecidos(
           id,
           nome
         )
@@ -42,7 +42,7 @@ export const addGroupMember = async (member: NewGroupMember): Promise<GroupMembe
       .insert(member)
       .select(`
         *,
-        favorecidos!inner(
+        favorecidos(
           id,
           nome
         )
@@ -92,7 +92,7 @@ export const getGroupMemberById = async (memberId: string): Promise<GroupMember 
       .from('favorecidos_grupos')
       .select(`
         *,
-        favorecidos!inner(
+        favorecidos(
           id,
           nome
         )
@@ -131,7 +131,7 @@ export const updateGroupMember = async (memberId: string, updates: Partial<NewGr
       .eq('id', memberId)
       .select(`
         *,
-        favorecidos!inner(
+        favorecidos(
           id,
           nome
         )
