@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { AppLogo } from '@/components/ui/AppLogo';
 import { TypographyMuted } from '@/components/ui/typography';
 import { formatCNPJ } from "@/utils/formValidation";
@@ -12,8 +12,14 @@ interface DynamicHeaderProps {
 
 const DynamicHeader: React.FC<DynamicHeaderProps> = ({ company }) => {
   // Get admin panel state if needed for companySettings
-  const { adminPanelOpen } = useIndexPageContext();
+  const { adminPanelOpen, setSelectedHeaderCompany } = useIndexPageContext();
   const { companySettings } = useCompanySettings(adminPanelOpen);
+
+  // Update the selected header company in context whenever the company prop changes
+  useEffect(() => {
+    console.log("DynamicHeader: Setting selected header company:", company);
+    setSelectedHeaderCompany(company);
+  }, [company, setSelectedHeaderCompany]);
 
   return (
     <header className="bg-gradient-to-r from-[#3b82f6] to-[#1e40af] dark:from-[#0E1F46] dark:to-[#0A1C3A] text-white py-5 px-8 shadow-lg">

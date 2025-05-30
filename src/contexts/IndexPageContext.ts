@@ -1,3 +1,4 @@
+
 import { createContext } from "react";
 import { ConvenenteData } from "@/types/convenente";
 import { CompanySettings } from "@/types/companySettings";
@@ -31,6 +32,10 @@ export interface IndexPageContextType {
   setCurrentConvenenteId: (id: string | null) => void;
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void;
+  
+  // Selected company for header (NEW)
+  selectedHeaderCompany: { razaoSocial: string; cnpj: string } | null;
+  setSelectedHeaderCompany: (company: { razaoSocial: string; cnpj: string } | null) => void;
   
   // Search states
   searchTerm: string;

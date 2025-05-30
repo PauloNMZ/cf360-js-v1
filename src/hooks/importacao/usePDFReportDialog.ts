@@ -33,6 +33,11 @@ export const usePDFReportDialog = () => {
     convenente: any,
     companyCnpj: string = ""
   ) => {
+    console.log("usePDFReportDialog - generateReport chamado com:");
+    console.log("  - companyName:", companyName);
+    console.log("  - companyCnpj:", companyCnpj);
+    console.log("  - convenente:", convenente);
+    
     if (selectedRows.length === 0) {
       toast.error("Nenhum registro selecionado para gerar relatório.", {
         position: "bottom-right",
@@ -85,10 +90,16 @@ export const usePDFReportDialog = () => {
       const empresaName = convenente?.razaoSocial || companyName;
       const empresaCnpj = convenente?.cnpj || companyCnpj;
       
+      console.log("usePDFReportDialog - Final empresa values:");
+      console.log("  - empresaName:", empresaName);
+      console.log("  - empresaCnpj:", empresaCnpj);
+      
       // Create report data with only valid records - including CNPJ in empresa field
       const empresaDisplay = empresaCnpj 
         ? `${empresaName} - CNPJ: ${empresaCnpj}`
         : empresaName;
+      
+      console.log("usePDFReportDialog - empresaDisplay:", empresaDisplay);
       
       const pdfReportData: ReportData = {
         empresa: empresaDisplay,

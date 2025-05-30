@@ -1,3 +1,4 @@
+
 import React, { createContext, ReactNode, useState } from "react";
 import { IndexPageContext } from "@/contexts/IndexPageContext";
 import { useIndexPage } from "@/hooks/useIndexPage";
@@ -14,6 +15,9 @@ export const IndexPageProvider = ({ children }: { children: ReactNode }) => {
   
   // Add additional state for CNAB to API modal
   const [cnabToApiModalOpen, setCnabToApiModalOpen] = useState(false);
+  
+  // Add state for selected header company
+  const [selectedHeaderCompany, setSelectedHeaderCompany] = useState<{ razaoSocial: string; cnpj: string } | null>(null);
   
   // Get actions from useIndexPageActions
   const indexPageActions = useIndexPageActions({
@@ -54,6 +58,8 @@ export const IndexPageProvider = ({ children }: { children: ReactNode }) => {
     ...eventHandlers,
     cnabToApiModalOpen,
     setCnabToApiModalOpen,
+    selectedHeaderCompany,
+    setSelectedHeaderCompany,
     isDeleting: indexPageActions.isDeleting,
     resetDeletionState: indexPageActions.resetDeletionState, // Ensure this is passed down
     companySettings, // Certifique-se de que companySettings também é passado
