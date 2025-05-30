@@ -5,7 +5,14 @@ import { CNABWorkflowData, Favorecido } from '@/types/cnab240';
 import { downloadCNABFile, processSelectedRows } from '@/services/cnab240/cnab240Service';
 import { RowData } from '@/types/importacao';
 
-export const useWorkflowDialog = () => {
+interface UseWorkflowDialogOptions {
+  selectedConvenente?: any;
+  hasSelectedConvenente?: boolean;
+}
+
+export const useWorkflowDialog = (options: UseWorkflowDialogOptions = {}) => {
+  const { selectedConvenente, hasSelectedConvenente = false } = options;
+  
   const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [workflow, setWorkflow] = useState<CNABWorkflowData>({
@@ -16,22 +23,46 @@ export const useWorkflowDialog = () => {
     outputDirectory: ''
   });
 
-  // Initialize workflow with saved directory
+  // Initialize workflow with saved directory and selected convenente if available
   useEffect(() => {
     const savedDirectory = localStorage.getItem('cnab240OutputDirectory') || '';
     setWorkflow(prev => ({
       ...prev,
-      outputDirectory: savedDirectory
+      outputDirectory: savedDirectory,
+      convenente: hasSelectedConvenente ? selectedConvenente : null
     }));
-  }, []);
+  }, [selectedConvenente, hasSelectedConvenente]);
 
-  // Navigation functions
+  // Determine total steps based on whether convenente is pre-selected
+  const getTotalSteps = () => {
+    return hasSelectedConvenente ? 3 : 4; // Skip step 3 if convenente is already selected
+  };
+
+  // Get the actual step number for display (renumber when step 3 is skipped)
+  const getDisplayStepNumber = (step: number) => {
+    if (!hasSelectedConvenente) return step;
+    if (step <= 2) return step;
+    if (step === 4) return 3; // Step 4 becomes step 3 when step 3 is skipped
+    return step;
+  };
+
+  // Navigation functions with conditional logic
   const goToNextStep = () => {
-    setCurrentStep(prev => Math.min(prev + 1, 4));
+    if (hasSelectedConvenente && currentStep === 2) {
+      // Skip step 3 (convenente selection) and go directly to step 4
+      setCurrentStep(4);
+    } else {
+      setCurrentStep(prev => Math.min(prev + 1, hasSelectedConvenente ? 4 : 4));
+    }
   };
 
   const goToPreviousStep = () => {
-    setCurrentStep(prev => Math.max(prev - 1, 1));
+    if (hasSelectedConvenente && currentStep === 4) {
+      // Skip step 3 (convenente selection) and go directly to step 2
+      setCurrentStep(2);
+    } else {
+      setCurrentStep(prev => Math.max(prev - 1, 1));
+    }
   };
 
   // Function to update workflow data with debugging
@@ -54,24 +85,41 @@ export const useWorkflowDialog = () => {
     console.log("useWorkflowDialog - workflow state atualizado:", workflow);
   }, [workflow]);
 
-  // Function to check if the current step is valid - simplificada para debug
+  // Function to check if the current step is valid
   const isCurrentStepValid = () => {
     console.log("useWorkflowDialog - isCurrentStepValid chamado para step:", currentStep);
     console.log("useWorkflowDialog - workflow.paymentDate:", workflow.paymentDate);
     
     switch (currentStep) {
-      case 1: // Date selection - simplificado para aceitar qualquer data válida
+      case 1: // Date selection
         const isValid = workflow.paymentDate !== undefined && workflow.paymentDate !== null;
         console.log("useWorkflowDialog - Step 1 válido?", isValid, "paymentDate:", workflow.paymentDate);
         return isValid;
       case 2: // Service type
         return workflow.serviceType !== "";
-      case 3: // Convenente
+      case 3: // Convenente (only validate if not pre-selected)
+        if (hasSelectedConvenente) return true; // Skip validation if pre-selected
         return workflow.convenente !== null;
       case 4: // Send method
         return workflow.sendMethod !== "";
       default:
         return false;
+    }
+  };
+
+  // Get step title based on current step and whether convenente is pre-selected
+  const getStepTitle = () => {
+    switch (currentStep) {
+      case 1:
+        return "Data de Pagamento";
+      case 2:
+        return "Tipo de Serviço";
+      case 3:
+        return hasSelectedConvenente ? "Método de Envio" : "Selecionar Convenente";
+      case 4:
+        return "Método de Envio";
+      default:
+        return "";
     }
   };
 
@@ -125,6 +173,10 @@ export const useWorkflowDialog = () => {
     goToPreviousStep,
     updateWorkflow,
     isCurrentStepValid,
-    handleSubmitWorkflow
+    handleSubmitWorkflow,
+    getTotalSteps,
+    getDisplayStepNumber,
+    getStepTitle,
+    hasSelectedConvenente
   };
 };

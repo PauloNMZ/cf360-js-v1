@@ -86,6 +86,10 @@ export default function ImportacaoModal({ isOpen, onOpenChange }: ImportacaoModa
     updateWorkflow,
     isCurrentStepValid,
     handleSubmitWorkflow,
+    getTotalSteps,
+    getDisplayStepNumber,
+    getStepTitle,
+    hasSelectedConvenente,
     
     // Convenentes data
     convenentes,
@@ -148,6 +152,10 @@ export default function ImportacaoModal({ isOpen, onOpenChange }: ImportacaoModa
         isCurrentStepValid={isCurrentStepValid}
         convenentes={convenentes}
         carregandoConvenentes={carregandoConvenentes}
+        getTotalSteps={getTotalSteps}
+        getDisplayStepNumber={getDisplayStepNumber}
+        getStepTitle={getStepTitle}
+        hasSelectedConvenente={hasSelectedConvenente}
       />
 
       <DirectoryDialog

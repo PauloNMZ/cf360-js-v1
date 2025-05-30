@@ -47,7 +47,14 @@ import StepTwo from './workflow-steps/StepTwo';
 import StepThree from './workflow-steps/StepThree';
 import StepFour from './workflow-steps/StepFour';
 
-const WorkflowDialog: React.FC<WorkflowDialogProps> = ({
+interface ExtendedWorkflowDialogProps extends WorkflowDialogProps {
+  getTotalSteps?: () => number;
+  getDisplayStepNumber?: (step: number) => number;
+  getStepTitle?: () => string;
+  hasSelectedConvenente?: boolean;
+}
+
+const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
   isOpen,
   onOpenChange,
   workflow,
@@ -59,10 +66,19 @@ const WorkflowDialog: React.FC<WorkflowDialogProps> = ({
   handleSubmit,
   isCurrentStepValid,
   convenentes,
-  carregandoConvenentes
+  carregandoConvenentes,
+  getTotalSteps,
+  getDisplayStepNumber,
+  getStepTitle,
+  hasSelectedConvenente = false
 }) => {
-  // Get step title
-  const getStepTitle = () => {
+  // Use custom functions if provided, otherwise fallback to defaults
+  const actualTotalSteps = getTotalSteps ? getTotalSteps() : totalSteps;
+  const displayStepNumber = getDisplayStepNumber ? getDisplayStepNumber(currentStep) : currentStep;
+  const stepTitle = getStepTitle ? getStepTitle() : getDefaultStepTitle();
+
+  // Default step title function
+  function getDefaultStepTitle() {
     switch (currentStep) {
       case 1:
         return "Data de Pagamento";
@@ -75,9 +91,9 @@ const WorkflowDialog: React.FC<WorkflowDialogProps> = ({
       default:
         return "";
     }
-  };
+  }
 
-  // Render step content
+  // Render step content with conditional logic
   const renderStepContent = () => {
     switch (currentStep) {
       case 1:
@@ -85,6 +101,10 @@ const WorkflowDialog: React.FC<WorkflowDialogProps> = ({
       case 2:
         return <StepTwo workflow={workflow} updateWorkflow={updateWorkflow} />;
       case 3:
+        // If convenente is pre-selected, show StepFour instead of StepThree
+        if (hasSelectedConvenente) {
+          return <StepFour workflow={workflow} updateWorkflow={updateWorkflow} />;
+        }
         return (
           <StepThree 
             workflow={workflow} 
@@ -109,7 +129,7 @@ const WorkflowDialog: React.FC<WorkflowDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{getStepTitle()}</DialogTitle>
+          <DialogTitle>{stepTitle}</DialogTitle>
         </DialogHeader>
         
         {/* Step Content */}
@@ -118,7 +138,7 @@ const WorkflowDialog: React.FC<WorkflowDialogProps> = ({
         {/* Step Navigation */}
         <DialogFooter className="flex justify-between items-center">
           <div className="flex items-center text-sm text-gray-500">
-            Passo {currentStep} de {totalSteps}
+            Passo {displayStepNumber} de {actualTotalSteps}
           </div>
           <div className="space-x-2">
             {currentStep > 1 && (
@@ -132,7 +152,7 @@ const WorkflowDialog: React.FC<WorkflowDialogProps> = ({
               </Button>
             )}
             
-            {currentStep < totalSteps ? (
+            {currentStep < (hasSelectedConvenente ? 4 : 4) ? (
               <Button 
                 onClick={goToNextStep}
                 disabled={!isCurrentStepValid()}

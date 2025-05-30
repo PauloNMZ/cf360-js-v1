@@ -6,9 +6,16 @@ import { useWorkflowDialog } from './useWorkflowDialog';
 import { useDirectoryDialog } from './useDirectoryDialog';
 import { useCNABGeneration } from './useCNABGeneration';
 
-export const useProcessWorkflow = (getSelectedRows: () => any[]) => {
-  // Import workflow-related hooks
-  const workflowDialog = useWorkflowDialog();
+interface UseProcessWorkflowOptions {
+  selectedConvenente?: any;
+  hasSelectedConvenente?: boolean;
+}
+
+export const useProcessWorkflow = (getSelectedRows: () => any[], options: UseProcessWorkflowOptions = {}) => {
+  const { selectedConvenente, hasSelectedConvenente = false } = options;
+  
+  // Import workflow-related hooks with convenente info
+  const workflowDialog = useWorkflowDialog({ selectedConvenente, hasSelectedConvenente });
   const directoryDialog = useDirectoryDialog();
   const cnabGeneration = useCNABGeneration();
 
@@ -33,7 +40,7 @@ export const useProcessWorkflow = (getSelectedRows: () => any[]) => {
     workflowDialog.setWorkflow({
       paymentDate: undefined,
       serviceType: "Pagamentos Diversos",
-      convenente: null,
+      convenente: hasSelectedConvenente ? selectedConvenente : null,
       sendMethod: "cnab",
       outputDirectory: directoryDialog.outputDirectory // Preserve directory setting
     });
@@ -79,6 +86,10 @@ export const useProcessWorkflow = (getSelectedRows: () => any[]) => {
     goToPreviousStep: workflowDialog.goToPreviousStep,
     updateWorkflow: workflowDialog.updateWorkflow,
     isCurrentStepValid: workflowDialog.isCurrentStepValid,
+    getTotalSteps: workflowDialog.getTotalSteps,
+    getDisplayStepNumber: workflowDialog.getDisplayStepNumber,
+    getStepTitle: workflowDialog.getStepTitle,
+    hasSelectedConvenente: workflowDialog.hasSelectedConvenente,
     
     // Directory dialog related props and methods
     showDirectoryDialog: directoryDialog.showDirectoryDialog,

@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useImportacao } from '@/hooks/useImportacao';
@@ -60,7 +61,11 @@ const ImportarPlanilha = () => {
     handleSaveDirectorySettings,
     handleSubmitWorkflow,
     updateWorkflow,
-    isCurrentStepValid
+    isCurrentStepValid,
+    getTotalSteps,
+    getDisplayStepNumber,
+    getStepTitle,
+    hasSelectedConvenente
   } = useImportacao();
 
   // Listen for custom events from the StepFour component
@@ -122,6 +127,10 @@ const ImportarPlanilha = () => {
         isCurrentStepValid={isCurrentStepValid}
         convenentes={convenentes}
         carregandoConvenentes={carregandoConvenentes}
+        getTotalSteps={getTotalSteps}
+        getDisplayStepNumber={getDisplayStepNumber}
+        getStepTitle={getStepTitle}
+        hasSelectedConvenente={hasSelectedConvenente}
       />
 
       {/* Directory configuration dialog */}

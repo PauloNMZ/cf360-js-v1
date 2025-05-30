@@ -9,9 +9,18 @@ import { useValidationDialog } from './importacao/useValidationDialog';
 import { useConvenentesData } from './importacao/useConvenentesData';
 import { usePDFReportWithEmail } from './importacao/usePDFReportWithEmail';
 import { useProcessWorkflow } from './importacao/useProcessWorkflow';
+import { useIndexPageContext } from './useIndexPageContext';
 
 export const useImportacao = () => {
   const [showTable, setShowTable] = useState(false);
+  
+  // Get current selected convenente info from context
+  const { currentConvenenteId, formData } = useIndexPageContext();
+  const hasSelectedConvenente = !!(currentConvenenteId && formData);
+  const selectedConvenente = hasSelectedConvenente ? {
+    id: currentConvenenteId,
+    ...formData
+  } : null;
   
   // Import functionality from smaller hooks
   const fileImport = useFileImport();
@@ -19,7 +28,10 @@ export const useImportacao = () => {
   const convenentesData = useConvenentesData();
   const validationDialog = useValidationDialog();
   const pdfReportWithEmail = usePDFReportWithEmail();
-  const processWorkflow = useProcessWorkflow(tableOps.getSelectedRows);
+  const processWorkflow = useProcessWorkflow(tableOps.getSelectedRows, {
+    selectedConvenente,
+    hasSelectedConvenente
+  });
 
   // Sync tableData with the fileImport tableData when it changes
   useEffect(() => {
@@ -147,6 +159,10 @@ export const useImportacao = () => {
     goToPreviousStep: processWorkflow.goToPreviousStep,
     updateWorkflow: processWorkflow.updateWorkflow,
     isCurrentStepValid: processWorkflow.isCurrentStepValid,
+    getTotalSteps: processWorkflow.getTotalSteps,
+    getDisplayStepNumber: processWorkflow.getDisplayStepNumber,
+    getStepTitle: processWorkflow.getStepTitle,
+    hasSelectedConvenente: processWorkflow.hasSelectedConvenente,
     
     // Directory dialog related props and methods
     showDirectoryDialog: processWorkflow.showDirectoryDialog,
