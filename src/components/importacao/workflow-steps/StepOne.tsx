@@ -1,9 +1,10 @@
 
 import React from 'react';
-import { format } from 'date-fns';
+import { format, parse, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { CalendarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
@@ -16,6 +17,7 @@ interface StepOneProps {
 
 const StepOne: React.FC<StepOneProps> = ({ workflow, updateWorkflow }) => {
   const [open, setOpen] = React.useState(false);
+  const [inputValue, setInputValue] = React.useState('');
 
   // Função para normalizar datas (remover horário para comparação)
   const normalizeDate = (date: Date) => {
@@ -24,22 +26,68 @@ const StepOne: React.FC<StepOneProps> = ({ workflow, updateWorkflow }) => {
     return normalized;
   };
 
-  // Function to handle date selection with debugging
+  // Sincronizar o valor do input com a data selecionada
+  React.useEffect(() => {
+    if (workflow.paymentDate) {
+      setInputValue(format(workflow.paymentDate, "dd/MM/yyyy", { locale: ptBR }));
+    } else {
+      setInputValue('');
+    }
+  }, [workflow.paymentDate]);
+
+  // Function to handle date selection from calendar
   const handleSelectDate = (date: Date | undefined) => {
     console.log("StepOne - handleSelectDate chamado com:", date);
-    console.log("StepOne - workflow.paymentDate antes da atualização:", workflow.paymentDate);
-    
     updateWorkflow("paymentDate", date);
-    
-    console.log("StepOne - updateWorkflow chamado para paymentDate");
     setOpen(false);
-    console.log("StepOne - Popover fechado");
   };
 
-  // Debug logging for component state
-  React.useEffect(() => {
-    console.log("StepOne - workflow.paymentDate atualizado para:", workflow.paymentDate);
-  }, [workflow.paymentDate]);
+  // Function to handle manual input
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setInputValue(value);
+
+    // Tentar parsear a data quando o usuário digitar no formato DD/MM/YYYY
+    if (value.length === 10) {
+      try {
+        const parsedDate = parse(value, "dd/MM/yyyy", new Date());
+        if (isValid(parsedDate)) {
+          console.log("StepOne - Data válida digitada:", parsedDate);
+          updateWorkflow("paymentDate", parsedDate);
+        }
+      } catch (error) {
+        console.log("StepOne - Erro ao parsear data:", error);
+      }
+    }
+  };
+
+  // Function to format input as user types
+  const formatInputValue = (value: string) => {
+    // Remove tudo que não for número
+    const numbers = value.replace(/\D/g, '');
+    
+    // Aplicar máscara DD/MM/YYYY
+    if (numbers.length <= 2) return numbers;
+    if (numbers.length <= 4) return `${numbers.slice(0, 2)}/${numbers.slice(2)}`;
+    return `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}/${numbers.slice(4, 8)}`;
+  };
+
+  const handleInputKeyPress = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatInputValue(e.target.value);
+    setInputValue(formatted);
+    
+    // Se tiver 10 caracteres (DD/MM/YYYY), tentar parsear
+    if (formatted.length === 10) {
+      try {
+        const parsedDate = parse(formatted, "dd/MM/yyyy", new Date());
+        if (isValid(parsedDate)) {
+          updateWorkflow("paymentDate", parsedDate);
+        }
+      } catch (error) {
+        // Ignorar erros de parsing
+      }
+    }
+  };
 
   // Obter data de hoje normalizada
   const today = normalizeDate(new Date());
@@ -50,54 +98,68 @@ const StepOne: React.FC<StepOneProps> = ({ workflow, updateWorkflow }) => {
         Selecione a data em que os pagamentos serão processados.
       </p>
       <div className="flex flex-col items-center space-y-4">
-        <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className={cn(
-                "w-full justify-start text-left font-normal",
-                !workflow.paymentDate && "text-muted-foreground"
-              )}
-              onClick={() => {
-                console.log("StepOne - Botão do calendário clicado, abrindo popover");
-                setOpen(true);
-              }}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {workflow.paymentDate ? (
-                format(workflow.paymentDate, "dd/MM/yyyy", { locale: ptBR })
-              ) : (
-                <span>Selecione uma data</span>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="center">
-            <Calendar
-              mode="single"
-              selected={workflow.paymentDate}
-              onSelect={(date) => {
-                console.log("StepOne - Calendar onSelect chamado com:", date);
-                handleSelectDate(date);
-              }}
-              disabled={(date) => {
-                // Normalizar a data para comparação sem considerar horário
-                const normalizedDate = normalizeDate(date);
-                const isDisabled = normalizedDate < today;
-                console.log("StepOne - Data", format(date, "dd/MM/yyyy"), "está desabilitada?", isDisabled);
-                return isDisabled;
-              }}
-              initialFocus
-              locale={ptBR}
+        <div className="w-full relative">
+          <div className="flex">
+            <Input
+              type="text"
+              placeholder="DD/MM/AAAA"
+              value={inputValue}
+              onChange={handleInputKeyPress}
+              className="flex-1 rounded-r-none border-r-0"
+              maxLength={10}
             />
-          </PopoverContent>
-        </Popover>
-        
-        {/* Informação adicional para debug */}
-        {workflow.paymentDate && (
-          <p className="text-xs text-green-600">
-            Data selecionada: {format(workflow.paymentDate, "dd/MM/yyyy", { locale: ptBR })}
-          </p>
-        )}
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="rounded-l-none border-l-0 px-3"
+                  onClick={() => setOpen(true)}
+                >
+                  <CalendarIcon className="h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent 
+                className="w-auto p-0 z-[9999]" 
+                align="end"
+                side="bottom"
+                sideOffset={5}
+              >
+                <Calendar
+                  mode="single"
+                  selected={workflow.paymentDate}
+                  onSelect={handleSelectDate}
+                  disabled={(date) => {
+                    const normalizedDate = normalizeDate(date);
+                    const isDisabled = normalizedDate < today;
+                    return isDisabled;
+                  }}
+                  initialFocus
+                  locale={ptBR}
+                  className="pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+          
+          {/* Mensagem de validação */}
+          {inputValue && inputValue.length === 10 && workflow.paymentDate && (
+            <p className="text-xs text-green-600 mt-1">
+              ✓ Data válida: {format(workflow.paymentDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+            </p>
+          )}
+          
+          {inputValue && inputValue.length === 10 && !workflow.paymentDate && (
+            <p className="text-xs text-red-600 mt-1">
+              ✗ Data inválida. Use o formato DD/MM/AAAA
+            </p>
+          )}
+          
+          {!inputValue && (
+            <p className="text-xs text-gray-400 mt-1">
+              Digite a data ou clique no ícone para usar o calendário
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );
