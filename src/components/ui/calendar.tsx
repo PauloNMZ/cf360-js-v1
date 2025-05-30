@@ -41,26 +41,29 @@ function Calendar({
   classNames,
   showOutsideDays = true,
   locale = ptBR,
-  onSelect,
   ...props
 }: CalendarProps) {
-  // Debug wrapper for onSelect
-  const handleSelect = React.useCallback((date: Date | undefined) => {
-    console.log("Calendar - handleSelect chamado com:", date);
-    if (onSelect) {
-      console.log("Calendar - Chamando onSelect prop");
-      onSelect(date);
-    } else {
-      console.log("Calendar - onSelect prop não definido!");
+  // Debug wrapper for onSelect - wrap the original onSelect if it exists
+  const wrappedProps = React.useMemo(() => {
+    if (props.onSelect) {
+      const originalOnSelect = props.onSelect;
+      return {
+        ...props,
+        onSelect: (date: any) => {
+          console.log("Calendar - handleSelect chamado com:", date);
+          console.log("Calendar - Chamando onSelect prop original");
+          originalOnSelect(date);
+        }
+      };
     }
-  }, [onSelect]);
+    return props;
+  }, [props]);
 
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
       className={cn("p-3 pointer-events-auto", className)}
       locale={locale}
-      onSelect={handleSelect}
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
@@ -111,7 +114,7 @@ function Calendar({
         IconLeft: ({ ..._props }) => <ChevronLeft className="h-4 w-4" />,
         IconRight: ({ ..._props }) => <ChevronRight className="h-4 w-4" />,
       }}
-      {...props}
+      {...wrappedProps}
     />
   );
 }
