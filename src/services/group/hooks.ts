@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Group, NewGroup, NewGroupMember } from "@/types/group";
 import { getGroups, getGroupById, createGroup, updateGroup, deleteGroup } from "./groupOperations";
-import { getGroupMembers, addGroupMember, removeGroupMember } from "./memberOperations";
+import { getGroupMembers, addGroupMember, removeGroupMember, updateGroupMember } from "./memberOperations";
 
 // Hook for group operations with toast notifications
 export const useGroupOperations = () => {
@@ -146,6 +146,24 @@ export const useGroupOperations = () => {
     }
   };
   
+  const updateMemberInGroup = async (memberId: string, updates: Partial<NewGroupMember>) => {
+    try {
+      const result = await updateGroupMember(memberId, updates);
+      toast({
+        title: "Membro atualizado",
+        description: "Dados do favorecido atualizados com sucesso",
+      });
+      return result;
+    } catch (error: any) {
+      toast({
+        title: "Erro ao atualizar membro",
+        description: error.message || "Falha ao atualizar dados do favorecido",
+        variant: "destructive",
+      });
+      throw error;
+    }
+  };
+  
   return {
     fetchGroups,
     fetchGroupDetails,
@@ -154,6 +172,7 @@ export const useGroupOperations = () => {
     editGroup,
     removeGroup,
     addMemberToGroup,
-    removeMemberFromGroup
+    removeMemberFromGroup,
+    updateMemberInGroup
   };
 };

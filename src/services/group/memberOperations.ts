@@ -2,12 +2,18 @@
 import { supabase } from "@/integrations/supabase/client";
 import { GroupMember, NewGroupMember } from "@/types/group";
 
-// Get all members of a group
+// Get all members of a group with favorecido details
 export const getGroupMembers = async (groupId: string): Promise<GroupMember[]> => {
   try {
     const { data, error } = await supabase
       .from('favorecidos_grupos')
-      .select('*')
+      .select(`
+        *,
+        favorecidos!inner(
+          id,
+          nome
+        )
+      `)
       .eq('grupo_id', groupId);
       
     if (error) {
@@ -15,7 +21,13 @@ export const getGroupMembers = async (groupId: string): Promise<GroupMember[]> =
       throw new Error(error.message);
     }
     
-    return data || [];
+    // Transform the data to match our expected structure
+    const transformedData = data?.map(item => ({
+      ...item,
+      favorecido: item.favorecidos
+    })) || [];
+    
+    return transformedData;
   } catch (error) {
     console.error('Error in getGroupMembers:', error);
     throw error;
@@ -28,7 +40,13 @@ export const addGroupMember = async (member: NewGroupMember): Promise<GroupMembe
     const { data, error } = await supabase
       .from('favorecidos_grupos')
       .insert(member)
-      .select()
+      .select(`
+        *,
+        favorecidos!inner(
+          id,
+          nome
+        )
+      `)
       .single();
       
     if (error) {
@@ -36,7 +54,13 @@ export const addGroupMember = async (member: NewGroupMember): Promise<GroupMembe
       throw new Error(error.message);
     }
     
-    return data;
+    // Transform the data to match our expected structure
+    const transformedData = {
+      ...data,
+      favorecido: data.favorecidos
+    };
+    
+    return transformedData;
   } catch (error) {
     console.error('Error in addGroupMember:', error);
     throw error;
@@ -66,7 +90,13 @@ export const getGroupMemberById = async (memberId: string): Promise<GroupMember 
   try {
     const { data, error } = await supabase
       .from('favorecidos_grupos')
-      .select('*')
+      .select(`
+        *,
+        favorecidos!inner(
+          id,
+          nome
+        )
+      `)
       .eq('id', memberId)
       .single();
       
@@ -79,7 +109,13 @@ export const getGroupMemberById = async (memberId: string): Promise<GroupMember 
       throw new Error(error.message);
     }
     
-    return data;
+    // Transform the data to match our expected structure
+    const transformedData = {
+      ...data,
+      favorecido: data.favorecidos
+    };
+    
+    return transformedData;
   } catch (error) {
     console.error('Error in getGroupMemberById:', error);
     throw error;
@@ -93,7 +129,13 @@ export const updateGroupMember = async (memberId: string, updates: Partial<NewGr
       .from('favorecidos_grupos')
       .update(updates)
       .eq('id', memberId)
-      .select()
+      .select(`
+        *,
+        favorecidos!inner(
+          id,
+          nome
+        )
+      `)
       .single();
       
     if (error) {
@@ -101,7 +143,13 @@ export const updateGroupMember = async (memberId: string, updates: Partial<NewGr
       throw new Error(error.message);
     }
     
-    return data;
+    // Transform the data to match our expected structure
+    const transformedData = {
+      ...data,
+      favorecido: data.favorecidos
+    };
+    
+    return transformedData;
   } catch (error) {
     console.error('Error in updateGroupMember:', error);
     throw error;

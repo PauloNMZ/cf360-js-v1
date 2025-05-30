@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { useGroupOperations } from "@/services/group/hooks";
 import { Group, GroupMember } from "@/types/group";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Edit } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -19,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { FavorecidoData } from "@/types/favorecido";
 import { useFavorecidos } from "@/hooks/favorecidos/useFavorecidos";
+import EditMemberDialog from "./EditMemberDialog";
 
 interface GrupoMembrosViewProps {
   grupo: Group;
@@ -29,7 +29,9 @@ const GrupoMembrosView: React.FC<GrupoMembrosViewProps> = ({ grupo, onBack }) =>
   const [members, setMembers] = useState<GroupMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const { fetchGroupMembers, addMemberToGroup, removeMemberFromGroup } = useGroupOperations();
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [selectedMember, setSelectedMember] = useState<GroupMember | null>(null);
+  const { fetchGroupMembers, addMemberToGroup, removeMemberFromGroup, updateMemberInGroup } = useGroupOperations();
 
   useEffect(() => {
     if (grupo) {
@@ -77,6 +79,24 @@ const GrupoMembrosView: React.FC<GrupoMembrosViewProps> = ({ grupo, onBack }) =>
     }
   };
 
+  const handleEditMember = (member: GroupMember) => {
+    setSelectedMember(member);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleUpdateMember = async (memberId: string, valor?: number) => {
+    try {
+      await updateMemberInGroup(memberId, { valor });
+      setIsEditDialogOpen(false);
+      setSelectedMember(null);
+      loadMembers();
+      toast.success("Membro atualizado com sucesso");
+    } catch (error) {
+      console.error("Erro ao atualizar membro:", error);
+      toast.error("Erro ao atualizar membro");
+    }
+  };
+
   return (
     <Card className="w-full">
       <CardHeader className="flex flex-row items-center justify-between">
@@ -117,12 +137,21 @@ const GrupoMembrosView: React.FC<GrupoMembrosViewProps> = ({ grupo, onBack }) =>
                 className="flex items-center justify-between p-3 border rounded-md hover:bg-muted/50 transition-colors"
               >
                 <div>
-                  <h3 className="font-medium">{member.favorecido_id}</h3>
+                  <h3 className="font-medium">{member.favorecido?.nome || "Nome não encontrado"}</h3>
                   <p className="text-sm text-muted-foreground">
                     Valor: {member.valor ? `R$ ${member.valor.toFixed(2)}` : "Não definido"}
                   </p>
                 </div>
                 <div className="flex space-x-2">
+                  <Button 
+                    variant="outline" 
+                    size="icon" 
+                    onClick={() => handleEditMember(member)}
+                    title="Editar membro"
+                    className="hover:bg-blue-100 dark:hover:bg-blue-900"
+                  >
+                    <Edit size={16} />
+                  </Button>
                   <Button 
                     variant="outline" 
                     size="icon" 
@@ -144,6 +173,14 @@ const GrupoMembrosView: React.FC<GrupoMembrosViewProps> = ({ grupo, onBack }) =>
         isOpen={isAddDialogOpen} 
         onClose={() => setIsAddDialogOpen(false)} 
         onAdd={handleAddMember}
+      />
+
+      {/* Edit Member Dialog */}
+      <EditMemberDialog 
+        isOpen={isEditDialogOpen} 
+        onClose={() => setIsEditDialogOpen(false)} 
+        onUpdate={handleUpdateMember}
+        member={selectedMember}
       />
     </Card>
   );

@@ -24,6 +24,10 @@ export interface GroupMember {
   favorecido_id: string;
   valor?: number | null;
   criado_em?: string;
+  favorecido?: {
+    id: string;
+    nome: string;
+  };
 }
 
 export interface NewGroupMember {
