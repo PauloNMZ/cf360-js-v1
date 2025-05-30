@@ -43,22 +43,6 @@ function Calendar({
   locale = ptBR,
   ...props
 }: CalendarProps) {
-  // Debug wrapper for onSelect - wrap the original onSelect if it exists
-  const wrappedProps = React.useMemo(() => {
-    if (props.onSelect) {
-      const originalOnSelect = props.onSelect;
-      return {
-        ...props,
-        onSelect: (date: any) => {
-          console.log("Calendar - handleSelect chamado com:", date);
-          console.log("Calendar - Chamando onSelect prop original");
-          originalOnSelect(date);
-        }
-      };
-    }
-    return props;
-  }, [props]);
-
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
@@ -114,7 +98,7 @@ function Calendar({
         IconLeft: ({ ..._props }) => <ChevronLeft className="h-4 w-4" />,
         IconRight: ({ ..._props }) => <ChevronRight className="h-4 w-4" />,
       }}
-      {...wrappedProps}
+      {...props}
     />
   );
 }

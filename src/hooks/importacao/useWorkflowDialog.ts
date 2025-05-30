@@ -54,15 +54,15 @@ export const useWorkflowDialog = () => {
     console.log("useWorkflowDialog - workflow state atualizado:", workflow);
   }, [workflow]);
 
-  // Function to check if the current step is valid
+  // Function to check if the current step is valid - simplificada para debug
   const isCurrentStepValid = () => {
     console.log("useWorkflowDialog - isCurrentStepValid chamado para step:", currentStep);
     console.log("useWorkflowDialog - workflow.paymentDate:", workflow.paymentDate);
     
     switch (currentStep) {
-      case 1: // Date selection
-        const isValid = workflow.paymentDate !== undefined;
-        console.log("useWorkflowDialog - Step 1 válido?", isValid);
+      case 1: // Date selection - simplificado para aceitar qualquer data válida
+        const isValid = workflow.paymentDate !== undefined && workflow.paymentDate !== null;
+        console.log("useWorkflowDialog - Step 1 válido?", isValid, "paymentDate:", workflow.paymentDate);
         return isValid;
       case 2: // Service type
         return workflow.serviceType !== "";

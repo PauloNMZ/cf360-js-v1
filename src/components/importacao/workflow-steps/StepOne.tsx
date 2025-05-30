@@ -15,8 +15,14 @@ interface StepOneProps {
 }
 
 const StepOne: React.FC<StepOneProps> = ({ workflow, updateWorkflow }) => {
-  // Add state for controlling the popover
   const [open, setOpen] = React.useState(false);
+
+  // Função para normalizar datas (remover horário para comparação)
+  const normalizeDate = (date: Date) => {
+    const normalized = new Date(date);
+    normalized.setHours(0, 0, 0, 0);
+    return normalized;
+  };
 
   // Function to handle date selection with debugging
   const handleSelectDate = (date: Date | undefined) => {
@@ -25,10 +31,7 @@ const StepOne: React.FC<StepOneProps> = ({ workflow, updateWorkflow }) => {
     
     updateWorkflow("paymentDate", date);
     
-    // Log após a atualização para verificar se foi chamada
     console.log("StepOne - updateWorkflow chamado para paymentDate");
-    
-    // Close the popover after selecting a date
     setOpen(false);
     console.log("StepOne - Popover fechado");
   };
@@ -37,6 +40,9 @@ const StepOne: React.FC<StepOneProps> = ({ workflow, updateWorkflow }) => {
   React.useEffect(() => {
     console.log("StepOne - workflow.paymentDate atualizado para:", workflow.paymentDate);
   }, [workflow.paymentDate]);
+
+  // Obter data de hoje normalizada
+  const today = normalizeDate(new Date());
 
   return (
     <div className="py-6 space-y-4">
@@ -74,8 +80,10 @@ const StepOne: React.FC<StepOneProps> = ({ workflow, updateWorkflow }) => {
                 handleSelectDate(date);
               }}
               disabled={(date) => {
-                const isDisabled = date < new Date();
-                console.log("StepOne - Data", date, "está desabilitada?", isDisabled);
+                // Normalizar a data para comparação sem considerar horário
+                const normalizedDate = normalizeDate(date);
+                const isDisabled = normalizedDate < today;
+                console.log("StepOne - Data", format(date, "dd/MM/yyyy"), "está desabilitada?", isDisabled);
                 return isDisabled;
               }}
               initialFocus
@@ -83,6 +91,13 @@ const StepOne: React.FC<StepOneProps> = ({ workflow, updateWorkflow }) => {
             />
           </PopoverContent>
         </Popover>
+        
+        {/* Informação adicional para debug */}
+        {workflow.paymentDate && (
+          <p className="text-xs text-green-600">
+            Data selecionada: {format(workflow.paymentDate, "dd/MM/yyyy", { locale: ptBR })}
+          </p>
+        )}
       </div>
     </div>
   );
