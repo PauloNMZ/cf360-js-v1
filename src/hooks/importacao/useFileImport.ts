@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import ExcelJS from 'exceljs';
 import { toast } from '@/components/ui/sonner';
@@ -33,18 +34,24 @@ export const useFileImport = () => {
         throw new Error("Planilha não encontrada");
       }
 
-      // Get headers from first row
-      const headers = worksheet.getRow(1).values as string[];
-      const formattedHeaders = headers.map(header => 
-        header ? header.toString().trim().toUpperCase() : ''
-      );
+      // Get headers from first row - ExcelJS returns array with undefined at index 0
+      const headerRow = worksheet.getRow(1);
+      const rawHeaders = headerRow.values as any[];
+      
+      // Filter out undefined/null values and convert to string, skipping index 0
+      const headers = rawHeaders
+        .slice(1) // Remove the undefined value at index 0
+        .map(header => header ? header.toString().trim().toUpperCase() : '')
+        .filter(header => header !== ''); // Remove empty headers
+
+      console.log("Headers extraídos:", headers);
 
       // Validate headers against expected headers
       const missingColumns = EXPECTED_HEADERS.filter(
-        header => !formattedHeaders.includes(header)
+        header => !headers.includes(header)
       );
       
-      const extraColumns = formattedHeaders.filter(
+      const extraColumns = headers.filter(
         header => header && !EXPECTED_HEADERS.includes(header)
       );
 
@@ -62,17 +69,22 @@ export const useFileImport = () => {
         if (rowNumber === 1) return; // Skip header row
         
         const rowData: Record<string, any> = { id: rowNumber - 2, selected: false };
-        row.eachCell((cell, colNumber) => {
-          const header = formattedHeaders[colNumber - 1];
-          if (header) {
-            rowData[header] = cell.value;
+        const cellValues = row.values as any[];
+        
+        // Map cell values to headers, skipping index 0 from ExcelJS
+        headers.forEach((header, headerIndex) => {
+          const cellIndex = headerIndex + 1; // Adjust for ExcelJS indexing (skip index 0)
+          if (cellValues[cellIndex] !== undefined) {
+            rowData[header] = cellValues[cellIndex];
           }
         });
+        
+        console.log(`Linha ${rowNumber}:`, rowData);
         rows.push(rowData as RowData);
       });
 
       setPlanilhaData({
-        headers: formattedHeaders,
+        headers,
         rows,
         isValid,
         missingColumns,
