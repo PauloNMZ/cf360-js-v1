@@ -73,6 +73,9 @@ Atenciosamente,
       if (!emailAttachment && reportData) {
         const reportOptions = {
           companyName: emailFormValues.companyName,
+          companyCnpj: emailFormValues.companyName.includes('CNPJ:') 
+            ? emailFormValues.companyName.split('CNPJ: ')[1] || ""
+            : "",
           remittanceReference: emailFormValues.remittanceReference,
           responsibleName: emailFormValues.senderName,
           department: emailFormValues.senderDepartment
