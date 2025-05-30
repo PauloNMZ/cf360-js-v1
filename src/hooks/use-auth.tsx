@@ -1,8 +1,7 @@
-
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthContextType, AuthSession, AuthUser } from '@/types/auth';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -13,18 +12,40 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
+  const initialLoadRef = useRef(true);
+  const lastEventRef = useRef<string>('');
 
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        console.log('Auth event:', event, 'at location:', location.pathname);
+        
         setSession(session);
         setUser(session?.user ?? null);
         
+        // Evitar redirecionamentos desnecessários durante o carregamento inicial
+        if (initialLoadRef.current) {
+          initialLoadRef.current = false;
+          return;
+        }
+
+        // Evitar processar o mesmo evento múltiplas vezes
+        const eventKey = `${event}-${session?.access_token?.slice(-10) || 'none'}`;
+        if (lastEventRef.current === eventKey) {
+          return;
+        }
+        lastEventRef.current = eventKey;
+
         if (event === 'SIGNED_IN') {
-          setTimeout(() => {
-            navigate('/');
-          }, 0);
+          // Só redirecionar para home se estivermos na página de auth
+          // Caso contrário, manter na página atual
+          if (location.pathname === '/auth') {
+            setTimeout(() => {
+              navigate('/');
+            }, 0);
+          }
         } else if (event === 'SIGNED_OUT') {
           setTimeout(() => {
             navigate('/auth');
@@ -38,10 +59,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setIsLoading(false);
+      initialLoadRef.current = false;
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, location.pathname]);
 
   const signIn = async (email: string, password: string) => {
     try {
