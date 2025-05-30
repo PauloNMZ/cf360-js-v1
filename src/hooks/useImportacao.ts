@@ -1,18 +1,9 @@
-import { useState, useEffect } from 'react';
-import { validateFavorecidos } from '@/services/cnab240/validationService';
-
-// Import smaller hooks
-import { useFileImport } from './importacao/useFileImport';
-import { useTableOperations } from './importacao/useTableOperations';
-import { useValidationDialog } from './importacao/useValidationDialog';
-import { useConvenentesData } from './importacao/useConvenentesData';
-import { usePDFReportWithEmail } from './importacao/usePDFReportWithEmail';
-import { useProcessWorkflow } from './importacao/useProcessWorkflow';
 import { useIndexPageContext } from './useIndexPageContext';
+import { useImportacaoState } from './importacao/useImportacaoState';
+import { useImportacaoCompany } from './importacao/useImportacaoCompany';
+import { useImportacaoHandlers } from './importacao/useImportacaoHandlers';
 
 export const useImportacao = () => {
-  const [showTable, setShowTable] = useState(false);
-  
   // Get current selected convenente info from context
   const { currentConvenenteId, formData, selectedHeaderCompany } = useIndexPageContext();
   const hasSelectedConvenente = !!(currentConvenenteId && formData);
@@ -21,109 +12,42 @@ export const useImportacao = () => {
     ...formData
   } : null;
   
-  // Import functionality from smaller hooks
-  const fileImport = useFileImport();
-  const tableOps = useTableOperations(fileImport.tableData);
-  const convenentesData = useConvenentesData();
-  const validationDialog = useValidationDialog();
-  const pdfReportWithEmail = usePDFReportWithEmail();
-  const processWorkflow = useProcessWorkflow(tableOps.getSelectedRows, {
+  // Use the state management hook
+  const {
+    showTable,
+    setShowTable,
+    fileImport,
+    tableOps,
+    convenentesData,
+    validationDialog,
+    pdfReportWithEmail,
+    processWorkflow
+  } = useImportacaoState(selectedConvenente, hasSelectedConvenente);
+
+  // Use the company logic hook
+  const { getCompanyInfo } = useImportacaoCompany(
     selectedConvenente,
-    hasSelectedConvenente
-  });
+    convenentesData,
+    processWorkflow
+  );
 
-  // Sync tableData with the fileImport tableData when it changes
-  useEffect(() => {
-    if (fileImport.tableData.length > 0) {
-      tableOps.setTableData(fileImport.tableData);
-    }
-  }, [fileImport.tableData]);
-
-  // Update directory in workflow when output directory changes
-  useEffect(() => {
-    processWorkflow.updateWorkflow('outputDirectory', processWorkflow.workflow.outputDirectory);
-  }, [processWorkflow.workflow.outputDirectory]);
-
-  // Handle initial processing
-  const handleProcessar = () => {
-    console.log("useImportacao - handleProcessar chamado");
-    const result = fileImport.handleProcessar();
-    if (result) {
-      setShowTable(true);
-      validationDialog.setValidationPerformed(false); // Reset validation status when new data is processed
-      validationDialog.setValidationErrors([]);
-    }
-  };
-
-  // Wrapper for verify errors function
-  const handleVerifyErrors = () => {
-    console.log("useImportacao - handleVerifyErrors chamado");
-    console.log("useImportacao - tableOps.tableData length:", tableOps.tableData.length);
-    console.log("useImportacao - validateFavorecidos function:", typeof validateFavorecidos);
-    validationDialog.handleVerifyErrors(validateFavorecidos, tableOps.tableData);
-  };
-
-  // Handle process selected function
-  const handleProcessSelected = () => {
-    console.log("useImportacao - handleProcessSelected chamado");
-    console.log("useImportacao - selected rows:", tableOps.getSelectedRows().length);
-    processWorkflow.handleProcessSelected();
-  };
-  
-  // Handle PDF report generation
-  const handleGenerateReport = async () => {
-    console.log("useImportacao - handleGenerateReport chamado");
-    console.log("useImportacao - cnabFileGenerated:", processWorkflow.cnabFileGenerated);
-    
-    // Get company name and CNPJ with priority order
-    let companyName = "Empresa";
-    let companyCnpj = "";
-    
-    console.log("useImportacao - Debug company sources:");
-    console.log("  - selectedHeaderCompany:", selectedHeaderCompany);
-    console.log("  - selectedConvenente:", selectedConvenente);
-    console.log("  - processWorkflow.workflow.convenente:", processWorkflow.workflow.convenente);
-    
-    // Priority 1: Header-selected company (from context)
-    if (selectedHeaderCompany) {
-      console.log("useImportacao - Using header company:", selectedHeaderCompany);
-      companyName = selectedHeaderCompany.razaoSocial;
-      companyCnpj = selectedHeaderCompany.cnpj || "";
-    }
-    // Priority 2: Globally selected convenente (from context)
-    else if (selectedConvenente && selectedConvenente.razaoSocial) {
-      console.log("useImportacao - Using selected convenente:", selectedConvenente);
-      companyName = selectedConvenente.razaoSocial;
-      companyCnpj = selectedConvenente.cnpj || "";
-    }
-    // Priority 3: Workflow-selected convenente
-    else if (processWorkflow.workflow.convenente) {
-      const workflowConvenente = convenentesData.convenentes.find(
-        c => c.id === processWorkflow.workflow.convenente
-      );
-      if (workflowConvenente) {
-        console.log("useImportacao - Using workflow convenente:", workflowConvenente);
-        companyName = workflowConvenente.razaoSocial;
-        companyCnpj = workflowConvenente.cnpj || "";
-      }
-    }
-    
-    console.log("useImportacao - Final company values:");
-    console.log("  - companyName:", companyName);
-    console.log("  - companyCnpj:", companyCnpj);
-    
-    await pdfReportWithEmail.handleGenerateReport(
-      tableOps.getSelectedRows(),
-      processWorkflow.cnabFileGenerated,
-      processWorkflow.cnabFileName,
-      companyName,
-      validateFavorecidos,
-      processWorkflow.workflow.convenente ? 
-        convenentesData.convenentes.find(c => c.id === processWorkflow.workflow.convenente) : 
-        selectedConvenente,
-      companyCnpj
-    );
-  };
+  // Use the handlers hook
+  const {
+    handleProcessar,
+    handleVerifyErrors,
+    handleProcessSelected,
+    handleGenerateReport
+  } = useImportacaoHandlers(
+    fileImport,
+    tableOps,
+    validationDialog,
+    processWorkflow,
+    pdfReportWithEmail,
+    convenentesData,
+    selectedConvenente,
+    getCompanyInfo,
+    setShowTable
+  );
 
   return {
     // File related props and methods
