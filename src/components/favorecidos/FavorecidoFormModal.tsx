@@ -1,5 +1,7 @@
+
 import React from "react";
 import { FavorecidoData } from "@/types/favorecido";
+import { Group } from "@/types/group";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -11,6 +13,7 @@ interface FavorecidoFormModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   currentFavorecido: FavorecidoData;
+  grupos: Group[];
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSelectChange: (name: string, value: string) => void;
   handleSave: () => void;
@@ -22,6 +25,7 @@ const FavorecidoFormModal: React.FC<FavorecidoFormModalProps> = ({
   open,
   onOpenChange,
   currentFavorecido,
+  grupos,
   handleInputChange,
   handleSelectChange,
   handleSave,
@@ -34,6 +38,7 @@ const FavorecidoFormModal: React.FC<FavorecidoFormModalProps> = ({
     formMode,
     currentFavorecidoId: currentFavorecido.id,
     currentFavorecidoNome: currentFavorecido.nome,
+    gruposCount: grupos.length,
     isLoading
   });
 
@@ -42,7 +47,7 @@ const FavorecidoFormModal: React.FC<FavorecidoFormModalProps> = ({
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>
-            {'Cadastro da Empresa'}
+            {formMode === 'create' ? 'Cadastro de Favorecido' : 'Editar Favorecido'}
           </DialogTitle>
         </DialogHeader>
 
@@ -166,7 +171,11 @@ const FavorecidoFormModal: React.FC<FavorecidoFormModalProps> = ({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">Nenhum</SelectItem>
-                {/* Grupos seriam listados aqui */}
+                {grupos.map((grupo) => (
+                  <SelectItem key={grupo.id} value={grupo.id}>
+                    {grupo.nome}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </FormField>

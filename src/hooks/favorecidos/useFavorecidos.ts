@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { FavorecidoData, emptyFavorecido } from "@/types/favorecido";
 import { 
@@ -8,11 +7,13 @@ import {
   deleteFavorecido,
   searchFavorecidosByTerm
 } from "@/services/favorecido/favorecidoService";
+import { useGroupOperations } from "@/services/group/hooks";
 import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const useFavorecidos = () => {
   const queryClient = useQueryClient();
+  const { fetchGroups } = useGroupOperations();
   const [searchTerm, setSearchTerm] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [currentFavorecido, setCurrentFavorecido] = useState<FavorecidoData>({...emptyFavorecido});
@@ -38,6 +39,15 @@ export const useFavorecidos = () => {
   } = useQuery({
     queryKey: ['favorecidos'],
     queryFn: getFavorecidos
+  });
+
+  // Query to fetch groups
+  const { 
+    data: grupos = [], 
+    isLoading: isLoadingGroups 
+  } = useQuery({
+    queryKey: ['grupos'],
+    queryFn: fetchGroups
   });
 
   // Query for searched favorecidos
@@ -155,10 +165,11 @@ export const useFavorecidos = () => {
     saveMutation({ favorecido: currentFavorecido, mode: formMode });
   };
 
-  const isLoading = isLoadingFavorecidos || isSearching || isSaving || isDeleting;
+  const isLoading = isLoadingFavorecidos || isSearching || isSaving || isDeleting || isLoadingGroups;
 
   return {
     favorecidos,
+    grupos,
     filteredFavorecidos,
     isLoading,
     searchTerm,

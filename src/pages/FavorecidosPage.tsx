@@ -11,6 +11,7 @@ import { useFavorecidos } from "@/hooks/favorecidos/useFavorecidos";
 const FavorecidosPage = () => {
   const {
     filteredFavorecidos,
+    grupos,
     isLoading,
     searchTerm,
     modalOpen,
@@ -36,6 +37,7 @@ const FavorecidosPage = () => {
   console.log("FavorecidosPage - currentFavorecido:", currentFavorecido);
   console.log("FavorecidosPage - formMode:", formMode);
   console.log("FavorecidosPage - filteredFavorecidos count:", filteredFavorecidos.length);
+  console.log("FavorecidosPage - grupos count:", grupos.length);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900/95">
@@ -76,6 +78,7 @@ const FavorecidosPage = () => {
           open={modalOpen}
           onOpenChange={setModalOpen}
           currentFavorecido={currentFavorecido}
+          grupos={grupos}
           handleInputChange={handleInputChange}
           handleSelectChange={handleSelectChange}
           handleSave={handleSave}
