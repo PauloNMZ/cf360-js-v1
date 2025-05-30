@@ -34,19 +34,36 @@ export const useWorkflowDialog = () => {
     setCurrentStep(prev => Math.max(prev - 1, 1));
   };
 
-  // Function to update workflow data
+  // Function to update workflow data with debugging
   const updateWorkflow = (field: keyof CNABWorkflowData, value: any) => {
-    setWorkflow(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    console.log("useWorkflowDialog - updateWorkflow chamado:", { field, value });
+    console.log("useWorkflowDialog - workflow antes da atualização:", workflow);
+    
+    setWorkflow(prev => {
+      const newWorkflow = {
+        ...prev,
+        [field]: value
+      };
+      console.log("useWorkflowDialog - workflow após atualização:", newWorkflow);
+      return newWorkflow;
+    });
   };
+
+  // Debug logging for workflow state changes
+  useEffect(() => {
+    console.log("useWorkflowDialog - workflow state atualizado:", workflow);
+  }, [workflow]);
 
   // Function to check if the current step is valid
   const isCurrentStepValid = () => {
+    console.log("useWorkflowDialog - isCurrentStepValid chamado para step:", currentStep);
+    console.log("useWorkflowDialog - workflow.paymentDate:", workflow.paymentDate);
+    
     switch (currentStep) {
       case 1: // Date selection
-        return workflow.paymentDate !== undefined;
+        const isValid = workflow.paymentDate !== undefined;
+        console.log("useWorkflowDialog - Step 1 válido?", isValid);
+        return isValid;
       case 2: // Service type
         return workflow.serviceType !== "";
       case 3: // Convenente

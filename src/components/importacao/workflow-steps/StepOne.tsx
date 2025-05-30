@@ -18,12 +18,25 @@ const StepOne: React.FC<StepOneProps> = ({ workflow, updateWorkflow }) => {
   // Add state for controlling the popover
   const [open, setOpen] = React.useState(false);
 
-  // Function to handle date selection
+  // Function to handle date selection with debugging
   const handleSelectDate = (date: Date | undefined) => {
+    console.log("StepOne - handleSelectDate chamado com:", date);
+    console.log("StepOne - workflow.paymentDate antes da atualização:", workflow.paymentDate);
+    
     updateWorkflow("paymentDate", date);
+    
+    // Log após a atualização para verificar se foi chamada
+    console.log("StepOne - updateWorkflow chamado para paymentDate");
+    
     // Close the popover after selecting a date
     setOpen(false);
+    console.log("StepOne - Popover fechado");
   };
+
+  // Debug logging for component state
+  React.useEffect(() => {
+    console.log("StepOne - workflow.paymentDate atualizado para:", workflow.paymentDate);
+  }, [workflow.paymentDate]);
 
   return (
     <div className="py-6 space-y-4">
@@ -39,6 +52,10 @@ const StepOne: React.FC<StepOneProps> = ({ workflow, updateWorkflow }) => {
                 "w-full justify-start text-left font-normal",
                 !workflow.paymentDate && "text-muted-foreground"
               )}
+              onClick={() => {
+                console.log("StepOne - Botão do calendário clicado, abrindo popover");
+                setOpen(true);
+              }}
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
               {workflow.paymentDate ? (
@@ -52,8 +69,15 @@ const StepOne: React.FC<StepOneProps> = ({ workflow, updateWorkflow }) => {
             <Calendar
               mode="single"
               selected={workflow.paymentDate}
-              onSelect={handleSelectDate}
-              disabled={(date) => date < new Date()}
+              onSelect={(date) => {
+                console.log("StepOne - Calendar onSelect chamado com:", date);
+                handleSelectDate(date);
+              }}
+              disabled={(date) => {
+                const isDisabled = date < new Date();
+                console.log("StepOne - Data", date, "está desabilitada?", isDisabled);
+                return isDisabled;
+              }}
               initialFocus
               locale={ptBR}
             />
