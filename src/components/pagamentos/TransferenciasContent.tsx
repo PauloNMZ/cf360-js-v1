@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import LancamentoButtons from './LancamentoButtons';
 import LancamentoFavorecidos from './LancamentoFavorecidos';
-import { ImportarPlanilha, ImportarCNAB } from './LancamentoPlaceholders';
+import ImportarPlanilha from '@/components/ImportarPlanilha';
+import { ImportarCNAB } from './LancamentoPlaceholders';
 
 const TransferenciasContent = () => {
   const [activeLancamentoTab, setActiveLancamentoTab] = useState<'favorecidos' | 'planilha' | 'cnab' | null>(null);
