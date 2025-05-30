@@ -17,7 +17,8 @@ export const usePDFReportWithEmail = () => {
     cnabFileName: string,
     companyName: string,
     validateFavorecidos: any,
-    convenente: any = null
+    convenente: any = null,
+    companyCnpj: string = ""
   ) => {
     if (selectedRows.length === 0) {
       toast.error("Nenhum registro selecionado para gerar relatório.");
@@ -37,7 +38,8 @@ export const usePDFReportWithEmail = () => {
       cnabFileName,
       companyName,
       validateFavorecidos,
-      convenente
+      convenente,
+      companyCnpj
     );
     
     if (reportResult) {

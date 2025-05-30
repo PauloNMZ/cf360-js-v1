@@ -1,3 +1,4 @@
+
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { formatarValorCurrency } from '@/utils/formatting/currencyUtils';
@@ -5,6 +6,7 @@ import { RowData } from '@/types/importacao';
 
 interface ReportGenerationOptions {
   companyName: string;
+  companyCnpj: string;
   remittanceReference: string;
   responsibleName: string;
   department: string;
@@ -54,8 +56,8 @@ export const generateRemittanceReport = async (
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Remessa Bancária');
   
-  // Add header information
-  worksheet.addRow([`Empresa: ${options.companyName}`]);
+  // Add header information with company name and CNPJ
+  worksheet.addRow([`Empresa: ${options.companyName} - CNPJ: ${options.companyCnpj}`]);
   worksheet.addRow([`Data de Geração: ${formattedDate} ${formattedTime}`]);
   worksheet.addRow([`Referência da Remessa: ${options.remittanceReference}`]);
   worksheet.addRow([`Total de Registros: ${selectedRows.length}`]);

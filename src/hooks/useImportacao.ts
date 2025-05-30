@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { validateFavorecidos } from '@/services/cnab240/validationService';
 
@@ -76,14 +75,23 @@ export const useImportacao = () => {
     console.log("useImportacao - handleGenerateReport chamado");
     console.log("useImportacao - cnabFileGenerated:", processWorkflow.cnabFileGenerated);
     
-    // Get company name if available
+    // Get company name and CNPJ if available
     let companyName = "Empresa";
-    if (processWorkflow.workflow.convenente) {
-      const selectedConvenente = convenentesData.convenentes.find(
+    let companyCnpj = "";
+    
+    // First check if there's a globally selected company (from context)
+    if (selectedConvenente && selectedConvenente.razaoSocial) {
+      companyName = selectedConvenente.razaoSocial;
+      companyCnpj = selectedConvenente.cnpj || "";
+    }
+    // Otherwise, check if there's a convenente selected in the workflow
+    else if (processWorkflow.workflow.convenente) {
+      const workflowConvenente = convenentesData.convenentes.find(
         c => c.id === processWorkflow.workflow.convenente
       );
-      if (selectedConvenente) {
-        companyName = selectedConvenente.razaoSocial;
+      if (workflowConvenente) {
+        companyName = workflowConvenente.razaoSocial;
+        companyCnpj = workflowConvenente.cnpj || "";
       }
     }
     
@@ -95,7 +103,8 @@ export const useImportacao = () => {
       validateFavorecidos,
       processWorkflow.workflow.convenente ? 
         convenentesData.convenentes.find(c => c.id === processWorkflow.workflow.convenente) : 
-        null
+        selectedConvenente,
+      companyCnpj
     );
   };
 

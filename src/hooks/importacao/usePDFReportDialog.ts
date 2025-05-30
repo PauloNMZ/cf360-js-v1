@@ -30,7 +30,8 @@ export const usePDFReportDialog = () => {
     cnabFileName: string,
     companyName: string,
     validateFavorecidos: any,
-    convenente: any
+    convenente: any,
+    companyCnpj: string = ""
   ) => {
     if (selectedRows.length === 0) {
       toast.error("Nenhum registro selecionado para gerar relatório.", {
@@ -82,10 +83,15 @@ export const usePDFReportDialog = () => {
       
       // Use convenente name if available, otherwise use companyName
       const empresaName = convenente?.razaoSocial || companyName;
+      const empresaCnpj = convenente?.cnpj || companyCnpj;
       
-      // Create report data with only valid records
+      // Create report data with only valid records - including CNPJ in empresa field
+      const empresaDisplay = empresaCnpj 
+        ? `${empresaName} - CNPJ: ${empresaCnpj}`
+        : empresaName;
+      
       const pdfReportData: ReportData = {
-        empresa: empresaName,
+        empresa: empresaDisplay,
         dataGeracao: formattedDate,
         referencia: remittanceReference,
         beneficiarios: validRecords,
@@ -100,6 +106,7 @@ export const usePDFReportDialog = () => {
       try {
         const reportOptions = {
           companyName: empresaName,
+          companyCnpj: empresaCnpj,
           remittanceReference: remittanceReference,
           responsibleName: "Usuário do Sistema",
           department: "Financeiro"
