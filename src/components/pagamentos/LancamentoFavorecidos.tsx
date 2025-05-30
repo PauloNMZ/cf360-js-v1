@@ -31,6 +31,7 @@ const LancamentoFavorecidos = () => {
     setSuccessModalOpen,
     deleteDialogOpen,
     setDeleteDialogOpen,
+    grupos,
   } = useFavorecidos();
 
   const [selectedFavorecido, setSelectedFavorecido] = useState<any>(null);
@@ -129,6 +130,7 @@ const LancamentoFavorecidos = () => {
         open={modalOpen}
         onOpenChange={setModalOpen}
         currentFavorecido={currentFavorecido}
+        grupos={grupos}
         handleInputChange={handleInputChange}
         handleSelectChange={handleSelectChange}
         handleSave={handleSave}
