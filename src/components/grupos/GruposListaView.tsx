@@ -81,7 +81,7 @@ const GruposListaView: React.FC<GruposListaViewProps> = ({
         <div className="mb-4 relative">
           <div className="relative w-64">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input type="search" placeholder="Buscar por nome ou descrição..." value={searchTerm} onChange={handleSearchChange} className="pl-8 px-[15px]" />
+            <Input type="search" placeholder="Buscar por nome ou descrição..." value={searchTerm} onChange={handleSearchChange} className="pl-8 px-[10px]" />
           </div>
         </div>
 
