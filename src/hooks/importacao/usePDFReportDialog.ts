@@ -31,7 +31,8 @@ export const usePDFReportDialog = () => {
     companyName: string,
     validateFavorecidos: any,
     convenente: any,
-    companyCnpj: string = ""
+    companyCnpj: string = "",
+    paymentDate: Date | undefined = undefined
   ) => {
     console.log("=== DEBUG usePDFReportDialog - generateReport ===");
     console.log("Parameters received:");
@@ -40,6 +41,7 @@ export const usePDFReportDialog = () => {
     console.log("  - companyCnpj:", companyCnpj);
     console.log("  - convenente:", convenente);
     console.log("  - cnabFileGenerated:", cnabFileGenerated);
+    console.log("  - paymentDate:", paymentDate);
     
     if (selectedRows.length === 0) {
       toast.error("Nenhum registro selecionado para gerar relatório.", {
@@ -79,6 +81,11 @@ export const usePDFReportDialog = () => {
       // Generate formatted date
       const formattedDate = formatCurrentDateTime();
       
+      // Format payment date
+      const formattedPaymentDate = paymentDate 
+        ? paymentDate.toLocaleDateString('pt-BR') 
+        : "Não definida";
+      
       // Use CNAB filename as reference
       const remittanceReference = cnabFileName || "Remessa_" + new Date().toISOString().slice(0, 10).replace(/-/g, '');
       
@@ -114,12 +121,14 @@ export const usePDFReportDialog = () => {
       console.log("=== Final company values for report ===");
       console.log("finalCompanyName:", finalCompanyName);
       console.log("finalCompanyCnpj:", finalCompanyCnpj);
+      console.log("formattedPaymentDate:", formattedPaymentDate);
       
-      // Create report data with only valid records
+      // Create report data with only valid records including payment date
       const pdfReportData: ReportData = {
         empresaNome: finalCompanyName,
         empresaCnpj: finalCompanyCnpj,
         dataGeracao: formattedDate,
+        dataPagamento: formattedPaymentDate,
         referencia: remittanceReference,
         beneficiarios: validRecords,
         totalRegistros: validRecords.length,
@@ -129,6 +138,7 @@ export const usePDFReportDialog = () => {
       console.log("=== Created reportData ===");
       console.log("reportData.empresaNome:", pdfReportData.empresaNome);
       console.log("reportData.empresaCnpj:", pdfReportData.empresaCnpj);
+      console.log("reportData.dataPagamento:", pdfReportData.dataPagamento);
       
       // Store report data
       setReportData(pdfReportData);
@@ -140,7 +150,8 @@ export const usePDFReportDialog = () => {
           companyCnpj: finalCompanyCnpj,
           remittanceReference: remittanceReference,
           responsibleName: "Usuário do Sistema",
-          department: "Financeiro"
+          department: "Financeiro",
+          paymentDate: formattedPaymentDate
         };
         
         const excelReport = await generateRemittanceReport(validRecords, reportOptions);

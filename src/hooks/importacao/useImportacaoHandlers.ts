@@ -43,6 +43,7 @@ export const useImportacaoHandlers = (
     console.log("=== DEBUG useImportacaoHandlers - handleGenerateReport ===");
     console.log("cnabFileGenerated:", processWorkflow.cnabFileGenerated);
     console.log("selected rows count:", tableOps.getSelectedRows().length);
+    console.log("workflow paymentDate:", processWorkflow.workflow.paymentDate);
     
     // Get company info using the improved function
     const { companyName, companyCnpj } = getCompanyInfo();
@@ -62,6 +63,7 @@ export const useImportacaoHandlers = (
     }
     
     console.log("Final convenente to use:", convenenteToUse);
+    console.log("Payment date to use:", processWorkflow.workflow.paymentDate);
     
     await pdfReportWithEmail.handleGenerateReport(
       tableOps.getSelectedRows(),
@@ -70,7 +72,8 @@ export const useImportacaoHandlers = (
       companyName,
       validateFavorecidos,
       convenenteToUse,
-      companyCnpj
+      companyCnpj,
+      processWorkflow.workflow.paymentDate
     );
   };
 

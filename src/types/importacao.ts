@@ -98,11 +98,12 @@ export interface ValidationErrorsDialogProps {
   handleExportErrors?: () => void;
 }
 
-// PDF report types - UPDATED: Separated empresa into empresaNome and empresaCnpj
+// PDF report types - UPDATED: Added dataPagamento field
 export interface ReportData {
   empresaNome: string;
   empresaCnpj: string;
   dataGeracao: string;
+  dataPagamento: string;
   referencia: string;
   beneficiarios: RowData[];
   totalRegistros: number;

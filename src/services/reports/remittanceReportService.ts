@@ -1,3 +1,4 @@
+
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { formatarValorCurrency } from '@/utils/formatting/currencyUtils';
@@ -10,6 +11,7 @@ interface ReportGenerationOptions {
   remittanceReference: string;
   responsibleName: string;
   department: string;
+  paymentDate: string;
 }
 
 /**
@@ -60,6 +62,7 @@ export const generateRemittanceReport = async (
   worksheet.addRow([`Empresa: ${options.companyName}`]);
   worksheet.addRow([`CNPJ: ${formatarCpfCnpj(options.companyCnpj)}`]);
   worksheet.addRow([`Data de Geração: ${formattedDate} ${formattedTime}`]);
+  worksheet.addRow([`Data de Pagamento: ${options.paymentDate}`]);
   worksheet.addRow([`Referência da Remessa: ${options.remittanceReference}`]);
   worksheet.addRow([`Total de Registros: ${selectedRows.length}`]);
   worksheet.addRow([`Valor Total: ${formatarValorCurrency(totalAmount)}`]);
@@ -80,8 +83,8 @@ export const generateRemittanceReport = async (
     column.width = widths[index];
   });
   
-  // Style the header row (now at row 8 instead of 7)
-  const headerRow = worksheet.getRow(8);
+  // Style the header row (now at row 9 instead of 8 due to new payment date line)
+  const headerRow = worksheet.getRow(9);
   headerRow.font = { bold: true };
   headerRow.fill = {
     type: 'pattern',

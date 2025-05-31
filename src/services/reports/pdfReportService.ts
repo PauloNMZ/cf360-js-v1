@@ -1,3 +1,4 @@
+
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import { ReportData, RowData } from '@/types/importacao';
@@ -26,19 +27,20 @@ export const generatePDFReport = async (reportData: ReportData): Promise<Blob> =
   doc.text(`Empresa: ${reportData.empresaNome}`, 15, 35);
   doc.text(`CNPJ: ${formatarCpfCnpj(reportData.empresaCnpj)}`, 15, 42);
   doc.text(`Data de Geração: ${reportData.dataGeracao}`, 15, 49);
-  doc.text(`Referência da Remessa: ${reportData.referencia}`, 15, 56);
+  doc.text(`Data de Pagamento: ${reportData.dataPagamento}`, 15, 56);
+  doc.text(`Referência da Remessa: ${reportData.referencia}`, 15, 63);
   
-  // Add total value information
+  // Add total value information - adjusted position
   const valorTotalFormatado = formatarValorCurrency(reportData.valorTotal);
-  doc.text(`Valor total dessa remessa: ${valorTotalFormatado} com ${reportData.totalRegistros} favorecidos`, 15, 63);
+  doc.text(`Valor total dessa remessa: ${valorTotalFormatado} com ${reportData.totalRegistros} favorecidos`, 15, 70);
   
   // Add horizontal line - adjusted position
-  doc.line(15, 69, 195, 69);
+  doc.line(15, 76, 195, 76);
   
   // Add BENEFICIÁRIOS text - adjusted position
   doc.setFontSize(12);
   doc.setFont(undefined, 'bold');
-  doc.text("BENEFICIÁRIOS:", 15, 79);
+  doc.text("BENEFICIÁRIOS:", 15, 86);
   
   // Define table columns
   const tableColumns = [
@@ -66,7 +68,7 @@ export const generatePDFReport = async (reportData: ReportData): Promise<Blob> =
   
   // Create the table with improved styling - adjusted starting position
   (doc as any).autoTable({
-    startY: 84, // Adjusted to fit after the new line
+    startY: 91, // Adjusted to fit after the new payment date line
     head: [tableColumns.map(col => col.header)],
     body: tableData.map(row => tableColumns.map(col => row[col.dataKey])),
     theme: 'grid',
