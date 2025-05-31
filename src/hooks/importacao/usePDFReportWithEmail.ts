@@ -10,6 +10,9 @@ export const usePDFReportWithEmail = () => {
   const pdfReportDialog = usePDFReportDialog();
   const emailConfigDialog = useEmailConfigDialog();
 
+  // Store the original payment date for email flow
+  const [originalPaymentDate, setOriginalPaymentDate] = useState<string>('');
+
   // Generate PDF report and prepare for email
   const handleGenerateReport = async (
     selectedRows: any[],
@@ -18,7 +21,8 @@ export const usePDFReportWithEmail = () => {
     companyName: string,
     validateFavorecidos: any,
     convenente: any = null,
-    companyCnpj: string = ""
+    companyCnpj: string = "",
+    paymentDate: Date | undefined = undefined
   ) => {
     if (selectedRows.length === 0) {
       toast.error("Nenhum registro selecionado para gerar relatório.");
@@ -31,6 +35,13 @@ export const usePDFReportWithEmail = () => {
       return;
     }
 
+    // Store the formatted payment date for email flow
+    const formattedPaymentDate = paymentDate 
+      ? paymentDate.toLocaleDateString('pt-BR') 
+      : "Não definida";
+    
+    setOriginalPaymentDate(formattedPaymentDate);
+
     // Generate report
     const reportResult = await pdfReportDialog.generateReport(
       selectedRows,
@@ -39,7 +50,8 @@ export const usePDFReportWithEmail = () => {
       companyName,
       validateFavorecidos,
       convenente,
-      companyCnpj
+      companyCnpj,
+      paymentDate
     );
     
     if (reportResult) {
@@ -76,13 +88,14 @@ export const usePDFReportWithEmail = () => {
     );
   };
 
-  // Handle email form submission
+  // Handle email form submission with original payment date
   const handleEmailSubmit = async (emailFormValues: EmailFormValues) => {
     return emailConfigDialog.handleEmailSubmit(
       emailFormValues,
       pdfReportDialog.reportData,
       pdfReportDialog.reportAttachment,
-      pdfReportDialog.reportFileName
+      pdfReportDialog.reportFileName,
+      originalPaymentDate // Pass the original payment date
     );
   };
 

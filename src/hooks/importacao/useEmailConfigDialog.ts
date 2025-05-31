@@ -59,7 +59,8 @@ Atenciosamente,
     emailFormValues: EmailFormValues,
     reportData: any,
     reportAttachment: Blob | null,
-    reportFileName: string
+    reportFileName: string,
+    originalPaymentDate?: string // Add optional parameter for original payment date
   ) => {
     try {
       // Show sending email toast
@@ -71,6 +72,9 @@ Atenciosamente,
       
       // If there's no Excel report (unlikely), create it now
       if (!emailAttachment && reportData) {
+        // Use the original payment date if provided, otherwise fallback to reportData
+        const paymentDateToUse = originalPaymentDate || reportData.dataPagamento || "Não definida";
+        
         const reportOptions = {
           companyName: emailFormValues.companyName,
           companyCnpj: emailFormValues.companyName.includes('CNPJ:') 
@@ -79,7 +83,7 @@ Atenciosamente,
           remittanceReference: emailFormValues.remittanceReference,
           responsibleName: emailFormValues.senderName,
           department: emailFormValues.senderDepartment,
-          paymentDate: reportData.dataPagamento || "Não definida"
+          paymentDate: paymentDateToUse // Use the original payment date
         };
         
         const excelReport = await generateRemittanceReport(reportData.beneficiarios, reportOptions);
