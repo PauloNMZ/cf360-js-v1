@@ -78,7 +78,8 @@ Atenciosamente,
             : "",
           remittanceReference: emailFormValues.remittanceReference,
           responsibleName: emailFormValues.senderName,
-          department: emailFormValues.senderDepartment
+          department: emailFormValues.senderDepartment,
+          paymentDate: reportData.dataPagamento || "Não definida"
         };
         
         const excelReport = await generateRemittanceReport(reportData.beneficiarios, reportOptions);
