@@ -5,6 +5,7 @@ import { ArrowRightLeft, Barcode, Receipt } from "lucide-react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPix } from '@fortawesome/free-brands-svg-icons';
 import { cn } from "@/lib/utils";
+import PixContent from './PixContent';
 
 interface PagamentosTabsProps {
   children: React.ReactNode;
@@ -50,11 +51,10 @@ const PagamentosTabs: React.FC<PagamentosTabsProps> = ({ children }) => {
       </TabsContent>
 
       <TabsContent value="pix">
-        <h2>Conteúdo de PIX</h2>
+        <PixContent />
       </TabsContent>
     </Tabs>
   );
 };
 
 export default PagamentosTabs;
-
