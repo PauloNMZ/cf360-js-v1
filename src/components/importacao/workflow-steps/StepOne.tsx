@@ -99,20 +99,20 @@ const StepOne: React.FC<StepOneProps> = ({ workflow, updateWorkflow }) => {
       </p>
       <div className="flex flex-col items-center space-y-4">
         <div className="w-full relative">
-          <div className="flex">
+          <div className="flex border border-input rounded-md focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 has-[:focus]:ring-2 has-[:focus]:ring-ring has-[:focus]:ring-offset-2">
             <Input
               type="text"
               placeholder="DD/MM/AAAA"
               value={inputValue}
               onChange={handleInputKeyPress}
-              className="flex-1 rounded-r-none border-r-0"
+              className="flex-1 border-0 rounded-r-none focus-visible:ring-0 focus-visible:ring-offset-0"
               maxLength={10}
             />
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="rounded-l-none border-l-0 px-3"
+                  className="rounded-l-none border-0 px-3 focus-visible:ring-0 focus-visible:ring-offset-0"
                   onClick={() => setOpen(true)}
                 >
                   <CalendarIcon className="h-4 w-4" />
