@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, FileOutput } from "lucide-react";
 import FavorecidoFormModal from '@/components/favorecidos/FavorecidoFormModal';
 import DeleteFavorecidoDialog from '@/components/favorecidos/DeleteFavorecidoDialog';
 import { useFavorecidos } from '@/hooks/favorecidos/useFavorecidos';
@@ -9,6 +9,7 @@ import FavorecidoSearchBar, { EmptyState } from '@/components/favorecidos/Favore
 import FavorecidosTable from '@/components/favorecidos/FavorecidosTable';
 import { Loader2 } from 'lucide-react';
 import SuccessModal from '@/components/ui/SuccessModal';
+import { toast } from "sonner";
 
 const LancamentoFavorecidos = () => {
   const {
@@ -47,6 +48,19 @@ const LancamentoFavorecidos = () => {
 
   const handleSelectionChange = (selectedIds: string[]) => {
     setSelectedFavorecidos(selectedIds);
+  };
+
+  const handleProcessSelected = () => {
+    if (selectedFavorecidos.length === 0) {
+      toast.error("Nenhum favorecido selecionado para processar.");
+      return;
+    }
+    
+    console.log("Processando favorecidos selecionados:", selectedFavorecidos);
+    toast.success(`${selectedFavorecidos.length} favorecido(s) sendo processado(s)...`);
+    
+    // Aqui será implementada a lógica de processamento dos favorecidos selecionados
+    // Por exemplo: abrir modal de lançamento em lote, redirecionar para tela de pagamento, etc.
   };
 
   const handleCloseSuccessModal = () => {
@@ -112,9 +126,18 @@ const LancamentoFavorecidos = () => {
                 <h4 className="text-lg font-semibold">
                   {selectedFavorecidos.length} favorecido(s) selecionado(s)
                 </h4>
-                <Button variant="outline" size="sm" onClick={() => setSelectedFavorecidos([])}>
-                  Limpar Seleção
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleProcessSelected}
+                    className="flex items-center gap-2"
+                  >
+                    <FileOutput size={16} />
+                    Processar Selecionados
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setSelectedFavorecidos([])}>
+                    Limpar Seleção
+                  </Button>
+                </div>
               </div>
               <div className="mt-4">
                 <p className="text-muted-foreground">
