@@ -71,12 +71,12 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
     return location.pathname === link || location.pathname.startsWith(`${link}/`);
   };
 
-  // Function to render icon with PIX icon handling
+  // Function to render icon with Pix icon handling
   const renderIcon = (module: any) => {
-    // Check for PIX module
+    // Check for Pix module
     const isPixModule = 
-      module.name === "Gestão de PIX" || 
-      module.name.includes("PIX") || 
+      module.name === "Gestão de Pix" || 
+      module.name.includes("Pix") || 
       module.icon === "PIX_ICON";
     
     if (isPixModule) {

@@ -29,7 +29,7 @@ const RecebimentosTabs: React.FC<RecebimentosTabsProps> = ({ children }) => {
         </TabsTrigger>
         <TabsTrigger value="pix" className="flex-1">
           <FontAwesomeIcon icon={faPix} className="w-4 h-4 mr-2" />
-          PIX
+          Pix
         </TabsTrigger>
         <TabsTrigger value="bbpay" className="flex-1">
           <Building className="w-4 h-4 mr-2" />
@@ -46,7 +46,7 @@ const RecebimentosTabs: React.FC<RecebimentosTabsProps> = ({ children }) => {
       </TabsContent>
 
       <TabsContent value="pix">
-        <h2>Conteúdo de PIX</h2>
+        <h2>Conteúdo de Pix</h2>
       </TabsContent>
 
       <TabsContent value="bbpay">

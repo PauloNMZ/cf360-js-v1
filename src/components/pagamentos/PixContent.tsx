@@ -22,14 +22,14 @@ const PixContent = () => {
       default:
         console.log("Renderizando default message");
         return (
-          <p className="text-center text-muted-foreground">Selecione uma opção de lançamento PIX acima.</p>
+          <p className="text-center text-muted-foreground">Selecione uma opção de lançamento Pix acima.</p>
         );
     }
   };
 
   return (
     <>
-      <h2 className="text-xl font-semibold mb-4">Opções de Lançamento PIX</h2>
+      <h2 className="text-xl font-semibold mb-4">Opções de Lançamento Pix</h2>
       <PixButtons 
         activePixTab={activePixTab}
         setActivePixTab={setActivePixTab}

@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPix } from '@fortawesome/free-brands-svg-icons';
 import { cn } from "@/lib/utils";
 import PixContent from './PixContent';
+import GuiasContent from './GuiasContent';
 
 interface PagamentosTabsProps {
   children: React.ReactNode;
@@ -34,7 +35,7 @@ const PagamentosTabs: React.FC<PagamentosTabsProps> = ({ children }) => {
         </TabsTrigger>
         <TabsTrigger value="pix" className="flex-1">
           <FontAwesomeIcon icon={faPix} className="w-4 h-4 mr-2" />
-          PIX
+          Pix
         </TabsTrigger>
       </TabsList>
 
@@ -47,7 +48,7 @@ const PagamentosTabs: React.FC<PagamentosTabsProps> = ({ children }) => {
       </TabsContent>
 
       <TabsContent value="guias">
-        <h2>Conteúdo de Guias</h2>
+        <GuiasContent />
       </TabsContent>
 
       <TabsContent value="pix">
