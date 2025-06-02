@@ -37,6 +37,14 @@ export const modularNavigationConfig: SidebarModule[] = [
       {
         name: "Conciliação",
         link: "/financeiro/conciliacao"
+      },
+      {
+        name: "Pagamentos",
+        link: "/financeiro/pagamentos"
+      },
+      {
+        name: "Recebimentos",
+        link: "/financeiro/recebimentos"
       }
     ]
   },
