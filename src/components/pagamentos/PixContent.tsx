@@ -29,7 +29,7 @@ const PixContent = () => {
 
   return (
     <>
-      <h2 className="text-xl font-semibold">Opções de Lançamento PIX</h2>
+      <h2 className="text-xl font-semibold mb-4">Opções de Lançamento PIX</h2>
       <PixButtons 
         activePixTab={activePixTab}
         setActivePixTab={setActivePixTab}
