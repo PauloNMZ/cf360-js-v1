@@ -1,11 +1,43 @@
-import { supabase, searchConvenentes } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
 import type { ConvenenteData } from "@/types/convenente";
 import { mapToCamelCase, mapToSnakeCase } from "./convenenteTransformers";
 
 export const searchConvenentesByTerm = async (searchTerm: string): Promise<Array<ConvenenteData & { id: string }>> => {
   try {
-    const { data, error } = await searchConvenentes(searchTerm);
+    if (!searchTerm || searchTerm.length < 2) {
+      // If query is too short, return all convenentes
+      const { data, error } = await supabase
+        .from('convenentes')
+        .select('id, razao_social, cnpj')
+        .order('razao_social', { ascending: true });
+        
+      if (error) throw new Error(error.message || "Erro ao buscar convenentes");
+      
+      return (data || []).map(item => ({
+        id: item.id,
+        razaoSocial: item.razao_social,
+        cnpj: item.cnpj,
+        endereco: "",
+        numero: "",
+        complemento: "",
+        uf: "",
+        cidade: "",
+        contato: "",
+        fone: "",
+        celular: "",
+        email: "",
+        agencia: "",
+        conta: "",
+        chavePix: "",
+        convenioPag: ""
+      }));
+    }
+    
+    // Call the Supabase RPC function directly
+    const { data, error } = await supabase.rpc('buscar_convenentes', { criterio: searchTerm });
+    
     if (error) throw new Error(error.message || "Erro ao buscar convenentes");
+    
     return (data || []).map(item => ({
       id: item.id,
       razaoSocial: item.razao_social,
