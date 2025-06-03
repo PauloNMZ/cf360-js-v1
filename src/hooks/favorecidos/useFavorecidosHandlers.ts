@@ -2,7 +2,7 @@
 import { FavorecidoData } from "@/types/favorecido";
 
 interface UseFavorecidosHandlersProps {
-  setCurrentFavorecido: (favorecido: FavorecidoData) => void;
+  setCurrentFavorecido: (favorecido: FavorecidoData | ((prev: FavorecidoData) => FavorecidoData)) => void;
   setSearchTerm: (term: string) => void;
 }
 
