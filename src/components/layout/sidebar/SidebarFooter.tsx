@@ -1,5 +1,5 @@
+
 import React from "react";
-import { LogOut } from "lucide-react";
 import { SidebarFooter as Footer } from "@/components/ui/sidebar";
 import { useSidebar } from "@/components/ui/sidebar";
 import { useTheme } from "@/hooks/use-theme";
@@ -30,16 +30,6 @@ const SidebarFooter = ({ onLogout }: SidebarFooterProps) => {
             )}
           </div>
           {!isCollapsed && <span>{isDark ? 'Modo Claro' : 'Modo Escuro'}</span>}
-        </button>
-        
-        <button
-          onClick={onLogout}
-          className="group relative flex w-full items-center gap-4 rounded-lg px-4 py-3 text-base font-medium text-foreground hover:bg-gray-100 dark:hover:bg-slate-800/70"
-        >
-          <div className="transition-transform duration-300 group-hover:translate-x-2">
-            <LogOut className="h-7 w-7 text-gray-500 dark:text-gray-400" strokeWidth={1.5} />
-          </div>
-          {!isCollapsed && <span>Sair</span>}
         </button>
       </div>
     </Footer>
