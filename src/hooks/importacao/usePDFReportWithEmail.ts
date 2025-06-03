@@ -3,13 +3,13 @@ import { useState } from 'react';
 import { ReportData, EmailFormValues } from '@/types/importacao';
 import { usePDFReportDialog } from './usePDFReportDialog';
 import { useEmailConfigDialog } from './useEmailConfigDialog';
-import { useNotificationModal } from '@/hooks/useNotificationModal';
+import { useNotificationModalContext } from '@/components/ui/NotificationModalProvider';
 
 export const usePDFReportWithEmail = () => {
   // Import smaller hooks
   const pdfReportDialog = usePDFReportDialog();
   const emailConfigDialog = useEmailConfigDialog();
-  const { showError, showWarning } = useNotificationModal();
+  const { showError, showWarning } = useNotificationModalContext();
 
   // Store the original payment date for email flow
   const [originalPaymentDate, setOriginalPaymentDate] = useState<string>('');

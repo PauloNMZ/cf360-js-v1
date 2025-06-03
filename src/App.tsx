@@ -10,7 +10,6 @@ import FavorecidosPage from "./pages/FavorecidosPage";
 import EmpresaPage from "./pages/EmpresaPage";
 import PagamentosPage from "./pages/PagamentosPage";
 import RecebimentosPage from "./pages/RecebimentosPage";
-import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/hooks/use-theme";
 import { AuthProvider } from "@/hooks/use-auth";
@@ -52,7 +51,6 @@ function App() {
                 </Route>
                 <Route path="*" element={<NotFound />} />
               </Routes>
-              <SonnerToaster position="top-right" />
               <Toaster />
             </NotificationModalProvider>
           </AuthProvider>

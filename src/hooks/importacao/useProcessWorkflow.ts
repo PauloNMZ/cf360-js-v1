@@ -4,7 +4,7 @@ import { validateFavorecidos } from '@/services/cnab240/validationService';
 import { useWorkflowDialog } from './useWorkflowDialog';
 import { useDirectoryDialog } from './useDirectoryDialog';
 import { useCNABGeneration } from './useCNABGeneration';
-import { useNotificationModal } from '@/hooks/useNotificationModal';
+import { useNotificationModalContext } from '@/components/ui/NotificationModalProvider';
 
 interface UseProcessWorkflowOptions {
   selectedConvenente?: any;
@@ -13,7 +13,7 @@ interface UseProcessWorkflowOptions {
 
 export const useProcessWorkflow = (getSelectedRows: () => any[], options: UseProcessWorkflowOptions = {}) => {
   const { selectedConvenente, hasSelectedConvenente = false } = options;
-  const { showError } = useNotificationModal();
+  const { showError } = useNotificationModalContext();
   
   // Import workflow-related hooks with convenente info
   const workflowDialog = useWorkflowDialog({ selectedConvenente, hasSelectedConvenente });

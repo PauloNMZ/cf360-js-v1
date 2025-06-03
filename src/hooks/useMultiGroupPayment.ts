@@ -3,14 +3,14 @@ import { useState } from 'react';
 import { Group } from "@/types/group";
 import { CNABWorkflowData } from "@/types/cnab240";
 import { useGroupOperations } from '@/services/group/hooks';
-import { useNotificationModal } from '@/hooks/useNotificationModal';
+import { useNotificationModalContext } from '@/components/ui/NotificationModalProvider';
 
 export const useMultiGroupPayment = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
   const [fileOption, setFileOption] = useState<'single' | 'multiple'>('single');
   const { fetchGroupDetails, fetchGroupMembers } = useGroupOperations();
-  const { showError, showSuccess } = useNotificationModal();
+  const { showError, showSuccess } = useNotificationModalContext();
   
   const handleSelectGroup = (groupId: string) => {
     if (selectedGroups.includes(groupId)) {

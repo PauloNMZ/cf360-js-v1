@@ -6,7 +6,7 @@ import {
   sendToAPI,
   ParsedCNABData
 } from '@/services/cnabToApiService';
-import { useNotificationModal } from '@/hooks/useNotificationModal';
+import { useNotificationModalContext } from '@/components/ui/NotificationModalProvider';
 
 export const useCNABToAPI = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -14,7 +14,7 @@ export const useCNABToAPI = () => {
   const [cnabData, setCnabData] = useState<ParsedCNABData | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [jsonOutput, setJsonOutput] = useState<string | null>(null);
-  const { showSuccess, showError } = useNotificationModal();
+  const { showSuccess, showError } = useNotificationModalContext();
 
   // Handle file selection
   const handleFileChange = (files: File[]) => {

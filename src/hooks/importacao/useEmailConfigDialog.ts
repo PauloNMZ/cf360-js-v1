@@ -4,13 +4,13 @@ import { EmailFormValues } from '@/types/importacao';
 import { sendEmail, logEmailActivity, getCurrentUserEmail } from '@/services/emailService';
 import { generateRemittanceReport } from '@/services/reports/remittanceReportService';
 import { formatarValorCurrency } from '@/utils/formatting/currencyUtils';
-import { useNotificationModal } from '@/hooks/useNotificationModal';
+import { useNotificationModalContext } from '@/components/ui/NotificationModalProvider';
 
 export const useEmailConfigDialog = () => {
   const [showEmailConfigDialog, setShowEmailConfigDialog] = useState(false);
   const [reportDate, setReportDate] = useState('');
   const [defaultEmailMessage, setDefaultEmailMessage] = useState('');
-  const { showSuccess, showError, showInfo } = useNotificationModal();
+  const { showSuccess, showError, showInfo } = useNotificationModalContext();
   
   const createDefaultEmailMessage = (formattedDate: string, totalValue: number) => {
     const formattedDateForEmail = formattedDate.split(' ')[0]; // Just the date part
