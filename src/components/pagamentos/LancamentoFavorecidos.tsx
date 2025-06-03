@@ -6,9 +6,9 @@ import { useLancamentoFavorecidosState } from '@/hooks/favorecidos/useLancamento
 import { useLancamentoFavorecidosHandlers } from '@/hooks/favorecidos/useLancamentoFavorecidosHandlers';
 import { useLancamentoFavorecidosReport } from '@/hooks/favorecidos/useLancamentoFavorecidosReport';
 import { Button } from "@/components/ui/button";
-import { Plus, Loader2 } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import FavorecidosTable from "@/components/favorecidos/FavorecidosTable";
+import { Plus } from "lucide-react";
+import FavorecidosListView from "./favorecidos/FavorecidosListView";
+import LancamentoFavorecidosDialogs from "./favorecidos/LancamentoFavorecidosDialogs";
 
 interface LancamentoFavorecidosProps {
   hidePixColumn?: boolean;
@@ -127,29 +127,20 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
       ) : (
         <>
           {/* List View */}
-          <div className="space-y-4">
-            <div className="flex gap-4">
-              <Input
-                placeholder="Buscar favorecidos..."
-                value={searchTerm}
-                onChange={handleSearchChange}
-                className="max-w-md"
-              />
-            </div>
-
-            {isLoading ? (
-              <div className="flex justify-center items-center h-64">
-                <Loader2 className="h-8 w-8 animate-spin" />
-              </div>
-            ) : (
-              <FavorecidosTable
-                favorecidos={filteredFavorecidos}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-                itemsPerPage={10}
-              />
-            )}
-          </div>
+          <FavorecidosListView
+            searchTerm={searchTerm}
+            onSearchChange={handleSearchChange}
+            isLoading={isLoading}
+            filteredFavorecidos={filteredFavorecidos}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onSelectFavorecido={handleSelectFavorecido}
+            selectedFavorecidos={selectedFavorecidos}
+            onSelectionChange={handleSelectionChange}
+            hidePixColumn={hidePixColumn}
+            hideBankColumn={hideBankColumn}
+            hideTipoColumn={hideTipoColumn}
+          />
 
           {/* Actions */}
           <div className="flex gap-4 items-center p-4 border rounded-md bg-muted/50">
@@ -188,6 +179,26 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
           </div>
         </>
       )}
+
+      {/* Dialogs */}
+      <LancamentoFavorecidosDialogs
+        modalOpen={modalOpen}
+        setModalOpen={setModalOpen}
+        currentFavorecido={currentFavorecido}
+        grupos={grupos}
+        handleInputChange={handleInputChange}
+        handleSelectChange={handleSelectChange}
+        handleSave={handleSave}
+        formMode={formMode}
+        isLoading={isLoading}
+        deleteDialogOpen={deleteDialogOpen}
+        setDeleteDialogOpen={setDeleteDialogOpen}
+        confirmDelete={confirmDelete}
+        notificationModalOpen={notificationModalOpen}
+        setNotificationModalOpen={setNotificationModalOpen}
+        notificationConfig={notificationConfig}
+        onCloseNotificationModal={handleCloseNotificationModal}
+      />
     </div>
   );
 };
