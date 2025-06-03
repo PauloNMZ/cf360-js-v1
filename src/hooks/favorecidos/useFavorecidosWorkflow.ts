@@ -101,7 +101,7 @@ export const useFavorecidosWorkflow = ({ selectedFavorecidos, favorecidos }: Use
     goToNextStep,
     goToPreviousStep,
     getTotalSteps,
-    getDisplayStepNumber,
+    getDisplayStepNumber: () => getDisplayStepNumber(currentStep),
     getStepTitle: () => getStepTitle(currentStep),
     
     // Processing
