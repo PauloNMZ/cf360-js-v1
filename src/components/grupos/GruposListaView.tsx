@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -6,8 +7,9 @@ import { Group } from "@/types/group";
 import { Plus, Edit, Trash2, Users, Search, ArrowLeft } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
+import { useNotificationModalContext } from "@/components/ui/NotificationModalProvider";
 import { useNavigate } from "react-router-dom";
+
 interface GruposListaViewProps {
   onCreateClick: () => void;
   onEditClick: (group: Group) => void;
@@ -15,6 +17,7 @@ interface GruposListaViewProps {
   onManageMembers: (group: Group) => void;
   refreshTrigger?: number;
 }
+
 const GruposListaView: React.FC<GruposListaViewProps> = ({
   onCreateClick,
   onEditClick,
@@ -26,24 +29,29 @@ const GruposListaView: React.FC<GruposListaViewProps> = ({
   const [filteredGroups, setFilteredGroups] = useState<Group[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const {
-    fetchGroups
-  } = useGroupOperations();
+  
+  const { fetchGroups } = useGroupOperations();
+  const { showError } = useNotificationModalContext();
   const navigate = useNavigate();
 
-  // Effect that runs when component mounts or refreshTrigger changes
   useEffect(() => {
     loadGroups();
-  }, [refreshTrigger]); // Added refreshTrigger dependency
+  }, [refreshTrigger]);
 
   useEffect(() => {
     if (searchTerm.trim() === "") {
       setFilteredGroups(groups);
     } else {
       const termo = searchTerm.trim().toLowerCase();
-      setFilteredGroups(groups.filter(group => group.nome.toLowerCase().includes(termo) || group.descricao && group.descricao.toLowerCase().includes(termo)));
+      setFilteredGroups(
+        groups.filter(group => 
+          group.nome.toLowerCase().includes(termo) || 
+          (group.descricao && group.descricao.toLowerCase().includes(termo))
+        )
+      );
     }
   }, [searchTerm, groups]);
+
   const loadGroups = async () => {
     setIsLoading(true);
     try {
@@ -52,18 +60,22 @@ const GruposListaView: React.FC<GruposListaViewProps> = ({
       setFilteredGroups(data);
     } catch (error) {
       console.error("Erro ao carregar grupos:", error);
-      toast.error("Não foi possível carregar os grupos");
+      showError("Erro!", "Não foi possível carregar os grupos");
     } finally {
       setIsLoading(false);
     }
   };
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
+
   const handleGoBack = () => {
     navigate(-1);
   };
-  return <Card className="w-full">
+
+  return (
+    <Card className="w-full">
       <CardHeader className="flex flex-row items-center justify-between">
         <div className="flex items-center gap-4">
           <Button variant="outline" onClick={handleGoBack} className="flex items-center gap-2">
@@ -81,24 +93,40 @@ const GruposListaView: React.FC<GruposListaViewProps> = ({
         <div className="mb-4 relative">
           <div className="relative w-80">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input type="search" placeholder="Buscar por nome ou descrição..." value={searchTerm} onChange={handleSearchChange} className="pl-10" />
+            <Input
+              type="search"
+              placeholder="Buscar por nome ou descrição..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              className="pl-10"
+            />
           </div>
         </div>
 
-        {isLoading ? <div className="space-y-2">
+        {isLoading ? (
+          <div className="space-y-2">
             <Skeleton className="h-12 w-full" />
             <Skeleton className="h-12 w-full" />
             <Skeleton className="h-12 w-full" />
-          </div> : filteredGroups.length === 0 ? <div className="text-center py-8">
-            {searchTerm.trim() !== "" ? <p className="text-muted-foreground">Nenhum grupo encontrado para "{searchTerm}"</p> : <>
+          </div>
+        ) : filteredGroups.length === 0 ? (
+          <div className="text-center py-8">
+            {searchTerm.trim() !== "" ? (
+              <p className="text-muted-foreground">Nenhum grupo encontrado para "{searchTerm}"</p>
+            ) : (
+              <>
                 <p className="text-muted-foreground">Nenhum grupo encontrado</p>
                 <Button variant="outline" className="mt-4" onClick={onCreateClick}>
                   <Plus size={16} className="mr-1" />
                   Criar Novo Grupo
                 </Button>
-              </>}
-          </div> : <div className="space-y-2">
-            {filteredGroups.map(group => <div key={group.id} className="flex items-center justify-between p-3 border rounded-md hover:bg-muted/50 transition-colors">
+              </>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {filteredGroups.map(group => (
+              <div key={group.id} className="flex items-center justify-between p-3 border rounded-md hover:bg-muted/50 transition-colors">
                 <div>
                   <h3 className="font-medium">{group.nome}</h3>
                   <p className="text-sm text-muted-foreground">{group.descricao || "Sem descrição"}</p>
@@ -110,13 +138,23 @@ const GruposListaView: React.FC<GruposListaViewProps> = ({
                   <Button variant="outline" size="icon" onClick={() => onEditClick(group)} title="Editar grupo">
                     <Edit size={16} />
                   </Button>
-                  <Button variant="outline" size="icon" onClick={() => onDeleteClick(group)} title="Excluir grupo" className="hover:bg-red-100 dark:hover:bg-red-900">
+                  <Button 
+                    variant="outline" 
+                    size="icon" 
+                    onClick={() => onDeleteClick(group)} 
+                    title="Excluir grupo" 
+                    className="hover:bg-red-100 dark:hover:bg-red-900"
+                  >
                     <Trash2 size={16} />
                   </Button>
                 </div>
-              </div>)}
-          </div>}
+              </div>
+            ))}
+          </div>
+        )}
       </CardContent>
-    </Card>;
+    </Card>
+  );
 };
+
 export default GruposListaView;
