@@ -2,7 +2,7 @@ import React from "react";
 import { FavorecidoData, TipoContaType } from "@/types/favorecido";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash, ChevronLeft, ChevronRight } from "lucide-react";
+import { Pencil, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { formatCurrency } from "@/utils/formatting/currencyUtils";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -156,8 +156,8 @@ const FavorecidosTable: React.FC<FavorecidosTableProps> = ({
                         <Button variant="ghost" size="icon" onClick={e => handleEditClick(e, favorecido)} className="hover:bg-blue-100 hover:text-blue-600">
                           <Pencil className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={e => handleDeleteClick(e, favorecido.id)} className="hover:text-red-600 bg-red-100">
-                          <Trash className="h-4 w-4" />
+                        <Button variant="outline" size="icon" onClick={e => handleDeleteClick(e, favorecido.id)} className="hover:bg-red-100 dark:hover:bg-red-900 hover:text-red-600">
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </TableCell>}
