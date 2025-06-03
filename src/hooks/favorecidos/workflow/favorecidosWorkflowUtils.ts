@@ -6,7 +6,7 @@ export const getStepTitle = (step: number): string => {
     case 1:
       return "Selecionar Convenente";
     case 2:
-      return "Configurar Pagamento";
+      return "Data de Pagamento";
     case 3:
       return "Revisar Dados";
     case 4:

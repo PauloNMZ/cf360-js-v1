@@ -9,11 +9,16 @@ export const useFavorecidosWorkflowState = () => {
   const [cnabFileName, setCnabFileName] = useState('');
   const [workflow, setWorkflow] = useState({
     convenente: null,
-    paymentDate: new Date()
+    paymentDate: null // Inicializar como null para permitir validação correta
   });
 
   const updateWorkflow = (updates: any) => {
-    setWorkflow(prev => ({ ...prev, ...updates }));
+    console.log("updateWorkflow called with:", updates);
+    setWorkflow(prev => {
+      const newWorkflow = { ...prev, ...updates };
+      console.log("Updated workflow:", newWorkflow);
+      return newWorkflow;
+    });
   };
 
   return {

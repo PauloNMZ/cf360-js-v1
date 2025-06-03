@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -81,29 +80,28 @@ const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
   function getDefaultStepTitle() {
     switch (currentStep) {
       case 1:
-        return "Data de Pagamento";
-      case 2:
-        return "Tipo de Serviço";
-      case 3:
         return "Selecionar Convenente";
+      case 2:
+        return "Data de Pagamento";
+      case 3:
+        return "Revisar Dados";
       case 4:
-        return "Método de Envio";
+        return "Finalizar";
       default:
         return "";
     }
   }
 
+  // Log current state for debugging
+  console.log("WorkflowDialog - currentStep:", currentStep, "workflow:", workflow, "isValid:", isCurrentStepValid());
+
   // Render step content with conditional logic
   const renderStepContent = () => {
     switch (currentStep) {
       case 1:
-        return <StepOne workflow={workflow} updateWorkflow={updateWorkflow} />;
-      case 2:
-        return <StepTwo workflow={workflow} updateWorkflow={updateWorkflow} />;
-      case 3:
-        // If convenente is pre-selected, show StepFour instead of StepThree
+        // If convenente is pre-selected, show StepTwo instead of StepThree
         if (hasSelectedConvenente) {
-          return <StepFour workflow={workflow} updateWorkflow={updateWorkflow} />;
+          return <StepTwo workflow={workflow} updateWorkflow={updateWorkflow} />;
         }
         return (
           <StepThree 
@@ -113,6 +111,10 @@ const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
             carregandoConvenentes={carregandoConvenentes}
           />
         );
+      case 2:
+        return <StepTwo workflow={workflow} updateWorkflow={updateWorkflow} />;
+      case 3:
+        return <StepOne workflow={workflow} updateWorkflow={updateWorkflow} />;
       case 4:
         return (
           <StepFour 
@@ -152,7 +154,7 @@ const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
               </Button>
             )}
             
-            {currentStep < (hasSelectedConvenente ? 4 : 4) ? (
+            {currentStep < actualTotalSteps ? (
               <Button 
                 onClick={goToNextStep}
                 disabled={!isCurrentStepValid()}
