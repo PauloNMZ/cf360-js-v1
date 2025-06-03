@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react';
 import { Group } from "@/types/group";
 import { useGroupOperations } from "@/services/group/hooks";
-import { toast } from "sonner";
 import { useNotificationModal } from "@/hooks/useNotificationModal";
 
 export const useGroupPayment = () => {
@@ -16,7 +15,7 @@ export const useGroupPayment = () => {
   const [hasError, setHasError] = useState(false);
   
   const { fetchGroups, fetchGroupMembers } = useGroupOperations();
-  const { isOpen: notificationModalOpen, config: notificationConfig, showSuccess, hideNotification } = useNotificationModal();
+  const { isOpen: notificationModalOpen, config: notificationConfig, showSuccess, showError, hideNotification } = useNotificationModal();
 
   useEffect(() => {
     console.log("useGroupPayment hook initialized");
@@ -34,7 +33,7 @@ export const useGroupPayment = () => {
     } catch (error) {
       console.error("Erro ao carregar grupos:", error);
       setHasError(true);
-      toast.error("Erro ao carregar grupos");
+      showError("Erro!", "Erro ao carregar grupos");
     } finally {
       setIsLoadingGroups(false);
     }
@@ -45,12 +44,12 @@ export const useGroupPayment = () => {
     console.log("Form submitted");
     
     if (!selectedGroupId) {
-      toast.error("Selecione um grupo");
+      showError("Erro!", "Selecione um grupo");
       return;
     }
     
     if (!paymentDate) {
-      toast.error("Informe a data de pagamento");
+      showError("Erro!", "Informe a data de pagamento");
       return;
     }
 
@@ -61,7 +60,7 @@ export const useGroupPayment = () => {
       const selectedGroup = groups.find(g => g.id === selectedGroupId);
       
       if (members.length === 0) {
-        toast.error("O grupo selecionado não possui membros");
+        showError("Erro!", "O grupo selecionado não possui membros");
         return;
       }
 
@@ -83,7 +82,7 @@ export const useGroupPayment = () => {
       
     } catch (error) {
       console.error("Erro ao processar lançamento:", error);
-      toast.error("Erro ao processar lançamento por grupo");
+      showError("Erro!", "Erro ao processar lançamento por grupo");
     } finally {
       setIsLoading(false);
     }

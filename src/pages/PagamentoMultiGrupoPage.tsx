@@ -1,15 +1,17 @@
+
 import React, { useState, useEffect } from "react";
 import { Group } from "@/types/group";
 import { useGroupOperations } from "@/services/group/hooks";
-import { toast } from "sonner";
 import { useMultiGroupPayment } from "@/hooks/useMultiGroupPayment";
 import GroupSelectionCard from "@/components/payment/multi-group/GroupSelectionCard";
 import FileOptionsCard from "@/components/payment/multi-group/FileOptionsCard";
+import { useNotificationModalContext } from "@/components/ui/NotificationModalProvider";
 
 const PagamentoMultiGrupoPage = () => {
   const [groups, setGroups] = useState<Group[]>([]);
   const [isLoadingGroups, setIsLoadingGroups] = useState(true);
   const { fetchGroups } = useGroupOperations();
+  const { showError } = useNotificationModalContext();
   const {
     selectedGroups,
     fileOption,
@@ -31,7 +33,7 @@ const PagamentoMultiGrupoPage = () => {
       setGroups(data);
     } catch (error) {
       console.error("Erro ao carregar grupos:", error);
-      toast.error("Erro ao carregar grupos");
+      showError("Erro!", "Erro ao carregar grupos");
     } finally {
       setIsLoadingGroups(false);
     }

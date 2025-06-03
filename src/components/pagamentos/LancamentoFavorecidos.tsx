@@ -9,7 +9,7 @@ import FavorecidoSearchBar, { EmptyState } from '@/components/favorecidos/Favore
 import FavorecidosTable from '@/components/favorecidos/FavorecidosTable';
 import { Loader2 } from 'lucide-react';
 import NotificationModal from '@/components/ui/NotificationModal';
-import { toast } from "sonner";
+import { useNotificationModalContext } from "@/components/ui/NotificationModalProvider";
 
 interface LancamentoFavorecidosProps {
   hidePixColumn?: boolean;
@@ -48,6 +48,7 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
 
   const [selectedFavorecido, setSelectedFavorecido] = useState<any>(null);
   const [selectedFavorecidos, setSelectedFavorecidos] = useState<string[]>([]);
+  const { showSuccess, showError } = useNotificationModalContext();
 
   const handleSelectFavorecido = (favorecido: any) => {
     setSelectedFavorecido(favorecido);
@@ -63,12 +64,12 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
 
   const handleProcessSelected = () => {
     if (selectedFavorecidos.length === 0) {
-      toast.error("Nenhum favorecido selecionado para processar.");
+      showError("Erro!", "Nenhum favorecido selecionado para processar.");
       return;
     }
     
     console.log("Processando favorecidos selecionados:", selectedFavorecidos);
-    toast.success(`${selectedFavorecidos.length} favorecido(s) sendo processado(s)...`);
+    showSuccess("Sucesso!", `${selectedFavorecidos.length} favorecido(s) sendo processado(s)...`);
     
     // Aqui será implementada a lógica de processamento dos favorecidos selecionados
     // Por exemplo: abrir modal de lançamento em lote, redirecionar para tela de pagamento, etc.

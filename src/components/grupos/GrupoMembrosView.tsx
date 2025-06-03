@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -8,7 +9,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
 import { 
   Select,
   SelectContent,
@@ -19,6 +19,7 @@ import {
 import { FavorecidoData } from "@/types/favorecido";
 import { useFavorecidos } from "@/hooks/favorecidos/useFavorecidos";
 import EditMemberDialog from "./EditMemberDialog";
+import { useNotificationModalContext } from "@/components/ui/NotificationModalProvider";
 
 interface GrupoMembrosViewProps {
   grupo: Group;
@@ -32,6 +33,7 @@ const GrupoMembrosView: React.FC<GrupoMembrosViewProps> = ({ grupo, onBack }) =>
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<GroupMember | null>(null);
   const { fetchGroupMembers, addMemberToGroup, removeMemberFromGroup, updateMemberInGroup } = useGroupOperations();
+  const { showSuccess, showError } = useNotificationModalContext();
 
   useEffect(() => {
     if (grupo) {
@@ -46,7 +48,7 @@ const GrupoMembrosView: React.FC<GrupoMembrosViewProps> = ({ grupo, onBack }) =>
       setMembers(data);
     } catch (error) {
       console.error("Erro ao carregar membros do grupo:", error);
-      toast.error("Não foi possível carregar os membros do grupo");
+      showError("Erro!", "Não foi possível carregar os membros do grupo");
     } finally {
       setIsLoading(false);
     }
@@ -61,10 +63,10 @@ const GrupoMembrosView: React.FC<GrupoMembrosViewProps> = ({ grupo, onBack }) =>
       });
       setIsAddDialogOpen(false);
       loadMembers();
-      toast.success("Favorecido adicionado ao grupo");
+      showSuccess("Sucesso!", "Favorecido adicionado ao grupo");
     } catch (error) {
       console.error("Erro ao adicionar membro ao grupo:", error);
-      toast.error("Erro ao adicionar favorecido ao grupo");
+      showError("Erro!", "Erro ao adicionar favorecido ao grupo");
     }
   };
 
@@ -72,10 +74,10 @@ const GrupoMembrosView: React.FC<GrupoMembrosViewProps> = ({ grupo, onBack }) =>
     try {
       await removeMemberFromGroup(memberId);
       loadMembers();
-      toast.success("Favorecido removido do grupo");
+      showSuccess("Sucesso!", "Favorecido removido do grupo");
     } catch (error) {
       console.error("Erro ao remover membro do grupo:", error);
-      toast.error("Erro ao remover favorecido do grupo");
+      showError("Erro!", "Erro ao remover favorecido do grupo");
     }
   };
 
@@ -90,10 +92,10 @@ const GrupoMembrosView: React.FC<GrupoMembrosViewProps> = ({ grupo, onBack }) =>
       setIsEditDialogOpen(false);
       setSelectedMember(null);
       loadMembers();
-      toast.success("Membro atualizado com sucesso");
+      showSuccess("Sucesso!", "Membro atualizado com sucesso");
     } catch (error) {
       console.error("Erro ao atualizar membro:", error);
-      toast.error("Erro ao atualizar membro");
+      showError("Erro!", "Erro ao atualizar membro");
     }
   };
 
