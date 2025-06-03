@@ -6,12 +6,11 @@ import {
   deleteFavorecido
 } from "@/services/favorecido/favorecidoService";
 import { FavorecidoData } from "@/types/favorecido";
-import { toast } from "sonner";
-import { useSuccessModal } from "@/hooks/useSuccessModal";
+import { useNotificationModal } from "@/hooks/useNotificationModal";
 
 export const useFavorecidosMutations = () => {
   const queryClient = useQueryClient();
-  const { showSuccess } = useSuccessModal();
+  const { showSuccess, showError } = useNotificationModal();
 
   // Mutation for creating/updating favorecidos
   const { mutate: saveMutation, isPending: isSaving } = useMutation({
@@ -28,15 +27,17 @@ export const useFavorecidosMutations = () => {
       const { mode } = variables;
       showSuccess(
         "Sucesso!",
-        mode === 'create' ? "Favorecido cadastrado com sucesso." : "Favorecido atualizado com sucesso.",
-        "OK"
+        mode === 'create' ? "Favorecido cadastrado com sucesso." : "Favorecido atualizado com sucesso."
       );
       queryClient.invalidateQueries({ queryKey: ['favorecidos'] });
     },
     onError: (error, variables) => {
       const { mode } = variables;
       console.error(`Erro ao ${mode === 'create' ? 'criar' : 'atualizar'} favorecido:`, error);
-      toast.error(`Erro ao ${mode === 'create' ? 'criar' : 'atualizar'} favorecido`);
+      showError(
+        "Erro!",
+        `Erro ao ${mode === 'create' ? 'criar' : 'atualizar'} favorecido`
+      );
     }
   });
 
@@ -46,12 +47,12 @@ export const useFavorecidosMutations = () => {
       return await deleteFavorecido(id);
     },
     onSuccess: () => {
-      showSuccess("Sucesso!", "Favorecido excluído com sucesso.", "OK");
+      showSuccess("Sucesso!", "Favorecido excluído com sucesso.");
       queryClient.invalidateQueries({ queryKey: ['favorecidos'] });
     },
     onError: (error) => {
       console.error("Erro ao excluir favorecido:", error);
-      toast.error("Erro ao excluir favorecido");
+      showError("Erro!", "Erro ao excluir favorecido");
     }
   });
 

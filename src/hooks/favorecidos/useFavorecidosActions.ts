@@ -1,6 +1,6 @@
 
 import { FavorecidoData, emptyFavorecido } from "@/types/favorecido";
-import { toast } from "sonner";
+import { useNotificationModal } from "@/hooks/useNotificationModal";
 
 interface UseFavorecidosActionsProps {
   setCurrentFavorecido: (favorecido: FavorecidoData) => void;
@@ -27,6 +27,7 @@ export const useFavorecidosActions = ({
   saveMutation,
   deleteMutation
 }: UseFavorecidosActionsProps) => {
+  const { showError } = useNotificationModal();
   
   // Create new favorecido
   const handleCreateNew = () => {
@@ -68,7 +69,7 @@ export const useFavorecidosActions = ({
     console.log("useFavorecidosActions - handleSave called");
     // Basic validation
     if (!currentFavorecido.nome.trim() || !currentFavorecido.inscricao.trim()) {
-      toast.error("Nome e Inscrição são campos obrigatórios");
+      showError("Campos obrigatórios", "Nome e Inscrição são campos obrigatórios");
       return;
     }
 

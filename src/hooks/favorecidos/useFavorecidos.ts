@@ -1,5 +1,5 @@
 
-import { useSuccessModal } from "@/hooks/useSuccessModal";
+import { useNotificationModal } from "@/hooks/useNotificationModal";
 import { useFavorecidosData } from "./useFavorecidosData";
 import { useFavorecidosMutations } from "./useFavorecidosMutations";
 import { useFavorecidosState } from "./useFavorecidosState";
@@ -40,8 +40,8 @@ export const useFavorecidos = () => {
     isDeleting
   } = useFavorecidosMutations();
 
-  // Success modal
-  const { isOpen: successModalOpen, config: successConfig, hideSuccess } = useSuccessModal();
+  // Notification modal
+  const { isOpen: notificationModalOpen, config: notificationConfig, hideNotification } = useNotificationModal();
 
   // Actions
   const {
@@ -86,8 +86,8 @@ export const useFavorecidos = () => {
     formMode,
     deleteDialogOpen,
     favorecidoToDelete,
-    successModalOpen,
-    successConfig,
+    notificationModalOpen,
+    notificationConfig,
     handleCreateNew,
     handleEdit,
     handleDelete,
@@ -98,7 +98,7 @@ export const useFavorecidos = () => {
     handleSave,
     setModalOpen,
     setDeleteDialogOpen,
-    setSuccessModalOpen: hideSuccess,
+    setNotificationModalOpen: hideNotification,
     refetch,
   };
 };
