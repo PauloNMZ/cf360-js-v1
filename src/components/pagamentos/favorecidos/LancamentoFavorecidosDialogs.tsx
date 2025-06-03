@@ -1,3 +1,4 @@
+
 import React from 'react';
 import FavorecidoFormModal from "@/components/favorecidos/FavorecidoFormModal";
 import DeleteFavorecidoDialog from "@/components/favorecidos/DeleteFavorecidoDialog";
@@ -71,12 +72,13 @@ const LancamentoFavorecidosDialogs: React.FC<LancamentoFavorecidosDialogsProps> 
       {/* Notification Modal */}
       {notificationModalOpen && (
         <NotificationModal
-          isOpen={notificationModalOpen}
-          onClose={onCloseNotificationModal}
+          open={notificationModalOpen}
+          onOpenChange={(open) => !open && onCloseNotificationModal()}
           type={notificationConfig.type}
           title={notificationConfig.title}
           message={notificationConfig.message}
           buttonText={notificationConfig.buttonText}
+          onButtonClick={onCloseNotificationModal}
         />
       )}
     </>
