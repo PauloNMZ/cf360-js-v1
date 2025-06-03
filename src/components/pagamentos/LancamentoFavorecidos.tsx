@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Plus, FileOutput } from "lucide-react";
@@ -7,7 +8,7 @@ import { useFavorecidos } from '@/hooks/favorecidos/useFavorecidos';
 import FavorecidoSearchBar, { EmptyState } from '@/components/favorecidos/FavorecidoSearchBar';
 import FavorecidosTable from '@/components/favorecidos/FavorecidosTable';
 import { Loader2 } from 'lucide-react';
-import SuccessModal from '@/components/ui/SuccessModal';
+import NotificationModal from '@/components/ui/NotificationModal';
 import { toast } from "sonner";
 
 interface LancamentoFavorecidosProps {
@@ -37,9 +38,9 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
     filteredFavorecidos,
     searchTerm,
     handleSearchChange,
-    successModalOpen,
-    successConfig,
-    setSuccessModalOpen,
+    notificationModalOpen,
+    notificationConfig,
+    setNotificationModalOpen,
     deleteDialogOpen,
     setDeleteDialogOpen,
     grupos,
@@ -73,8 +74,8 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
     // Por exemplo: abrir modal de lançamento em lote, redirecionar para tela de pagamento, etc.
   };
 
-  const handleCloseSuccessModal = () => {
-    setSuccessModalOpen();
+  const handleCloseNotificationModal = () => {
+    setNotificationModalOpen();
   };
 
   return (
@@ -181,13 +182,14 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
         isDeleting={isLoading}
       />
 
-      <SuccessModal
-        open={successModalOpen}
-        onOpenChange={setSuccessModalOpen}
-        title={successConfig.title}
-        message={successConfig.message}
-        buttonText={successConfig.buttonText}
-        onButtonClick={handleCloseSuccessModal}
+      <NotificationModal
+        open={notificationModalOpen}
+        onOpenChange={setNotificationModalOpen}
+        type={notificationConfig.type}
+        title={notificationConfig.title}
+        message={notificationConfig.message}
+        buttonText={notificationConfig.buttonText}
+        onButtonClick={handleCloseNotificationModal}
       />
     </div>
   );

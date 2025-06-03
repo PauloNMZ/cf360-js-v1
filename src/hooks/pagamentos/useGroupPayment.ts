@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Group } from "@/types/group";
 import { useGroupOperations } from "@/services/group/hooks";
 import { toast } from "sonner";
-import { useSuccessModal } from "@/hooks/useSuccessModal";
+import { useNotificationModal } from "@/hooks/useNotificationModal";
 
 export const useGroupPayment = () => {
   const [groups, setGroups] = useState<Group[]>([]);
@@ -16,7 +16,7 @@ export const useGroupPayment = () => {
   const [hasError, setHasError] = useState(false);
   
   const { fetchGroups, fetchGroupMembers } = useGroupOperations();
-  const { isOpen: successModalOpen, config: successConfig, showSuccess, hideSuccess } = useSuccessModal();
+  const { isOpen: notificationModalOpen, config: notificationConfig, showSuccess, hideNotification } = useNotificationModal();
 
   useEffect(() => {
     console.log("useGroupPayment hook initialized");
@@ -107,8 +107,8 @@ export const useGroupPayment = () => {
     selectedGroup,
     loadGroups,
     handleSubmit,
-    successModalOpen,
-    successConfig,
-    hideSuccess
+    notificationModalOpen,
+    notificationConfig,
+    hideNotification
   };
 };
