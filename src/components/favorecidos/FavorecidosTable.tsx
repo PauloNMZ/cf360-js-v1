@@ -1,4 +1,3 @@
-
 import React from "react";
 import { FavorecidoData, TipoContaType } from "@/types/favorecido";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -137,7 +136,6 @@ const FavorecidosTable: React.FC<FavorecidosTableProps> = ({
                 )}
                 <TableHead className="table-header-elegant">NOME</TableHead>
                 <TableHead className="table-header-elegant">INSCRIÇÃO</TableHead>
-                <TableHead className="table-header-elegant">TIPO</TableHead>
                 <TableHead className="table-header-elegant">BANCO/AGÊNCIA/CONTA</TableHead>
                 <TableHead className="table-header-elegant">TIPO</TableHead>
                 <TableHead className="table-header-elegant">CHAVE PIX</TableHead>
@@ -166,7 +164,6 @@ const FavorecidosTable: React.FC<FavorecidosTableProps> = ({
                   )}
                   <TableCell className="font-medium">{favorecido.nome}</TableCell>
                   <TableCell>{favorecido.inscricao}</TableCell>
-                  <TableCell>{favorecido.tipoInscricao}</TableCell>
                   <TableCell>
                     {favorecido.banco && favorecido.agencia && favorecido.conta 
                       ? `${favorecido.banco} / ${favorecido.agencia} / ${favorecido.conta}` 

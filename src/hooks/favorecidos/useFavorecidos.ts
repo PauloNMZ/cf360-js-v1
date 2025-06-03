@@ -10,6 +10,7 @@ import {
 import { useGroupOperations } from "@/services/group/hooks";
 import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { validarInscricao } from "@/utils/validation/registrationUtils";
 
 export const useFavorecidos = () => {
   const queryClient = useQueryClient();
@@ -87,7 +88,7 @@ export const useFavorecidos = () => {
     }
   });
 
-  // Mutation for deleting favorecidos
+  // Delete favorecido
   const { mutate: deleteMutation, isPending: isDeleting } = useMutation({
     mutationFn: async (id: string) => {
       return await deleteFavorecido(id);
@@ -137,12 +138,6 @@ export const useFavorecidos = () => {
     deleteMutation(favorecidoToDelete);
   };
 
-  // Handle input change
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setCurrentFavorecido(prev => ({ ...prev, [name]: value }));
-  };
-
   // Handle select change
   const handleSelectChange = (name: string, value: string) => {
     setCurrentFavorecido(prev => ({ ...prev, [name]: value }));
@@ -166,6 +161,29 @@ export const useFavorecidos = () => {
   };
 
   const isLoading = isLoadingFavorecidos || isSearching || isSaving || isDeleting || isLoadingGroups;
+
+  // Function to determine if inscription is CPF or CNPJ
+  const determineTipoInscricao = (inscricao: string): "CPF" | "CNPJ" => {
+    const limpo = inscricao.replace(/\D/g, '');
+    return limpo.length <= 11 ? "CPF" : "CNPJ";
+  };
+
+  // Handle input change with automatic tipo detection
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    
+    // If changing inscription, automatically determine the type
+    if (name === 'inscricao') {
+      const tipoInscricao = determineTipoInscricao(value);
+      setCurrentFavorecido(prev => ({ 
+        ...prev, 
+        [name]: value,
+        tipoInscricao
+      }));
+    } else {
+      setCurrentFavorecido(prev => ({ ...prev, [name]: value }));
+    }
+  };
 
   return {
     favorecidos,

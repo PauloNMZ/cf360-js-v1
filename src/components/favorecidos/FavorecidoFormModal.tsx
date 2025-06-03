@@ -63,31 +63,15 @@ const FavorecidoFormModal: React.FC<FavorecidoFormModalProps> = ({
             />
           </FormField>
 
-          <div className="grid grid-cols-3 gap-3">
-            <FormField name="inscricao" label="Inscrição" required className="col-span-2">
-              <Input 
-                id="inscricao"
-                name="inscricao"
-                value={currentFavorecido.inscricao}
-                onChange={handleInputChange}
-                placeholder="CPF ou CNPJ"
-              />
-            </FormField>
-            <FormField name="tipoInscricao" label="Tipo" className="w-full">
-              <Select 
-                value={currentFavorecido.tipoInscricao}
-                onValueChange={(value) => handleSelectChange("tipoInscricao", value)}
-              >
-                <SelectTrigger id="tipoInscricao">
-                  <SelectValue placeholder="Tipo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="CPF">CPF</SelectItem>
-                  <SelectItem value="CNPJ">CNPJ</SelectItem>
-                </SelectContent>
-              </Select>
-            </FormField>
-          </div>
+          <FormField name="inscricao" label="Inscrição" required className="w-full">
+            <Input 
+              id="inscricao"
+              name="inscricao"
+              value={currentFavorecido.inscricao}
+              onChange={handleInputChange}
+              placeholder="CPF ou CNPJ"
+            />
+          </FormField>
         </div>
 
         <div className="grid grid-cols-4 gap-4 mt-4">
