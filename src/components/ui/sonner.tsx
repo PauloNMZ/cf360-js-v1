@@ -1,41 +1,35 @@
 
 import { useTheme } from "@/hooks/use-theme";
-import { Toaster as Sonner } from "sonner";
 
-type ToasterProps = React.ComponentProps<typeof Sonner>;
+type ToasterProps = any;
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  const { theme = "light" } = useTheme();
-
-  return (
-    <Sonner
-      theme={theme as ToasterProps["theme"]}
-      className="toaster group"
-      position="bottom-right"
-      richColors
-      closeButton
-      expand
-      toastOptions={{
-        classNames: {
-          toast:
-            "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg",
-          description: "group-[.toast]:text-muted-foreground",
-          actionButton:
-            "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground",
-          cancelButton:
-            "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
-        },
-        duration: 5000,
-        style: {
-          padding: '12px',
-          borderRadius: '8px',
-        }
-      }}
-      {...props}
-    />
-  );
+  // Return null to disable Sonner toast notifications
+  // All notifications now use the Modal Universal system
+  return null;
 };
 
 export { Toaster };
 
-export { toast } from "sonner";
+// Disabled toast function - all notifications use Modal Universal
+export const toast = {
+  success: (message: string, options?: any) => {
+    console.log("Sonner toast blocked - using Modal Universal instead:", message);
+  },
+  error: (message: string, options?: any) => {
+    console.log("Sonner toast blocked - using Modal Universal instead:", message);
+  },
+  warning: (message: string, options?: any) => {
+    console.log("Sonner toast blocked - using Modal Universal instead:", message);
+  },
+  info: (message: string, options?: any) => {
+    console.log("Sonner toast blocked - using Modal Universal instead:", message);
+  },
+  promise: (promise: Promise<any>, options?: any) => {
+    console.log("Sonner toast promise blocked - using Modal Universal instead");
+    return promise;
+  },
+  dismiss: (id?: string) => {
+    console.log("Sonner toast dismiss blocked - using Modal Universal instead");
+  }
+};

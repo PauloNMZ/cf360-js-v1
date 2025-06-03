@@ -2,10 +2,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { ConvenenteData } from "@/types/convenente";
 import { searchConvenentesByTerm } from "@/services/convenente/convenenteApi";
-import { useToast } from "@/hooks/use-toast";
 
 export const useConvenenteSearch = (convenentes: Array<ConvenenteData & { id: string }>) => {
-  const { toast } = useToast();
   
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredConvenentes, setFilteredConvenentes] = useState<Array<ConvenenteData & { id: string }>>([]);
@@ -29,11 +27,6 @@ export const useConvenenteSearch = (convenentes: Array<ConvenenteData & { id: st
         setFilteredConvenentes(searchResults);
       } catch (error) {
         console.error("Erro na pesquisa:", error);
-        toast({
-          title: "Erro na pesquisa",
-          description: "Ocorreu um erro ao pesquisar convenentes.",
-          variant: "destructive",
-        });
         // If search fails, fallback to all convenentes
         setFilteredConvenentes(convenentes);
       } finally {
@@ -47,7 +40,7 @@ export const useConvenenteSearch = (convenentes: Array<ConvenenteData & { id: st
     }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [searchTerm, convenentes, toast]);
+  }, [searchTerm, convenentes]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);

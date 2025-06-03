@@ -1,6 +1,5 @@
 
 import { useRef } from "react";
-import { useToast } from "@/hooks/use-toast";
 import { ConvenenteData } from "@/types/convenente";
 
 export const useActionHandlers = ({
@@ -12,7 +11,6 @@ export const useActionHandlers = ({
   indexPageActions: any;
   isDeleting: boolean;
 }) => {
-  const { toast } = useToast();
   const actionInProgressRef = useRef(false);
   const saveActionInProgressRef = useRef(false);
 
@@ -37,20 +35,12 @@ export const useActionHandlers = ({
     
     try {
       if (!indexPage.formData.cnpj || indexPage.formData.cnpj.trim() === '') {
-        toast({
-          title: "Dados incompletos",
-          description: "CNPJ é obrigatório.",
-          variant: "destructive",
-        });
+        console.log("Validation error: CNPJ é obrigatório");
         return;
       }
       
       if (!indexPage.formData.razaoSocial || indexPage.formData.razaoSocial.trim() === '') {
-        toast({
-          title: "Dados incompletos",
-          description: "Razão Social é obrigatória.",
-          variant: "destructive",
-        });
+        console.log("Validation error: Razão Social é obrigatória");
         return;
       }
       

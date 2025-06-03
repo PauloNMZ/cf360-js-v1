@@ -148,33 +148,16 @@ function dispatch(action: Action) {
 // Renamed to fix circular reference
 type ToastProps = Omit<ToasterToast, "id">
 
+// Deprecated: This function is now disabled to prevent toast notifications
+// All notifications should use the Modal Universal system
 function toast({ ...props }: ToastProps) {
-  const id = genId()
-
-  const update = (props: ToasterToast) =>
-    dispatch({
-      type: "UPDATE_TOAST",
-      toast: { ...props, id },
-    })
-  const dismiss = () => 
-    dispatch({ type: "DISMISS_TOAST", toastId: id, onDismiss: props.onDismiss });
-
-  dispatch({
-    type: "ADD_TOAST",
-    toast: {
-      ...props,
-      id,
-      open: true,
-      onOpenChange: (open) => {
-        if (!open) dismiss()
-      },
-    },
-  })
-
+  console.log("Toast notification blocked - using Modal Universal instead:", props.title, props.description);
+  
+  // Return dummy functions to maintain compatibility
   return {
-    id: id,
-    dismiss,
-    update,
+    id: "disabled",
+    dismiss: () => {},
+    update: () => {},
   }
 }
 
@@ -191,10 +174,20 @@ function useToast() {
     }
   }, [state])
 
+  // Return disabled toast functions
   return {
     ...state,
-    toast,
-    dismiss: (toastId?: string) => dispatch({ type: "DISMISS_TOAST", toastId }),
+    toast: ({ ...props }: ToastProps) => {
+      console.log("Toast notification blocked - using Modal Universal instead:", props.title, props.description);
+      return {
+        id: "disabled",
+        dismiss: () => {},
+        update: () => {},
+      }
+    },
+    dismiss: (toastId?: string) => {
+      console.log("Toast dismiss blocked - using Modal Universal instead");
+    },
   }
 }
 

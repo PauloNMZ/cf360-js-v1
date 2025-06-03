@@ -1,10 +1,8 @@
 
 import { useState } from "react";
 import { ConvenenteData, emptyConvenente } from "@/types/convenente";
-import { useToast } from "@/hooks/use-toast";
 
 export const useConvenenteModal = () => {
-  const { toast } = useToast();
   
   // Modal states
   const [modalOpen, setModalOpen] = useState(false);
