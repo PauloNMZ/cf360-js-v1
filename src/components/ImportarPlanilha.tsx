@@ -130,7 +130,7 @@ const ImportarPlanilha = () => {
         getTotalSteps={getTotalSteps}
         getDisplayStepNumber={getDisplayStepNumber}
         getStepTitle={getStepTitle}
-        hasSelectedConvenente={hasSelectedConvenente}
+        hasSelectedCompany={hasSelectedConvenente}
       />
 
       {/* Directory configuration dialog */}

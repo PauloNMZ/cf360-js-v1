@@ -155,7 +155,7 @@ export default function ImportacaoModal({ isOpen, onOpenChange }: ImportacaoModa
         getTotalSteps={getTotalSteps}
         getDisplayStepNumber={getDisplayStepNumber}
         getStepTitle={getStepTitle}
-        hasSelectedConvenente={hasSelectedConvenente}
+        hasSelectedCompany={hasSelectedConvenente}
       />
 
       <DirectoryDialog
