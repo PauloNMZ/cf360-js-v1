@@ -1,60 +1,55 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { FileOutput, FileText } from "lucide-react";
 
 interface SelectedFavorecidosActionsProps {
-  selectedCount: number;
-  onProcessSelected: () => void;
-  onGenerateReport: () => void;
-  onClearSelection: () => void;
+  selectedFavorecidos: string[];
   hasConvenente: boolean;
+  onClearSelection: () => void;
+  onGenerateReport: () => void;
+  onProcessSelected: () => void;
 }
 
 const SelectedFavorecidosActions: React.FC<SelectedFavorecidosActionsProps> = ({
-  selectedCount,
-  onProcessSelected,
-  onGenerateReport,
+  selectedFavorecidos,
+  hasConvenente,
   onClearSelection,
-  hasConvenente
+  onGenerateReport,
+  onProcessSelected
 }) => {
-  if (selectedCount === 0) return null;
-
   return (
-    <div className="mt-4 p-4 border rounded-md bg-background">
-      <div className="flex justify-between items-center">
-        <h4 className="text-lg font-semibold">
-          {selectedCount} favorecido(s) selecionado(s)
-        </h4>
-        <div className="flex gap-2">
-          <Button
-            onClick={onProcessSelected}
-            className="flex items-center gap-2"
+    <div className="flex gap-4 items-center p-4 border rounded-md bg-muted/50">
+      <span className="text-sm text-muted-foreground">
+        {selectedFavorecidos.length} favorecido(s) selecionado(s)
+      </span>
+      
+      <div className="flex gap-2 ml-auto">
+        {selectedFavorecidos.length > 0 && (
+          <Button 
+            variant="outline" 
+            onClick={onClearSelection}
+            size="sm"
           >
-            <FileOutput size={16} />
-            Processar Selecionados
-          </Button>
-          <Button
-            onClick={onGenerateReport}
-            variant="outline"
-            className="flex items-center gap-2"
-            disabled={!hasConvenente}
-          >
-            <FileText size={16} />
-            Gerar Relatório
-          </Button>
-          <Button variant="outline" size="sm" onClick={onClearSelection}>
             Limpar Seleção
           </Button>
-        </div>
-      </div>
-      <div className="mt-4">
-        <p className="text-muted-foreground">
-          Clique em "Processar Selecionados" para gerar arquivo CNAB + relatório, ou "Gerar Relatório" para apenas o relatório.
-          {!hasConvenente && (
-            <span className="text-orange-600"> (Selecione um convenente primeiro para gerar relatório)</span>
-          )}
-        </p>
+        )}
+        
+        <Button 
+          onClick={onGenerateReport}
+          disabled={selectedFavorecidos.length === 0 || !hasConvenente}
+          variant="outline"
+          size="sm"
+        >
+          Gerar Relatório
+        </Button>
+        
+        <Button 
+          onClick={onProcessSelected}
+          disabled={selectedFavorecidos.length === 0}
+          size="sm"
+        >
+          Processar Selecionados
+        </Button>
       </div>
     </div>
   );

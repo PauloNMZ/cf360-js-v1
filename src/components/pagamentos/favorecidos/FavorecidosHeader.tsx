@@ -3,11 +3,11 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
-interface FavorecidoHeaderProps {
+interface FavorecidosHeaderProps {
   onCreateNew: () => void;
 }
 
-const FavorecidoHeader: React.FC<FavorecidoHeaderProps> = ({ onCreateNew }) => {
+const FavorecidosHeader: React.FC<FavorecidosHeaderProps> = ({ onCreateNew }) => {
   return (
     <div className="flex justify-between items-center mb-6">
       <h2 className="text-xl font-semibold">Favorecidos</h2>
@@ -19,4 +19,4 @@ const FavorecidoHeader: React.FC<FavorecidoHeaderProps> = ({ onCreateNew }) => {
   );
 };
 
-export default FavorecidoHeader;
+export default FavorecidosHeader;

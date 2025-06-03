@@ -4,12 +4,12 @@ import { Button } from "@/components/ui/button";
 
 interface SelectedFavorecidoViewProps {
   selectedFavorecido: any;
-  onCancel: () => void;
+  onCancelSelection: () => void;
 }
 
 const SelectedFavorecidoView: React.FC<SelectedFavorecidoViewProps> = ({
   selectedFavorecido,
-  onCancel
+  onCancelSelection
 }) => {
   return (
     <div className="p-4 border rounded-md bg-background">
@@ -17,7 +17,7 @@ const SelectedFavorecidoView: React.FC<SelectedFavorecidoViewProps> = ({
       <p><strong>Nome:</strong> {selectedFavorecido?.nome}</p>
       <p><strong>Inscrição:</strong> {selectedFavorecido?.inscricao}</p>
       <div className="mt-4">
-        <Button variant="outline" onClick={onCancel}>
+        <Button variant="outline" onClick={onCancelSelection}>
           Voltar à Lista
         </Button>
       </div>
