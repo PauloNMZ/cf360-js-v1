@@ -1,3 +1,4 @@
+
 import React from 'react';
 import FavorecidoFormModal from "@/components/favorecidos/FavorecidoFormModal";
 import DeleteFavorecidoDialog from "@/components/favorecidos/DeleteFavorecidoDialog";
@@ -41,6 +42,8 @@ interface LancamentoFavorecidosDialogsProps {
   handleSubmitWorkflow?: () => void;
   convenentes?: any[];
   carregandoConvenentes?: boolean;
+  hasSelectedCompany?: boolean;
+  selectedCompany?: any;
 }
 
 const LancamentoFavorecidosDialogs: React.FC<LancamentoFavorecidosDialogsProps> = ({
@@ -74,7 +77,9 @@ const LancamentoFavorecidosDialogs: React.FC<LancamentoFavorecidosDialogsProps> 
   isCurrentStepValid,
   handleSubmitWorkflow,
   convenentes = [],
-  carregandoConvenentes = false
+  carregandoConvenentes = false,
+  hasSelectedCompany = false,
+  selectedCompany = null
 }) => {
   return (
     <>
@@ -117,7 +122,8 @@ const LancamentoFavorecidosDialogs: React.FC<LancamentoFavorecidosDialogsProps> 
           getTotalSteps={getTotalSteps}
           getDisplayStepNumber={getDisplayStepNumber}
           getStepTitle={getStepTitle}
-          hasSelectedConvenente={false}
+          hasSelectedCompany={hasSelectedCompany}
+          selectedCompany={selectedCompany}
         />
       )}
 

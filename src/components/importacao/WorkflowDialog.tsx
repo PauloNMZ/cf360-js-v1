@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -50,7 +51,8 @@ interface ExtendedWorkflowDialogProps extends WorkflowDialogProps {
   getTotalSteps?: () => number;
   getDisplayStepNumber?: (step: number) => number;
   getStepTitle?: () => string;
-  hasSelectedConvenente?: boolean;
+  hasSelectedCompany?: boolean;
+  selectedCompany?: any;
 }
 
 const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
@@ -69,7 +71,8 @@ const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
   getTotalSteps,
   getDisplayStepNumber,
   getStepTitle,
-  hasSelectedConvenente = false
+  hasSelectedCompany = false,
+  selectedCompany = null
 }) => {
   // Use custom functions if provided, otherwise fallback to defaults
   const actualTotalSteps = getTotalSteps ? getTotalSteps() : totalSteps;
@@ -105,7 +108,8 @@ const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
             updateWorkflow={updateWorkflow} 
             convenentes={convenentes}
             carregandoConvenentes={carregandoConvenentes}
-            hasSelectedConvenente={hasSelectedConvenente}
+            hasSelectedCompany={hasSelectedCompany}
+            selectedCompany={selectedCompany}
           />
         );
       case 2:

@@ -175,6 +175,8 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
         handleSubmitWorkflow={workflowData.handleSubmitWorkflow}
         convenentes={workflowData.convenentes}
         carregandoConvenentes={workflowData.carregandoConvenentes}
+        hasSelectedCompany={workflowData.hasSelectedCompany}
+        selectedCompany={workflowData.selectedCompany}
       />
     </div>
   );
