@@ -53,6 +53,13 @@ const FavorecidosListView: React.FC<FavorecidosListViewProps> = ({
           favorecidos={filteredFavorecidos}
           onEdit={onEdit}
           onDelete={onDelete}
+          onSelectFavorecido={onSelectFavorecido}
+          selectedFavorecidos={selectedFavorecidos}
+          onSelectionChange={onSelectionChange}
+          showActions={false}
+          hidePixColumn={hidePixColumn}
+          hideBankColumn={hideBankColumn}
+          hideTipoColumn={hideTipoColumn}
           itemsPerPage={10}
         />
       )}
