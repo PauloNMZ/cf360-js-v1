@@ -59,12 +59,20 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
     setShowWorkflowDialog,
     showDirectoryDialog,
     setShowDirectoryDialog,
+    currentStep,
     workflow,
     updateWorkflow,
     isCurrentStepValid,
+    goToNextStep,
+    goToPreviousStep,
+    getTotalSteps,
+    getDisplayStepNumber,
+    getStepTitle,
     handleOpenDirectorySettings,
     handleSaveDirectorySettings,
-    handleSubmitWorkflow
+    handleSubmitWorkflow,
+    convenentes,
+    carregandoConvenentes
   } = useFavorecidosWorkflow({
     selectedFavorecidos,
     favorecidos: filteredFavorecidos
@@ -103,7 +111,7 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
     
     console.log("Abrindo workflow para favorecidos selecionados:", selectedFavorecidos);
     
-    // Open workflow dialog directly on StepFour (Method Selection)
+    // Open workflow dialog starting with convenente selection
     setShowWorkflowDialog(true);
   };
 
@@ -196,24 +204,24 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
         </div>
       )}
 
-      {/* Workflow Dialog - showing only StepFour */}
+      {/* Workflow Dialog - complete flow with convenente selection */}
       <WorkflowDialog 
         isOpen={showWorkflowDialog}
         onOpenChange={setShowWorkflowDialog}
         workflow={workflow}
         updateWorkflow={updateWorkflow}
-        currentStep={4} // Always show StepFour (Method Selection)
-        totalSteps={4}
-        goToNextStep={() => {}} // Not needed for single step
-        goToPreviousStep={() => setShowWorkflowDialog(false)} // Close dialog
+        currentStep={currentStep}
+        totalSteps={4} // Keep original totalSteps for proper rendering
+        goToNextStep={goToNextStep}
+        goToPreviousStep={goToPreviousStep}
         handleSubmit={handleSubmitWorkflow}
         isCurrentStepValid={isCurrentStepValid}
-        convenentes={[]} // Not needed for this workflow
-        carregandoConvenentes={false}
-        getTotalSteps={() => 1} // Only one step to show
-        getDisplayStepNumber={() => 1} // Show as step 1
-        getStepTitle={() => "Método de Envio"}
-        hasSelectedConvenente={true} // Skip convenente selection
+        convenentes={convenentes}
+        carregandoConvenentes={carregandoConvenentes}
+        getTotalSteps={getTotalSteps}
+        getDisplayStepNumber={getDisplayStepNumber}
+        getStepTitle={getStepTitle}
+        hasSelectedConvenente={false} // Show convenente selection step
       />
 
       {/* Directory configuration dialog */}
