@@ -21,10 +21,10 @@ export const useFavorecidosWorkflowState = () => {
     serviceType: "Pagamentos Diversos" // Valor padrão
   });
 
-  const updateWorkflow = (updates: any) => {
-    console.log("updateWorkflow called with:", updates);
+  const updateWorkflow = (field: string, value: any) => {
+    console.log("updateWorkflow called with field:", field, "value:", value);
     setWorkflow(prev => {
-      const newWorkflow = { ...prev, ...updates };
+      const newWorkflow = { ...prev, [field]: value };
       console.log("Updated workflow:", newWorkflow);
       return newWorkflow;
     });
