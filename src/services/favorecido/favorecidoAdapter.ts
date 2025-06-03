@@ -9,6 +9,7 @@ const dbToModelMapping = {
   banco: "banco",
   agencia: "agencia",
   conta: "conta",
+  tipoconta: "tipoConta",
   chavepix: "chavePix",
   tipochavepix: "tipoChavePix",
   valorpadrao: "valorPadrao",
