@@ -1,15 +1,16 @@
 
 import { useState } from 'react';
-import { toast } from 'sonner';
 import { Group } from "@/types/group";
 import { CNABWorkflowData } from "@/types/cnab240";
 import { useGroupOperations } from '@/services/group/hooks';
+import { useNotificationModal } from '@/hooks/useNotificationModal';
 
 export const useMultiGroupPayment = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
   const [fileOption, setFileOption] = useState<'single' | 'multiple'>('single');
   const { fetchGroupDetails, fetchGroupMembers } = useGroupOperations();
+  const { showError, showSuccess } = useNotificationModal();
   
   const handleSelectGroup = (groupId: string) => {
     if (selectedGroups.includes(groupId)) {
@@ -29,7 +30,7 @@ export const useMultiGroupPayment = () => {
 
   const generatePayments = async () => {
     if (selectedGroups.length === 0) {
-      toast.error("Selecione pelo menos um grupo para pagamento");
+      showError("Erro!", "Selecione pelo menos um grupo para pagamento");
       return false;
     }
 
@@ -68,19 +69,17 @@ export const useMultiGroupPayment = () => {
       if (fileOption === 'single') {
         // Generate a single consolidated CNAB file
         console.log("Generating single CNAB file for groups:", groupsData.map(g => g.group.nome));
-        toast.success("Arquivo CNAB consolidado gerado com sucesso", {
-          description: `Incluindo ${selectedGroups.length} grupos de pagamento`
-        });
+        showSuccess("Sucesso!", `Arquivo CNAB consolidado gerado com sucesso. Incluindo ${selectedGroups.length} grupos de pagamento`);
       } else {
         // Generate multiple CNAB files (one per group)
         console.log("Generating multiple CNAB files for groups:", groupsData.map(g => g.group.nome));
-        toast.success(`${selectedGroups.length} arquivos CNAB gerados com sucesso`);
+        showSuccess("Sucesso!", `${selectedGroups.length} arquivos CNAB gerados com sucesso`);
       }
       
       return true;
     } catch (error) {
       console.error("Erro ao gerar pagamentos:", error);
-      toast.error("Erro ao gerar pagamentos");
+      showError("Erro!", "Erro ao gerar pagamentos");
       return false;
     } finally {
       setIsProcessing(false);

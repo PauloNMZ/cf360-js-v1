@@ -1,8 +1,8 @@
 
 import { useState } from 'react';
 import ExcelJS from 'exceljs';
-import { toast } from '@/components/ui/sonner';
 import { PlanilhaData, RowData, EXPECTED_HEADERS } from '@/types/importacao';
+import { useNotificationModal } from '@/hooks/useNotificationModal';
 
 /**
  * Safely converts Excel cell value to appropriate type
@@ -35,6 +35,7 @@ export const useFileImport = () => {
   const [planilhaData, setPlanilhaData] = useState<PlanilhaData | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [tableData, setTableData] = useState<RowData[]>([]);
+  const { showSuccess, showError } = useNotificationModal();
 
   const handleFileChange = (files: File[]) => {
     console.log("useFileImport - handleFileChange called with files:", files);
@@ -124,7 +125,7 @@ export const useFileImport = () => {
       setTableData(rows);
 
       if (isValid) {
-        toast.success("Planilha validada com sucesso!");
+        showSuccess("Sucesso!", "Planilha validada com sucesso!");
       }
     } catch (error) {
       console.error("useFileImport - Erro ao processar planilha:", error);
@@ -141,11 +142,11 @@ export const useFileImport = () => {
     console.log("useFileImport - tableData length:", tableData.length);
     
     if (!planilhaData || !planilhaData.isValid) {
-      toast.error("A planilha não é válida para processamento.");
+      showError("Erro!", "A planilha não é válida para processamento.");
       return;
     }
 
-    toast.success(`Mostrando ${tableData.length} registros.`);
+    showSuccess("Sucesso!", `Mostrando ${tableData.length} registros.`);
     return true;
   };
 

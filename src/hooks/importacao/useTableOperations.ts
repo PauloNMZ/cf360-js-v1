@@ -1,12 +1,13 @@
 
 import { useState, useEffect } from 'react';
-import { toast } from '@/components/ui/sonner';
 import { RowData } from '@/types/importacao';
+import { useNotificationModal } from '@/hooks/useNotificationModal';
 
 export const useTableOperations = (initialData: RowData[] = []) => {
   const [tableData, setTableData] = useState<RowData[]>(initialData);
   const [selectAll, setSelectAll] = useState(false);
   const [total, setTotal] = useState<number>(0);
+  const { showSuccess } = useNotificationModal();
 
   // Sync tableData when initialData changes
   useEffect(() => {
@@ -68,7 +69,7 @@ export const useTableOperations = (initialData: RowData[] = []) => {
       return newData;
     });
     
-    toast.success("Linha removida com sucesso!");
+    showSuccess("Sucesso!", "Linha removida com sucesso!");
   };
 
   const getSelectedRows = () => tableData.filter(row => row.selected);

@@ -1,15 +1,16 @@
 
 import { useState } from 'react';
-import { toast } from '@/components/ui/sonner';
 import { ReportData, EmailFormValues } from '@/types/importacao';
 import { generateRemittanceReport } from '@/services/reports/remittanceReportService';
 import { formatarValorCurrency } from '@/utils/formatting/currencyUtils';
+import { useNotificationModal } from '@/hooks/useNotificationModal';
 
 export const usePDFReportDialog = () => {
   const [showPDFPreviewDialog, setShowPDFPreviewDialog] = useState(false);
   const [reportData, setReportData] = useState<ReportData | null>(null);
   const [reportAttachment, setReportAttachment] = useState<Blob | null>(null);
   const [reportFileName, setReportFileName] = useState<string>('');
+  const { showSuccess, showError, showWarning } = useNotificationModal();
   
   // Format date for display
   const formatCurrentDateTime = () => {
@@ -44,19 +45,13 @@ export const usePDFReportDialog = () => {
     console.log("  - paymentDate:", paymentDate);
     
     if (selectedRows.length === 0) {
-      toast.error("Nenhum registro selecionado para gerar relatório.", {
-        position: "bottom-right",
-        duration: 5000,
-      });
+      showError("Erro!", "Nenhum registro selecionado para gerar relatório.");
       return null;
     }
     
     // Check if CNAB file was generated
     if (!cnabFileGenerated) {
-      toast.warning("É necessário gerar o arquivo CNAB antes de visualizar o relatório.", {
-        position: "bottom-right",
-        duration: 5000,
-      });
+      showWarning("Atenção!", "É necessário gerar o arquivo CNAB antes de visualizar o relatório.");
       return null;
     }
 
@@ -71,10 +66,7 @@ export const usePDFReportDialog = () => {
       const validRecords = selectedRows.filter(row => !errorIds.has(row.id));
       
       if (validRecords.length === 0) {
-        toast.error("Não há registros válidos para gerar o relatório.", {
-          position: "bottom-right",
-          duration: 5000,
-        });
+        showError("Erro!", "Não há registros válidos para gerar o relatório.");
         return null;
       }
       
@@ -172,10 +164,7 @@ export const usePDFReportDialog = () => {
       };
     } catch (error) {
       console.error("Erro ao gerar relatório:", error);
-      toast.error("Erro ao gerar relatório de remessa bancária.", {
-        position: "bottom-right",
-        duration: 5000,
-      });
+      showError("Erro!", "Erro ao gerar relatório de remessa bancária.");
       return null;
     }
   };

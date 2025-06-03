@@ -2,12 +2,13 @@
 import { useState } from 'react';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
-import { toast } from '@/components/ui/sonner';
+import { useNotificationModal } from '@/hooks/useNotificationModal';
 
 export const useValidationDialog = () => {
   const [showValidationDialog, setShowValidationDialog] = useState(false);
   const [validationErrors, setValidationErrors] = useState<any[]>([]);
   const [validationPerformed, setValidationPerformed] = useState(false);
+  const { showSuccess, showError, showWarning } = useNotificationModal();
   
   // Function to validate records and display errors
   const handleVerifyErrors = (validateFavorecidos: any, tableData: any[]) => {
@@ -17,7 +18,7 @@ export const useValidationDialog = () => {
     
     if (tableData.length === 0) {
       console.log("useValidationDialog - Nenhum registro para validar");
-      toast.error('Nenhum registro para validar. Importe uma planilha primeiro.');
+      showError('Erro!', 'Nenhum registro para validar. Importe uma planilha primeiro.');
       return;
     }
 
@@ -30,13 +31,9 @@ export const useValidationDialog = () => {
     
     if (errors.length > 0) {
       setShowValidationDialog(true);
-      toast.error(`Encontrados ${errors.length} registros com erros de validação`, {
-        description: `${validRecordsCount} de ${totalRecords} registros estão válidos para processamento. Registros com erro serão excluídos do arquivo CNAB.`
-      });
+      showError('Erro!', `Encontrados ${errors.length} registros com erros de validação. ${validRecordsCount} de ${totalRecords} registros estão válidos para processamento. Registros com erro serão excluídos do arquivo CNAB.`);
     } else {
-      toast.success(`Todos os registros estão válidos!`, {
-        description: `${validRecordsCount} registros validados com sucesso.`
-      });
+      showSuccess('Sucesso!', `Todos os registros estão válidos! ${validRecordsCount} registros validados com sucesso.`);
     }
   };
 
@@ -46,7 +43,7 @@ export const useValidationDialog = () => {
     console.log("useValidationDialog - validationErrors length:", validationErrors.length);
     
     if (validationErrors.length === 0) {
-      toast.warning("Não há erros para exportar.");
+      showWarning("Atenção!", "Não há erros para exportar.");
       return;
     }
 
@@ -97,7 +94,7 @@ export const useValidationDialog = () => {
     const fileData = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     saveAs(fileData, `Erros_Validacao_${new Date().toISOString().slice(0, 10).replace(/-/g, '')}.xlsx`);
     
-    toast.success("Arquivo de erros exportado com sucesso!");
+    showSuccess("Sucesso!", "Arquivo de erros exportado com sucesso!");
   };
 
   return {
