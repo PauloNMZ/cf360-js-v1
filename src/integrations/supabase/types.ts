@@ -141,6 +141,7 @@ export type Database = {
           inscricao: string
           nome: string
           tipochavepix: string | null
+          tipoconta: string | null
           tipoinscricao: string
           user_id: string
           valorpadrao: number | null
@@ -157,6 +158,7 @@ export type Database = {
           inscricao: string
           nome: string
           tipochavepix?: string | null
+          tipoconta?: string | null
           tipoinscricao: string
           user_id: string
           valorpadrao?: number | null
@@ -173,6 +175,7 @@ export type Database = {
           inscricao?: string
           nome?: string
           tipochavepix?: string | null
+          tipoconta?: string | null
           tipoinscricao?: string
           user_id?: string
           valorpadrao?: number | null
