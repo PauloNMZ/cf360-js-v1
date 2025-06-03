@@ -37,7 +37,7 @@ export const useFavorecidosWorkflowNavigation = ({
   };
 
   return {
-    isCurrentStepValid: isCurrentStepValid(),
+    isCurrentStepValid,
     goToNextStep,
     goToPreviousStep
   };
