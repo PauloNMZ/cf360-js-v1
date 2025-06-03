@@ -80,7 +80,7 @@ const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
   function getDefaultStepTitle() {
     switch (currentStep) {
       case 1:
-        return "Selecionar Convenente";
+        return "Selecionar Empresa";
       case 2:
         return "Data de Pagamento";
       case 3:
@@ -99,16 +99,13 @@ const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
   const renderStepContent = () => {
     switch (currentStep) {
       case 1:
-        // If convenente is pre-selected, show StepTwo instead of StepThree
-        if (hasSelectedConvenente) {
-          return <StepTwo workflow={workflow} updateWorkflow={updateWorkflow} />;
-        }
         return (
           <StepThree 
             workflow={workflow} 
             updateWorkflow={updateWorkflow} 
             convenentes={convenentes}
             carregandoConvenentes={carregandoConvenentes}
+            hasSelectedConvenente={hasSelectedConvenente}
           />
         );
       case 2:

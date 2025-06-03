@@ -7,6 +7,7 @@ import { useFavorecidosWorkflowState } from './workflow/useFavorecidosWorkflowSt
 import { useFavorecidosWorkflowNavigation } from './workflow/useFavorecidosWorkflowNavigation';
 import { useFavorecidosWorkflowProcessing } from './workflow/useFavorecidosWorkflowProcessing';
 import { useFavorecidosWorkflowValidation } from './workflow/useFavorecidosWorkflowValidation';
+import { useFavorecidosWorkflowCompany } from './workflow/useFavorecidosWorkflowCompany';
 import { getStepTitle, getTotalSteps, getDisplayStepNumber } from './workflow/favorecidosWorkflowUtils';
 
 interface UseFavorecidosWorkflowProps {
@@ -15,6 +16,9 @@ interface UseFavorecidosWorkflowProps {
 }
 
 export const useFavorecidosWorkflow = ({ selectedFavorecidos, favorecidos }: UseFavorecidosWorkflowProps) => {
+  // Company management
+  const { hasSelectedCompany, getSelectedCompany, selectedCompany } = useFavorecidosWorkflowCompany();
+
   // State management
   const {
     showWorkflowDialog,
@@ -95,6 +99,10 @@ export const useFavorecidosWorkflow = ({ selectedFavorecidos, favorecidos }: Use
     updateWorkflow,
     cnabFileGenerated,
     cnabFileName,
+    
+    // Company
+    hasSelectedCompany,
+    selectedCompany,
     
     // Navigation
     isCurrentStepValid,

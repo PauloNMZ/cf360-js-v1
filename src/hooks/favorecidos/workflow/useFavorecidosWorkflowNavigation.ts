@@ -1,4 +1,6 @@
 
+import { useFavorecidosWorkflowCompany } from './useFavorecidosWorkflowCompany';
+
 interface UseFavorecidosWorkflowNavigationProps {
   currentStep: number;
   setCurrentStep: (step: number) => void;
@@ -13,15 +15,19 @@ export const useFavorecidosWorkflowNavigation = ({
   workflow
 }: UseFavorecidosWorkflowNavigationProps) => {
   
+  const { hasSelectedCompany, getSelectedCompany } = useFavorecidosWorkflowCompany();
+  
   const isCurrentStepValid = () => {
     console.log("Validating step:", currentStep, "workflow:", workflow);
     
     switch (currentStep) {
       case 1:
-        // Step 1: Selecionar Convenente
-        const hasConvenente = !!workflow.convenente;
-        console.log("Step 1 validation - hasConvenente:", hasConvenente);
-        return hasConvenente;
+        // Step 1: Selecionar Empresa - check header company or workflow convenente
+        const hasHeaderCompany = hasSelectedCompany();
+        const hasWorkflowConvenente = !!workflow.convenente;
+        const isValid = hasHeaderCompany || hasWorkflowConvenente;
+        console.log("Step 1 validation - hasHeaderCompany:", hasHeaderCompany, "hasWorkflowConvenente:", hasWorkflowConvenente, "isValid:", isValid);
+        return isValid;
       case 2:
         // Step 2: Configurar Pagamento (Data de Pagamento)
         const hasPaymentDate = !!workflow.paymentDate;

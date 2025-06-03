@@ -4,7 +4,7 @@ import { FavorecidoData } from '@/types/favorecido';
 export const getStepTitle = (step: number): string => {
   switch (step) {
     case 1:
-      return "Selecionar Convenente";
+      return "Selecionar Empresa";
     case 2:
       return "Data de Pagamento";
     case 3:
