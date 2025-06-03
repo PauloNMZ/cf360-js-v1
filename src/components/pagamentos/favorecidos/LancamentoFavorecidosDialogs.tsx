@@ -3,6 +3,7 @@ import React from 'react';
 import FavorecidoFormModal from "@/components/favorecidos/FavorecidoFormModal";
 import DeleteFavorecidoDialog from "@/components/favorecidos/DeleteFavorecidoDialog";
 import NotificationModal from "@/components/ui/NotificationModal";
+import WorkflowDialog from "@/components/importacao/WorkflowDialog";
 
 interface LancamentoFavorecidosDialogsProps {
   modalOpen: boolean;
@@ -26,6 +27,21 @@ interface LancamentoFavorecidosDialogsProps {
     buttonText: string;
   };
   onCloseNotificationModal: () => void;
+  // Workflow props
+  showWorkflowDialog?: boolean;
+  setShowWorkflowDialog?: (show: boolean) => void;
+  workflow?: any;
+  updateWorkflow?: (field: string, value: any) => void;
+  currentStep?: number;
+  getTotalSteps?: () => number;
+  getDisplayStepNumber?: () => number;
+  getStepTitle?: () => string;
+  goToNextStep?: () => void;
+  goToPreviousStep?: () => void;
+  isCurrentStepValid?: () => boolean;
+  handleSubmitWorkflow?: () => void;
+  convenentes?: any[];
+  carregandoConvenentes?: boolean;
 }
 
 const LancamentoFavorecidosDialogs: React.FC<LancamentoFavorecidosDialogsProps> = ({
@@ -44,7 +60,22 @@ const LancamentoFavorecidosDialogs: React.FC<LancamentoFavorecidosDialogsProps> 
   notificationModalOpen,
   setNotificationModalOpen,
   notificationConfig,
-  onCloseNotificationModal
+  onCloseNotificationModal,
+  // Workflow props
+  showWorkflowDialog = false,
+  setShowWorkflowDialog,
+  workflow,
+  updateWorkflow,
+  currentStep = 1,
+  getTotalSteps,
+  getDisplayStepNumber,
+  getStepTitle,
+  goToNextStep,
+  goToPreviousStep,
+  isCurrentStepValid,
+  handleSubmitWorkflow,
+  convenentes = [],
+  carregandoConvenentes = false
 }) => {
   return (
     <>
@@ -68,6 +99,27 @@ const LancamentoFavorecidosDialogs: React.FC<LancamentoFavorecidosDialogsProps> 
         onConfirm={confirmDelete}
         isDeleting={isLoading}
       />
+
+      {/* Workflow Dialog */}
+      {showWorkflowDialog && setShowWorkflowDialog && workflow && updateWorkflow && (
+        <WorkflowDialog
+          isOpen={showWorkflowDialog}
+          onOpenChange={setShowWorkflowDialog}
+          workflow={workflow}
+          updateWorkflow={updateWorkflow}
+          currentStep={currentStep}
+          totalSteps={getTotalSteps ? getTotalSteps() : 4}
+          goToNextStep={goToNextStep || (() => {})}
+          goToPreviousStep={goToPreviousStep || (() => {})}
+          handleSubmit={handleSubmitWorkflow || (() => {})}
+          isCurrentStepValid={isCurrentStepValid || (() => true)}
+          convenentes={convenentes}
+          carregandoConvenentes={carregandoConvenentes}
+          getTotalSteps={getTotalSteps}
+          getDisplayStepNumber={getDisplayStepNumber}
+          getStepTitle={getStepTitle}
+        />
+      )}
 
       {/* Notification Modal */}
       {notificationModalOpen && (

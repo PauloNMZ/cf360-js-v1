@@ -198,6 +198,21 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
         setNotificationModalOpen={setNotificationModalOpen}
         notificationConfig={notificationConfig}
         onCloseNotificationModal={handleCloseNotificationModal}
+        // Workflow props
+        showWorkflowDialog={workflowData.showWorkflowDialog}
+        setShowWorkflowDialog={workflowData.setShowWorkflowDialog}
+        workflow={workflowData.workflow}
+        updateWorkflow={workflowData.updateWorkflow}
+        currentStep={workflowData.currentStep}
+        getTotalSteps={workflowData.getTotalSteps}
+        getDisplayStepNumber={workflowData.getDisplayStepNumber}
+        getStepTitle={workflowData.getStepTitle}
+        goToNextStep={workflowData.goToNextStep}
+        goToPreviousStep={workflowData.goToPreviousStep}
+        isCurrentStepValid={workflowData.isCurrentStepValid}
+        handleSubmitWorkflow={workflowData.handleSubmitWorkflow}
+        convenentes={workflowData.convenentes}
+        carregandoConvenentes={workflowData.carregandoConvenentes}
       />
     </div>
   );
