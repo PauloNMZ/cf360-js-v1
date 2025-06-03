@@ -1,14 +1,15 @@
 
 import { useState } from 'react';
-import { toast } from '@/components/ui/sonner';
 import { ReportData, EmailFormValues } from '@/types/importacao';
 import { usePDFReportDialog } from './usePDFReportDialog';
 import { useEmailConfigDialog } from './useEmailConfigDialog';
+import { useNotificationModal } from '@/hooks/useNotificationModal';
 
 export const usePDFReportWithEmail = () => {
   // Import smaller hooks
   const pdfReportDialog = usePDFReportDialog();
   const emailConfigDialog = useEmailConfigDialog();
+  const { showError, showWarning } = useNotificationModal();
 
   // Store the original payment date for email flow
   const [originalPaymentDate, setOriginalPaymentDate] = useState<string>('');
@@ -25,13 +26,13 @@ export const usePDFReportWithEmail = () => {
     paymentDate: Date | undefined = undefined
   ) => {
     if (selectedRows.length === 0) {
-      toast.error("Nenhum registro selecionado para gerar relatório.");
+      showError("Erro!", "Nenhum registro selecionado para gerar relatório.");
       return;
     }
     
     // Check if CNAB file was generated
     if (!cnabFileGenerated) {
-      toast.warning("É necessário gerar o arquivo CNAB antes de visualizar o relatório.");
+      showWarning("Atenção!", "É necessário gerar o arquivo CNAB antes de visualizar o relatório.");
       return;
     }
 

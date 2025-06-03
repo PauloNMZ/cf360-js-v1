@@ -1,11 +1,12 @@
 
 import { useState, useEffect } from 'react';
-import { toast } from '@/components/ui/sonner';
 import { getConvenentes } from '@/services/convenente/convenenteService';
+import { useNotificationModal } from '@/hooks/useNotificationModal';
 
 export const useConvenentesData = () => {
   const [convenentes, setConvenentes] = useState<Array<any>>([]);
   const [carregandoConvenentes, setCarregandoConvenentes] = useState(false);
+  const { showError } = useNotificationModal();
   
   // Carregar convenentes do banco de dados
   useEffect(() => {
@@ -17,14 +18,14 @@ export const useConvenentesData = () => {
         setConvenentes(data);
       } catch (error) {
         console.error("Erro ao carregar convenentes:", error);
-        toast.error("Erro ao carregar convenentes");
+        showError("Erro!", "Erro ao carregar convenentes");
       } finally {
         setCarregandoConvenentes(false);
       }
     };
     
     loadConvenentes();
-  }, []);
+  }, [showError]);
 
   return { convenentes, carregandoConvenentes };
 };

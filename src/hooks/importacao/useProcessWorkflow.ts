@@ -1,10 +1,10 @@
 
 import { useState } from 'react';
-import { toast } from '@/components/ui/sonner';
 import { validateFavorecidos } from '@/services/cnab240/validationService';
 import { useWorkflowDialog } from './useWorkflowDialog';
 import { useDirectoryDialog } from './useDirectoryDialog';
 import { useCNABGeneration } from './useCNABGeneration';
+import { useNotificationModal } from '@/hooks/useNotificationModal';
 
 interface UseProcessWorkflowOptions {
   selectedConvenente?: any;
@@ -13,6 +13,7 @@ interface UseProcessWorkflowOptions {
 
 export const useProcessWorkflow = (getSelectedRows: () => any[], options: UseProcessWorkflowOptions = {}) => {
   const { selectedConvenente, hasSelectedConvenente = false } = options;
+  const { showError } = useNotificationModal();
   
   // Import workflow-related hooks with convenente info
   const workflowDialog = useWorkflowDialog({ selectedConvenente, hasSelectedConvenente });
@@ -27,7 +28,7 @@ export const useProcessWorkflow = (getSelectedRows: () => any[], options: UsePro
     
     if (selectedRows.length === 0) {
       console.log("useProcessWorkflow - Nenhum registro selecionado");
-      toast.error("Nenhum registro selecionado para processamento.");
+      showError("Erro!", "Nenhum registro selecionado para processamento.");
       return;
     }
 

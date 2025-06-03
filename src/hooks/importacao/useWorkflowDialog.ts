@@ -1,9 +1,9 @@
 
 import { useState, useEffect } from 'react';
-import { toast } from '@/components/ui/sonner';
 import { CNABWorkflowData, Favorecido } from '@/types/cnab240';
 import { downloadCNABFile, processSelectedRows } from '@/services/cnab240/cnab240Service';
 import { RowData } from '@/types/importacao';
+import { useNotificationModal } from '@/hooks/useNotificationModal';
 
 interface UseWorkflowDialogOptions {
   selectedConvenente?: any;
@@ -12,6 +12,7 @@ interface UseWorkflowDialogOptions {
 
 export const useWorkflowDialog = (options: UseWorkflowDialogOptions = {}) => {
   const { selectedConvenente, hasSelectedConvenente = false } = options;
+  const { showSuccess, showInfo } = useNotificationModal();
   
   const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
   const [currentStep, setCurrentStep] = useState<number>(1);
@@ -138,11 +139,11 @@ export const useWorkflowDialog = (options: UseWorkflowDialogOptions = {}) => {
   const handleSubmitWorkflow = async (selectedRows: RowData[]): Promise<{ success: boolean; fileName?: string }> => {
     try {
       // Show processing message
-      toast.info(`Processando ${selectedRows.length} registros...`);
+      showInfo("Processando...", `Processando ${selectedRows.length} registros...`);
       
       // If "API REST" method is selected, we would handle that differently
       if (workflow.sendMethod === 'api') {
-        toast.success(`Enviando ${selectedRows.length} pagamentos via API REST...`);
+        showSuccess("Sucesso!", `Enviando ${selectedRows.length} pagamentos via API REST...`);
         // This would call an API integration - not implemented yet
         return { success: true };
       }

@@ -1,15 +1,16 @@
 
 import { useState } from 'react';
-import { toast } from '@/components/ui/sonner';
 import { EmailFormValues } from '@/types/importacao';
 import { sendEmail, logEmailActivity, getCurrentUserEmail } from '@/services/emailService';
 import { generateRemittanceReport } from '@/services/reports/remittanceReportService';
 import { formatarValorCurrency } from '@/utils/formatting/currencyUtils';
+import { useNotificationModal } from '@/hooks/useNotificationModal';
 
 export const useEmailConfigDialog = () => {
   const [showEmailConfigDialog, setShowEmailConfigDialog] = useState(false);
   const [reportDate, setReportDate] = useState('');
   const [defaultEmailMessage, setDefaultEmailMessage] = useState('');
+  const { showSuccess, showError, showInfo } = useNotificationModal();
   
   const createDefaultEmailMessage = (formattedDate: string, totalValue: number) => {
     const formattedDateForEmail = formattedDate.split(' ')[0]; // Just the date part
@@ -63,8 +64,8 @@ Atenciosamente,
     originalPaymentDate?: string // Add optional parameter for original payment date
   ) => {
     try {
-      // Show sending email toast
-      toast.info("Enviando relatório por e-mail...");
+      // Show sending email notification
+      showInfo("Enviando...", "Enviando relatório por e-mail...");
       
       // Prepare email data - using Excel report as attachment
       let emailAttachment = reportAttachment;
@@ -119,18 +120,14 @@ Atenciosamente,
       setShowEmailConfigDialog(false);
       
       if (response.success) {
-        toast.success("Relatório enviado com sucesso!", {
-          description: `E-mail enviado para ${emailFormValues.recipientEmail}`
-        });
+        showSuccess("Sucesso!", `E-mail enviado para ${emailFormValues.recipientEmail}`);
       } else {
-        toast.error("Erro ao enviar e-mail", {
-          description: response.error || "Ocorreu um erro ao enviar o relatório."
-        });
+        showError("Erro!", response.error || "Ocorreu um erro ao enviar o relatório.");
       }
       
     } catch (error) {
       console.error("Erro ao enviar relatório por e-mail:", error);
-      toast.error("Erro ao enviar relatório por e-mail.");
+      showError("Erro!", "Erro ao enviar relatório por e-mail.");
     }
   };
   
