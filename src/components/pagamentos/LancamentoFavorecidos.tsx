@@ -1,10 +1,13 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Plus, FileOutput } from "lucide-react";
 import FavorecidoFormModal from '@/components/favorecidos/FavorecidoFormModal';
 import DeleteFavorecidoDialog from '@/components/favorecidos/DeleteFavorecidoDialog';
+import WorkflowDialog from '@/components/importacao/WorkflowDialog';
+import DirectoryDialog from '@/components/importacao/DirectoryDialog';
 import { useFavorecidos } from '@/hooks/favorecidos/useFavorecidos';
+import { useFavorecidosWorkflow } from '@/hooks/favorecidos/useFavorecidosWorkflow';
 import FavorecidoSearchBar, { EmptyState } from '@/components/favorecidos/FavorecidoSearchBar';
 import FavorecidosTable from '@/components/favorecidos/FavorecidosTable';
 import { Loader2 } from 'lucide-react';
@@ -50,6 +53,36 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
   const [selectedFavorecidos, setSelectedFavorecidos] = useState<string[]>([]);
   const { showSuccess, showError } = useNotificationModalContext();
 
+  // Initialize workflow hook
+  const {
+    showWorkflowDialog,
+    setShowWorkflowDialog,
+    showDirectoryDialog,
+    setShowDirectoryDialog,
+    workflow,
+    updateWorkflow,
+    isCurrentStepValid,
+    handleOpenDirectorySettings,
+    handleSaveDirectorySettings,
+    handleSubmitWorkflow
+  } = useFavorecidosWorkflow({
+    selectedFavorecidos,
+    favorecidos: filteredFavorecidos
+  });
+
+  // Listen for custom events from the StepFour component
+  useEffect(() => {
+    const handleOpenSettings = () => {
+      handleOpenDirectorySettings();
+    };
+
+    document.addEventListener('openDirectorySettings', handleOpenSettings);
+    
+    return () => {
+      document.removeEventListener('openDirectorySettings', handleOpenSettings);
+    };
+  }, [handleOpenDirectorySettings]);
+
   const handleSelectFavorecido = (favorecido: any) => {
     setSelectedFavorecido(favorecido);
   };
@@ -68,11 +101,10 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
       return;
     }
     
-    console.log("Processando favorecidos selecionados:", selectedFavorecidos);
-    showSuccess("Sucesso!", `${selectedFavorecidos.length} favorecido(s) sendo processado(s)...`);
+    console.log("Abrindo workflow para favorecidos selecionados:", selectedFavorecidos);
     
-    // Aqui será implementada a lógica de processamento dos favorecidos selecionados
-    // Por exemplo: abrir modal de lançamento em lote, redirecionar para tela de pagamento, etc.
+    // Open workflow dialog directly on StepFour (Method Selection)
+    setShowWorkflowDialog(true);
   };
 
   const handleCloseNotificationModal = () => {
@@ -156,7 +188,7 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
               </div>
               <div className="mt-4">
                 <p className="text-muted-foreground">
-                  Formulário de lançamento em lote para os favorecidos selecionados aqui...
+                  Clique em "Processar Selecionados" para gerar arquivo CNAB ou enviar via API.
                 </p>
               </div>
             </div>
@@ -164,6 +196,36 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
         </div>
       )}
 
+      {/* Workflow Dialog - showing only StepFour */}
+      <WorkflowDialog 
+        isOpen={showWorkflowDialog}
+        onOpenChange={setShowWorkflowDialog}
+        workflow={workflow}
+        updateWorkflow={updateWorkflow}
+        currentStep={4} // Always show StepFour (Method Selection)
+        totalSteps={4}
+        goToNextStep={() => {}} // Not needed for single step
+        goToPreviousStep={() => setShowWorkflowDialog(false)} // Close dialog
+        handleSubmit={handleSubmitWorkflow}
+        isCurrentStepValid={isCurrentStepValid}
+        convenentes={[]} // Not needed for this workflow
+        carregandoConvenentes={false}
+        getTotalSteps={() => 1} // Only one step to show
+        getDisplayStepNumber={() => 1} // Show as step 1
+        getStepTitle={() => "Método de Envio"}
+        hasSelectedConvenente={true} // Skip convenente selection
+      />
+
+      {/* Directory configuration dialog */}
+      <DirectoryDialog 
+        isOpen={showDirectoryDialog}
+        onOpenChange={setShowDirectoryDialog}
+        workflow={workflow}
+        updateWorkflow={updateWorkflow}
+        handleSaveSettings={handleSaveDirectorySettings}
+      />
+
+      {/* Form Modal */}
       <FavorecidoFormModal
         open={modalOpen}
         onOpenChange={setModalOpen}
@@ -176,6 +238,7 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
         isLoading={isLoading}
       />
 
+      {/* Delete Confirmation Dialog */}
       <DeleteFavorecidoDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
@@ -183,6 +246,7 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
         isDeleting={isLoading}
       />
 
+      {/* Notification Modal */}
       <NotificationModal
         open={notificationModalOpen}
         onOpenChange={setNotificationModalOpen}
