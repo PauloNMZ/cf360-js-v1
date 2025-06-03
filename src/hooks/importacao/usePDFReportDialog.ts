@@ -3,14 +3,14 @@ import { useState } from 'react';
 import { ReportData, EmailFormValues } from '@/types/importacao';
 import { generateRemittanceReport } from '@/services/reports/remittanceReportService';
 import { formatarValorCurrency } from '@/utils/formatting/currencyUtils';
-import { useNotificationModal } from '@/hooks/useNotificationModal';
+import { useNotificationModalContext } from '@/components/ui/NotificationModalProvider';
 
 export const usePDFReportDialog = () => {
   const [showPDFPreviewDialog, setShowPDFPreviewDialog] = useState(false);
   const [reportData, setReportData] = useState<ReportData | null>(null);
   const [reportAttachment, setReportAttachment] = useState<Blob | null>(null);
   const [reportFileName, setReportFileName] = useState<string>('');
-  const { showSuccess, showError, showWarning } = useNotificationModal();
+  const { showSuccess, showError, showWarning } = useNotificationModalContext();
   
   // Format date for display
   const formatCurrentDateTime = () => {

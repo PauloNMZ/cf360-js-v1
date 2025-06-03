@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { CNABWorkflowData, Favorecido } from '@/types/cnab240';
 import { downloadCNABFile, processSelectedRows } from '@/services/cnab240/cnab240Service';
 import { RowData } from '@/types/importacao';
-import { useNotificationModal } from '@/hooks/useNotificationModal';
+import { useNotificationModalContext } from '@/components/ui/NotificationModalProvider';
 
 interface UseWorkflowDialogOptions {
   selectedConvenente?: any;
@@ -12,7 +12,7 @@ interface UseWorkflowDialogOptions {
 
 export const useWorkflowDialog = (options: UseWorkflowDialogOptions = {}) => {
   const { selectedConvenente, hasSelectedConvenente = false } = options;
-  const { showSuccess, showInfo } = useNotificationModal();
+  const { showSuccess, showInfo } = useNotificationModalContext();
   
   const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
   const [currentStep, setCurrentStep] = useState<number>(1);

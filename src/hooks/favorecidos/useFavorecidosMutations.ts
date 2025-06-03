@@ -6,11 +6,11 @@ import {
   deleteFavorecido
 } from "@/services/favorecido/favorecidoService";
 import { FavorecidoData } from "@/types/favorecido";
-import { useNotificationModal } from "@/hooks/useNotificationModal";
+import { useNotificationModalContext } from "@/components/ui/NotificationModalProvider";
 
 export const useFavorecidosMutations = () => {
   const queryClient = useQueryClient();
-  const { showSuccess, showError } = useNotificationModal();
+  const { showSuccess, showError } = useNotificationModalContext();
 
   // Mutation for creating/updating favorecidos
   const { mutate: saveMutation, isPending: isSaving } = useMutation({

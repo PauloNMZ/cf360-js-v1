@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Group } from "@/types/group";
 import { useGroupOperations } from "@/services/group/hooks";
-import { useNotificationModal } from "@/hooks/useNotificationModal";
+import { useNotificationModalContext } from "@/components/ui/NotificationModalProvider";
 
 export const useGroupPayment = () => {
   const [groups, setGroups] = useState<Group[]>([]);
@@ -15,7 +15,7 @@ export const useGroupPayment = () => {
   const [hasError, setHasError] = useState(false);
   
   const { fetchGroups, fetchGroupMembers } = useGroupOperations();
-  const { isOpen: notificationModalOpen, config: notificationConfig, showSuccess, showError, hideNotification } = useNotificationModal();
+  const { showSuccess, showError } = useNotificationModalContext();
 
   useEffect(() => {
     console.log("useGroupPayment hook initialized");
@@ -106,8 +106,8 @@ export const useGroupPayment = () => {
     selectedGroup,
     loadGroups,
     handleSubmit,
-    notificationModalOpen,
-    notificationConfig,
-    hideNotification
+    notificationModalOpen: false, // Legacy compatibility
+    notificationConfig: { type: 'success' as const, title: '', message: '', buttonText: 'OK' }, // Legacy compatibility
+    hideNotification: () => {} // Legacy compatibility
   };
 };

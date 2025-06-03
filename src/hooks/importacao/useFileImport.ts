@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import ExcelJS from 'exceljs';
 import { PlanilhaData, RowData, EXPECTED_HEADERS } from '@/types/importacao';
-import { useNotificationModal } from '@/hooks/useNotificationModal';
+import { useNotificationModalContext } from '@/components/ui/NotificationModalProvider';
 
 /**
  * Safely converts Excel cell value to appropriate type
@@ -35,7 +35,7 @@ export const useFileImport = () => {
   const [planilhaData, setPlanilhaData] = useState<PlanilhaData | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [tableData, setTableData] = useState<RowData[]>([]);
-  const { showSuccess, showError } = useNotificationModal();
+  const { showSuccess, showError } = useNotificationModalContext();
 
   const handleFileChange = (files: File[]) => {
     console.log("useFileImport - handleFileChange called with files:", files);

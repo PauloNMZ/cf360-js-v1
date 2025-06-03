@@ -1,13 +1,13 @@
 
 import { useState, useEffect } from 'react';
 import { RowData } from '@/types/importacao';
-import { useNotificationModal } from '@/hooks/useNotificationModal';
+import { useNotificationModalContext } from '@/components/ui/NotificationModalProvider';
 
 export const useTableOperations = (initialData: RowData[] = []) => {
   const [tableData, setTableData] = useState<RowData[]>(initialData);
   const [selectAll, setSelectAll] = useState(false);
   const [total, setTotal] = useState<number>(0);
-  const { showSuccess } = useNotificationModal();
+  const { showSuccess } = useNotificationModalContext();
 
   // Sync tableData when initialData changes
   useEffect(() => {

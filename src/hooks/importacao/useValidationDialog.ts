@@ -2,13 +2,13 @@
 import { useState } from 'react';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
-import { useNotificationModal } from '@/hooks/useNotificationModal';
+import { useNotificationModalContext } from '@/components/ui/NotificationModalProvider';
 
 export const useValidationDialog = () => {
   const [showValidationDialog, setShowValidationDialog] = useState(false);
   const [validationErrors, setValidationErrors] = useState<any[]>([]);
   const [validationPerformed, setValidationPerformed] = useState(false);
-  const { showSuccess, showError, showWarning } = useNotificationModal();
+  const { showSuccess, showError, showWarning } = useNotificationModalContext();
   
   // Function to validate records and display errors
   const handleVerifyErrors = (validateFavorecidos: any, tableData: any[]) => {

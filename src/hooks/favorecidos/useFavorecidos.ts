@@ -1,5 +1,5 @@
 
-import { useNotificationModal } from "@/hooks/useNotificationModal";
+import { useNotificationModalContext } from "@/components/ui/NotificationModalProvider";
 import { useFavorecidosData } from "./useFavorecidosData";
 import { useFavorecidosMutations } from "./useFavorecidosMutations";
 import { useFavorecidosState } from "./useFavorecidosState";
@@ -40,8 +40,8 @@ export const useFavorecidos = () => {
     isDeleting
   } = useFavorecidosMutations();
 
-  // Notification modal
-  const { isOpen: notificationModalOpen, config: notificationConfig, hideNotification } = useNotificationModal();
+  // Notification modal - using context instead of hook
+  const { showSuccess, showError, showWarning, showInfo } = useNotificationModalContext();
 
   // Actions
   const {
@@ -86,8 +86,8 @@ export const useFavorecidos = () => {
     formMode,
     deleteDialogOpen,
     favorecidoToDelete,
-    notificationModalOpen,
-    notificationConfig,
+    notificationModalOpen: false, // Legacy compatibility
+    notificationConfig: { type: 'success' as const, title: '', message: '', buttonText: 'OK' }, // Legacy compatibility
     handleCreateNew,
     handleEdit,
     handleDelete,
@@ -98,7 +98,7 @@ export const useFavorecidos = () => {
     handleSave,
     setModalOpen,
     setDeleteDialogOpen,
-    setNotificationModalOpen: hideNotification,
+    setNotificationModalOpen: () => {}, // Legacy compatibility
     refetch,
   };
 };

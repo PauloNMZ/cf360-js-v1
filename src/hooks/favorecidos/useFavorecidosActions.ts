@@ -1,6 +1,6 @@
 
 import { FavorecidoData, emptyFavorecido } from "@/types/favorecido";
-import { useNotificationModal } from "@/hooks/useNotificationModal";
+import { useNotificationModalContext } from "@/components/ui/NotificationModalProvider";
 
 interface UseFavorecidosActionsProps {
   setCurrentFavorecido: (favorecido: FavorecidoData) => void;
@@ -27,7 +27,7 @@ export const useFavorecidosActions = ({
   saveMutation,
   deleteMutation
 }: UseFavorecidosActionsProps) => {
-  const { showError } = useNotificationModal();
+  const { showError } = useNotificationModalContext();
   
   // Create new favorecido
   const handleCreateNew = () => {
