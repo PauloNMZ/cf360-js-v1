@@ -74,7 +74,7 @@ const FavorecidosTableRow: React.FC<FavorecidosTableRowProps> = ({
             <Button variant="ghost" size="icon" onClick={handleEditClick} className="hover:bg-blue-100 hover:text-blue-600">
               <Pencil className="h-4 w-4" />
             </Button>
-            <Button variant="outline" size="icon" onClick={handleDeleteClick} className="hover:bg-red-100 dark:hover:bg-red-900 text-transparent">
+            <Button variant="outline" size="icon" onClick={handleDeleteClick} className="hover:bg-red-100 dark:hover:bg-red-900">
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>
