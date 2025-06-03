@@ -24,6 +24,7 @@ interface FavorecidosTableProps {
   itemsPerPage?: number;
   hidePixColumn?: boolean;
   hideBankColumn?: boolean;
+  hideTipoColumn?: boolean;
 }
 
 const getTipoContaLabel = (tipo: TipoContaType): string => {
@@ -49,7 +50,8 @@ const FavorecidosTable: React.FC<FavorecidosTableProps> = ({
   onSelectionChange,
   itemsPerPage = 10,
   hidePixColumn = false,
-  hideBankColumn = false
+  hideBankColumn = false,
+  hideTipoColumn = false
 }) => {
   const [currentPage, setCurrentPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(itemsPerPage);
@@ -141,7 +143,9 @@ const FavorecidosTable: React.FC<FavorecidosTableProps> = ({
                 {!hideBankColumn && (
                   <TableHead className="table-header-elegant">BANCO/AGÊNCIA/CONTA</TableHead>
                 )}
-                <TableHead className="table-header-elegant">TIPO</TableHead>
+                {!hideTipoColumn && (
+                  <TableHead className="table-header-elegant">TIPO</TableHead>
+                )}
                 {!hidePixColumn && (
                   <TableHead className="table-header-elegant">CHAVE PIX</TableHead>
                 )}
@@ -178,9 +182,11 @@ const FavorecidosTable: React.FC<FavorecidosTableProps> = ({
                       }
                     </TableCell>
                   )}
-                  <TableCell>
-                    {favorecido.tipoConta ? getTipoContaLabel(favorecido.tipoConta) : "-"}
-                  </TableCell>
+                  {!hideTipoColumn && (
+                    <TableCell>
+                      {favorecido.tipoConta ? getTipoContaLabel(favorecido.tipoConta) : "-"}
+                    </TableCell>
+                  )}
                   {!hidePixColumn && (
                     <TableCell>
                       {favorecido.chavePix 
@@ -219,7 +225,6 @@ const FavorecidosTable: React.FC<FavorecidosTableProps> = ({
         </div>
       </div>
 
-      {/* Pagination */}
       {totalPages > 1 && pageSize !== -1 && (
         <div className="flex items-center justify-between px-2 flex-wrap gap-4">
           <div className="flex-1 text-sm text-muted-foreground">
@@ -261,7 +266,6 @@ const FavorecidosTable: React.FC<FavorecidosTableProps> = ({
         </div>
       )}
 
-      {/* Show All Info */}
       {pageSize === -1 && (
         <div className="text-center text-sm text-muted-foreground">
           Mostrando todos os {favorecidos.length} registros

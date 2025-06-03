@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Plus, FileOutput } from "lucide-react";
@@ -14,11 +13,13 @@ import { toast } from "sonner";
 interface LancamentoFavorecidosProps {
   hidePixColumn?: boolean;
   hideBankColumn?: boolean;
+  hideTipoColumn?: boolean;
 }
 
 const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
   hidePixColumn = false,
-  hideBankColumn = false
+  hideBankColumn = false,
+  hideTipoColumn = false
 }) => {
   const {
     modalOpen,
@@ -125,6 +126,7 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
               itemsPerPage={5}
               hidePixColumn={hidePixColumn}
               hideBankColumn={hideBankColumn}
+              hideTipoColumn={hideTipoColumn}
             />
           ) : (
             <EmptyState searchTerm={searchTerm} />
