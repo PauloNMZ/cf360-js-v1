@@ -1,7 +1,13 @@
 
-import React, { createContext, useContext } from 'react';
-import { useNotificationModal } from '@/hooks/useNotificationModal';
+import React, { createContext, useContext, useState } from 'react';
 import NotificationModal, { NotificationType } from './NotificationModal';
+
+interface NotificationConfig {
+  type: NotificationType;
+  title: string;
+  message: string;
+  buttonText: string;
+}
 
 interface NotificationModalContextType {
   showSuccess: (title?: string, message?: string, buttonText?: string) => void;
@@ -26,16 +32,38 @@ interface NotificationModalProviderProps {
 }
 
 export const NotificationModalProvider: React.FC<NotificationModalProviderProps> = ({ children }) => {
-  const { 
-    isOpen, 
-    config, 
-    showNotification,
-    showSuccess, 
-    showError, 
-    showWarning, 
-    showInfo, 
-    hideNotification 
-  } = useNotificationModal();
+  const [isOpen, setIsOpen] = useState(false);
+  const [config, setConfig] = useState<NotificationConfig>({
+    type: 'success',
+    title: '',
+    message: '',
+    buttonText: 'OK'
+  });
+
+  const showNotification = (type: NotificationType, title: string, message: string, buttonText: string = 'OK') => {
+    setConfig({ type, title, message, buttonText });
+    setIsOpen(true);
+  };
+
+  const showSuccess = (title: string = 'Sucesso!', message: string = '', buttonText: string = 'OK') => {
+    showNotification('success', title, message, buttonText);
+  };
+
+  const showError = (title: string = 'Erro!', message: string = '', buttonText: string = 'OK') => {
+    showNotification('error', title, message, buttonText);
+  };
+
+  const showWarning = (title: string = 'Atenção!', message: string = '', buttonText: string = 'OK') => {
+    showNotification('warning', title, message, buttonText);
+  };
+
+  const showInfo = (title: string = 'Informação', message: string = '', buttonText: string = 'OK') => {
+    showNotification('info', title, message, buttonText);
+  };
+
+  const hideNotification = () => {
+    setIsOpen(false);
+  };
 
   return (
     <NotificationModalContext.Provider value={{ 
