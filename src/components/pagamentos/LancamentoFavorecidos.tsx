@@ -38,6 +38,7 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
     searchTerm,
     handleSearchChange,
     successModalOpen,
+    successConfig,
     setSuccessModalOpen,
     deleteDialogOpen,
     setDeleteDialogOpen,
@@ -73,7 +74,7 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
   };
 
   const handleCloseSuccessModal = () => {
-    setSuccessModalOpen(false);
+    setSuccessModalOpen();
   };
 
   return (
@@ -183,9 +184,9 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
       <SuccessModal
         open={successModalOpen}
         onOpenChange={setSuccessModalOpen}
-        title="Sucesso!"
-        message="Favorecido cadastrado com sucesso."
-        buttonText="OK"
+        title={successConfig.title}
+        message={successConfig.message}
+        buttonText={successConfig.buttonText}
         onButtonClick={handleCloseSuccessModal}
       />
     </div>

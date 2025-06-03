@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Group } from "@/types/group";
 import { useGroupOperations } from "@/services/group/hooks";
 import { toast } from "sonner";
+import { useSuccessModal } from "@/hooks/useSuccessModal";
 
 export const useGroupPayment = () => {
   const [groups, setGroups] = useState<Group[]>([]);
@@ -15,6 +16,7 @@ export const useGroupPayment = () => {
   const [hasError, setHasError] = useState(false);
   
   const { fetchGroups, fetchGroupMembers } = useGroupOperations();
+  const { isOpen: successModalOpen, config: successConfig, showSuccess, hideSuccess } = useSuccessModal();
 
   useEffect(() => {
     console.log("useGroupPayment hook initialized");
@@ -67,9 +69,11 @@ export const useGroupPayment = () => {
       // Por enquanto, vamos simular o processamento
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      toast.success(`Lançamento criado para o grupo "${selectedGroup?.nome}"`, {
-        description: `${members.length} favorecidos processados`
-      });
+      showSuccess(
+        "Lançamento Criado!",
+        `Lançamento criado para o grupo "${selectedGroup?.nome}" com ${members.length} favorecidos processados.`,
+        "Entendi"
+      );
       
       // Limpar formulário
       setSelectedGroupId("");
@@ -102,6 +106,9 @@ export const useGroupPayment = () => {
     hasError,
     selectedGroup,
     loadGroups,
-    handleSubmit
+    handleSubmit,
+    successModalOpen,
+    successConfig,
+    hideSuccess
   };
 };

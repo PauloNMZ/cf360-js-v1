@@ -11,6 +11,7 @@ import { useGroupOperations } from "@/services/group/hooks";
 import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { validarInscricao } from "@/utils/validation/registrationUtils";
+import { useSuccessModal } from "@/hooks/useSuccessModal";
 
 export const useFavorecidos = () => {
   const queryClient = useQueryClient();
@@ -21,7 +22,9 @@ export const useFavorecidos = () => {
   const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [favorecidoToDelete, setFavorecidoToDelete] = useState<string | null>(null);
-  const [successModalOpen, setSuccessModalOpen] = useState(false);
+  
+  // Use the new success modal hook
+  const { isOpen: successModalOpen, config: successConfig, showSuccess, hideSuccess, setIsOpen: setSuccessModalOpen } = useSuccessModal();
 
   // Debug logs for modal states
   console.log("useFavorecidos - Current states:", {
@@ -78,7 +81,11 @@ export const useFavorecidos = () => {
     onSuccess: (_, variables) => {
       const { mode } = variables;
       setModalOpen(false);
-      setSuccessModalOpen(true);
+      showSuccess(
+        "Sucesso!",
+        mode === 'create' ? "Favorecido cadastrado com sucesso." : "Favorecido atualizado com sucesso.",
+        "OK"
+      );
       queryClient.invalidateQueries({ queryKey: ['favorecidos'] });
     },
     onError: (error, variables) => {
@@ -94,7 +101,7 @@ export const useFavorecidos = () => {
       return await deleteFavorecido(id);
     },
     onSuccess: () => {
-      toast.success("Favorecido excluído com sucesso");
+      showSuccess("Sucesso!", "Favorecido excluído com sucesso.", "OK");
       queryClient.invalidateQueries({ queryKey: ['favorecidos'] });
       setDeleteDialogOpen(false);
       setFavorecidoToDelete(null);
@@ -197,6 +204,7 @@ export const useFavorecidos = () => {
     deleteDialogOpen,
     favorecidoToDelete,
     successModalOpen,
+    successConfig,
     handleCreateNew,
     handleEdit,
     handleDelete,
@@ -207,7 +215,7 @@ export const useFavorecidos = () => {
     handleSave,
     setModalOpen,
     setDeleteDialogOpen,
-    setSuccessModalOpen,
+    setSuccessModalOpen: hideSuccess,
     refetch,
   };
 };
