@@ -80,7 +80,7 @@ export const useFavorecidosWorkflowNavigation = ({
         case 1:
           // Step 1: Data de Pagamento
           const hasPaymentDate = !!workflow.paymentDate;
-          console.log("Step 1 validation - hasPaymentDate:", hasPaymentDate);
+          console.log("Step 1 validation - hasPaymentDate:", hasPaymentDate, "paymentDate:", workflow.paymentDate);
           return hasPaymentDate;
         case 2:
           // Step 2: Tipo de Serviço
@@ -101,7 +101,7 @@ export const useFavorecidosWorkflowNavigation = ({
         case 1:
           // Step 1: Data de Pagamento (empresa já selecionada no header)
           const hasPaymentDate = !!workflow.paymentDate;
-          console.log("Step 1 validation (with company) - hasPaymentDate:", hasPaymentDate);
+          console.log("Step 1 validation (with company) - hasPaymentDate:", hasPaymentDate, "paymentDate:", workflow.paymentDate);
           return hasPaymentDate;
         case 2:
           // Step 2: Tipo de Serviço
@@ -124,12 +124,16 @@ export const useFavorecidosWorkflowNavigation = ({
     const isValid = isCurrentStepValid();
     const maxStep = getTotalSteps();
     
-    console.log("goToNextStep - isValid:", isValid, "currentStep:", currentStep, "maxStep:", maxStep);
+    console.log("goToNextStep called - isValid:", isValid, "currentStep:", currentStep, "maxStep:", maxStep);
     
     if (isValid && currentStep < maxStep) {
+      console.log("Moving to next step:", currentStep + 1);
       setCurrentStep(currentStep + 1);
     } else {
       console.log("Cannot go to next step - validation failed or at max step");
+      if (!isValid) {
+        console.log("Validation details - workflow:", workflow);
+      }
     }
   };
 

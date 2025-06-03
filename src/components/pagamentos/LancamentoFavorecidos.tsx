@@ -102,6 +102,15 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
     setNotificationModalOpen();
   };
 
+  // Debug: log workflow state changes
+  useEffect(() => {
+    console.log("Workflow state changed:", {
+      currentStep: workflowData.currentStep,
+      workflow: workflowData.workflow,
+      isCurrentStepValid: workflowData.isCurrentStepValid()
+    });
+  }, [workflowData.currentStep, workflowData.workflow]);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -160,7 +169,7 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
         setNotificationModalOpen={setNotificationModalOpen}
         notificationConfig={notificationConfig}
         onCloseNotificationModal={handleCloseNotificationModal}
-        // Workflow props
+        // Workflow props - corrigindo para passar a função, não o resultado
         showWorkflowDialog={workflowData.showWorkflowDialog}
         setShowWorkflowDialog={workflowData.setShowWorkflowDialog}
         workflow={workflowData.workflow}
@@ -171,7 +180,7 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
         getStepTitle={workflowData.getStepTitle}
         goToNextStep={workflowData.goToNextStep}
         goToPreviousStep={workflowData.goToPreviousStep}
-        isCurrentStepValid={workflowData.isCurrentStepValid()}
+        isCurrentStepValid={workflowData.isCurrentStepValid}
         handleSubmitWorkflow={workflowData.handleSubmitWorkflow}
         convenentes={workflowData.convenentes}
         carregandoConvenentes={workflowData.carregandoConvenentes}
