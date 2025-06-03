@@ -1,5 +1,6 @@
 
 export type PixKeyType = "CPF" | "CNPJ" | "EMAIL" | "TELEFONE" | "ALEATORIA";
+export type TipoContaType = "CC" | "PP" | "TD";
 
 export interface FavorecidoData {
   id?: string;
@@ -9,6 +10,7 @@ export interface FavorecidoData {
   banco: string;
   agencia: string;
   conta: string;
+  tipoConta: TipoContaType;
   chavePix: string;
   tipoChavePix: PixKeyType;
   valorPadrao: number;
@@ -24,6 +26,7 @@ export const emptyFavorecido: FavorecidoData = {
   banco: "",
   agencia: "",
   conta: "",
+  tipoConta: "CC",
   chavePix: "",
   tipoChavePix: "CPF",
   valorPadrao: 0

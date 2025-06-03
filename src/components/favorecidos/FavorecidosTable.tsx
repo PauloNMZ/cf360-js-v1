@@ -1,6 +1,6 @@
 
 import React from "react";
-import { FavorecidoData } from "@/types/favorecido";
+import { FavorecidoData, TipoContaType } from "@/types/favorecido";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash, ChevronLeft, ChevronRight } from "lucide-react";
@@ -24,6 +24,19 @@ interface FavorecidosTableProps {
   onSelectionChange?: (selectedIds: string[]) => void;
   itemsPerPage?: number;
 }
+
+const getTipoContaLabel = (tipo: TipoContaType): string => {
+  switch (tipo) {
+    case "CC":
+      return "Conta Corrente";
+    case "PP":
+      return "Conta Poupança";
+    case "TD":
+      return "Ted";
+    default:
+      return tipo;
+  }
+};
 
 const FavorecidosTable: React.FC<FavorecidosTableProps> = ({
   favorecidos,
@@ -126,6 +139,7 @@ const FavorecidosTable: React.FC<FavorecidosTableProps> = ({
                 <TableHead className="table-header-elegant">INSCRIÇÃO</TableHead>
                 <TableHead className="table-header-elegant">TIPO</TableHead>
                 <TableHead className="table-header-elegant">BANCO/AGÊNCIA/CONTA</TableHead>
+                <TableHead className="table-header-elegant">TIPO</TableHead>
                 <TableHead className="table-header-elegant">CHAVE PIX</TableHead>
                 <TableHead className="table-header-elegant">VALOR PADRÃO</TableHead>
                 {showActions && (
@@ -158,6 +172,9 @@ const FavorecidosTable: React.FC<FavorecidosTableProps> = ({
                       ? `${favorecido.banco} / ${favorecido.agencia} / ${favorecido.conta}` 
                       : "-"
                     }
+                  </TableCell>
+                  <TableCell>
+                    {favorecido.tipoConta ? getTipoContaLabel(favorecido.tipoConta) : "-"}
                   </TableCell>
                   <TableCell>
                     {favorecido.chavePix 

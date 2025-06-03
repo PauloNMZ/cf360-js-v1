@@ -90,7 +90,7 @@ const FavorecidoFormModal: React.FC<FavorecidoFormModalProps> = ({
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-4 mt-4">
+        <div className="grid grid-cols-4 gap-4 mt-4">
           <FormField name="banco" label="Banco" className="w-full">
             <Input 
               id="banco"
@@ -118,10 +118,25 @@ const FavorecidoFormModal: React.FC<FavorecidoFormModalProps> = ({
               placeholder="00000-0"
             />
           </FormField>
+          <FormField name="tipoConta" label="Tipo" className="w-full">
+            <Select 
+              value={currentFavorecido.tipoConta}
+              onValueChange={(value) => handleSelectChange("tipoConta", value)}
+            >
+              <SelectTrigger id="tipoConta">
+                <SelectValue placeholder="Tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="CC">Conta Corrente</SelectItem>
+                <SelectItem value="PP">Conta Poupança</SelectItem>
+                <SelectItem value="TD">Ted</SelectItem>
+              </SelectContent>
+            </Select>
+          </FormField>
         </div>
 
         <div className="grid grid-cols-3 gap-4 mt-4">
-          <FormField name="tipoChavePix" label="Tipo Chave PIX" className="w-full">
+          <FormField name="tipoChavePix" label="Tipo Chave Pix" className="w-full">
             <Select 
               value={currentFavorecido.tipoChavePix}
               onValueChange={(value) => handleSelectChange("tipoChavePix", value as any)}
@@ -138,13 +153,13 @@ const FavorecidoFormModal: React.FC<FavorecidoFormModalProps> = ({
               </SelectContent>
             </Select>
           </FormField>
-          <FormField name="chavePix" label="Chave PIX" className="col-span-2">
+          <FormField name="chavePix" label="Chave Pix" className="col-span-2">
             <Input 
               id="chavePix"
               name="chavePix"
               value={currentFavorecido.chavePix}
               onChange={handleInputChange}
-              placeholder="Informe a chave PIX"
+              placeholder="Informe a chave Pix"
             />
           </FormField>
         </div>
