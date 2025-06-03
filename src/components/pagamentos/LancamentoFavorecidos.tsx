@@ -5,11 +5,10 @@ import { useFavorecidosWorkflow } from '@/hooks/favorecidos/useFavorecidosWorkfl
 import { useLancamentoFavorecidosState } from '@/hooks/favorecidos/useLancamentoFavorecidosState';
 import { useLancamentoFavorecidosHandlers } from '@/hooks/favorecidos/useLancamentoFavorecidosHandlers';
 import { useLancamentoFavorecidosReport } from '@/hooks/favorecidos/useLancamentoFavorecidosReport';
-import FavorecidoHeader from './favorecidos/FavorecidoHeader';
-import SelectedFavorecidoView from './favorecidos/SelectedFavorecidoView';
-import FavorecidosListView from './favorecidos/FavorecidosListView';
-import SelectedFavorecidosActions from './favorecidos/SelectedFavorecidosActions';
-import LancamentoFavorecidosDialogs from './favorecidos/LancamentoFavorecidosDialogs';
+import { Button } from "@/components/ui/button";
+import { Plus, Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import FavorecidosTable from "@/components/favorecidos/FavorecidosTable";
 
 interface LancamentoFavorecidosProps {
   hidePixColumn?: boolean;
@@ -104,89 +103,91 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
 
   return (
     <div className="space-y-6">
-      <FavorecidoHeader onCreateNew={handleCreateNew} />
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-semibold">Favorecidos</h2>
+        <Button onClick={handleCreateNew} className="flex items-center gap-2">
+          <Plus size={16} />
+          Novo Favorecido
+        </Button>
+      </div>
 
       {selectedFavorecido ? (
-        <SelectedFavorecidoView 
-          selectedFavorecido={selectedFavorecido}
-          onCancel={handleCancelSelection}
-        />
+        // Selected Favorecido View
+        <div className="p-4 border rounded-md bg-background">
+          <h3 className="text-lg font-semibold mb-4">Favorecido Selecionado</h3>
+          <p><strong>Nome:</strong> {selectedFavorecido?.nome}</p>
+          <p><strong>Inscrição:</strong> {selectedFavorecido?.inscricao}</p>
+          <div className="mt-4">
+            <Button variant="outline" onClick={handleCancelSelection}>
+              Voltar à Lista
+            </Button>
+          </div>
+        </div>
       ) : (
         <>
-          <FavorecidosListView
-            searchTerm={searchTerm}
-            onSearchChange={handleSearchChange}
-            isLoading={isLoading}
-            filteredFavorecidos={filteredFavorecidos}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onSelectFavorecido={handleSelectFavorecido}
-            selectedFavorecidos={selectedFavorecidos}
-            onSelectionChange={handleSelectionChange}
-            hidePixColumn={hidePixColumn}
-            hideBankColumn={hideBankColumn}
-            hideTipoColumn={hideTipoColumn}
-          />
+          {/* List View */}
+          <div className="space-y-4">
+            <div className="flex gap-4">
+              <Input
+                placeholder="Buscar favorecidos..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+                className="max-w-md"
+              />
+            </div>
 
-          <SelectedFavorecidosActions
-            selectedCount={selectedFavorecidos.length}
-            onProcessSelected={handleProcessSelected}
-            onGenerateReport={handleGenerateReportOnly}
-            onClearSelection={() => setSelectedFavorecidos([])}
-            hasConvenente={hasConvenente}
-          />
+            {isLoading ? (
+              <div className="flex justify-center items-center h-64">
+                <Loader2 className="h-8 w-8 animate-spin" />
+              </div>
+            ) : (
+              <FavorecidosTable
+                favorecidos={filteredFavorecidos}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                itemsPerPage={10}
+              />
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-4 items-center p-4 border rounded-md bg-muted/50">
+            <span className="text-sm text-muted-foreground">
+              {selectedFavorecidos.length} favorecido(s) selecionado(s)
+            </span>
+            
+            <div className="flex gap-2 ml-auto">
+              {selectedFavorecidos.length > 0 && (
+                <Button 
+                  variant="outline" 
+                  onClick={() => setSelectedFavorecidos([])}
+                  size="sm"
+                >
+                  Limpar Seleção
+                </Button>
+              )}
+              
+              <Button 
+                onClick={handleGenerateReportOnly}
+                disabled={selectedFavorecidos.length === 0 || !hasConvenente}
+                variant="outline"
+                size="sm"
+              >
+                Gerar Relatório
+              </Button>
+              
+              <Button 
+                onClick={handleProcessSelected}
+                disabled={selectedFavorecidos.length === 0}
+                size="sm"
+              >
+                Processar Selecionados
+              </Button>
+            </div>
+          </div>
         </>
       )}
-
-      <LancamentoFavorecidosDialogs
-        showWorkflowDialog={workflowData.showWorkflowDialog}
-        setShowWorkflowDialog={workflowData.setShowWorkflowDialog}
-        workflow={workflowData.workflow}
-        updateWorkflow={workflowData.updateWorkflow}
-        currentStep={workflowData.currentStep}
-        goToNextStep={workflowData.goToNextStep}
-        goToPreviousStep={workflowData.goToPreviousStep}
-        handleSubmitWorkflow={workflowData.handleSubmitWorkflow}
-        isCurrentStepValid={workflowData.isCurrentStepValid}
-        convenentes={workflowData.convenentes}
-        carregandoConvenentes={workflowData.carregandoConvenentes}
-        getTotalSteps={workflowData.getTotalSteps}
-        getDisplayStepNumber={workflowData.getDisplayStepNumber}
-        getStepTitle={workflowData.getStepTitle}
-        
-        showDirectoryDialog={workflowData.showDirectoryDialog}
-        setShowDirectoryDialog={workflowData.setShowDirectoryDialog}
-        handleSaveDirectorySettings={workflowData.handleSaveDirectorySettings}
-        
-        showPDFPreviewDialog={workflowData.showPDFPreviewDialog}
-        setShowPDFPreviewDialog={workflowData.setShowPDFPreviewDialog}
-        reportData={workflowData.reportData}
-        showEmailConfigDialog={workflowData.showEmailConfigDialog}
-        setShowEmailConfigDialog={workflowData.setShowEmailConfigDialog}
-        defaultEmailMessage={workflowData.defaultEmailMessage}
-        reportDate={workflowData.reportDate}
-        handleSendEmailReport={workflowData.handleSendEmailReport}
-        handleEmailSubmit={workflowData.handleEmailSubmit}
-        
-        modalOpen={modalOpen}
-        setModalOpen={setModalOpen}
-        currentFavorecido={currentFavorecido}
-        grupos={grupos}
-        handleInputChange={handleInputChange}
-        handleSelectChange={handleSelectChange}
-        handleSave={handleSave}
-        formMode={formMode}
-        isLoading={isLoading}
-        
-        deleteDialogOpen={deleteDialogOpen}
-        setDeleteDialogOpen={setDeleteDialogOpen}
-        confirmDelete={confirmDelete}
-        
-        notificationModalOpen={notificationModalOpen}
-        setNotificationModalOpen={setNotificationModalOpen}
-        notificationConfig={notificationConfig}
-        onCloseNotificationModal={handleCloseNotificationModal}
-      />
     </div>
   );
 };

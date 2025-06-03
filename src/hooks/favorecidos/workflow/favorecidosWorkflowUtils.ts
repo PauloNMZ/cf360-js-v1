@@ -26,7 +26,7 @@ export const getDisplayStepNumber = (currentStep: number): number => {
 
 export const mapFavorecidoToRowData = (favorecido: FavorecidoData & { id: string }, index: number) => {
   return {
-    id: favorecido.id,
+    id: index, // Convert string id to numeric index for RowData compatibility
     nome: favorecido.nome,
     inscricao: favorecido.inscricao,
     tipoInscricao: favorecido.tipoInscricao,
@@ -34,8 +34,9 @@ export const mapFavorecidoToRowData = (favorecido: FavorecidoData & { id: string
     agencia: favorecido.agencia,
     conta: favorecido.conta,
     tipoConta: favorecido.tipoConta,
-    valor: favorecido.valor || 0,
-    index
+    valor: (favorecido as any).valor || 0, // Add valor with type assertion
+    index,
+    originalId: favorecido.id // Keep original string id for reference
   };
 };
 
