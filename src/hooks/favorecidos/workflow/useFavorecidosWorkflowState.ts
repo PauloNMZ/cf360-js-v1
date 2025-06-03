@@ -1,15 +1,24 @@
 
 import { useState } from 'react';
+import { useFavorecidosWorkflowCompany } from './useFavorecidosWorkflowCompany';
 
 export const useFavorecidosWorkflowState = () => {
+  const { hasSelectedCompany } = useFavorecidosWorkflowCompany();
+  
   const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
   const [showDirectoryDialog, setShowDirectoryDialog] = useState(false);
-  const [currentStep, setCurrentStep] = useState(1);
+  
+  // Começar no step correto baseado se há empresa selecionada
+  const [currentStep, setCurrentStep] = useState(() => {
+    return hasSelectedCompany() ? 1 : 0;
+  });
+  
   const [cnabFileGenerated, setCnabFileGenerated] = useState(false);
   const [cnabFileName, setCnabFileName] = useState('');
   const [workflow, setWorkflow] = useState({
     convenente: null,
-    paymentDate: null // Inicializar como null para permitir validação correta
+    paymentDate: null,
+    serviceType: "Pagamentos Diversos" // Valor padrão
   });
 
   const updateWorkflow = (updates: any) => {

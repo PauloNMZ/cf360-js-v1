@@ -4,6 +4,7 @@ import { CNABWorkflowData, Favorecido } from '@/types/cnab240';
 import { downloadCNABFile, processSelectedRows } from '@/services/cnab240/cnab240Service';
 import { RowData } from '@/types/importacao';
 import { useNotificationModalContext } from '@/components/ui/NotificationModalProvider';
+import { useIndexPageContext } from '@/hooks/useIndexPageContext';
 
 interface UseWorkflowDialogOptions {
   selectedConvenente?: any;
@@ -13,9 +14,16 @@ interface UseWorkflowDialogOptions {
 export const useWorkflowDialog = (options: UseWorkflowDialogOptions = {}) => {
   const { selectedConvenente, hasSelectedConvenente = false } = options;
   const { showSuccess, showInfo } = useNotificationModalContext();
+  const { selectedHeaderCompany } = useIndexPageContext();
   
   const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
-  const [currentStep, setCurrentStep] = useState<number>(1);
+  
+  // Determinar step inicial baseado se há empresa selecionada
+  const hasCompanyInHeader = !!(selectedHeaderCompany && selectedHeaderCompany.razaoSocial);
+  const [currentStep, setCurrentStep] = useState<number>(() => {
+    return (hasCompanyInHeader || hasSelectedConvenente) ? 1 : 0;
+  });
+  
   const [workflow, setWorkflow] = useState<CNABWorkflowData>({
     paymentDate: undefined,
     serviceType: "Pagamentos Diversos",
@@ -34,35 +42,33 @@ export const useWorkflowDialog = (options: UseWorkflowDialogOptions = {}) => {
     }));
   }, [selectedConvenente, hasSelectedConvenente]);
 
-  // Determine total steps based on whether convenente is pre-selected
+  // Determine total steps based on whether convenente is pre-selected or company is in header
   const getTotalSteps = () => {
-    return hasSelectedConvenente ? 3 : 4; // Skip step 3 if convenente is already selected
+    return (hasCompanyInHeader || hasSelectedConvenente) ? 4 : 5;
   };
 
-  // Get the actual step number for display (renumber when step 3 is skipped)
+  // Get the actual step number for display
   const getDisplayStepNumber = (step: number) => {
-    if (!hasSelectedConvenente) return step;
-    if (step <= 2) return step;
-    if (step === 4) return 3; // Step 4 becomes step 3 when step 3 is skipped
-    return step;
+    if (hasCompanyInHeader || hasSelectedConvenente) {
+      return step;
+    }
+    return step + 1; // When step 0 exists, display as 1, 2, 3, 4, 5
   };
 
   // Navigation functions with conditional logic
   const goToNextStep = () => {
-    if (hasSelectedConvenente && currentStep === 2) {
-      // Skip step 3 (convenente selection) and go directly to step 4
-      setCurrentStep(4);
-    } else {
-      setCurrentStep(prev => Math.min(prev + 1, hasSelectedConvenente ? 4 : 4));
+    const isValid = isCurrentStepValid();
+    const maxStep = getTotalSteps();
+    
+    if (isValid && currentStep < maxStep) {
+      setCurrentStep(prev => prev + 1);
     }
   };
 
   const goToPreviousStep = () => {
-    if (hasSelectedConvenente && currentStep === 4) {
-      // Skip step 3 (convenente selection) and go directly to step 2
-      setCurrentStep(2);
-    } else {
-      setCurrentStep(prev => Math.max(prev - 1, 1));
+    const minStep = (hasCompanyInHeader || hasSelectedConvenente) ? 1 : 0;
+    if (currentStep > minStep) {
+      setCurrentStep(prev => prev - 1);
     }
   };
 
@@ -78,7 +84,6 @@ export const useWorkflowDialog = (options: UseWorkflowDialogOptions = {}) => {
       };
       console.log("useWorkflowDialog - workflow após atualização:", newWorkflow);
       
-      // ADDED: Special logging for convenente updates
       if (field === 'convenente') {
         console.log("🎯 CONVENENTE UPDATED:");
         console.log("  - Old convenente:", prev.convenente);
@@ -100,38 +105,80 @@ export const useWorkflowDialog = (options: UseWorkflowDialogOptions = {}) => {
   // Function to check if the current step is valid
   const isCurrentStepValid = () => {
     console.log("useWorkflowDialog - isCurrentStepValid chamado para step:", currentStep);
-    console.log("useWorkflowDialog - workflow.paymentDate:", workflow.paymentDate);
     
-    switch (currentStep) {
-      case 1: // Date selection
-        const isValid = workflow.paymentDate !== undefined && workflow.paymentDate !== null;
-        console.log("useWorkflowDialog - Step 1 válido?", isValid, "paymentDate:", workflow.paymentDate);
-        return isValid;
-      case 2: // Service type
-        return workflow.serviceType !== "";
-      case 3: // Convenente (only validate if not pre-selected)
-        if (hasSelectedConvenente) return true; // Skip validation if pre-selected
-        return workflow.convenente !== null;
-      case 4: // Send method
-        return workflow.sendMethod !== "";
-      default:
-        return false;
+    // Se há empresa no header ou convenente pré-selecionado
+    if (hasCompanyInHeader || hasSelectedConvenente) {
+      switch (currentStep) {
+        case 1: // Data de Pagamento
+          const isValid = workflow.paymentDate !== undefined && workflow.paymentDate !== null;
+          console.log("Step 1 válido?", isValid, "paymentDate:", workflow.paymentDate);
+          return isValid;
+        case 2: // Tipo de Serviço
+          const hasServiceType = workflow.serviceType !== "";
+          console.log("Step 2 válido?", hasServiceType, "serviceType:", workflow.serviceType);
+          return hasServiceType;
+        case 3: // Revisar Dados
+          return true;
+        case 4: // Método de Envio
+          return workflow.sendMethod !== "";
+        default:
+          return false;
+      }
+    } else {
+      // Se não há empresa no header
+      switch (currentStep) {
+        case 0: // Seleção de Empresa
+          const hasConvenente = workflow.convenente !== null;
+          console.log("Step 0 válido?", hasConvenente, "convenente:", workflow.convenente);
+          return hasConvenente;
+        case 1: // Data de Pagamento
+          const isValid = workflow.paymentDate !== undefined && workflow.paymentDate !== null;
+          console.log("Step 1 válido?", isValid, "paymentDate:", workflow.paymentDate);
+          return isValid;
+        case 2: // Tipo de Serviço
+          const hasServiceType = workflow.serviceType !== "";
+          console.log("Step 2 válido?", hasServiceType, "serviceType:", workflow.serviceType);
+          return hasServiceType;
+        case 3: // Revisar Dados
+          return true;
+        case 4: // Método de Envio
+          return workflow.sendMethod !== "";
+        default:
+          return false;
+      }
     }
   };
 
   // Get step title based on current step and whether convenente is pre-selected
   const getStepTitle = () => {
-    switch (currentStep) {
-      case 1:
-        return "Data de Pagamento";
-      case 2:
-        return "Tipo de Serviço";
-      case 3:
-        return hasSelectedConvenente ? "Método de Envio" : "Selecionar Convenente";
-      case 4:
-        return "Método de Envio";
-      default:
-        return "";
+    if (hasCompanyInHeader || hasSelectedConvenente) {
+      switch (currentStep) {
+        case 1:
+          return "Data de Pagamento";
+        case 2:
+          return "Tipo de Serviço";
+        case 3:
+          return "Revisar Dados";
+        case 4:
+          return "Método de Envio";
+        default:
+          return "";
+      }
+    } else {
+      switch (currentStep) {
+        case 0:
+          return "Selecionar Empresa";
+        case 1:
+          return "Data de Pagamento";
+        case 2:
+          return "Tipo de Serviço";
+        case 3:
+          return "Revisar Dados";
+        case 4:
+          return "Método de Envio";
+        default:
+          return "";
+      }
     }
   };
 
@@ -189,6 +236,6 @@ export const useWorkflowDialog = (options: UseWorkflowDialogOptions = {}) => {
     getTotalSteps,
     getDisplayStepNumber,
     getStepTitle,
-    hasSelectedConvenente
+    hasSelectedConvenente: hasSelectedConvenente || hasCompanyInHeader
   };
 };
