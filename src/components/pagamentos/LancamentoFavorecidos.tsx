@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useFavorecidos } from '@/hooks/favorecidos/useFavorecidos';
 import { useFavorecidosWorkflow } from '@/hooks/favorecidos/useFavorecidosWorkflow';
@@ -171,7 +170,7 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
         getStepTitle={workflowData.getStepTitle}
         goToNextStep={workflowData.goToNextStep}
         goToPreviousStep={workflowData.goToPreviousStep}
-        isCurrentStepValid={workflowData.isCurrentStepValid}
+        isCurrentStepValid={workflowData.isCurrentStepValid()}
         handleSubmitWorkflow={workflowData.handleSubmitWorkflow}
         convenentes={workflowData.convenentes}
         carregandoConvenentes={workflowData.carregandoConvenentes}
