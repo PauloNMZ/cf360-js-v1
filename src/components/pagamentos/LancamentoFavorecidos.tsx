@@ -11,7 +11,15 @@ import { Loader2 } from 'lucide-react';
 import SuccessModal from '@/components/ui/SuccessModal';
 import { toast } from "sonner";
 
-const LancamentoFavorecidos = () => {
+interface LancamentoFavorecidosProps {
+  hidePixColumn?: boolean;
+  hideBankColumn?: boolean;
+}
+
+const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
+  hidePixColumn = false,
+  hideBankColumn = false
+}) => {
   const {
     modalOpen,
     setModalOpen,
@@ -115,6 +123,8 @@ const LancamentoFavorecidos = () => {
               selectedFavorecidos={selectedFavorecidos}
               onSelectionChange={handleSelectionChange}
               itemsPerPage={5}
+              hidePixColumn={hidePixColumn}
+              hideBankColumn={hideBankColumn}
             />
           ) : (
             <EmptyState searchTerm={searchTerm} />

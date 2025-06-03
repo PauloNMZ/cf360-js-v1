@@ -16,7 +16,7 @@ const TransferenciasContent = () => {
     switch (activeLancamentoTab) {
       case 'favorecidos':
         console.log("Renderizando LancamentoFavorecidos");
-        return <LancamentoFavorecidos />;
+        return <LancamentoFavorecidos hidePixColumn={true} />;
       case 'planilha':
         console.log("Renderizando ImportarPlanilha");
         return <ImportarPlanilha />;

@@ -15,7 +15,7 @@ const PixContent = () => {
     switch (activePixTab) {
       case 'favorecidos':
         console.log("Renderizando LancamentoFavorecidos");
-        return <LancamentoFavorecidos />;
+        return <LancamentoFavorecidos hideBankColumn={true} />;
       case 'planilha':
         console.log("Renderizando ImportarPlanilha");
         return <ImportarPlanilha />;

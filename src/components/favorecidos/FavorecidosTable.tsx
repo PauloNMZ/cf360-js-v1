@@ -22,6 +22,8 @@ interface FavorecidosTableProps {
   selectedFavorecidos?: string[];
   onSelectionChange?: (selectedIds: string[]) => void;
   itemsPerPage?: number;
+  hidePixColumn?: boolean;
+  hideBankColumn?: boolean;
 }
 
 const getTipoContaLabel = (tipo: TipoContaType): string => {
@@ -45,12 +47,13 @@ const FavorecidosTable: React.FC<FavorecidosTableProps> = ({
   showActions = true,
   selectedFavorecidos = [],
   onSelectionChange,
-  itemsPerPage = 10
+  itemsPerPage = 10,
+  hidePixColumn = false,
+  hideBankColumn = false
 }) => {
   const [currentPage, setCurrentPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(itemsPerPage);
 
-  // Debug logs
   console.log("FavorecidosTable - Total favorecidos:", favorecidos.length);
   console.log("FavorecidosTable - Page size:", pageSize);
   const totalPages = pageSize === -1 ? 1 : Math.ceil(favorecidos.length / pageSize);
@@ -86,7 +89,6 @@ const FavorecidosTable: React.FC<FavorecidosTableProps> = ({
   };
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    // Scroll to top smoothly when page changes
     window.scrollTo({
       top: 0,
       behavior: 'smooth'
@@ -136,9 +138,13 @@ const FavorecidosTable: React.FC<FavorecidosTableProps> = ({
                 )}
                 <TableHead className="table-header-elegant">NOME</TableHead>
                 <TableHead className="table-header-elegant">INSCRIÇÃO</TableHead>
-                <TableHead className="table-header-elegant">BANCO/AGÊNCIA/CONTA</TableHead>
+                {!hideBankColumn && (
+                  <TableHead className="table-header-elegant">BANCO/AGÊNCIA/CONTA</TableHead>
+                )}
                 <TableHead className="table-header-elegant">TIPO</TableHead>
-                <TableHead className="table-header-elegant">CHAVE PIX</TableHead>
+                {!hidePixColumn && (
+                  <TableHead className="table-header-elegant">CHAVE PIX</TableHead>
+                )}
                 <TableHead className="table-header-elegant">VALOR PADRÃO</TableHead>
                 {showActions && (
                   <TableHead className="table-header-actions">AÇÕES</TableHead>
@@ -164,21 +170,25 @@ const FavorecidosTable: React.FC<FavorecidosTableProps> = ({
                   )}
                   <TableCell className="font-medium">{favorecido.nome}</TableCell>
                   <TableCell>{favorecido.inscricao}</TableCell>
-                  <TableCell>
-                    {favorecido.banco && favorecido.agencia && favorecido.conta 
-                      ? `${favorecido.banco} / ${favorecido.agencia} / ${favorecido.conta}` 
-                      : "-"
-                    }
-                  </TableCell>
+                  {!hideBankColumn && (
+                    <TableCell>
+                      {favorecido.banco && favorecido.agencia && favorecido.conta 
+                        ? `${favorecido.banco} / ${favorecido.agencia} / ${favorecido.conta}` 
+                        : "-"
+                      }
+                    </TableCell>
+                  )}
                   <TableCell>
                     {favorecido.tipoConta ? getTipoContaLabel(favorecido.tipoConta) : "-"}
                   </TableCell>
-                  <TableCell>
-                    {favorecido.chavePix 
-                      ? `${favorecido.tipoChavePix}: ${favorecido.chavePix}` 
-                      : "-"
-                    }
-                  </TableCell>
+                  {!hidePixColumn && (
+                    <TableCell>
+                      {favorecido.chavePix 
+                        ? `${favorecido.tipoChavePix}: ${favorecido.chavePix}` 
+                        : "-"
+                      }
+                    </TableCell>
+                  )}
                   <TableCell>{formatCurrency(favorecido.valorPadrao)}</TableCell>
                   {showActions && (
                     <TableCell>
