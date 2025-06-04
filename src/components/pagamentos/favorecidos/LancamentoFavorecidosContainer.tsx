@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useFavorecidos } from '@/hooks/favorecidos/useFavorecidos';
 import { useFavorecidosWorkflow } from '@/hooks/favorecidos/useFavorecidosWorkflow';
@@ -117,7 +116,7 @@ const LancamentoFavorecidosContainer: React.FC<LancamentoFavorecidosContainerPro
       console.log("Workflow state changed:", {
         currentStep: workflowData.currentStep,
         workflow: workflowData.workflow,
-        isCurrentStepValid: workflowData.isCurrentStepValid()
+        isCurrentStepValid: workflowData.isCurrentStepValid
       });
     } catch (error) {
       handleError(error, {
@@ -175,7 +174,7 @@ const LancamentoFavorecidosContainer: React.FC<LancamentoFavorecidosContainerPro
           setNotificationModalOpen={setNotificationModalOpen}
           notificationConfig={notificationConfig}
           onCloseNotificationModal={handleCloseNotificationModal}
-          // Workflow props - pass boolean value by calling the function
+          // Workflow props - pass boolean value directly
           showWorkflowDialog={workflowData.showWorkflowDialog}
           setShowWorkflowDialog={workflowData.setShowWorkflowDialog}
           workflow={workflowData.workflow}
@@ -186,7 +185,7 @@ const LancamentoFavorecidosContainer: React.FC<LancamentoFavorecidosContainerPro
           getStepTitle={() => workflowData.getStepTitle(workflowData.currentStep)}
           goToNextStep={workflowData.goToNextStep}
           goToPreviousStep={workflowData.goToPreviousStep}
-          isCurrentStepValid={workflowData.isCurrentStepValid()} // Call function to get boolean value
+          isCurrentStepValid={workflowData.isCurrentStepValid} // Now passing boolean directly
           handleSubmitWorkflow={workflowData.handleSubmitWorkflow}
           convenentes={workflowData.convenentes}
           carregandoConvenentes={workflowData.carregandoConvenentes}

@@ -1,5 +1,5 @@
 
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 interface UseFavorecidosWorkflowNavigationProps {
   currentStep: number;
@@ -33,7 +33,7 @@ export const useFavorecidosWorkflowNavigation = ({
     return titles[step] || 'Etapa Desconhecida';
   }, []);
 
-  const isCurrentStepValid = useCallback(() => {
+  const isCurrentStepValid = useMemo(() => {
     switch (currentStep) {
       case 0:
         return !!workflow.convenente;
@@ -49,7 +49,7 @@ export const useFavorecidosWorkflowNavigation = ({
   }, [currentStep, workflow]);
 
   const goToNextStep = useCallback(() => {
-    if (currentStep < getTotalSteps() - 1 && isCurrentStepValid()) {
+    if (currentStep < getTotalSteps() - 1 && isCurrentStepValid) {
       setCurrentStep(currentStep + 1);
     }
   }, [currentStep, setCurrentStep, getTotalSteps, isCurrentStepValid]);
@@ -66,6 +66,6 @@ export const useFavorecidosWorkflowNavigation = ({
     getTotalSteps,
     getDisplayStepNumber,
     getStepTitle,
-    isCurrentStepValid // Return the function itself for consistent usage
+    isCurrentStepValid // Now returns boolean value directly
   };
 };
