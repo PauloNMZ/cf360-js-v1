@@ -1,12 +1,10 @@
-import React, { useEffect } from 'react';
-import { useFavorecidos } from '@/hooks/favorecidos/useFavorecidos';
-import { useFavorecidosWorkflow } from '@/hooks/favorecidos/useFavorecidosWorkflow';
-import { useLancamentoFavorecidosState } from '@/hooks/favorecidos/useLancamentoFavorecidosState';
-import { useLancamentoFavorecidosHandlers } from '@/hooks/favorecidos/useLancamentoFavorecidosHandlers';
-import { useLancamentoFavorecidosReport } from '@/hooks/favorecidos/useLancamentoFavorecidosReport';
-import { useErrorHandler } from '@/hooks/useErrorHandler';
+
+import React from 'react';
+import { useLancamentoFavorecidosContainer } from '@/hooks/favorecidos/useLancamentoFavorecidosContainer';
 import LancamentoFavorecidosContent from './LancamentoFavorecidosContent';
 import LancamentoFavorecidosDialogs from './LancamentoFavorecidosDialogs';
+import WorkflowEventHandler from './WorkflowEventHandler';
+import DebugLogger from './DebugLogger';
 import ErrorBoundary from '@/components/ui/ErrorBoundary';
 
 interface LancamentoFavorecidosContainerProps {
@@ -20,161 +18,75 @@ const LancamentoFavorecidosContainer: React.FC<LancamentoFavorecidosContainerPro
   hideBankColumn = false,
   hideTipoColumn = false
 }) => {
-  const { handleError } = useErrorHandler();
-
-  // Favorecidos management
   const {
-    modalOpen,
-    setModalOpen,
-    handleCreateNew,
-    handleEdit,
-    handleDelete,
-    confirmDelete,
-    handleInputChange,
-    handleSelectChange,
-    handleSave,
-    formMode,
-    currentFavorecido,
-    isLoading,
-    filteredFavorecidos,
-    searchTerm,
-    handleSearchChange,
-    notificationModalOpen,
-    notificationConfig,
-    setNotificationModalOpen,
-    deleteDialogOpen,
-    setDeleteDialogOpen,
-    grupos,
-  } = useFavorecidos();
-
-  // Local state management
-  const {
-    selectedFavorecido,
-    setSelectedFavorecido,
-    selectedFavorecidos,
-    setSelectedFavorecidos
-  } = useLancamentoFavorecidosState();
-
-  // Workflow functionality
-  const workflowData = useFavorecidosWorkflow({
-    selectedFavorecidos,
-    favorecidos: filteredFavorecidos
-  });
-
-  // Report functionality
-  const {
-    handleGenerateReportOnly,
-    hasConvenente
-  } = useLancamentoFavorecidosReport({
-    selectedFavorecidos,
-    workflow: workflowData.workflow,
-    handleGenerateOnlyReport: workflowData.handleGenerateOnlyReport,
-    setShowWorkflowDialog: workflowData.setShowWorkflowDialog
-  });
-
-  // Event handlers
-  const {
-    handleSelectFavorecido,
-    handleCancelSelection,
-    handleSelectionChange,
-    handleProcessSelected
-  } = useLancamentoFavorecidosHandlers({
-    selectedFavorecidos,
-    setSelectedFavorecido,
-    setSelectedFavorecidos,
-    setShowWorkflowDialog: workflowData.setShowWorkflowDialog
-  });
-
-  // Listen for custom events from StepFour component
-  useEffect(() => {
-    const handleOpenSettings = () => {
-      try {
-        workflowData.handleOpenDirectorySettings();
-      } catch (error) {
-        handleError(error, {
-          component: 'LancamentoFavorecidosContainer',
-          file: 'LancamentoFavorecidosContainer.tsx',
-          action: 'handleOpenSettings'
-        });
-      }
-    };
-
-    document.addEventListener('openDirectorySettings', handleOpenSettings);
-    
-    return () => {
-      document.removeEventListener('openDirectorySettings', handleOpenSettings);
-    };
-  }, [workflowData.handleOpenDirectorySettings, handleError]);
+    favorecidosData,
+    stateData,
+    workflowData,
+    reportData,
+    handlersData
+  } = useLancamentoFavorecidosContainer();
 
   const handleCloseNotificationModal = () => {
-    setNotificationModalOpen();
+    favorecidosData.setNotificationModalOpen();
   };
-
-  // Debug: log workflow state changes
-  useEffect(() => {
-    try {
-      console.log("Workflow state changed:", {
-        currentStep: workflowData.currentStep,
-        workflow: workflowData.workflow,
-        isCurrentStepValid: workflowData.isCurrentStepValid
-      });
-    } catch (error) {
-      handleError(error, {
-        component: 'LancamentoFavorecidosContainer',
-        file: 'LancamentoFavorecidosContainer.tsx',
-        action: 'logWorkflowState'
-      });
-    }
-  }, [workflowData.currentStep, workflowData.workflow, workflowData.isCurrentStepValid, handleError]);
-
-  // Debug: log selected favorecidos
-  useEffect(() => {
-    console.log("Selected favorecidos changed:", selectedFavorecidos);
-  }, [selectedFavorecidos]);
 
   return (
     <ErrorBoundary>
       <div className="space-y-6">
+        {/* Event Handler */}
+        <WorkflowEventHandler 
+          onOpenDirectorySettings={workflowData.handleOpenDirectorySettings}
+        />
+
+        {/* Debug Logger */}
+        <DebugLogger
+          currentStep={workflowData.currentStep}
+          workflow={workflowData.workflow}
+          isCurrentStepValid={workflowData.isCurrentStepValid}
+          selectedFavorecidos={stateData.selectedFavorecidos}
+        />
+
+        {/* Main Content */}
         <LancamentoFavorecidosContent
-          selectedFavorecido={selectedFavorecido}
-          onCancelSelection={handleCancelSelection}
-          onCreateNew={handleCreateNew}
-          searchTerm={searchTerm}
-          onSearchChange={handleSearchChange}
-          isLoading={isLoading}
-          filteredFavorecidos={filteredFavorecidos}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onSelectFavorecido={handleSelectFavorecido}
-          selectedFavorecidos={selectedFavorecidos}
-          onSelectionChange={handleSelectionChange}
+          selectedFavorecido={stateData.selectedFavorecido}
+          onCancelSelection={handlersData.handleCancelSelection}
+          onCreateNew={favorecidosData.handleCreateNew}
+          searchTerm={favorecidosData.searchTerm}
+          onSearchChange={favorecidosData.handleSearchChange}
+          isLoading={favorecidosData.isLoading}
+          filteredFavorecidos={favorecidosData.filteredFavorecidos}
+          onEdit={favorecidosData.handleEdit}
+          onDelete={favorecidosData.handleDelete}
+          onSelectFavorecido={handlersData.handleSelectFavorecido}
+          selectedFavorecidos={stateData.selectedFavorecidos}
+          onSelectionChange={handlersData.handleSelectionChange}
           hidePixColumn={hidePixColumn}
           hideBankColumn={hideBankColumn}
           hideTipoColumn={hideTipoColumn}
-          hasConvenente={hasConvenente}
-          onClearSelection={() => setSelectedFavorecidos([])}
-          onGenerateReport={handleGenerateReportOnly}
-          onProcessSelected={handleProcessSelected}
+          hasConvenente={reportData.hasConvenente}
+          onClearSelection={() => stateData.setSelectedFavorecidos([])}
+          onGenerateReport={reportData.handleGenerateReportOnly}
+          onProcessSelected={handlersData.handleProcessSelected}
         />
 
+        {/* Dialogs */}
         <LancamentoFavorecidosDialogs
-          modalOpen={modalOpen}
-          setModalOpen={setModalOpen}
-          currentFavorecido={currentFavorecido}
-          grupos={grupos}
-          handleInputChange={handleInputChange}
-          handleSelectChange={handleSelectChange}
-          handleSave={handleSave}
-          formMode={formMode}
-          isLoading={isLoading}
-          deleteDialogOpen={deleteDialogOpen}
-          setDeleteDialogOpen={setDeleteDialogOpen}
-          confirmDelete={confirmDelete}
-          notificationModalOpen={notificationModalOpen}
-          setNotificationModalOpen={setNotificationModalOpen}
-          notificationConfig={notificationConfig}
+          modalOpen={favorecidosData.modalOpen}
+          setModalOpen={favorecidosData.setModalOpen}
+          currentFavorecido={favorecidosData.currentFavorecido}
+          grupos={favorecidosData.grupos}
+          handleInputChange={favorecidosData.handleInputChange}
+          handleSelectChange={favorecidosData.handleSelectChange}
+          handleSave={favorecidosData.handleSave}
+          formMode={favorecidosData.formMode}
+          isLoading={favorecidosData.isLoading}
+          deleteDialogOpen={favorecidosData.deleteDialogOpen}
+          setDeleteDialogOpen={favorecidosData.setDeleteDialogOpen}
+          confirmDelete={favorecidosData.confirmDelete}
+          notificationModalOpen={favorecidosData.notificationModalOpen}
+          setNotificationModalOpen={favorecidosData.setNotificationModalOpen}
+          notificationConfig={favorecidosData.notificationConfig}
           onCloseNotificationModal={handleCloseNotificationModal}
-          // Workflow props - pass boolean value directly
           showWorkflowDialog={workflowData.showWorkflowDialog}
           setShowWorkflowDialog={workflowData.setShowWorkflowDialog}
           workflow={workflowData.workflow}
@@ -185,7 +97,7 @@ const LancamentoFavorecidosContainer: React.FC<LancamentoFavorecidosContainerPro
           getStepTitle={() => workflowData.getStepTitle(workflowData.currentStep)}
           goToNextStep={workflowData.goToNextStep}
           goToPreviousStep={workflowData.goToPreviousStep}
-          isCurrentStepValid={workflowData.isCurrentStepValid} // Now passing boolean directly
+          isCurrentStepValid={workflowData.isCurrentStepValid}
           handleSubmitWorkflow={workflowData.handleSubmitWorkflow}
           convenentes={workflowData.convenentes}
           carregandoConvenentes={workflowData.carregandoConvenentes}
