@@ -22,6 +22,12 @@ export const useProcessWorkflow = (options: UseProcessWorkflowOptions = {}) => {
   // Use directory dialog hook - CORRIGIDO: sem passar parâmetros
   const directoryDialog = useDirectoryDialog();
 
+  // NOVO: Função para processar selecionados (abre o workflow dialog)
+  const handleProcessSelected = () => {
+    console.log("useProcessWorkflow - handleProcessSelected chamado");
+    workflowDialog.setShowWorkflowDialog(true);
+  };
+
   return {
     // Workflow dialog states and methods
     showWorkflowDialog: workflowDialog.showWorkflowDialog,
@@ -45,6 +51,9 @@ export const useProcessWorkflow = (options: UseProcessWorkflowOptions = {}) => {
     setShowDirectoryDialog: directoryDialog.setShowDirectoryDialog,
     handleOpenDirectorySettings: directoryDialog.handleOpenDirectorySettings,
     handleSaveDirectorySettings: directoryDialog.handleSaveDirectorySettings,
+
+    // NOVO: Função para processar selecionados
+    handleProcessSelected,
 
     // CNAB file states - ATUALIZADO: Agora vem do useWorkflowDialog
     cnabFileGenerated: workflowDialog.cnabFileGenerated,
