@@ -22,7 +22,7 @@ export const useLancamentoFavorecidosContainer = () => {
   const reportData = useLancamentoFavorecidosReport({
     selectedFavorecidos: stateData.selectedFavorecidos,
     workflow: workflowData.workflow,
-    handleGenerateOnlyReport: workflowData.handleGenerateOnlyReport,
+    handleGenerateOnlyReport: async () => await workflowData.handleGenerateOnlyReport(), // Wrapper para Promise
     setShowWorkflowDialog: workflowData.setShowWorkflowDialog
   });
 
