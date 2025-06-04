@@ -30,6 +30,9 @@ export function ReportSortDialog({
   const [selectedSort, setSelectedSort] = useState<ReportSortType>(defaultSortType);
 
   const handleConfirm = () => {
+    console.log("=== DEBUG ReportSortDialog - handleConfirm ===");
+    console.log("selectedSort:", selectedSort);
+    console.log("Calling onConfirm with sortType:", selectedSort);
     onConfirm(selectedSort);
     onOpenChange(false);
   };
@@ -50,7 +53,11 @@ export function ReportSortDialog({
         <div className="py-4">
           <RadioGroup
             value={selectedSort}
-            onValueChange={(value) => setSelectedSort(value as ReportSortType)}
+            onValueChange={(value) => {
+              console.log("=== DEBUG ReportSortDialog - onValueChange ===");
+              console.log("New value selected:", value);
+              setSelectedSort(value as ReportSortType);
+            }}
             className="space-y-4"
           >
             {REPORT_SORT_OPTIONS.map((option) => (

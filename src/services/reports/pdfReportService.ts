@@ -62,15 +62,25 @@ const categorizarFavorecidosPorBanco = (favorecidos: RowData[]): TotaisPorCatego
  * Ordena favorecidos de acordo com o tipo de ordenação escolhido
  */
 const ordenarFavorecidos = (favorecidos: RowData[], sortType: ReportSortType = ReportSortType.BY_NAME): RowData[] => {
-  return [...favorecidos].sort((a, b) => {
+  console.log("=== DEBUG ordenarFavorecidos ===");
+  console.log("Input favorecidos count:", favorecidos.length);
+  console.log("Input sortType:", sortType);
+  console.log("Sample of first 3 favorecidos:");
+  favorecidos.slice(0, 3).forEach((fav, index) => {
+    console.log(`  [${index}] NOME: ${fav.NOME}, BANCO: ${fav.BANCO}, VALOR: ${fav.VALOR}`);
+  });
+
+  const sortedFavorecidos = [...favorecidos].sort((a, b) => {
     switch (sortType) {
       case ReportSortType.BY_NAME:
+        console.log("Applying BY_NAME sorting");
         // Por nome (crescente)
         const nomeA = (a.NOME || '').toString().toUpperCase();
         const nomeB = (b.NOME || '').toString().toUpperCase();
         return nomeA.localeCompare(nomeB);
 
       case ReportSortType.BY_BANK_NAME:
+        console.log("Applying BY_BANK_NAME sorting");
         // Por banco + nome + tipo
         const bancoA = (a.BANCO || '').toString().padStart(3, '0');
         const bancoB = (b.BANCO || '').toString().padStart(3, '0');
@@ -89,6 +99,7 @@ const ordenarFavorecidos = (favorecidos: RowData[], sortType: ReportSortType = R
         return tipoA.localeCompare(tipoB);
 
       case ReportSortType.BY_BANK_VALUE:
+        console.log("Applying BY_BANK_VALUE sorting");
         // Por banco + valor (maior para menor)
         const bancoA3 = (a.BANCO || '').toString().padStart(3, '0');
         const bancoB3 = (b.BANCO || '').toString().padStart(3, '0');
@@ -106,6 +117,7 @@ const ordenarFavorecidos = (favorecidos: RowData[], sortType: ReportSortType = R
         return valorB - valorA; // Decrescente
 
       case ReportSortType.BY_VALUE_DESC:
+        console.log("Applying BY_VALUE_DESC sorting");
         // Por valor (maior para menor)
         const valorA2 = typeof a.VALOR === 'number' 
           ? a.VALOR
@@ -117,9 +129,17 @@ const ordenarFavorecidos = (favorecidos: RowData[], sortType: ReportSortType = R
         return valorB2 - valorA2; // Decrescente
 
       default:
+        console.log("Using default sorting (no sort)");
         return 0;
     }
   });
+
+  console.log("After sorting - first 3 favorecidos:");
+  sortedFavorecidos.slice(0, 3).forEach((fav, index) => {
+    console.log(`  [${index}] NOME: ${fav.NOME}, BANCO: ${fav.BANCO}, VALOR: ${fav.VALOR}`);
+  });
+
+  return sortedFavorecidos;
 };
 
 /**
@@ -157,11 +177,18 @@ const adicionarSecaoTotais = (doc: jsPDF, startY: number, totais: TotaisPorCateg
  * Generate a PDF remittance report from the selected rows
  */
 export const generatePDFReport = async (reportData: ReportData, sortType: ReportSortType = ReportSortType.BY_NAME): Promise<Blob> => {
+  console.log("=== DEBUG generatePDFReport ===");
+  console.log("Received reportData with", reportData.beneficiarios.length, "beneficiarios");
+  console.log("Received sortType:", sortType);
+  
   // Create a new PDF document
   const doc = new jsPDF();
   
   // Ordenar favorecidos de acordo com o tipo escolhido
+  console.log("=== Calling ordenarFavorecidos ===");
   const favorecidosOrdenados = ordenarFavorecidos(reportData.beneficiarios, sortType);
+  console.log("=== After ordenarFavorecidos ===");
+  console.log("favorecidosOrdenados count:", favorecidosOrdenados.length);
   
   // Categorizar favorecidos por banco
   const totaisPorCategoria = categorizarFavorecidosPorBanco(favorecidosOrdenados);
@@ -291,5 +318,6 @@ export const generatePDFReport = async (reportData: ReportData, sortType: Report
   
   // Generate the PDF as a Blob
   const pdfBlob = doc.output('blob');
+  console.log("=== PDF generation completed ===");
   return pdfBlob;
 };

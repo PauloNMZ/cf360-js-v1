@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { ReportData, EmailFormValues } from '@/types/importacao';
 import { ReportSortType } from '@/types/reportSorting';
@@ -37,6 +38,10 @@ export const usePDFReportDialog = () => {
     paymentDate: Date | undefined = undefined,
     sortType: ReportSortType = ReportSortType.BY_NAME
   ) => {
+    console.log("=== DEBUG usePDFReportDialog - generateReport ===");
+    console.log("Received sortType:", sortType);
+    console.log("selectedRows count:", selectedRows.length);
+    
     if (selectedRows.length === 0) {
       showError("Erro!", "Nenhum registro selecionado para gerar relatório.");
       return null;
@@ -108,6 +113,10 @@ export const usePDFReportDialog = () => {
         valorTotal: totalValue
       };
       
+      console.log("=== DEBUG usePDFReportDialog - Storing report data and sort type ===");
+      console.log("Storing sortType:", sortType);
+      console.log("Report data beneficiarios count:", pdfReportData.beneficiarios.length);
+      
       // Store report data and sort type
       setReportData(pdfReportData);
       setSelectedSortType(sortType);
@@ -129,6 +138,9 @@ export const usePDFReportDialog = () => {
       } catch (error) {
         console.error("Erro ao gerar relatório Excel:", error);
       }
+
+      console.log("=== DEBUG usePDFReportDialog - Opening PDF preview dialog ===");
+      console.log("selectedSortType being used:", sortType);
 
       // Show PDF preview dialog
       setShowPDFPreviewDialog(true);

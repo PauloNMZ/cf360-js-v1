@@ -26,6 +26,11 @@ export const usePDFReportWithEmail = () => {
     paymentDate: Date | undefined = undefined,
     sortType: ReportSortType = ReportSortType.BY_NAME // ADDED: Sort type parameter
   ) => {
+    console.log("=== DEBUG usePDFReportWithEmail - handleGenerateReport ===");
+    console.log("Received sortType:", sortType);
+    console.log("selectedRows count:", selectedRows.length);
+    console.log("cnabFileGenerated:", cnabFileGenerated);
+    
     if (selectedRows.length === 0) {
       showError("Erro!", "Nenhum registro selecionado para gerar relatório.");
       return;
@@ -46,6 +51,9 @@ export const usePDFReportWithEmail = () => {
       : "Não definida";
     
     setOriginalPaymentDate(formattedPaymentDate);
+
+    console.log("=== DEBUG usePDFReportWithEmail - Calling pdfReportDialog.generateReport ===");
+    console.log("Passing sortType to generateReport:", sortType);
 
     // Generate report with sort type - pass the sort type to generateReport
     const reportResult = await pdfReportDialog.generateReport(
@@ -119,9 +127,9 @@ export const usePDFReportWithEmail = () => {
     
     // Handler functions
     handleGenerateReport,
-    handleSendEmailReport,
-    handleSendEmailReportWithParams, // Export the parameterized version as well
-    handleEmailSubmit,
+    handleSendEmailReport: pdfReportDialog.handleSendEmailReport,
+    handleSendEmailReportWithParams: pdfReportDialog.handleSendEmailReportWithParams, // Export the parameterized version as well
+    handleEmailSubmit: pdfReportDialog.handleEmailSubmit,
     selectedSortType: pdfReportDialog.selectedSortType, // ADDED: Expose sort type
     setSelectedSortType: pdfReportDialog.setSelectedSortType, // ADDED: Expose sort type setter
   };

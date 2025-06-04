@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -76,7 +77,7 @@ export function TableView({
   };
 
   const handleGenerateReportClick = () => {
-    console.log("TableView - Botão Gerar Relatório clicado");
+    console.log("=== DEBUG TableView - handleGenerateReportClick ===");
     console.log("TableView - cnabFileGenerated:", cnabFileGenerated);
     
     if (!cnabFileGenerated) {
@@ -85,11 +86,15 @@ export function TableView({
     }
     
     // Abrir dialog de seleção de ordenação
+    console.log("TableView - Abrindo dialog de ordenação");
     setShowSortDialog(true);
   };
 
   const handleSortConfirm = (sortType: ReportSortType) => {
+    console.log("=== DEBUG TableView - handleSortConfirm ===");
     console.log("TableView - Ordenação selecionada:", sortType);
+    console.log("TableView - Calling handleGenerateReport with sortType:", sortType);
+    
     if (handleGenerateReport) {
       handleGenerateReport(sortType);
     } else {

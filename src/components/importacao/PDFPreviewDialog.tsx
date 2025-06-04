@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import {
   Dialog,
@@ -34,9 +35,14 @@ export function PDFPreviewDialog({
     
     const generatePreview = async () => {
       if (reportData) {
+        console.log("=== DEBUG PDFPreviewDialog - generatePreview ===");
+        console.log("reportData:", reportData);
+        console.log("sortType:", sortType);
+        
         setLoading(true);
         try {
           // Generate PDF blob with sort type
+          console.log("=== Calling generatePDFReport with sortType:", sortType, "===");
           const pdfBlob = await generatePDFReport(reportData, sortType);
           
           // Create a URL for the blob
@@ -45,6 +51,8 @@ export function PDFPreviewDialog({
           
           // Forçar o recarregamento do iframe quando os dados mudarem
           setIframeKey(prev => prev + 1);
+          
+          console.log("=== PDF preview generated successfully ===");
         } catch (error) {
           console.error("Error generating PDF preview:", error);
           toast.error("Erro ao gerar visualização do PDF", {
