@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useFavorecidos } from '@/hooks/favorecidos/useFavorecidos';
 import { useFavorecidosWorkflow } from '@/hooks/favorecidos/useFavorecidosWorkflow';
@@ -186,7 +185,7 @@ const LancamentoFavorecidosContainer: React.FC<LancamentoFavorecidosContainerPro
           getStepTitle={() => workflowData.getStepTitle(workflowData.currentStep)}
           goToNextStep={workflowData.goToNextStep}
           goToPreviousStep={workflowData.goToPreviousStep}
-          isCurrentStepValid={workflowData.isCurrentStepValid}
+          isCurrentStepValid={workflowData.isCurrentStepValid} // Fixed: removed () as it should be a boolean, not a function
           handleSubmitWorkflow={workflowData.handleSubmitWorkflow}
           convenentes={workflowData.convenentes}
           carregandoConvenentes={workflowData.carregandoConvenentes}
