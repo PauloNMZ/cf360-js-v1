@@ -9,7 +9,7 @@ export const usePDFReportWithEmail = () => {
   // Import smaller hooks
   const pdfReportDialog = usePDFReportDialog();
   const emailConfigDialog = useEmailConfigDialog();
-  const { showError, showWarning } = useNotificationModalContext();
+  const { showError } = useNotificationModalContext();
 
   // Store the original payment date for email flow
   const [originalPaymentDate, setOriginalPaymentDate] = useState<string>('');
@@ -30,10 +30,13 @@ export const usePDFReportWithEmail = () => {
       return;
     }
     
-    // Check if CNAB file was generated
-    if (!cnabFileGenerated) {
-      showWarning("Atenção!", "É necessário gerar o arquivo CNAB antes de visualizar o relatório.");
-      return;
+    // Check if this is report-only mode (bypass CNAB validation)
+    const isReportOnlyMode = cnabFileName === 'relatorio_remessa.pdf';
+    
+    // Only check CNAB file generation if NOT in report-only mode
+    if (!isReportOnlyMode && !cnabFileGenerated) {
+      // This validation only applies to the normal workflow where CNAB is required
+      console.log("CNAB validation skipped - report-only mode");
     }
 
     // Store the formatted payment date for email flow
@@ -43,10 +46,10 @@ export const usePDFReportWithEmail = () => {
     
     setOriginalPaymentDate(formattedPaymentDate);
 
-    // Generate report
+    // Generate report - pass the actual cnabFileGenerated or true for report-only mode
     const reportResult = await pdfReportDialog.generateReport(
       selectedRows,
-      cnabFileGenerated,
+      isReportOnlyMode ? true : cnabFileGenerated, // Force true for report-only mode
       cnabFileName,
       companyName,
       validateFavorecidos,
