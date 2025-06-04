@@ -1,8 +1,11 @@
 
 import { useNotificationModalContext } from "@/components/ui/NotificationModalProvider";
+import { usePDFReportWithEmail } from '@/hooks/importacao/usePDFReportWithEmail';
+import { mapFavorecidoToRowData, validateFavorecidos } from './workflow/favorecidosWorkflowUtils';
 
 interface UseLancamentoFavorecidosReportProps {
   selectedFavorecidos: string[];
+  favorecidos: any[];
   workflow: any;
   handleGenerateOnlyReport: () => Promise<void>;
   setShowWorkflowDialog: (show: boolean) => void;
@@ -10,11 +13,13 @@ interface UseLancamentoFavorecidosReportProps {
 
 export const useLancamentoFavorecidosReport = ({
   selectedFavorecidos,
+  favorecidos,
   workflow,
   handleGenerateOnlyReport,
   setShowWorkflowDialog
 }: UseLancamentoFavorecidosReportProps) => {
   const { showError, showInfo } = useNotificationModalContext();
+  const pdfReportWithEmail = usePDFReportWithEmail();
 
   const handleGenerateReportOnly = async () => {
     if (selectedFavorecidos.length === 0) {
@@ -32,7 +37,35 @@ export const useLancamentoFavorecidosReport = ({
     showInfo("Gerando...", "Gerando relatório de remessa...");
     
     try {
-      await handleGenerateOnlyReport();
+      // Get selected favorecidos data
+      const selectedFavorecidosData = favorecidos.filter(fav => 
+        selectedFavorecidos.includes(fav.id)
+      );
+
+      if (selectedFavorecidosData.length === 0) {
+        throw new Error("Nenhum favorecido encontrado");
+      }
+
+      // Convert favorecidos to the format expected by report generation
+      const rowData = selectedFavorecidosData.map((fav, index) => 
+        mapFavorecidoToRowData(fav, index)
+      );
+
+      const companyName = workflow.convenente?.razaoSocial || "Empresa";
+      const companyCnpj = workflow.convenente?.cnpj || "";
+      
+      // Generate report using the PDF system - bypassing CNAB validation
+      await pdfReportWithEmail.handleGenerateReport(
+        rowData,
+        false, // cnabFileGenerated = false for report-only mode
+        'relatorio_remessa.pdf',
+        companyName,
+        validateFavorecidos,
+        workflow.convenente,
+        companyCnpj,
+        workflow.paymentDate
+      );
+      
     } catch (error) {
       console.error("Erro ao gerar relatório:", error);
       showError("Erro!", "Erro ao gerar relatório de remessa.");
@@ -41,6 +74,16 @@ export const useLancamentoFavorecidosReport = ({
 
   return {
     handleGenerateReportOnly,
-    hasConvenente: !!workflow.convenente
+    hasConvenente: !!workflow.convenente,
+    // Expose PDF report states and handlers
+    showPDFPreviewDialog: pdfReportWithEmail.showPDFPreviewDialog,
+    setShowPDFPreviewDialog: pdfReportWithEmail.setShowPDFPreviewDialog,
+    reportData: pdfReportWithEmail.reportData,
+    showEmailConfigDialog: pdfReportWithEmail.showEmailConfigDialog,
+    setShowEmailConfigDialog: pdfReportWithEmail.setShowEmailConfigDialog,
+    defaultEmailMessage: pdfReportWithEmail.defaultEmailMessage,
+    reportDate: pdfReportWithEmail.reportDate,
+    handleSendEmailReport: pdfReportWithEmail.handleSendEmailReport,
+    handleEmailSubmit: pdfReportWithEmail.handleEmailSubmit
   };
 };

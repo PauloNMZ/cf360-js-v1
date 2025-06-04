@@ -49,8 +49,8 @@ export const usePDFReportDialog = () => {
       return null;
     }
     
-    // Check if CNAB file was generated
-    if (!cnabFileGenerated) {
+    // Check if CNAB file was generated - only show warning if explicitly required
+    if (!cnabFileGenerated && cnabFileName !== 'relatorio_remessa.pdf') {
       showWarning("Atenção!", "É necessário gerar o arquivo CNAB antes de visualizar o relatório.");
       return null;
     }

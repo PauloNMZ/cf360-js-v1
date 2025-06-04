@@ -18,11 +18,12 @@ export const useLancamentoFavorecidosContainer = () => {
     favorecidos: favorecidosData.filteredFavorecidos
   });
 
-  // Report functionality
+  // Report functionality - now passing favorecidos data
   const reportData = useLancamentoFavorecidosReport({
     selectedFavorecidos: stateData.selectedFavorecidos,
+    favorecidos: favorecidosData.filteredFavorecidos,
     workflow: workflowData.workflow,
-    handleGenerateOnlyReport: async () => await workflowData.handleGenerateOnlyReport(), // Wrapper para Promise
+    handleGenerateOnlyReport: async () => await workflowData.handleGenerateOnlyReport(),
     setShowWorkflowDialog: workflowData.setShowWorkflowDialog
   });
 

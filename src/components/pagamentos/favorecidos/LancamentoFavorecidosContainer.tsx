@@ -6,6 +6,8 @@ import LancamentoFavorecidosDialogs from './LancamentoFavorecidosDialogs';
 import WorkflowEventHandler from './WorkflowEventHandler';
 import DebugLogger from './DebugLogger';
 import ErrorBoundary from '@/components/ui/ErrorBoundary';
+import { PDFPreviewDialog } from '@/components/importacao/PDFPreviewDialog';
+import { EmailConfigDialog } from '@/components/importacao/EmailConfigDialog';
 
 interface LancamentoFavorecidosContainerProps {
   hidePixColumn?: boolean;
@@ -69,7 +71,7 @@ const LancamentoFavorecidosContainer: React.FC<LancamentoFavorecidosContainerPro
           onProcessSelected={handlersData.handleProcessSelected}
         />
 
-        {/* Dialogs */}
+        {/* Main Dialogs */}
         <LancamentoFavorecidosDialogs
           modalOpen={favorecidosData.modalOpen}
           setModalOpen={favorecidosData.setModalOpen}
@@ -103,6 +105,23 @@ const LancamentoFavorecidosContainer: React.FC<LancamentoFavorecidosContainerPro
           carregandoConvenentes={workflowData.carregandoConvenentes}
           hasSelectedCompany={workflowData.hasSelectedCompany}
           selectedCompany={workflowData.selectedCompany}
+        />
+
+        {/* PDF Preview Dialog */}
+        <PDFPreviewDialog
+          isOpen={reportData.showPDFPreviewDialog}
+          onOpenChange={reportData.setShowPDFPreviewDialog}
+          reportData={reportData.reportData}
+          onSendEmail={reportData.handleSendEmailReport}
+        />
+
+        {/* Email Config Dialog */}
+        <EmailConfigDialog
+          isOpen={reportData.showEmailConfigDialog}
+          onOpenChange={reportData.setShowEmailConfigDialog}
+          defaultMessage={reportData.defaultEmailMessage}
+          onSubmit={reportData.handleEmailSubmit}
+          reportDate={reportData.reportDate}
         />
       </div>
     </ErrorBoundary>
