@@ -1,3 +1,4 @@
+
 import React from 'react';
 import FavorecidoFormModal from "@/components/favorecidos/FavorecidoFormModal";
 import DeleteFavorecidoDialog from "@/components/favorecidos/DeleteFavorecidoDialog";
