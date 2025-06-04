@@ -74,9 +74,9 @@ export const useFavorecidosWorkflowNavigation = ({
       switch (currentStep) {
         case 0:
           // Step 0: Seleção de empresa (quando não há empresa no header)
-          const hasWorkflowConvenente = !!workflow.convenente;
-          console.log("Step 0 validation - hasWorkflowConvenente:", hasWorkflowConvenente);
-          return hasWorkflowConvenente;
+          // Permitir avançar mesmo sem empresa selecionada para que o usuário possa selecionar no próximo step
+          console.log("Step 0 validation - allowing progression to select company");
+          return true;
         case 1:
           // Step 1: Data de Pagamento
           const hasPaymentDate = !!workflow.paymentDate;
