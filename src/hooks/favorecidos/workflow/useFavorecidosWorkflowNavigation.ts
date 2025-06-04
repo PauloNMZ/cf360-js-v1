@@ -14,7 +14,7 @@ interface WorkflowNavigationReturn {
   getTotalSteps: () => number;
   getDisplayStepNumber: (step: number) => number;
   getStepTitle: (step: number) => string;
-  isCurrentStepValid: boolean;
+  isCurrentStepValid: boolean; // CORRIGIDO: Agora é boolean direto, não função
 }
 
 export const useFavorecidosWorkflowNavigation = ({
@@ -42,7 +42,7 @@ export const useFavorecidosWorkflowNavigation = ({
     return titles[step] || 'Etapa Desconhecida';
   }, []);
 
-  // Compute the validation directly as a boolean value with detailed logging
+  // CORRIGIDO: Retorna diretamente o valor boolean em vez de função
   const isCurrentStepValid = useMemo(() => {
     console.log("🔍 Validating step:", currentStep, "workflow state:", { 
       convenente: workflow.convenente, 
@@ -103,6 +103,6 @@ export const useFavorecidosWorkflowNavigation = ({
     getTotalSteps,
     getDisplayStepNumber,
     getStepTitle,
-    isCurrentStepValid
+    isCurrentStepValid // CORRIGIDO: Agora retorna valor boolean direto
   };
 };
