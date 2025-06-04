@@ -24,7 +24,7 @@ interface FavorecidosWorkflowReturn {
   getTotalSteps: () => number;
   getDisplayStepNumber: (step: number) => number;
   getStepTitle: (step: number) => string;
-  isCurrentStepValid: boolean; // Explicitamente tipado como boolean
+  isCurrentStepValid: boolean;
   handleSubmitWorkflow: () => void;
   handleGenerateOnlyReport: () => void;
   handleOpenDirectorySettings: () => void;
@@ -63,7 +63,7 @@ export const useFavorecidosWorkflow = ({ selectedFavorecidos, favorecidos }: Use
 
   // Processing
   const {
-    handleSubmitWorkflow,
+    handleSubmitWorkflow: originalHandleSubmitWorkflow,
     handleGenerateOnlyReport
   } = useFavorecidosWorkflowProcessing({
     workflow,
@@ -87,6 +87,23 @@ export const useFavorecidosWorkflow = ({ selectedFavorecidos, favorecidos }: Use
     carregandoConvenentes
   } = useConvenentesData();
 
+  // Wrapper para handleSubmitWorkflow com logs de debug
+  const handleSubmitWorkflow = () => {
+    console.log("🚀 useFavorecidosWorkflow - handleSubmitWorkflow called");
+    console.log("Current workflow state:", workflow);
+    console.log("Selected favorecidos:", selectedFavorecidos);
+    console.log("Current step:", currentStep);
+    console.log("Is current step valid:", navigationData.isCurrentStepValid);
+    
+    if (!navigationData.isCurrentStepValid) {
+      console.log("❌ Current step is not valid, cannot proceed");
+      return;
+    }
+    
+    console.log("✅ Calling original handleSubmitWorkflow");
+    originalHandleSubmitWorkflow();
+  };
+
   // Initialize workflow when selectedFavorecidos changes
   useEffect(() => {
     if (selectedFavorecidos.length > 0) {
@@ -105,7 +122,7 @@ export const useFavorecidosWorkflow = ({ selectedFavorecidos, favorecidos }: Use
     getTotalSteps: navigationData.getTotalSteps,
     getDisplayStepNumber: navigationData.getDisplayStepNumber,
     getStepTitle: navigationData.getStepTitle,
-    isCurrentStepValid: navigationData.isCurrentStepValid, // Now directly a boolean value
+    isCurrentStepValid: navigationData.isCurrentStepValid, // FIXED: Now correctly typed as boolean
     handleSubmitWorkflow,
     handleGenerateOnlyReport,
     handleOpenDirectorySettings,

@@ -24,6 +24,18 @@ const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
   goToNextStep,
   handleSubmit
 }) => {
+  console.log("WorkflowNavigation render - currentStep:", currentStep, "totalSteps:", totalSteps, "isCurrentStepValid:", isCurrentStepValid);
+  
+  const handleFinalizarClick = () => {
+    console.log("🎯 Finalizar button clicked!");
+    console.log("Current step:", currentStep, "Total steps:", totalSteps);
+    console.log("Is current step valid:", isCurrentStepValid);
+    handleSubmit();
+  };
+
+  // Determinar se estamos no último step (considerando que steps vão de 0 a totalSteps-1)
+  const isLastStep = currentStep >= totalSteps - 1;
+  
   return (
     <div className="flex justify-between items-center mt-4 px-2">
       <div className="text-sm text-gray-500">
@@ -42,7 +54,7 @@ const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
           </Button>
         )}
         
-        {currentStep < totalSteps ? (
+        {!isLastStep ? (
           <Button 
             onClick={goToNextStep}
             disabled={!isCurrentStepValid}
@@ -53,7 +65,8 @@ const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
           </Button>
         ) : (
           <Button 
-            onClick={handleSubmit}
+            onClick={handleFinalizarClick}
+            disabled={!isCurrentStepValid}
             className="bg-green-600 hover:bg-green-700 px-6"
           >
             Finalizar
