@@ -65,6 +65,8 @@ export const useImportacao = () => {
     handleSelectAll: tableOps.handleSelectAll,
     handleSelectRow: tableOps.handleSelectRow,
     handleDeleteRow: tableOps.handleDeleteRow,
+    handleClearSelection: tableOps.handleClearSelection, // NOVO: Exportar função de limpar seleção
+    getSelectedCount: tableOps.getSelectedCount, // NOVO: Exportar contagem de selecionados
     
     // UI state
     showTable,

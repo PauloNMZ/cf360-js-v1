@@ -55,6 +55,8 @@ export interface TableViewProps {
   handleSelectRow: (id: number, checked: boolean) => void;
   handleDeleteRow: (id: number) => void;
   handleProcessSelected: () => void;
+  handleClearSelection: () => void; // NOVO: Função para limpar seleção
+  selectedCount: number; // NOVO: Contagem de registros selecionados
   handleVerifyErrors: () => void;
   handleExportErrors: () => void;
   handleGenerateReport: () => void;

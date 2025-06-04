@@ -72,7 +72,17 @@ export const useTableOperations = (initialData: RowData[] = []) => {
     showSuccess("Sucesso!", "Linha removida com sucesso!");
   };
 
+  // NOVO: Handle clearing all selections
+  const handleClearSelection = () => {
+    setSelectAll(false);
+    setTableData(prevData => 
+      prevData.map(row => ({ ...row, selected: false }))
+    );
+    showSuccess("Sucesso!", "Seleção limpa com sucesso!");
+  };
+
   const getSelectedRows = () => tableData.filter(row => row.selected);
+  const getSelectedCount = () => tableData.filter(row => row.selected).length;
 
   return {
     tableData,
@@ -82,6 +92,8 @@ export const useTableOperations = (initialData: RowData[] = []) => {
     handleSelectAll,
     handleSelectRow,
     handleDeleteRow,
-    getSelectedRows
+    handleClearSelection, // NOVO: Exportar função de limpar seleção
+    getSelectedRows,
+    getSelectedCount // NOVO: Exportar contagem de selecionados
   };
 };

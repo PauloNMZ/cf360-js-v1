@@ -48,6 +48,8 @@ const ImportarPlanilha = () => {
     handleSelectAll,
     handleSelectRow,
     handleDeleteRow,
+    handleClearSelection, // NOVO: Importar função de limpar seleção
+    getSelectedCount, // NOVO: Importar contagem de selecionados
     handleProcessar,
     handleProcessSelected,
     handleVerifyErrors,
@@ -104,6 +106,8 @@ const ImportarPlanilha = () => {
             handleSelectRow={handleSelectRow}
             handleDeleteRow={handleDeleteRow}
             handleProcessSelected={handleProcessSelected}
+            handleClearSelection={handleClearSelection} // NOVO: Passar função de limpar seleção
+            selectedCount={getSelectedCount()} // NOVO: Passar contagem de selecionados
             handleVerifyErrors={handleVerifyErrors}
             handleExportErrors={handleExportErrors}
             handleGenerateReport={handleGenerateReport}
