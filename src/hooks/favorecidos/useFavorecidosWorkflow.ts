@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useFavorecidosWorkflowState } from './workflow/useFavorecidosWorkflowState';
 import { useFavorecidosWorkflowNavigation } from './workflow/useFavorecidosWorkflowNavigation';
@@ -122,7 +121,7 @@ export const useFavorecidosWorkflow = ({ selectedFavorecidos, favorecidos }: Use
     getTotalSteps: navigationData.getTotalSteps,
     getDisplayStepNumber: navigationData.getDisplayStepNumber,
     getStepTitle: navigationData.getStepTitle,
-    isCurrentStepValid: navigationData.isCurrentStepValid, // FIXED: Now correctly returns the boolean value
+    isCurrentStepValid: navigationData.isCurrentStepValid, // FIXED: Now correctly returns the boolean value directly
     handleSubmitWorkflow,
     handleGenerateOnlyReport,
     handleOpenDirectorySettings,

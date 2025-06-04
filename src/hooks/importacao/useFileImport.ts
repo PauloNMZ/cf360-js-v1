@@ -146,7 +146,8 @@ export const useFileImport = () => {
       return;
     }
 
-    showSuccess("Sucesso!", `Mostrando ${tableData.length} registros.`);
+    // REMOVED: Modal de sucesso desnecessário - o usuário pode ver os dados na tabela
+    // showSuccess("Sucesso!", `Mostrando ${tableData.length} registros.`);
     return true;
   };
 
