@@ -4,6 +4,7 @@ import FavorecidoFormModal from "@/components/favorecidos/FavorecidoFormModal";
 import DeleteFavorecidoDialog from "@/components/favorecidos/DeleteFavorecidoDialog";
 import NotificationModal from "@/components/ui/NotificationModal";
 import WorkflowDialog from "@/components/importacao/WorkflowDialog";
+import { RowData } from "@/types/importacao";
 
 interface LancamentoFavorecidosDialogsProps {
   modalOpen: boolean;
@@ -81,6 +82,15 @@ const LancamentoFavorecidosDialogs: React.FC<LancamentoFavorecidosDialogsProps> 
   hasSelectedCompany = false,
   selectedCompany = null
 }) => {
+  // CORRIGIDO: Criar wrapper que retorna Promise como esperado pela interface
+  const handleSubmitWorkflowWrapper = async (selectedRows: RowData[]): Promise<{ success: boolean; fileName?: string }> => {
+    if (handleSubmitWorkflow) {
+      handleSubmitWorkflow();
+      return { success: true };
+    }
+    return { success: false };
+  };
+
   return (
     <>
       {/* Form Modal */}
@@ -115,7 +125,7 @@ const LancamentoFavorecidosDialogs: React.FC<LancamentoFavorecidosDialogsProps> 
           totalSteps={getTotalSteps ? getTotalSteps() : 5}
           goToNextStep={goToNextStep || (() => {})}
           goToPreviousStep={goToPreviousStep || (() => {})}
-          handleSubmit={handleSubmitWorkflow || (() => {})}
+          handleSubmit={handleSubmitWorkflowWrapper}
           isCurrentStepValid={isCurrentStepValid}
           convenentes={convenentes}
           carregandoConvenentes={carregandoConvenentes}

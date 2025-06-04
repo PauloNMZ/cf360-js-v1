@@ -96,6 +96,9 @@ export default function ImportacaoModal({ isOpen, onOpenChange }: ImportacaoModa
     carregandoConvenentes
   } = useImportacao();
 
+  // CORRIGIDO: Criar wrapper function para não passar parâmetros
+  const getDisplayStepNumberWrapper = () => getDisplayStepNumber(currentStep);
+
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -153,7 +156,7 @@ export default function ImportacaoModal({ isOpen, onOpenChange }: ImportacaoModa
         convenentes={convenentes}
         carregandoConvenentes={carregandoConvenentes}
         getTotalSteps={getTotalSteps}
-        getDisplayStepNumber={getDisplayStepNumber}
+        getDisplayStepNumber={getDisplayStepNumberWrapper}
         getStepTitle={getStepTitle}
         hasSelectedCompany={hasSelectedConvenente}
       />

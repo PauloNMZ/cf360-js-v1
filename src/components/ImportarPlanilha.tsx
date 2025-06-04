@@ -81,6 +81,9 @@ const ImportarPlanilha = () => {
     };
   }, [handleOpenDirectorySettings]);
 
+  // CORRIGIDO: Criar wrapper functions para não passar parâmetros
+  const getDisplayStepNumberWrapper = () => getDisplayStepNumber(currentStep);
+
   return (
     <ScrollArea className="h-[600px]">
       <div className="space-y-6 pr-4">
@@ -128,7 +131,7 @@ const ImportarPlanilha = () => {
         convenentes={convenentes}
         carregandoConvenentes={carregandoConvenentes}
         getTotalSteps={getTotalSteps}
-        getDisplayStepNumber={getDisplayStepNumber}
+        getDisplayStepNumber={getDisplayStepNumberWrapper}
         getStepTitle={getStepTitle}
         hasSelectedCompany={hasSelectedConvenente}
       />

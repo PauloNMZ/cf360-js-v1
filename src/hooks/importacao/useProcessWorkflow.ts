@@ -3,9 +3,15 @@ import { useWorkflowDialog } from './useWorkflowDialog';
 import { useDirectoryDialog } from './useDirectoryDialog';
 import { useCNABGeneration } from './useCNABGeneration';
 
-// UPDATED: Agora aceita um objeto de opções
-export const useProcessWorkflow = (options = {}) => {
-  const { selectedConvenente, hasSelectedConvenente } = options;
+// UPDATED: Interface para as opções
+interface UseProcessWorkflowOptions {
+  selectedConvenente?: any;
+  hasSelectedConvenente?: boolean;
+}
+
+// UPDATED: Agora aceita um objeto de opções com tipagem correta
+export const useProcessWorkflow = (options: UseProcessWorkflowOptions = {}) => {
+  const { selectedConvenente, hasSelectedConvenente = false } = options;
 
   // Use workflow dialog hook with convenente options
   const workflowDialog = useWorkflowDialog({
@@ -13,11 +19,8 @@ export const useProcessWorkflow = (options = {}) => {
     hasSelectedConvenente
   });
 
-  // Use directory dialog hook
-  const directoryDialog = useDirectoryDialog(
-    workflowDialog.workflow,
-    workflowDialog.updateWorkflow
-  );
+  // Use directory dialog hook - CORRIGIDO: sem passar parâmetros
+  const directoryDialog = useDirectoryDialog();
 
   return {
     // Workflow dialog states and methods
