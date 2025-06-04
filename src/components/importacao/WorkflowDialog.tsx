@@ -139,16 +139,18 @@ const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{stepTitle}</DialogTitle>
         </DialogHeader>
         
         {/* Step Content */}
-        {renderStepContent()}
+        <div className="max-h-[60vh] overflow-y-auto">
+          {renderStepContent()}
+        </div>
         
         {/* Step Navigation */}
-        <DialogFooter className="flex justify-between items-center">
+        <DialogFooter className="flex justify-between items-center mt-4">
           <div className="flex items-center text-sm text-gray-500">
             Passo {displayStepNumber} de {actualTotalSteps}
           </div>

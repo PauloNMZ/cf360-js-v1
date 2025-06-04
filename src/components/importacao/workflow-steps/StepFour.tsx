@@ -2,9 +2,7 @@
 import React from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, Calendar, Building, CreditCard, QrCode, Download, Settings } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { CheckCircle, Calendar, Building, CreditCard, QrCode, Download } from 'lucide-react';
 import { CNABWorkflowData } from '@/types/cnab240';
 
 interface StepFourProps {
@@ -19,12 +17,6 @@ const StepFour: React.FC<StepFourProps> = ({
   hasSelectedCompany = false,
   selectedCompany = null
 }) => {
-  const handleOpenDirectorySettings = () => {
-    // This will be handled by the parent component
-    const event = new CustomEvent('openDirectorySettings');
-    document.dispatchEvent(event);
-  };
-
   // Determinar qual empresa usar
   const empresaAtiva = hasSelectedCompany && selectedCompany ? selectedCompany : workflow.convenente;
 
@@ -42,7 +34,7 @@ const StepFour: React.FC<StepFourProps> = ({
         return {
           icon: <Download className="h-4 w-4 text-blue-600" />,
           label: 'Arquivo CNAB',
-          description: 'Gerar arquivo no padrão CNAB para envio ao banco'
+          description: 'Gerar arquivo no padrão CNAB para download'
         };
     }
   };
@@ -50,62 +42,45 @@ const StepFour: React.FC<StepFourProps> = ({
   const sendMethodInfo = getSendMethodInfo();
 
   return (
-    <div className="py-6 space-y-6">
-      <div className="text-center mb-6">
-        <CheckCircle className="mx-auto h-12 w-12 text-green-500 mb-3" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">Revisar Dados</h3>
+    <div className="py-4 space-y-4">
+      <div className="text-center mb-4">
+        <CheckCircle className="mx-auto h-8 w-8 text-green-500 mb-2" />
+        <h3 className="text-lg font-medium text-gray-900 mb-1">Revisar Dados</h3>
         <p className="text-sm text-gray-500">
           Confirme todas as informações antes de gerar o arquivo
         </p>
       </div>
 
-      {/* Empresa Selecionada */}
-      <Card>
-        <CardHeader className="py-3">
-          <CardTitle className="text-md flex items-center">
-            <Building className="mr-2 h-4 w-4" />
-            Empresa
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="py-2">
+      {/* Informações em formato compacto */}
+      <div className="space-y-3">
+        {/* Empresa Selecionada */}
+        <div className="border rounded-lg p-3">
+          <div className="flex items-center mb-2">
+            <Building className="mr-2 h-4 w-4 text-gray-600" />
+            <span className="font-medium text-sm">Empresa</span>
+          </div>
           {empresaAtiva ? (
-            <dl className="text-sm divide-y">
-              <div className="grid grid-cols-3 py-2">
-                <dt className="font-medium text-gray-500">CNPJ:</dt>
-                <dd className="col-span-2">{empresaAtiva.cnpj}</dd>
-              </div>
-              <div className="grid grid-cols-3 py-2">
-                <dt className="font-medium text-gray-500">Razão Social:</dt>
-                <dd className="col-span-2">{empresaAtiva.razaoSocial}</dd>
-              </div>
+            <div className="text-sm space-y-1">
+              <div><span className="font-medium">CNPJ:</span> {empresaAtiva.cnpj}</div>
+              <div><span className="font-medium">Razão Social:</span> {empresaAtiva.razaoSocial}</div>
               {empresaAtiva.agencia && empresaAtiva.conta && (
-                <div className="grid grid-cols-3 py-2">
-                  <dt className="font-medium text-gray-500">Banco:</dt>
-                  <dd className="col-span-2">Ag {empresaAtiva.agencia} - Conta {empresaAtiva.conta}</dd>
-                </div>
+                <div><span className="font-medium">Banco:</span> Ag {empresaAtiva.agencia} - Conta {empresaAtiva.conta}</div>
               )}
               {empresaAtiva.convenioPag && (
-                <div className="grid grid-cols-3 py-2">
-                  <dt className="font-medium text-gray-500">Convênio:</dt>
-                  <dd className="col-span-2">{empresaAtiva.convenioPag}</dd>
-                </div>
+                <div><span className="font-medium">Convênio:</span> {empresaAtiva.convenioPag}</div>
               )}
-            </dl>
+            </div>
           ) : (
             <p className="text-sm text-gray-500">Nenhuma empresa selecionada</p>
           )}
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Data de Pagamento */}
-      <Card>
-        <CardHeader className="py-3">
-          <CardTitle className="text-md flex items-center">
-            <Calendar className="mr-2 h-4 w-4" />
-            Data de Pagamento
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="py-2">
+        {/* Data de Pagamento */}
+        <div className="border rounded-lg p-3">
+          <div className="flex items-center mb-2">
+            <Calendar className="mr-2 h-4 w-4 text-gray-600" />
+            <span className="font-medium text-sm">Data de Pagamento</span>
+          </div>
           {workflow.paymentDate ? (
             <p className="text-sm">
               {format(new Date(workflow.paymentDate), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
@@ -113,47 +88,28 @@ const StepFour: React.FC<StepFourProps> = ({
           ) : (
             <p className="text-sm text-gray-500">Nenhuma data selecionada</p>
           )}
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Tipo de Serviço */}
-      <Card>
-        <CardHeader className="py-3">
-          <CardTitle className="text-md flex items-center">
-            <CreditCard className="mr-2 h-4 w-4" />
-            Tipo de Serviço
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="py-2">
+        {/* Tipo de Serviço */}
+        <div className="border rounded-lg p-3">
+          <div className="flex items-center mb-2">
+            <CreditCard className="mr-2 h-4 w-4 text-gray-600" />
+            <span className="font-medium text-sm">Tipo de Serviço</span>
+          </div>
           <p className="text-sm">{workflow.serviceType || "Pagamentos Diversos"}</p>
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Método de Envio */}
-      <Card>
-        <CardHeader className="py-3">
-          <CardTitle className="text-md flex items-center">
+        {/* Método de Envio */}
+        <div className="border rounded-lg p-3">
+          <div className="flex items-center mb-2">
             {sendMethodInfo.icon}
-            <span className="ml-2">Método de Envio</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="py-2">
+            <span className="ml-2 font-medium text-sm">Método de Envio</span>
+          </div>
           <div className="space-y-1">
             <p className="text-sm font-medium">{sendMethodInfo.label}</p>
             <p className="text-xs text-gray-500">{sendMethodInfo.description}</p>
           </div>
-        </CardContent>
-      </Card>
-      
-      <div className="mt-6">
-        <Button 
-          variant="outline" 
-          onClick={handleOpenDirectorySettings} 
-          className="w-full flex items-center justify-center"
-        >
-          <Settings className="mr-2 h-4 w-4" />
-          Configurar Diretório de Saída
-        </Button>
+        </div>
       </div>
     </div>
   );
