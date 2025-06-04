@@ -47,7 +47,15 @@ export const useFavorecidosWorkflowProcessing = ({
       return;
     }
 
+    // Validate payment date is selected
+    if (!workflow.paymentDate) {
+      console.log("❌ No payment date selected");
+      showError("Erro!", "É necessário informar a data de pagamento.");
+      return;
+    }
+
     console.log("✅ Convenente found:", workflow.convenente);
+    console.log("✅ Payment date found:", workflow.paymentDate);
 
     setShowWorkflowDialog(false);
     
@@ -64,10 +72,23 @@ export const useFavorecidosWorkflowProcessing = ({
         throw new Error("Nenhum favorecido selecionado");
       }
 
-      // Convert favorecidos to the format expected by processSelectedRows
-      const rowData = selectedFavorecidosData.map((fav, index) => 
-        mapFavorecidoToRowData(fav, index)
+      // Validate that favorecidos have the required valor field
+      const invalidFavorecidos = selectedFavorecidosData.filter(fav => 
+        !fav.valorPadrao || fav.valorPadrao <= 0
       );
+
+      if (invalidFavorecidos.length > 0) {
+        console.log("❌ Some favorecidos missing valor:", invalidFavorecidos);
+        showError("Erro!", `${invalidFavorecidos.length} favorecidos não possuem valor válido configurado. Verifique os valores antes de continuar.`);
+        return;
+      }
+
+      // Convert favorecidos to the format expected by processSelectedRows
+      const rowData = selectedFavorecidosData.map((fav, index) => {
+        const mappedData = mapFavorecidoToRowData(fav, index);
+        console.log(`Mapping favorecido ${fav.id}:`, fav, "=>", mappedData);
+        return mappedData;
+      });
 
       console.log("Mapped row data:", rowData);
 

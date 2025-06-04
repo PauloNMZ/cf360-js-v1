@@ -25,7 +25,7 @@ export const useFavorecidosWorkflowNavigation = ({
 }: UseFavorecidosWorkflowNavigationProps): WorkflowNavigationReturn => {
   
   const getTotalSteps = useCallback(() => {
-    return 4; // Total steps: 0(convenente), 1(data), 2(tipo), 3(revisar) = 4 steps
+    return 4; // Total steps: 0(convenente), 1(data), 2(tipo), 3(revisar) = 4 steps (0-3)
   }, []);
 
   const getDisplayStepNumber = useCallback((step: number) => {
