@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -12,7 +11,6 @@ import { ReportSortType } from "@/types/reportSorting";
 import ImportacaoSearchBar from "./ImportacaoSearchBar";
 import TableViewHeader from "./TableViewHeader";
 import TableViewPagination from "./TableViewPagination";
-
 export function TableView({
   handleSelectAll,
   selectAll,
@@ -48,12 +46,10 @@ export function TableView({
       return nome.includes(term) || inscricao.includes(term);
     });
   }, [tableData, searchTerm]);
-
   const startIndex = (currentPage - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
   const currentRows = filteredData.slice(startIndex, endIndex);
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-
   const formatarValor = (valor: string | number): string => {
     if (typeof valor === "string") {
       const numericValue = valor.replace(/[^\d.,]/g, "").replace(",", ".");
@@ -61,31 +57,26 @@ export function TableView({
     }
     return formatarValorCurrency(valor);
   };
-
   const formatarInscricao = (inscricao: string): string => {
     if (!inscricao) return "";
     return formatCPFCNPJ(inscricao);
   };
-
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
     setCurrentPage(1); // Reset to first page when searching
   };
-
   const handleVerifyErrorsClick = () => {
     console.log("TableView - Botão Verificar Erros clicado");
     if (handleVerifyErrors) {
       handleVerifyErrors();
     }
   };
-
   const handleProcessSelectedClick = () => {
     console.log("TableView - Botão Processar Selecionados clicado");
     if (handleProcessSelected) {
       handleProcessSelected();
     }
   };
-
   const handleGenerateReportClick = () => {
     console.log("=== DEBUG TableView - handleGenerateReportClick ===");
     if (!cnabFileGenerated) {
@@ -94,53 +85,31 @@ export function TableView({
     }
     setShowSortDialog(true);
   };
-
   const handleSortConfirm = (sortType: ReportSortType) => {
     console.log("=== DEBUG TableView - handleSortConfirm ===");
     if (handleGenerateReport) {
       handleGenerateReport(sortType);
     }
   };
-
   const handleClearSelectionClick = () => {
     console.log("TableView - Botão Limpar Seleção clicado");
     if (handleClearSelection) {
       handleClearSelection();
     }
   };
-
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
-
   const handleRowsPerPageChange = (rows: number) => {
     setRowsPerPage(rows);
     setCurrentPage(1); // Reset to first page when changing rows per page
   };
-  
-  return (
-    <div className="space-y-4">
+  return <div className="space-y-4">
       {/* Header with actions */}
-      <TableViewHeader
-        selectedCount={selectedCount}
-        validationPerformed={validationPerformed}
-        hasValidationErrors={hasValidationErrors}
-        cnabFileGenerated={cnabFileGenerated}
-        onBack={() => setShowTable(false)}
-        onVerifyErrors={handleVerifyErrorsClick}
-        onExportErrors={handleExportErrors}
-        onClearSelection={handleClearSelectionClick}
-        onProcessSelected={handleProcessSelectedClick}
-        onGenerateReport={handleGenerateReportClick}
-      />
+      <TableViewHeader selectedCount={selectedCount} validationPerformed={validationPerformed} hasValidationErrors={hasValidationErrors} cnabFileGenerated={cnabFileGenerated} onBack={() => setShowTable(false)} onVerifyErrors={handleVerifyErrorsClick} onExportErrors={handleExportErrors} onClearSelection={handleClearSelectionClick} onProcessSelected={handleProcessSelectedClick} onGenerateReport={handleGenerateReportClick} />
 
       {/* Search bar */}
-      <ImportacaoSearchBar
-        searchTerm={searchTerm}
-        onSearchChange={handleSearchChange}
-        hasResults={filteredData.length > 0}
-        resultCount={filteredData.length}
-      />
+      <ImportacaoSearchBar searchTerm={searchTerm} onSearchChange={handleSearchChange} hasResults={filteredData.length > 0} resultCount={filteredData.length} />
 
       {/* Table */}
       <div className="rounded-md border">
@@ -166,8 +135,7 @@ export function TableView({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {currentRows.map(row => (
-              <TableRow key={row.id}>
+            {currentRows.map(row => <TableRow key={row.id}>
                 <TableCell>
                   <Checkbox checked={row.selected || false} onCheckedChange={checked => handleSelectRow(row.id, !!checked)} aria-label={`Selecionar ${row.NOME}`} />
                 </TableCell>
@@ -181,35 +149,19 @@ export function TableView({
                   {formatarValor(row.VALOR)}
                 </TableCell>
                 <TableCell>
-                  <Button variant="ghost" size="icon" onClick={() => handleDeleteRow(row.id)}>
+                  <Button variant="ghost" size="icon" onClick={() => handleDeleteRow(row.id)} className="bg-red-50">
                     <Trash2 className="h-4 w-4 text-red-500" />
                   </Button>
                 </TableCell>
-              </TableRow>
-            ))}
+              </TableRow>)}
           </TableBody>
         </Table>
       </div>
 
       {/* Pagination */}
-      <TableViewPagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        rowsPerPage={rowsPerPage}
-        totalItems={filteredData.length}
-        startIndex={startIndex}
-        endIndex={endIndex}
-        onPageChange={handlePageChange}
-        onRowsPerPageChange={handleRowsPerPageChange}
-      />
+      <TableViewPagination currentPage={currentPage} totalPages={totalPages} rowsPerPage={rowsPerPage} totalItems={filteredData.length} startIndex={startIndex} endIndex={endIndex} onPageChange={handlePageChange} onRowsPerPageChange={handleRowsPerPageChange} />
 
       {/* Sort dialog */}
-      <ReportSortDialog
-        isOpen={showSortDialog}
-        onOpenChange={setShowSortDialog}
-        onConfirm={handleSortConfirm}
-        defaultSortType={ReportSortType.BY_NAME}
-      />
-    </div>
-  );
+      <ReportSortDialog isOpen={showSortDialog} onOpenChange={setShowSortDialog} onConfirm={handleSortConfirm} defaultSortType={ReportSortType.BY_NAME} />
+    </div>;
 }
