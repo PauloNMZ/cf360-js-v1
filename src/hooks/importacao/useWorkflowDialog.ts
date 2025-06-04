@@ -26,8 +26,9 @@ export const useWorkflowDialog = (options: UseWorkflowDialogOptions = {}) => {
     return (hasCompanyInHeader || hasSelectedConvenente) ? 1 : 0;
   });
   
+  // UPDATED: Inicializar paymentDate com a data atual
   const [workflow, setWorkflow] = useState<CNABWorkflowData>({
-    paymentDate: undefined,
+    paymentDate: new Date(), // Data atual como padrão
     serviceType: "Pagamentos Diversos",
     convenente: null,
     sendMethod: "cnab",
