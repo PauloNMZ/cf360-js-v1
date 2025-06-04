@@ -5,6 +5,7 @@ import { downloadCNABFile, processSelectedRows } from '@/services/cnab240/cnab24
 import { RowData } from '@/types/importacao';
 import { useNotificationModalContext } from '@/components/ui/NotificationModalProvider';
 import { useIndexPageContext } from '@/hooks/useIndexPageContext';
+import { toast } from '@/components/ui/sonner';
 
 interface UseWorkflowDialogOptions {
   selectedConvenente?: any;
@@ -31,6 +32,10 @@ export const useWorkflowDialog = (options: UseWorkflowDialogOptions = {}) => {
     sendMethod: "cnab",
     outputDirectory: ''
   });
+
+  // CNAB file generation state - ADICIONADO
+  const [cnabFileGenerated, setCnabFileGenerated] = useState(false);
+  const [cnabFileName, setCnabFileName] = useState<string>('');
 
   // Initialize workflow with saved directory and selected convenente if available
   useEffect(() => {
@@ -185,40 +190,66 @@ export const useWorkflowDialog = (options: UseWorkflowDialogOptions = {}) => {
     }
   };
 
-  // Handle workflow submission
+  // Handle workflow submission - ATUALIZADO: Agora gera CNAB e habilita relatório
   const handleSubmitWorkflow = async (selectedRows: RowData[]): Promise<{ success: boolean; fileName?: string }> => {
     try {
+      console.log("🚀 handleSubmitWorkflow iniciado com:", { 
+        selectedRows: selectedRows.length, 
+        workflow,
+        sendMethod: workflow.sendMethod 
+      });
+
+      // Close the workflow dialog first
+      setShowWorkflowDialog(false);
+
+      // Validate required data
+      if (!workflow.convenente) {
+        toast.error("Convenente não selecionado para geração do arquivo.");
+        return { success: false };
+      }
+
+      if (!workflow.paymentDate) {
+        toast.error("Data de pagamento não informada.");
+        return { success: false };
+      }
+
+      if (selectedRows.length === 0) {
+        toast.error("Nenhum registro selecionado para pagamento.");
+        return { success: false };
+      }
+
       // Show processing message
       showInfo("Processando...", `Processando ${selectedRows.length} registros...`);
-      
+
       // If "API REST" method is selected, we would handle that differently
       if (workflow.sendMethod === 'api') {
         showSuccess("Sucesso!", `Enviando ${selectedRows.length} pagamentos via API REST...`);
         // This would call an API integration - not implemented yet
         return { success: true };
       }
-      
-      // Process selected rows with validation
+
+      // NOVO: Gerar arquivo CNAB usando o mesmo serviço do "Por Favorecidos"
+      console.log("📁 Gerando arquivo CNAB...");
       const result = await processSelectedRows(workflow, selectedRows);
       
-      // Log processing details (for debugging)
-      console.log("Dados completos do processamento:", {
-        totalRegistros: selectedRows.length,
-        dataPagamento: workflow.paymentDate,
-        tipoServico: workflow.serviceType,
-        convenente: workflow.convenente,
-        metodoEnvio: workflow.sendMethod,
-        diretorioSaida: workflow.outputDirectory
-      });
-      
-      // Generate a filename based on the current date and time if not provided by processSelectedRows
-      const fileName = `Pag_${new Date().toISOString().slice(0, 10).replace(/-/g, '')}_${new Date().toTimeString().slice(0, 8).replace(/:/g, '')}_${(workflow.convenente && workflow.convenente.convenioPag) || 'unknown'}_${Math.floor(Math.random() * 100)}.rem`;
-      
-      // Return the result with filename
-      return { success: true, fileName };
+      if (result.success && result.fileName) {
+        // NOVO: Habilitar o botão de relatório
+        setCnabFileGenerated(true);
+        setCnabFileName(result.fileName);
+        
+        console.log("✅ Arquivo CNAB gerado com sucesso:", result.fileName);
+        
+        // Show success message
+        showSuccess("Sucesso!", `Arquivo CNAB gerado: ${result.fileName}`);
+        
+        return { success: true, fileName: result.fileName };
+      } else {
+        console.log("❌ Falha na geração do arquivo CNAB");
+        return { success: false };
+      }
       
     } catch (error) {
-      console.error("Erro ao processar arquivo:", error);
+      console.error("❌ Erro ao processar arquivo:", error);
       // Error handling is already done in processSelectedRows
       return { success: false };
     }
@@ -239,6 +270,11 @@ export const useWorkflowDialog = (options: UseWorkflowDialogOptions = {}) => {
     getTotalSteps,
     getDisplayStepNumber,
     getStepTitle,
-    hasSelectedConvenente: hasSelectedConvenente || hasCompanyInHeader
+    hasSelectedConvenente: hasSelectedConvenente || hasCompanyInHeader,
+    // NOVO: Exportar estados do CNAB para habilitar o botão de relatório
+    cnabFileGenerated,
+    setCnabFileGenerated,
+    cnabFileName,
+    setCnabFileName
   };
 };

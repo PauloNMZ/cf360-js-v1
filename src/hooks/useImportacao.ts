@@ -1,3 +1,4 @@
+
 import { useIndexPageContext } from './useIndexPageContext';
 import { useImportacaoState } from './importacao/useImportacaoState';
 import { useImportacaoCompany } from './importacao/useImportacaoCompany';
@@ -120,7 +121,7 @@ export const useImportacao = () => {
     handleOpenDirectorySettings: processWorkflow.handleOpenDirectorySettings,
     handleSaveDirectorySettings: processWorkflow.handleSaveDirectorySettings,
     
-    // CNAB file state
+    // CNAB file state - ATUALIZADO: Agora vem do useWorkflowDialog
     cnabFileGenerated: processWorkflow.cnabFileGenerated,
     cnabFileName: processWorkflow.cnabFileName,
     
