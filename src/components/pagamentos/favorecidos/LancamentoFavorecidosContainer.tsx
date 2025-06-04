@@ -174,7 +174,7 @@ const LancamentoFavorecidosContainer: React.FC<LancamentoFavorecidosContainerPro
           setNotificationModalOpen={setNotificationModalOpen}
           notificationConfig={notificationConfig}
           onCloseNotificationModal={handleCloseNotificationModal}
-          // Workflow props - fix the TypeScript error by passing boolean value
+          // Workflow props - pass boolean value directly
           showWorkflowDialog={workflowData.showWorkflowDialog}
           setShowWorkflowDialog={workflowData.setShowWorkflowDialog}
           workflow={workflowData.workflow}
@@ -185,7 +185,7 @@ const LancamentoFavorecidosContainer: React.FC<LancamentoFavorecidosContainerPro
           getStepTitle={() => workflowData.getStepTitle(workflowData.currentStep)}
           goToNextStep={workflowData.goToNextStep}
           goToPreviousStep={workflowData.goToPreviousStep}
-          isCurrentStepValid={workflowData.isCurrentStepValid} // Fixed: removed () as it should be a boolean, not a function
+          isCurrentStepValid={workflowData.isCurrentStepValid} // Now correctly returns boolean
           handleSubmitWorkflow={workflowData.handleSubmitWorkflow}
           convenentes={workflowData.convenentes}
           carregandoConvenentes={workflowData.carregandoConvenentes}

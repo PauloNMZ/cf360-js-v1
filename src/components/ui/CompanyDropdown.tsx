@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Building2, ChevronDown, Check } from 'lucide-react';
 import {
   DropdownMenu,
@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { companySelectionService } from '@/services/companySelectionService';
 
 interface CompanyDropdownProps {
   companies: { id: number; name: string }[];
@@ -17,6 +18,7 @@ interface CompanyDropdownProps {
   placeholder?: string;
   disabled?: boolean;
   className?: string;
+  persistSelection?: boolean;
 }
 
 const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
@@ -25,9 +27,40 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
   onSelectCompany,
   placeholder = "Selecionar empresa...",
   disabled = false,
-  className
+  className,
+  persistSelection = true
 }) => {
   const selectedCompany = companies.find(company => company.id === selectedCompanyId);
+
+  const handleCompanySelect = (company: { id: number; name: string }) => {
+    onSelectCompany(company);
+    
+    // Persist selection to the centralized service if enabled
+    if (persistSelection) {
+      companySelectionService.setSelectedCompany({
+        id: company.id.toString(),
+        razaoSocial: company.name,
+        cnpj: '' // CNPJ not available in this interface
+      });
+    }
+  };
+
+  // Listen for external company selection changes
+  useEffect(() => {
+    if (!persistSelection) return;
+
+    const unsubscribe = companySelectionService.subscribe((company) => {
+      if (company) {
+        const companyId = parseInt(company.id);
+        const matchingCompany = companies.find(c => c.id === companyId);
+        if (matchingCompany && matchingCompany.id !== selectedCompanyId) {
+          onSelectCompany(matchingCompany);
+        }
+      }
+    });
+
+    return unsubscribe;
+  }, [companies, selectedCompanyId, onSelectCompany, persistSelection]);
 
   return (
     <DropdownMenu>
@@ -62,7 +95,7 @@ const CompanyDropdown: React.FC<CompanyDropdownProps> = ({
           companies.map((company) => (
             <DropdownMenuItem
               key={company.id}
-              onSelect={() => onSelectCompany(company)}
+              onSelect={() => handleCompanySelect(company)}
               className="cursor-pointer flex items-center justify-between"
             >
               <div className="flex items-center gap-2">
