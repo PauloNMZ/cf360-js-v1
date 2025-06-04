@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { ReportData, EmailFormValues } from '@/types/importacao';
 import { ReportSortType } from '@/types/reportSorting';
@@ -127,9 +128,9 @@ export const usePDFReportWithEmail = () => {
     
     // Handler functions
     handleGenerateReport,
-    handleSendEmailReport: pdfReportDialog.handleSendEmailReport,
-    handleSendEmailReportWithParams: pdfReportDialog.handleSendEmailReportWithParams, // Export the parameterized version as well
-    handleEmailSubmit: pdfReportDialog.handleEmailSubmit,
+    handleSendEmailReport, // Use our local function
+    handleSendEmailReportWithParams, // Use our local function
+    handleEmailSubmit, // Use our local function
     selectedSortType: pdfReportDialog.selectedSortType, // ADDED: Expose sort type
     setSelectedSortType: pdfReportDialog.setSelectedSortType, // ADDED: Expose sort type setter
   };
