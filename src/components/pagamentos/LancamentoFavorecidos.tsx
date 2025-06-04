@@ -176,11 +176,11 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
         updateWorkflow={workflowData.updateWorkflow}
         currentStep={workflowData.currentStep}
         getTotalSteps={workflowData.getTotalSteps}
-        getDisplayStepNumber={workflowData.getDisplayStepNumber}
-        getStepTitle={workflowData.getStepTitle}
+        getDisplayStepNumber={() => workflowData.getDisplayStepNumber()}
+        getStepTitle={() => workflowData.getStepTitle()}
         goToNextStep={workflowData.goToNextStep}
         goToPreviousStep={workflowData.goToPreviousStep}
-        isCurrentStepValid={workflowData.isCurrentStepValid}
+        isCurrentStepValid={workflowData.isCurrentStepValid()}
         handleSubmitWorkflow={workflowData.handleSubmitWorkflow}
         convenentes={workflowData.convenentes}
         carregandoConvenentes={workflowData.carregandoConvenentes}
