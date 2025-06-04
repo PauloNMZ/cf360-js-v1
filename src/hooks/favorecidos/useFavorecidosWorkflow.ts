@@ -13,7 +13,28 @@ interface UseFavorecidosWorkflowProps {
   favorecidos: FavorecidoData[];
 }
 
-export const useFavorecidosWorkflow = ({ selectedFavorecidos, favorecidos }: UseFavorecidosWorkflowProps) => {
+interface FavorecidosWorkflowReturn {
+  showWorkflowDialog: boolean;
+  setShowWorkflowDialog: (show: boolean) => void;
+  workflow: any;
+  updateWorkflow: (field: string, value: any) => void;
+  currentStep: number;
+  goToNextStep: () => void;
+  goToPreviousStep: () => void;
+  getTotalSteps: () => number;
+  getDisplayStepNumber: (step: number) => number;
+  getStepTitle: (step: number) => string;
+  isCurrentStepValid: boolean; // Explicitamente tipado como boolean
+  handleSubmitWorkflow: () => void;
+  handleGenerateOnlyReport: () => void;
+  handleOpenDirectorySettings: () => void;
+  convenentes: any[];
+  carregandoConvenentes: boolean;
+  hasSelectedCompany: boolean;
+  selectedCompany: any;
+}
+
+export const useFavorecidosWorkflow = ({ selectedFavorecidos, favorecidos }: UseFavorecidosWorkflowProps): FavorecidosWorkflowReturn => {
   // State management
   const {
     showWorkflowDialog,
@@ -84,7 +105,7 @@ export const useFavorecidosWorkflow = ({ selectedFavorecidos, favorecidos }: Use
     getTotalSteps: navigationData.getTotalSteps,
     getDisplayStepNumber: navigationData.getDisplayStepNumber,
     getStepTitle: navigationData.getStepTitle,
-    isCurrentStepValid: navigationData.isCurrentStepValid, // Agora retorna o valor boolean, não a função
+    isCurrentStepValid: navigationData.isCurrentStepValid, // Agora garantidamente um boolean
     handleSubmitWorkflow,
     handleGenerateOnlyReport,
     handleOpenDirectorySettings,

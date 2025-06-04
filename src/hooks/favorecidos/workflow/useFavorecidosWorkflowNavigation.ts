@@ -8,12 +8,21 @@ interface UseFavorecidosWorkflowNavigationProps {
   workflow: any;
 }
 
+interface WorkflowNavigationReturn {
+  goToNextStep: () => void;
+  goToPreviousStep: () => void;
+  getTotalSteps: () => number;
+  getDisplayStepNumber: (step: number) => number;
+  getStepTitle: (step: number) => string;
+  isCurrentStepValid: boolean; // Explicitamente boolean, não função
+}
+
 export const useFavorecidosWorkflowNavigation = ({
   currentStep,
   setCurrentStep,
   setShowWorkflowDialog,
   workflow
-}: UseFavorecidosWorkflowNavigationProps) => {
+}: UseFavorecidosWorkflowNavigationProps): WorkflowNavigationReturn => {
   
   const getTotalSteps = useCallback(() => {
     return 4; // Total steps in the workflow
@@ -33,7 +42,8 @@ export const useFavorecidosWorkflowNavigation = ({
     return titles[step] || 'Etapa Desconhecida';
   }, []);
 
-  const isCurrentStepValid = useMemo(() => {
+  // Calculado como valor boolean direto
+  const isCurrentStepValid = useMemo((): boolean => {
     switch (currentStep) {
       case 0:
         return !!workflow.convenente;
@@ -66,6 +76,6 @@ export const useFavorecidosWorkflowNavigation = ({
     getTotalSteps,
     getDisplayStepNumber,
     getStepTitle,
-    isCurrentStepValid
+    isCurrentStepValid // Retorna o valor boolean calculado
   };
 };
