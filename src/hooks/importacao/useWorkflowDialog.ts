@@ -47,24 +47,23 @@ export const useWorkflowDialog = (options: UseWorkflowDialogOptions = {}) => {
     }));
   }, [selectedConvenente, hasSelectedConvenente]);
 
-  // Determine total steps based on whether convenente is pre-selected or company is in header
-  // ATUALIZADO: Agora são 5 steps total
+  // CORRIGIDO: Sempre 5 steps, igual ao módulo "Por Favorecidos"
   const getTotalSteps = () => {
-    return (hasCompanyInHeader || hasSelectedConvenente) ? 5 : 6;
+    return 5;
   };
 
-  // Get the actual step number for display
+  // Get the actual step number for display - CORRIGIDO
   const getDisplayStepNumber = (step: number) => {
     if (hasCompanyInHeader || hasSelectedConvenente) {
       return step;
     }
-    return step + 1; // When step 0 exists, display as 1, 2, 3, 4, 5, 6
+    return step + 1; // When step 0 exists, display as 1, 2, 3, 4, 5
   };
 
-  // Navigation functions with conditional logic
+  // Navigation functions with conditional logic - CORRIGIDO: maxStep agora é 4 (5º passo)
   const goToNextStep = () => {
     const isValid = isCurrentStepValid();
-    const maxStep = getTotalSteps();
+    const maxStep = 4; // Steps: 0, 1, 2, 3, 4 (total de 5)
     
     if (isValid && currentStep < maxStep) {
       setCurrentStep(prev => prev + 1);
@@ -108,8 +107,7 @@ export const useWorkflowDialog = (options: UseWorkflowDialogOptions = {}) => {
     console.log("useWorkflowDialog - workflow state atualizado:", workflow);
   }, [workflow]);
 
-  // Function to check if the current step is valid
-  // ATUALIZADO: Adicionado validation para step 4 (novo step de revisão)
+  // Function to check if the current step is valid - CORRIGIDO: 5 steps (0-4)
   const isCurrentStepValid = () => {
     console.log("useWorkflowDialog - isCurrentStepValid chamado para step:", currentStep);
     
@@ -126,7 +124,7 @@ export const useWorkflowDialog = (options: UseWorkflowDialogOptions = {}) => {
           return hasServiceType;
         case 3: // Método de Envio
           return workflow.sendMethod !== "";
-        case 4: // Revisão de Dados
+        case 4: // Revisão de Dados - STEP FINAL
           return true;
         default:
           return false;
@@ -148,7 +146,7 @@ export const useWorkflowDialog = (options: UseWorkflowDialogOptions = {}) => {
           return hasServiceType;
         case 3: // Método de Envio
           return workflow.sendMethod !== "";
-        case 4: // Revisão de Dados
+        case 4: // Revisão de Dados - STEP FINAL
           return true;
         default:
           return false;
@@ -156,8 +154,7 @@ export const useWorkflowDialog = (options: UseWorkflowDialogOptions = {}) => {
     }
   };
 
-  // Get step title based on current step and whether convenente is pre-selected
-  // ATUALIZADO: Novos títulos
+  // Get step title based on current step - CORRIGIDO: 5 steps
   const getStepTitle = () => {
     if (hasCompanyInHeader || hasSelectedConvenente) {
       switch (currentStep) {

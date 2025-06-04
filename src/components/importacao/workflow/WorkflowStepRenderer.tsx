@@ -41,15 +41,9 @@ const WorkflowStepRenderer: React.FC<WorkflowStepRendererProps> = ({
     );
   }
 
-  // Mapear steps considerando se há empresa ou não - MÁXIMO 4 para effectiveStep
+  // CORRIGIDO: Mapear steps para 5 passos (0-4), igual ao módulo "Por Favorecidos"
   const effectiveStep = hasSelectedCompany ? currentStep - 1 : currentStep - 1;
   console.log("Effective step:", effectiveStep);
-  
-  // IMPORTANTE: Limitar effectiveStep a máximo 4 (que corresponde ao passo 5)
-  if (effectiveStep > 4) {
-    console.log("effectiveStep beyond limit, not rendering");
-    return null;
-  }
   
   switch (effectiveStep) {
     case 0: // Data de Pagamento
@@ -61,7 +55,7 @@ const WorkflowStepRenderer: React.FC<WorkflowStepRendererProps> = ({
     case 2: // Método de Envio
       console.log("Rendering StepThree (send method)");
       return <StepThree workflow={workflow} updateWorkflow={updateWorkflow} />;
-    case 3: // Revisar Dados
+    case 3: // Revisar Dados - STEP FINAL (4º step, que é o 5º passo)
       console.log("Rendering StepFour (review data)");
       return (
         <StepFour 
