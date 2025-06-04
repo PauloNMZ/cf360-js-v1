@@ -1,19 +1,16 @@
-
 import React from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { CheckCircle, Calendar, Building, CreditCard, QrCode, Download } from 'lucide-react';
 import { CNABWorkflowData } from '@/types/cnab240';
 import { formatCNPJ } from '@/utils/formatting/cnpjFormatter';
-
 interface StepFourProps {
   workflow: CNABWorkflowData;
   updateWorkflow: (field: keyof CNABWorkflowData, value: any) => void;
   hasSelectedCompany?: boolean;
   selectedCompany?: any;
 }
-
-const StepFour: React.FC<StepFourProps> = ({ 
+const StepFour: React.FC<StepFourProps> = ({
   workflow,
   hasSelectedCompany = false,
   selectedCompany = null
@@ -39,14 +36,11 @@ const StepFour: React.FC<StepFourProps> = ({
         };
     }
   };
-
   const sendMethodInfo = getSendMethodInfo();
-
-  return (
-    <div className="py-4 space-y-4">
+  return <div className="py-4 space-y-4">
       <div className="text-center mb-4">
         <CheckCircle className="mx-auto h-8 w-8 text-green-500 mb-2" />
-        <h3 className="text-lg font-medium text-gray-900 mb-1">Revisar Dados</h3>
+        <h3 className="text-lg font-medium mb-1 text-gray-100">Revisar Dados</h3>
         <p className="text-sm text-gray-500">
           Confirme todas as informações antes de gerar o arquivo
         </p>
@@ -60,20 +54,12 @@ const StepFour: React.FC<StepFourProps> = ({
             <Building className="mr-2 h-4 w-4 text-gray-600" />
             <span className="font-medium text-sm">Empresa</span>
           </div>
-          {empresaAtiva ? (
-            <div className="text-sm space-y-1">
+          {empresaAtiva ? <div className="text-sm space-y-1">
               <div><span className="font-medium">CNPJ:</span> {formatCNPJ(empresaAtiva.cnpj)}</div>
               <div><span className="font-medium">Razão Social:</span> {empresaAtiva.razaoSocial}</div>
-              {empresaAtiva.agencia && empresaAtiva.conta && (
-                <div><span className="font-medium">Banco:</span> Ag {empresaAtiva.agencia} - Conta {empresaAtiva.conta}</div>
-              )}
-              {empresaAtiva.convenioPag && (
-                <div><span className="font-medium">Convênio:</span> {empresaAtiva.convenioPag}</div>
-              )}
-            </div>
-          ) : (
-            <p className="text-sm text-gray-500">Nenhuma empresa selecionada</p>
-          )}
+              {empresaAtiva.agencia && empresaAtiva.conta && <div><span className="font-medium">Banco:</span> Ag {empresaAtiva.agencia} - Conta {empresaAtiva.conta}</div>}
+              {empresaAtiva.convenioPag && <div><span className="font-medium">Convênio:</span> {empresaAtiva.convenioPag}</div>}
+            </div> : <p className="text-sm text-gray-500">Nenhuma empresa selecionada</p>}
         </div>
 
         {/* Data de Pagamento */}
@@ -82,13 +68,11 @@ const StepFour: React.FC<StepFourProps> = ({
             <Calendar className="mr-2 h-4 w-4 text-gray-600" />
             <span className="font-medium text-sm">Data de Pagamento</span>
           </div>
-          {workflow.paymentDate ? (
-            <p className="text-sm">
-              {format(new Date(workflow.paymentDate), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
-            </p>
-          ) : (
-            <p className="text-sm text-gray-500">Nenhuma data selecionada</p>
-          )}
+          {workflow.paymentDate ? <p className="text-sm">
+              {format(new Date(workflow.paymentDate), "dd 'de' MMMM 'de' yyyy", {
+            locale: ptBR
+          })}
+            </p> : <p className="text-sm text-gray-500">Nenhuma data selecionada</p>}
         </div>
 
         {/* Tipo de Serviço */}
@@ -112,8 +96,6 @@ const StepFour: React.FC<StepFourProps> = ({
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default StepFour;
