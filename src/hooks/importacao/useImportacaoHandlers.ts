@@ -1,5 +1,6 @@
 
 import { validateFavorecidos } from '@/services/cnab240/validationService';
+import { ReportSortType } from '@/types/reportSorting';
 
 export const useImportacaoHandlers = (
   fileImport: any,
@@ -38,12 +39,13 @@ export const useImportacaoHandlers = (
     processWorkflow.handleProcessSelected();
   };
   
-  // Handle PDF report generation
-  const handleGenerateReport = async () => {
+  // Handle PDF report generation - UPDATED: Added sortType parameter
+  const handleGenerateReport = async (sortType: ReportSortType = ReportSortType.BY_NAME) => {
     console.log("=== DEBUG useImportacaoHandlers - handleGenerateReport ===");
     console.log("cnabFileGenerated:", processWorkflow.cnabFileGenerated);
     console.log("selected rows count:", tableOps.getSelectedRows().length);
     console.log("workflow paymentDate:", processWorkflow.workflow.paymentDate);
+    console.log("sortType:", sortType);
     
     // Get company info using the improved function
     const { companyName, companyCnpj } = getCompanyInfo();
@@ -73,7 +75,8 @@ export const useImportacaoHandlers = (
       validateFavorecidos,
       convenenteToUse,
       companyCnpj,
-      processWorkflow.workflow.paymentDate
+      processWorkflow.workflow.paymentDate,
+      sortType // ADDED: Pass the sortType parameter
     );
   };
 
