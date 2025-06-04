@@ -37,6 +37,7 @@ export default function ImportacaoModal({ isOpen, onOpenChange }: ImportacaoModa
     handleSelectAll,
     handleSelectRow,
     handleDeleteRow,
+    handleEditRow, // ADDED: Missing handleEditRow prop
     handleClearSelection,
     getSelectedCount,
     
@@ -127,6 +128,7 @@ export default function ImportacaoModal({ isOpen, onOpenChange }: ImportacaoModa
               tableData={tableData}
               handleSelectRow={handleSelectRow}
               handleDeleteRow={handleDeleteRow}
+              handleEditRow={handleEditRow}
               handleProcessSelected={handleProcessSelected}
               handleClearSelection={handleClearSelection}
               selectedCount={getSelectedCount()}
