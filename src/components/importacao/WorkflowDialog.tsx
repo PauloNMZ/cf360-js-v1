@@ -98,7 +98,7 @@ const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
   }
 
   // Log current state for debugging
-  console.log("WorkflowDialog - currentStep:", currentStep, "workflow:", workflow, "isValid:", typeof isCurrentStepValid === 'function' ? isCurrentStepValid() : isCurrentStepValid);
+  console.log("WorkflowDialog - currentStep:", currentStep, "workflow:", workflow, "isValid:", isCurrentStepValid());
 
   // Render step content with correct mapping
   const renderStepContent = () => {
@@ -138,7 +138,7 @@ const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
     }
   };
 
-  const isStepValid = typeof isCurrentStepValid === 'function' ? isCurrentStepValid() : isCurrentStepValid;
+  const isStepValid = isCurrentStepValid();
   const minStep = hasSelectedCompany ? 1 : 0;
 
   return (
