@@ -128,7 +128,7 @@ export const useFavorecidosWorkflow = ({ selectedFavorecidos, favorecidos }: Use
     handleOpenDirectorySettings,
     convenentes,
     carregandoConvenentes,
-    hasSelectedCompany,
+    hasSelectedCompany: hasSelectedCompany(),
     selectedCompany
   };
 };
