@@ -8,9 +8,11 @@ export const useFavorecidosWorkflowState = () => {
   const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
   const [showDirectoryDialog, setShowDirectoryDialog] = useState(false);
   
-  // Começar no step correto baseado se há empresa selecionada
+  // Inicializar o step correto baseado se há empresa selecionada no header
   const [currentStep, setCurrentStep] = useState(() => {
-    return hasSelectedCompany() ? 1 : 0;
+    const hasCompany = hasSelectedCompany();
+    console.log("Initial step calculation - hasSelectedCompany:", hasCompany);
+    return hasCompany ? 1 : 0;
   });
   
   const [cnabFileGenerated, setCnabFileGenerated] = useState(false);
@@ -30,9 +32,19 @@ export const useFavorecidosWorkflowState = () => {
     });
   };
 
+  // Resetar o step quando o dialog é aberto para recalcular baseado no estado atual
+  const setShowWorkflowDialogWithStepReset = (show: boolean) => {
+    if (show) {
+      const hasCompany = hasSelectedCompany();
+      console.log("Opening workflow dialog - hasSelectedCompany:", hasCompany);
+      setCurrentStep(hasCompany ? 1 : 0);
+    }
+    setShowWorkflowDialog(show);
+  };
+
   return {
     showWorkflowDialog,
-    setShowWorkflowDialog,
+    setShowWorkflowDialog: setShowWorkflowDialogWithStepReset,
     showDirectoryDialog,
     setShowDirectoryDialog,
     currentStep,

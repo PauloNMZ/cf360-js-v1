@@ -23,7 +23,7 @@ import StepFour from './workflow-steps/StepFour';
 
 interface ExtendedWorkflowDialogProps extends WorkflowDialogProps {
   getTotalSteps?: () => number;
-  getDisplayStepNumber?: (step: number) => number;
+  getDisplayStepNumber?: () => number;
   getStepTitle?: () => string;
   hasSelectedCompany?: boolean;
   selectedCompany?: any;
@@ -50,8 +50,10 @@ const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
 }) => {
   // Use custom functions if provided, otherwise fallback to defaults
   const actualTotalSteps = getTotalSteps ? getTotalSteps() : totalSteps;
-  const displayStepNumber = getDisplayStepNumber ? getDisplayStepNumber(currentStep) : currentStep;
+  const displayStepNumber = getDisplayStepNumber ? getDisplayStepNumber() : currentStep;
   const stepTitle = getStepTitle ? getStepTitle() : getDefaultStepTitle();
+
+  console.log("WorkflowDialog render - currentStep:", currentStep, "hasSelectedCompany:", hasSelectedCompany, "displayStepNumber:", displayStepNumber);
 
   // Default step title function
   function getDefaultStepTitle() {
@@ -88,8 +90,11 @@ const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
 
   // Render step content with correct mapping
   const renderStepContent = () => {
+    console.log("renderStepContent - currentStep:", currentStep, "hasSelectedCompany:", hasSelectedCompany);
+    
     // Se não há empresa selecionada, step 0 é seleção de empresa
     if (!hasSelectedCompany && currentStep === 0) {
+      console.log("Rendering StepZero (company selection)");
       return (
         <StepZero 
           workflow={workflow} 
@@ -102,13 +107,17 @@ const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
 
     // Mapear steps considerando se há empresa ou não
     const effectiveStep = hasSelectedCompany ? currentStep : currentStep - 1;
+    console.log("Effective step:", effectiveStep);
     
     switch (effectiveStep) {
       case 0: // Data de Pagamento
+        console.log("Rendering StepOne (payment date)");
         return <StepOne workflow={workflow} updateWorkflow={updateWorkflow} />;
       case 1: // Tipo de Serviço  
+        console.log("Rendering StepTwo (service type)");
         return <StepTwo workflow={workflow} updateWorkflow={updateWorkflow} />;
       case 2: // Revisar Dados
+        console.log("Rendering StepThree (review data)");
         return (
           <StepThree 
             workflow={workflow} 
@@ -118,6 +127,7 @@ const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
           />
         );
       case 3: // Finalizar
+        console.log("Rendering StepFour (finalize)");
         return (
           <StepFour 
             workflow={workflow} 
@@ -125,11 +135,11 @@ const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
           />
         );
       default:
+        console.log("No step to render for effectiveStep:", effectiveStep);
         return null;
     }
   };
 
-  const isStepValid = isCurrentStepValid();
   const minStep = hasSelectedCompany ? 1 : 0;
 
   return (
@@ -162,7 +172,7 @@ const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
             {currentStep < actualTotalSteps ? (
               <Button 
                 onClick={goToNextStep}
-                disabled={!isStepValid}
+                disabled={!isCurrentStepValid}
                 className="flex items-center"
               >
                 Avançar

@@ -31,7 +31,9 @@ export const useFavorecidosWorkflowCompany = () => {
 
   const hasSelectedCompany = () => {
     const company = getSelectedCompany();
-    return !!(company && company.razaoSocial);
+    const result = !!(company && company.razaoSocial);
+    console.log("hasSelectedCompany result:", result, "company:", company);
+    return result;
   };
 
   return {
