@@ -6,6 +6,7 @@ import { useNotificationModalContext } from '@/components/ui/NotificationModalPr
 export const useConvenentesData = () => {
   const [convenentes, setConvenentes] = useState<Array<any>>([]);
   const [carregandoConvenentes, setCarregandoConvenentes] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { showError } = useNotificationModalContext();
   
   // Carregar convenentes do banco de dados
@@ -13,12 +14,15 @@ export const useConvenentesData = () => {
     const loadConvenentes = async () => {
       try {
         setCarregandoConvenentes(true);
+        setError(null);
         const data = await getConvenentes();
         console.log("Convenentes carregados:", data);
         setConvenentes(data);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Erro ao carregar convenentes:", error);
-        showError("Erro!", "Erro ao carregar convenentes");
+        const errorMessage = error.message || "Erro ao carregar convenentes";
+        setError(errorMessage);
+        showError("Erro!", errorMessage);
       } finally {
         setCarregandoConvenentes(false);
       }
@@ -27,5 +31,14 @@ export const useConvenentesData = () => {
     loadConvenentes();
   }, [showError]);
 
-  return { convenentes, carregandoConvenentes };
+  return { 
+    convenentes, 
+    carregandoConvenentes, 
+    error,
+    retry: () => {
+      setError(null);
+      // Trigger useEffect to reload
+      setCarregandoConvenentes(true);
+    }
+  };
 };

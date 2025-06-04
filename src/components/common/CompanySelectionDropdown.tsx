@@ -11,19 +11,24 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ConvenenteData } from '@/types/convenente';
+import LoadingMessage from '@/components/ui/LoadingMessage';
 
 interface CompanySelectionDropdownProps {
   convenentes: Array<ConvenenteData & { id: string }>;
   isLoading: boolean;
+  error?: string | null;
   onSelectCompany: (convenente: ConvenenteData & { id: string }) => void;
   onCreateNew: () => void;
+  onRetry?: () => void;
 }
 
 const CompanySelectionDropdown: React.FC<CompanySelectionDropdownProps> = ({
   convenentes,
   isLoading,
+  error,
   onSelectCompany,
-  onCreateNew
+  onCreateNew,
+  onRetry
 }) => {
   const handleValueChange = (value: string) => {
     if (value === 'create-new') {
@@ -56,48 +61,54 @@ const CompanySelectionDropdown: React.FC<CompanySelectionDropdownProps> = ({
             </p>
           </div>
 
-          {isLoading ? (
-            <div className="text-center py-4">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600 mx-auto"></div>
-              <p className="text-sm text-gray-500 mt-2">Carregando empresas...</p>
-            </div>
-          ) : convenentes.length === 0 ? (
-            <div className="space-y-4">
-              <p className="text-sm text-gray-600">
-                Nenhuma empresa cadastrada ainda.
-              </p>
-              <Button 
-                onClick={onCreateNew}
-                className="w-full bg-primary-blue hover:bg-primary-blue/90"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Cadastrar Primeira Empresa
-              </Button>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <Select onValueChange={handleValueChange}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Selecione uma empresa..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {convenentes.map((convenente) => (
-                    <SelectItem key={convenente.id} value={convenente.id}>
-                      <div className="flex flex-col items-start">
-                        <span className="font-medium">{convenente.razaoSocial}</span>
-                        <span className="text-xs text-gray-500">{convenente.cnpj}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                  <SelectItem value="create-new">
-                    <div className="flex items-center">
-                      <Plus className="h-4 w-4 mr-2" />
-                      <span>Cadastrar Nova Empresa</span>
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <LoadingMessage
+            isLoading={isLoading}
+            error={error}
+            loadingMessage="Carregando empresas"
+            onRetry={onRetry}
+          />
+
+          {!isLoading && !error && (
+            <>
+              {convenentes.length === 0 ? (
+                <div className="space-y-4">
+                  <p className="text-sm text-gray-600">
+                    Nenhuma empresa cadastrada ainda.
+                  </p>
+                  <Button 
+                    onClick={onCreateNew}
+                    className="w-full bg-primary-blue hover:bg-primary-blue/90"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Cadastrar Primeira Empresa
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <Select onValueChange={handleValueChange}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Selecione uma empresa..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {convenentes.map((convenente) => (
+                        <SelectItem key={convenente.id} value={convenente.id}>
+                          <div className="flex flex-col items-start">
+                            <span className="font-medium">{convenente.razaoSocial}</span>
+                            <span className="text-xs text-gray-500">{convenente.cnpj}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                      <SelectItem value="create-new">
+                        <div className="flex items-center">
+                          <Plus className="h-4 w-4 mr-2" />
+                          <span>Cadastrar Nova Empresa</span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </>
           )}
         </CardContent>
       </Card>

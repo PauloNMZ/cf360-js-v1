@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { useIndexPageContext } from '@/hooks/useIndexPageContext';
+import { useConvenentesData } from '@/hooks/importacao/useConvenentesData';
 import CompanySelectionDropdown from './CompanySelectionDropdown';
 
 interface CompanyRequiredMessageProps {
@@ -13,11 +14,17 @@ const CompanyRequiredMessage: React.FC<CompanyRequiredMessageProps> = ({
   onEnsureCompany 
 }) => {
   const { 
-    convenentes, 
     handleSelectConvenente, 
     setFormMode, 
     setModalOpen 
   } = useIndexPageContext();
+
+  const { 
+    convenentes, 
+    carregandoConvenentes, 
+    error, 
+    retry 
+  } = useConvenentesData();
 
   const handleSelectCompany = (convenente: any) => {
     console.log("CompanyRequiredMessage - selecting company:", convenente);
@@ -33,9 +40,11 @@ const CompanyRequiredMessage: React.FC<CompanyRequiredMessageProps> = ({
   return (
     <CompanySelectionDropdown
       convenentes={convenentes || []}
-      isLoading={isEnsuring}
+      isLoading={isEnsuring || carregandoConvenentes}
+      error={error}
       onSelectCompany={handleSelectCompany}
       onCreateNew={handleCreateNew}
+      onRetry={retry}
     />
   );
 };

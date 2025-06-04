@@ -1,62 +1,30 @@
 
-import { FavorecidoData } from '@/types/favorecido';
-import { useQuery } from '@tanstack/react-query';
-import { getConvenentes } from '@/services/convenente/convenenteService';
-import { usePDFReportWithEmail } from '@/hooks/importacao/usePDFReportWithEmail';
+import { useState, useEffect } from 'react';
 import { useFavorecidosWorkflowState } from './workflow/useFavorecidosWorkflowState';
 import { useFavorecidosWorkflowNavigation } from './workflow/useFavorecidosWorkflowNavigation';
-import { useFavorecidosWorkflowProcessing } from './workflow/useFavorecidosWorkflowProcessing';
 import { useFavorecidosWorkflowValidation } from './workflow/useFavorecidosWorkflowValidation';
+import { useFavorecidosWorkflowProcessing } from './workflow/useFavorecidosWorkflowProcessing';
 import { useFavorecidosWorkflowCompany } from './workflow/useFavorecidosWorkflowCompany';
+import { FavorecidoData } from '@/types/favorecido';
 
 interface UseFavorecidosWorkflowProps {
-  selectedFavorecidos: string[];
-  favorecidos: Array<FavorecidoData & { id: string }>;
+  selectedFavorecidos: FavorecidoData[];
+  favorecidos: FavorecidoData[];
 }
 
 export const useFavorecidosWorkflow = ({ selectedFavorecidos, favorecidos }: UseFavorecidosWorkflowProps) => {
-  // Company management
-  const { hasSelectedCompany, getSelectedCompany, selectedCompany } = useFavorecidosWorkflowCompany();
-
   // State management
   const {
     showWorkflowDialog,
     setShowWorkflowDialog,
-    showDirectoryDialog,
-    setShowDirectoryDialog,
-    currentStep,
-    setCurrentStep,
-    cnabFileGenerated,
-    setCnabFileGenerated,
-    cnabFileName,
-    setCnabFileName,
     workflow,
-    updateWorkflow
+    updateWorkflow,
+    currentStep,
+    setCurrentStep
   } = useFavorecidosWorkflowState();
 
-  // Initialize PDF report hooks
+  // Navigation
   const {
-    showPDFPreviewDialog,
-    setShowPDFPreviewDialog,
-    reportData,
-    showEmailConfigDialog,
-    setShowEmailConfigDialog,
-    defaultEmailMessage,
-    reportDate,
-    handleGenerateReport,
-    handleSendEmailReport,
-    handleEmailSubmit
-  } = usePDFReportWithEmail();
-
-  // Validation and directory handling
-  const {
-    handleOpenDirectorySettings,
-    handleSaveDirectorySettings
-  } = useFavorecidosWorkflowValidation({ workflow });
-
-  // Navigation logic
-  const {
-    isCurrentStepValid,
     goToNextStep,
     goToPreviousStep,
     getTotalSteps,
@@ -65,74 +33,63 @@ export const useFavorecidosWorkflow = ({ selectedFavorecidos, favorecidos }: Use
   } = useFavorecidosWorkflowNavigation({
     currentStep,
     setCurrentStep,
-    setShowWorkflowDialog,
     workflow
   });
 
-  // Processing logic
+  // Validation
+  const { isCurrentStepValid } = useFavorecidosWorkflowValidation({
+    currentStep,
+    workflow
+  });
+
+  // Processing
   const {
     handleSubmitWorkflow,
-    handleGenerateOnlyReport
+    handleGenerateOnlyReport,
+    handleOpenDirectorySettings
   } = useFavorecidosWorkflowProcessing({
-    selectedFavorecidos,
-    favorecidos,
     workflow,
     setShowWorkflowDialog,
-    setCnabFileGenerated,
-    setCnabFileName,
-    handleGenerateReport
+    selectedFavorecidos,
+    favorecidos
   });
 
-  // Fetch convenentes for selection
-  const { data: convenentes = [], isLoading: carregandoConvenentes } = useQuery({
-    queryKey: ['convenentes'],
-    queryFn: getConvenentes,
-    enabled: showWorkflowDialog
-  });
+  // Company management
+  const {
+    convenentes,
+    carregandoConvenentes,
+    hasSelectedCompany,
+    selectedCompany
+  } = useFavorecidosWorkflowCompany({ workflow });
+
+  // Initialize workflow when selectedFavorecidos changes
+  useEffect(() => {
+    if (selectedFavorecidos.length > 0) {
+      updateWorkflow({
+        ...workflow,
+        favorecidos: selectedFavorecidos
+      });
+    }
+  }, [selectedFavorecidos]);
 
   return {
-    // State
     showWorkflowDialog,
     setShowWorkflowDialog,
-    showDirectoryDialog,
-    setShowDirectoryDialog,
-    currentStep,
     workflow,
     updateWorkflow,
-    cnabFileGenerated,
-    cnabFileName,
-    
-    // Company
-    hasSelectedCompany,
-    selectedCompany,
-    
-    // Navigation - returning functions directly
-    isCurrentStepValid: () => isCurrentStepValid(),
+    currentStep,
     goToNextStep,
     goToPreviousStep,
     getTotalSteps,
     getDisplayStepNumber,
     getStepTitle,
-    
-    // Processing
+    isCurrentStepValid: isCurrentStepValid(), // Call the function here to return boolean
     handleSubmitWorkflow,
     handleGenerateOnlyReport,
     handleOpenDirectorySettings,
-    handleSaveDirectorySettings,
-    
-    // Data
     convenentes,
     carregandoConvenentes,
-    
-    // Report functionality
-    showPDFPreviewDialog,
-    setShowPDFPreviewDialog,
-    reportData,
-    showEmailConfigDialog,
-    setShowEmailConfigDialog,
-    defaultEmailMessage,
-    reportDate,
-    handleSendEmailReport,
-    handleEmailSubmit
+    hasSelectedCompany,
+    selectedCompany
   };
 };
