@@ -42,7 +42,7 @@ export const useFavorecidosWorkflowNavigation = ({
     return titles[step] || 'Etapa Desconhecida';
   }, []);
 
-  // Compute the validation directly as a boolean value
+  // Compute the validation directly as a boolean value - FIXED: removed arrow function
   const isCurrentStepValid = useMemo(() => {
     switch (currentStep) {
       case 0:
@@ -56,7 +56,7 @@ export const useFavorecidosWorkflowNavigation = ({
       default:
         return false;
     }
-  }, [currentStep, workflow]);
+  }, [currentStep, workflow.convenente, workflow.paymentDate, workflow.serviceType]);
 
   const goToNextStep = useCallback(() => {
     if (currentStep < getTotalSteps() - 1 && isCurrentStepValid) {
