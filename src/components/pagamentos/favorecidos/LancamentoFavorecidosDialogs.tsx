@@ -116,7 +116,7 @@ const LancamentoFavorecidosDialogs: React.FC<LancamentoFavorecidosDialogsProps> 
           goToNextStep={goToNextStep || (() => {})}
           goToPreviousStep={goToPreviousStep || (() => {})}
           handleSubmit={handleSubmitWorkflow || (() => {})}
-          isCurrentStepValid={isCurrentStepValid ? isCurrentStepValid() : true}
+          isCurrentStepValid={isCurrentStepValid || (() => true)}
           convenentes={convenentes}
           carregandoConvenentes={carregandoConvenentes}
           getTotalSteps={getTotalSteps}

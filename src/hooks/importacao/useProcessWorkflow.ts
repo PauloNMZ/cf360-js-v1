@@ -1,109 +1,150 @@
 
-import { useState } from 'react';
-import { validateFavorecidos } from '@/services/cnab240/validationService';
-import { useWorkflowDialog } from './useWorkflowDialog';
-import { useDirectoryDialog } from './useDirectoryDialog';
-import { useCNABGeneration } from './useCNABGeneration';
-import { useNotificationModalContext } from '@/components/ui/NotificationModalProvider';
+import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { getConvenentes } from '@/services/convenente/convenenteService';
 
-interface UseProcessWorkflowOptions {
-  selectedConvenente?: any;
-  hasSelectedConvenente?: boolean;
+interface UseProcessWorkflowProps {
+  selectedConvenente: any;
+  hasSelectedConvenente: boolean;
 }
 
-export const useProcessWorkflow = (getSelectedRows: () => any[], options: UseProcessWorkflowOptions = {}) => {
-  const { selectedConvenente, hasSelectedConvenente = false } = options;
-  const { showError } = useNotificationModalContext();
+export const useProcessWorkflow = ({ selectedConvenente, hasSelectedConvenente }: UseProcessWorkflowProps) => {
+  const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
+  const [showDirectoryDialog, setShowDirectoryDialog] = useState(false);
   
-  // Import workflow-related hooks with convenente info
-  const workflowDialog = useWorkflowDialog({ selectedConvenente, hasSelectedConvenente });
-  const directoryDialog = useDirectoryDialog();
-  const cnabGeneration = useCNABGeneration();
+  // Calculate initial step based on whether there's a selected convenente
+  const calculateInitialStep = () => {
+    return hasSelectedConvenente ? 1 : 0;
+  };
+  
+  const [currentStep, setCurrentStep] = useState(calculateInitialStep);
+  const [cnabFileGenerated, setCnabFileGenerated] = useState(false);
+  const [cnabFileName, setCnabFileName] = useState('');
+  const [workflow, setWorkflow] = useState({
+    convenente: selectedConvenente,
+    paymentDate: null,
+    serviceType: "Pagamentos Diversos",
+    sendMethod: "cnab"
+  });
 
-  // Handle initial processing
-  const handleProcessSelected = () => {
-    console.log("useProcessWorkflow - handleProcessSelected chamado");
-    const selectedRows = getSelectedRows();
-    console.log("useProcessWorkflow - selectedRows length:", selectedRows.length);
-    
-    if (selectedRows.length === 0) {
-      console.log("useProcessWorkflow - Nenhum registro selecionado");
-      showError("Erro!", "Nenhum registro selecionado para processamento.");
-      return;
+  // Reset workflow when convenente changes
+  useEffect(() => {
+    setWorkflow(prev => ({
+      ...prev,
+      convenente: selectedConvenente
+    }));
+  }, [selectedConvenente]);
+
+  const updateWorkflow = (field: string, value: any) => {
+    setWorkflow(prev => ({ ...prev, [field]: value }));
+  };
+
+  // Navigation functions
+  const getTotalSteps = () => {
+    return hasSelectedConvenente ? 4 : 5;
+  };
+
+  const getDisplayStepNumber = () => {
+    return hasSelectedConvenente ? currentStep : (currentStep === 0 ? 1 : currentStep);
+  };
+
+  const getStepTitle = () => {
+    if (!hasSelectedConvenente) {
+      switch (currentStep) {
+        case 0: return "Selecionar Empresa";
+        case 1: return "Data de Pagamento";
+        case 2: return "Tipo de Serviço";
+        case 3: return "Método de Envio";
+        case 4: return "Revisar Dados";
+        default: return "";
+      }
+    } else {
+      switch (currentStep) {
+        case 1: return "Data de Pagamento";
+        case 2: return "Tipo de Serviço";
+        case 3: return "Método de Envio";
+        case 4: return "Revisar Dados";
+        default: return "";
+      }
     }
-
-    console.log("useProcessWorkflow - Validando registros automaticamente...");
-    // Automatically validate before proceeding
-    const { errors } = validateFavorecidos(selectedRows);
-    console.log("useProcessWorkflow - Validação concluída, erros:", errors.length);
-    
-    // Reset workflow steps and open dialog
-    workflowDialog.setWorkflow({
-      paymentDate: undefined,
-      serviceType: "Pagamentos Diversos",
-      convenente: hasSelectedConvenente ? selectedConvenente : null,
-      sendMethod: "cnab",
-      outputDirectory: directoryDialog.outputDirectory // Preserve directory setting
-    });
-    workflowDialog.setCurrentStep(1);
-    workflowDialog.setShowWorkflowDialog(true);
-    
-    // Reset CNAB file generation status
-    cnabGeneration.setCnabFileGenerated(false);
-    cnabGeneration.setCnabFileName('');
-    
-    console.log("useProcessWorkflow - Workflow dialog aberto");
   };
 
-  // Handle save directory settings
+  const isCurrentStepValid = () => {
+    if (!hasSelectedConvenente) {
+      switch (currentStep) {
+        case 0: return !!workflow.convenente;
+        case 1: return !!workflow.paymentDate;
+        case 2: return !!workflow.serviceType;
+        case 3: return !!workflow.sendMethod;
+        case 4: return true;
+        default: return true;
+      }
+    } else {
+      switch (currentStep) {
+        case 1: return !!workflow.paymentDate;
+        case 2: return !!workflow.serviceType;
+        case 3: return !!workflow.sendMethod;
+        case 4: return true;
+        default: return true;
+      }
+    }
+  };
+
+  const goToNextStep = () => {
+    if (isCurrentStepValid() && currentStep < getTotalSteps()) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const goToPreviousStep = () => {
+    const minStep = hasSelectedConvenente ? 1 : 0;
+    if (currentStep > minStep) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleSubmitWorkflow = () => {
+    console.log("Submitting workflow:", workflow);
+    setCnabFileGenerated(true);
+    setCnabFileName(`cnab_${Date.now()}.txt`);
+    setShowWorkflowDialog(false);
+  };
+
+  const handleOpenDirectorySettings = () => {
+    setShowDirectoryDialog(true);
+  };
+
   const handleSaveDirectorySettings = () => {
-    console.log("useProcessWorkflow - handleSaveDirectorySettings chamado");
-    // First update the workflow with the directory dialog value
-    workflowDialog.updateWorkflow('outputDirectory', directoryDialog.outputDirectory);
-    // Then save settings
-    directoryDialog.handleSaveDirectorySettings();
+    setShowDirectoryDialog(false);
   };
 
-  // Final submission handler
-  const handleSubmitWorkflow = async () => {
-    console.log("useProcessWorkflow - handleSubmitWorkflow chamado");
-    const selectedRows = getSelectedRows();
-    console.log("useProcessWorkflow - Submetendo workflow para", selectedRows.length, "registros");
-    
-    return cnabGeneration.handleSubmitWorkflow(
-      selectedRows, 
-      workflowDialog.workflow, 
-      workflowDialog.setShowWorkflowDialog
-    );
+  // Reset step when dialog opens
+  const setShowWorkflowDialogWithReset = (show: boolean) => {
+    if (show) {
+      setCurrentStep(calculateInitialStep());
+    }
+    setShowWorkflowDialog(show);
   };
 
   return {
-    // Workflow dialog related props and methods
-    showWorkflowDialog: workflowDialog.showWorkflowDialog,
-    setShowWorkflowDialog: workflowDialog.setShowWorkflowDialog,
-    currentStep: workflowDialog.currentStep,
-    workflow: workflowDialog.workflow,
-    goToNextStep: workflowDialog.goToNextStep,
-    goToPreviousStep: workflowDialog.goToPreviousStep,
-    updateWorkflow: workflowDialog.updateWorkflow,
-    isCurrentStepValid: workflowDialog.isCurrentStepValid,
-    getTotalSteps: workflowDialog.getTotalSteps,
-    getDisplayStepNumber: workflowDialog.getDisplayStepNumber,
-    getStepTitle: workflowDialog.getStepTitle,
-    hasSelectedConvenente: workflowDialog.hasSelectedConvenente,
-    
-    // Directory dialog related props and methods
-    showDirectoryDialog: directoryDialog.showDirectoryDialog,
-    setShowDirectoryDialog: directoryDialog.setShowDirectoryDialog,
-    handleOpenDirectorySettings: directoryDialog.handleOpenDirectorySettings,
+    showWorkflowDialog,
+    setShowWorkflowDialog: setShowWorkflowDialogWithReset,
+    showDirectoryDialog,
+    setShowDirectoryDialog,
+    currentStep,
+    workflow,
+    updateWorkflow,
+    cnabFileGenerated,
+    cnabFileName,
+    goToNextStep,
+    goToPreviousStep,
+    getTotalSteps,
+    getDisplayStepNumber,
+    getStepTitle,
+    isCurrentStepValid,
+    handleSubmitWorkflow,
+    handleOpenDirectorySettings,
     handleSaveDirectorySettings,
-    
-    // CNAB file state
-    cnabFileGenerated: cnabGeneration.cnabFileGenerated,
-    cnabFileName: cnabGeneration.cnabFileName,
-    
-    // Process handlers
-    handleProcessSelected,
-    handleSubmitWorkflow
+    hasSelectedConvenente
   };
 };
