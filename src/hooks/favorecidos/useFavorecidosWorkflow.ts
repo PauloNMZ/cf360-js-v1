@@ -84,7 +84,7 @@ export const useFavorecidosWorkflow = ({ selectedFavorecidos, favorecidos }: Use
     getTotalSteps: navigationData.getTotalSteps,
     getDisplayStepNumber: navigationData.getDisplayStepNumber,
     getStepTitle: navigationData.getStepTitle,
-    isCurrentStepValid: navigationData.isCurrentStepValid,
+    isCurrentStepValid: navigationData.isCurrentStepValid, // Agora retorna o valor boolean, não a função
     handleSubmitWorkflow,
     handleGenerateOnlyReport,
     handleOpenDirectorySettings,
