@@ -27,8 +27,8 @@ export const useFavorecidosWorkflowNavigation = ({
     if (hasSelectedCompany()) {
       return currentStep;
     }
-    // Se não há empresa, step 0 é oculto na contagem visual, então mostra step atual
-    return currentStep + 1;
+    // Se não há empresa, step 0 é mostrado como step 1 na UI
+    return currentStep === 0 ? 1 : currentStep;
   };
 
   const getStepTitle = () => {

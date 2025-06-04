@@ -153,8 +153,8 @@ export default function ImportacaoModal({ isOpen, onOpenChange }: ImportacaoModa
         convenentes={convenentes}
         carregandoConvenentes={carregandoConvenentes}
         getTotalSteps={getTotalSteps}
-        getDisplayStepNumber={() => getDisplayStepNumber()}
-        getStepTitle={() => getStepTitle()}
+        getDisplayStepNumber={getDisplayStepNumber}
+        getStepTitle={getStepTitle}
         hasSelectedCompany={hasSelectedConvenente}
       />
 

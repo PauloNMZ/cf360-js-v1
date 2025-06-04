@@ -8,7 +8,6 @@ import { useFavorecidosWorkflowNavigation } from './workflow/useFavorecidosWorkf
 import { useFavorecidosWorkflowProcessing } from './workflow/useFavorecidosWorkflowProcessing';
 import { useFavorecidosWorkflowValidation } from './workflow/useFavorecidosWorkflowValidation';
 import { useFavorecidosWorkflowCompany } from './workflow/useFavorecidosWorkflowCompany';
-import { getStepTitle, getTotalSteps, getDisplayStepNumber } from './workflow/favorecidosWorkflowUtils';
 
 interface UseFavorecidosWorkflowProps {
   selectedFavorecidos: string[];
@@ -59,7 +58,10 @@ export const useFavorecidosWorkflow = ({ selectedFavorecidos, favorecidos }: Use
   const {
     isCurrentStepValid,
     goToNextStep,
-    goToPreviousStep
+    goToPreviousStep,
+    getTotalSteps,
+    getDisplayStepNumber,
+    getStepTitle
   } = useFavorecidosWorkflowNavigation({
     currentStep,
     setCurrentStep,
@@ -104,13 +106,13 @@ export const useFavorecidosWorkflow = ({ selectedFavorecidos, favorecidos }: Use
     hasSelectedCompany,
     selectedCompany,
     
-    // Navigation
+    // Navigation - returning functions that match expected signatures
     isCurrentStepValid,
     goToNextStep,
     goToPreviousStep,
     getTotalSteps,
-    getDisplayStepNumber: () => getDisplayStepNumber(currentStep),
-    getStepTitle: () => getStepTitle(currentStep),
+    getDisplayStepNumber,
+    getStepTitle,
     
     // Processing
     handleSubmitWorkflow,
