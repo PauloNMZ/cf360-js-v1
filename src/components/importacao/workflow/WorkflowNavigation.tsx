@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -21,16 +22,26 @@ const WorkflowNavigation: React.FC<WorkflowNavigationProps> = ({
   goToNextStep,
   handleSubmit
 }) => {
-  console.log("WorkflowNavigation render - currentStep:", currentStep, "totalSteps:", totalSteps, "isCurrentStepValid:", isCurrentStepValid);
+  console.log("🔍 WorkflowNavigation render - currentStep:", currentStep, "totalSteps:", totalSteps, "isCurrentStepValid:", isCurrentStepValid);
+  
   const handleFinalizarClick = () => {
     console.log("🎯 Finalizar button clicked!");
     console.log("Current step:", currentStep, "Total steps:", totalSteps);
     console.log("Is current step valid:", isCurrentStepValid);
-    handleSubmit();
+    console.log("Calling handleSubmit function...");
+    
+    try {
+      handleSubmit();
+      console.log("✅ handleSubmit called successfully");
+    } catch (error) {
+      console.error("❌ Error calling handleSubmit:", error);
+    }
   };
 
   // Determinar se estamos no último step (considerando que steps vão de 0 a totalSteps-1)
   const isLastStep = currentStep >= totalSteps - 1;
+  console.log("🔍 isLastStep:", isLastStep, "currentStep >= totalSteps - 1:", currentStep, ">=", totalSteps - 1);
+  
   return <div className="flex justify-between items-center mt-4 px-2">
       <div className="text-sm text-gray-500 px-[10px]">
         Passo {displayStepNumber} de {totalSteps}

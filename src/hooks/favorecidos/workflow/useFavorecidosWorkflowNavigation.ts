@@ -42,45 +42,57 @@ export const useFavorecidosWorkflowNavigation = ({
     return titles[step] || 'Etapa Desconhecida';
   }, []);
 
-  // Compute the validation directly as a boolean value
+  // Compute the validation directly as a boolean value with detailed logging
   const isCurrentStepValid = useMemo(() => {
-    console.log("Validating step:", currentStep, "workflow:", { convenente: workflow.convenente, paymentDate: workflow.paymentDate, serviceType: workflow.serviceType });
+    console.log("🔍 Validating step:", currentStep, "workflow state:", { 
+      convenente: workflow.convenente, 
+      paymentDate: workflow.paymentDate, 
+      serviceType: workflow.serviceType 
+    });
+    
+    let isValid = false;
     
     switch (currentStep) {
       case 0:
-        const hasConvenente = !!workflow.convenente;
-        console.log("Step 0 validation - hasConvenente:", hasConvenente);
-        return hasConvenente;
+        isValid = !!workflow.convenente;
+        console.log("Step 0 validation - hasConvenente:", isValid, "convenente:", workflow.convenente);
+        break;
       case 1:
-        const hasPaymentData = !!workflow.paymentDate && !!workflow.serviceType;
-        console.log("Step 1 validation - hasPaymentData:", hasPaymentData);
-        return hasPaymentData;
+        isValid = !!workflow.paymentDate && !!workflow.serviceType;
+        console.log("Step 1 validation - hasPaymentData:", isValid, "paymentDate:", workflow.paymentDate, "serviceType:", workflow.serviceType);
+        break;
       case 2:
+        isValid = true; // Review step is always valid
         console.log("Step 2 validation - always true (review step)");
-        return true; // Review step is always valid
+        break;
       case 3:
+        isValid = true; // Settings step is always valid
         console.log("Step 3 validation - always true (settings step)");
-        return true; // Settings step is always valid
+        break;
       default:
+        isValid = false;
         console.log("Invalid step:", currentStep);
-        return false;
+        break;
     }
+    
+    console.log("🎯 Final validation result for step", currentStep, ":", isValid);
+    return isValid;
   }, [currentStep, workflow.convenente, workflow.paymentDate, workflow.serviceType]);
 
   const goToNextStep = useCallback(() => {
-    console.log("goToNextStep called - currentStep:", currentStep, "isValid:", isCurrentStepValid);
+    console.log("🔄 goToNextStep called - currentStep:", currentStep, "isValid:", isCurrentStepValid);
     if (currentStep < getTotalSteps() - 1 && isCurrentStepValid) {
-      console.log("Moving to next step:", currentStep + 1);
+      console.log("✅ Moving to next step:", currentStep + 1);
       setCurrentStep(currentStep + 1);
     } else {
-      console.log("Cannot move to next step - at last step or invalid");
+      console.log("❌ Cannot move to next step - at last step or invalid");
     }
   }, [currentStep, setCurrentStep, getTotalSteps, isCurrentStepValid]);
 
   const goToPreviousStep = useCallback(() => {
-    console.log("goToPreviousStep called - currentStep:", currentStep);
+    console.log("🔄 goToPreviousStep called - currentStep:", currentStep);
     if (currentStep > 0) {
-      console.log("Moving to previous step:", currentStep - 1);
+      console.log("✅ Moving to previous step:", currentStep - 1);
       setCurrentStep(currentStep - 1);
     }
   }, [currentStep, setCurrentStep]);
