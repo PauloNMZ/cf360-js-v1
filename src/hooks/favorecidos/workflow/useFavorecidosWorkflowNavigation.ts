@@ -18,9 +18,8 @@ export const useFavorecidosWorkflowNavigation = ({
   const { hasSelectedCompany } = useFavorecidosWorkflowCompany();
   
   const getTotalSteps = () => {
-    // Se não há empresa selecionada no header, são 5 steps (0-4)
-    // Se há empresa, são 4 steps (1-4)
-    return hasSelectedCompany() ? 4 : 5;
+    // Sempre retorna 4 - fazendo o Passo 4 ser o último
+    return 4;
   };
 
   const getDisplayStepNumber = () => {

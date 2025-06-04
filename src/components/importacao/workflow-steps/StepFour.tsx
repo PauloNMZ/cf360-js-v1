@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { CheckCircle, Calendar, Building, CreditCard, QrCode, Download } from 'lucide-react';
 import { CNABWorkflowData } from '@/types/cnab240';
+import { formatCNPJ } from '@/utils/formatting/cnpjFormatter';
 
 interface StepFourProps {
   workflow: CNABWorkflowData;
@@ -61,7 +62,7 @@ const StepFour: React.FC<StepFourProps> = ({
           </div>
           {empresaAtiva ? (
             <div className="text-sm space-y-1">
-              <div><span className="font-medium">CNPJ:</span> {empresaAtiva.cnpj}</div>
+              <div><span className="font-medium">CNPJ:</span> {formatCNPJ(empresaAtiva.cnpj)}</div>
               <div><span className="font-medium">Razão Social:</span> {empresaAtiva.razaoSocial}</div>
               {empresaAtiva.agencia && empresaAtiva.conta && (
                 <div><span className="font-medium">Banco:</span> Ag {empresaAtiva.agencia} - Conta {empresaAtiva.conta}</div>

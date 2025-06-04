@@ -139,13 +139,13 @@ const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-md max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>{stepTitle}</DialogTitle>
         </DialogHeader>
         
-        {/* Step Content */}
-        <div className="max-h-[60vh] overflow-y-auto">
+        {/* Step Content - removida barra de rolagem desnecessária */}
+        <div className="py-4">
           {renderStepContent()}
         </div>
         
