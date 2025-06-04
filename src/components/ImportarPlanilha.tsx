@@ -120,7 +120,7 @@ const ImportarPlanilha = () => {
         workflow={workflow}
         updateWorkflow={updateWorkflow}
         currentStep={currentStep}
-        totalSteps={4}
+        totalSteps={5}
         goToNextStep={goToNextStep}
         goToPreviousStep={goToPreviousStep}
         handleSubmit={handleSubmitWorkflow}

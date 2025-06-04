@@ -106,8 +106,8 @@ export const useFavorecidosWorkflow = ({ selectedFavorecidos, favorecidos }: Use
     hasSelectedCompany,
     selectedCompany,
     
-    // Navigation - returning functions that match expected signatures
-    isCurrentStepValid,
+    // Navigation - returning functions directly
+    isCurrentStepValid: () => isCurrentStepValid(),
     goToNextStep,
     goToPreviousStep,
     getTotalSteps,

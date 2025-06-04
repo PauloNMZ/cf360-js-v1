@@ -18,7 +18,8 @@ export const useFavorecidosWorkflowNavigation = ({
   const { hasSelectedCompany } = useFavorecidosWorkflowCompany();
   
   const getTotalSteps = () => {
-    // Se não há empresa selecionada no header, adiciona step 0 para seleção
+    // Se não há empresa selecionada no header, são 5 steps (0-4)
+    // Se há empresa, são 4 steps (1-4)
     return hasSelectedCompany() ? 4 : 5;
   };
 
@@ -43,9 +44,9 @@ export const useFavorecidosWorkflowNavigation = ({
         case 2:
           return "Tipo de Serviço";
         case 3:
-          return "Revisar Dados";
+          return "Método de Envio";
         case 4:
-          return "Finalizar";
+          return "Revisar Dados";
         default:
           return "";
       }
@@ -56,9 +57,9 @@ export const useFavorecidosWorkflowNavigation = ({
         case 2:
           return "Tipo de Serviço";
         case 3:
-          return "Revisar Dados";
+          return "Método de Envio";
         case 4:
-          return "Finalizar";
+          return "Revisar Dados";
         default:
           return "";
       }
@@ -87,10 +88,12 @@ export const useFavorecidosWorkflowNavigation = ({
           console.log("Step 2 validation - hasServiceType:", hasServiceType);
           return hasServiceType;
         case 3:
-          // Step 3: Revisar Dados
-          return true;
+          // Step 3: Método de Envio
+          const hasSendMethod = !!workflow.sendMethod;
+          console.log("Step 3 validation - hasSendMethod:", hasSendMethod);
+          return hasSendMethod;
         case 4:
-          // Step 4: Finalizar
+          // Step 4: Revisar Dados
           return true;
         default:
           return true;
@@ -108,10 +111,12 @@ export const useFavorecidosWorkflowNavigation = ({
           console.log("Step 2 validation (with company) - hasServiceType:", hasServiceType);
           return hasServiceType;
         case 3:
-          // Step 3: Revisar Dados
-          return true;
+          // Step 3: Método de Envio
+          const hasSendMethod = !!workflow.sendMethod;
+          console.log("Step 3 validation (with company) - hasSendMethod:", hasSendMethod);
+          return hasSendMethod;
         case 4:
-          // Step 4: Finalizar
+          // Step 4: Revisar Dados
           return true;
         default:
           return true;

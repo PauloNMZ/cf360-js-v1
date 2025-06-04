@@ -64,9 +64,9 @@ const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
         case 2:
           return "Tipo de Serviço";
         case 3:
-          return "Revisar Dados";
+          return "Método de Envio";
         case 4:
-          return "Finalizar";
+          return "Revisar Dados";
         default:
           return "";
       }
@@ -79,9 +79,9 @@ const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
         case 2:
           return "Tipo de Serviço";
         case 3:
-          return "Revisar Dados";
+          return "Método de Envio";
         case 4:
-          return "Finalizar";
+          return "Revisar Dados";
         default:
           return "";
       }
@@ -116,22 +116,17 @@ const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
       case 1: // Tipo de Serviço  
         console.log("Rendering StepTwo (service type)");
         return <StepTwo workflow={workflow} updateWorkflow={updateWorkflow} />;
-      case 2: // Revisar Dados
-        console.log("Rendering StepThree (review data)");
-        return (
-          <StepThree 
-            workflow={workflow} 
-            updateWorkflow={updateWorkflow}
-            hasSelectedCompany={hasSelectedCompany}
-            selectedCompany={selectedCompany}
-          />
-        );
-      case 3: // Finalizar
-        console.log("Rendering StepFour (finalize)");
+      case 2: // Método de Envio
+        console.log("Rendering StepThree (send method)");
+        return <StepThree workflow={workflow} updateWorkflow={updateWorkflow} />;
+      case 3: // Revisar Dados
+        console.log("Rendering StepFour (review data)");
         return (
           <StepFour 
             workflow={workflow} 
             updateWorkflow={updateWorkflow}
+            hasSelectedCompany={hasSelectedCompany}
+            selectedCompany={selectedCompany}
           />
         );
       default:

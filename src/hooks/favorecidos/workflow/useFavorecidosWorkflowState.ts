@@ -23,7 +23,8 @@ export const useFavorecidosWorkflowState = () => {
   const [workflow, setWorkflow] = useState({
     convenente: null,
     paymentDate: null,
-    serviceType: "Pagamentos Diversos" // Valor padrão
+    serviceType: "Pagamentos Diversos", // Valor padrão
+    sendMethod: "cnab" // Valor padrão para método de envio
   });
 
   const updateWorkflow = (field: string, value: any) => {
