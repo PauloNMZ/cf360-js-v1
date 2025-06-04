@@ -1,3 +1,4 @@
+
 import React from "react";
 import { 
   Home, 
@@ -94,34 +95,34 @@ export const navigationItems: NavigationItemConfig[] = [
   {
     icon: <FontAwesomeIcon icon={faPix} className="w-6 h-6" />,
     label: "Gestão Pix",
-    tooltipText: "Gestão de PIX",
+    tooltipText: "Gestão de Pix",
     handler: "emptyHandler",
     submenu: [
       {
         icon: <QrCode size={20} />,
-        label: "Cobranças PIX",
-        tooltipText: "Gestão de cobranças PIX",
+        label: "Cobranças Pix",
+        tooltipText: "Gestão de cobranças Pix",
         handler: "emptyHandler",
         path: "/pix/cobrancas"
       },
       {
         icon: <FileCode size={20} />,
-        label: "PIX Automático",
-        tooltipText: "Configuração de PIX automático",
+        label: "Pix Automático",
+        tooltipText: "Configuração de Pix automático",
         handler: "emptyHandler",
         path: "/pix/automatico"
       },
       {
         icon: <FileSpreadsheet size={20} />,
-        label: "Extrato PIX",
-        tooltipText: "Extrato de transações PIX",
+        label: "Extrato Pix",
+        tooltipText: "Extrato de transações Pix",
         handler: "emptyHandler",
         path: "/pix/extrato"
       },
       {
         icon: <Webhook size={20} />,
         label: "Webhooks / Logs",
-        tooltipText: "Webhooks e logs de PIX",
+        tooltipText: "Webhooks e logs de Pix",
         handler: "emptyHandler",
         path: "/pix/webhooks"
       }
