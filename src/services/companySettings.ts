@@ -5,7 +5,7 @@ const COMPANY_SETTINGS_KEY = 'gerapag_company_settings';
 
 // Default company settings
 export const DEFAULT_SETTINGS: CompanySettings = { 
-  logoUrl: '/lovable-uploads/7d888b52-31f2-4276-94b5-560eae0bdab9.png', 
+  logoUrl: '', 
   companyName: 'ConnectPag' 
 };
 
@@ -17,13 +17,8 @@ export const getCompanySettings = (): CompanySettings => {
       const parsedSettings = JSON.parse(settingsStr);
       // Ensure the parsed settings has the expected shape
       if (parsedSettings && typeof parsedSettings === 'object') {
-        // If logoUrl is empty or invalid, use the default
-        const logoUrl = parsedSettings.logoUrl && parsedSettings.logoUrl.trim() !== '' 
-          ? parsedSettings.logoUrl 
-          : DEFAULT_SETTINGS.logoUrl;
-        
         return {
-          logoUrl: logoUrl,
+          logoUrl: parsedSettings.logoUrl || DEFAULT_SETTINGS.logoUrl,
           companyName: parsedSettings.companyName || DEFAULT_SETTINGS.companyName
         };
       }
@@ -46,15 +41,5 @@ export const saveCompanySettings = (settings: CompanySettings): void => {
     localStorage.setItem(COMPANY_SETTINGS_KEY, JSON.stringify(safeSettings));
   } catch (e) {
     console.error('Error saving company settings:', e);
-  }
-};
-
-// Reset company settings to defaults (useful for clearing cache issues)
-export const resetCompanySettings = (): void => {
-  try {
-    localStorage.removeItem(COMPANY_SETTINGS_KEY);
-    console.log('Company settings reset to defaults');
-  } catch (e) {
-    console.error('Error resetting company settings:', e);
   }
 };
