@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useFavorecidos } from '@/hooks/favorecidos/useFavorecidos';
 import { useFavorecidosWorkflow } from '@/hooks/favorecidos/useFavorecidosWorkflow';
@@ -169,7 +168,7 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
         setNotificationModalOpen={setNotificationModalOpen}
         notificationConfig={notificationConfig}
         onCloseNotificationModal={handleCloseNotificationModal}
-        // Workflow props - passando o valor boolean em vez da função
+        // Workflow props - passando a função ao invés do resultado
         showWorkflowDialog={workflowData.showWorkflowDialog}
         setShowWorkflowDialog={workflowData.setShowWorkflowDialog}
         workflow={workflowData.workflow}
@@ -180,7 +179,7 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
         getStepTitle={workflowData.getStepTitle}
         goToNextStep={workflowData.goToNextStep}
         goToPreviousStep={workflowData.goToPreviousStep}
-        isCurrentStepValid={workflowData.isCurrentStepValid()}
+        isCurrentStepValid={workflowData.isCurrentStepValid}
         handleSubmitWorkflow={workflowData.handleSubmitWorkflow}
         convenentes={workflowData.convenentes}
         carregandoConvenentes={workflowData.carregandoConvenentes}
