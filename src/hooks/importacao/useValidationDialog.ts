@@ -32,9 +32,9 @@ export const useValidationDialog = () => {
     if (errors.length > 0) {
       setShowValidationDialog(true);
       showError('Erro!', `Encontrados ${errors.length} registros com erros de validação. ${validRecordsCount} de ${totalRecords} registros estão válidos para processamento. Registros com erro serão excluídos do arquivo CNAB.`);
-    } else {
-      showSuccess('Sucesso!', `Todos os registros estão válidos! ${validRecordsCount} registros validados com sucesso.`);
     }
+    // REMOVED: Modal de sucesso desnecessário quando todos os registros estão válidos
+    // O usuário pode ver na tabela que a validação foi bem-sucedida e prosseguir diretamente
   };
 
   // Function to export validation errors to Excel
