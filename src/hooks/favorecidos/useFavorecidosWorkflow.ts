@@ -5,10 +5,11 @@ import { useFavorecidosWorkflowNavigation } from './workflow/useFavorecidosWorkf
 import { useFavorecidosWorkflowValidation } from './workflow/useFavorecidosWorkflowValidation';
 import { useFavorecidosWorkflowProcessing } from './workflow/useFavorecidosWorkflowProcessing';
 import { useFavorecidosWorkflowCompany } from './workflow/useFavorecidosWorkflowCompany';
+import { useConvenentesData } from '@/hooks/importacao/useConvenentesData';
 import { FavorecidoData } from '@/types/favorecido';
 
 interface UseFavorecidosWorkflowProps {
-  selectedFavorecidos: FavorecidoData[];
+  selectedFavorecidos: string[];
   favorecidos: FavorecidoData[];
 }
 
@@ -29,48 +30,55 @@ export const useFavorecidosWorkflow = ({ selectedFavorecidos, favorecidos }: Use
     goToPreviousStep,
     getTotalSteps,
     getDisplayStepNumber,
-    getStepTitle
+    getStepTitle,
+    isCurrentStepValid
   } = useFavorecidosWorkflowNavigation({
     currentStep,
     setCurrentStep,
+    setShowWorkflowDialog,
     workflow
   });
 
   // Validation
-  const { isCurrentStepValid } = useFavorecidosWorkflowValidation({
-    currentStep,
+  const {
+    handleOpenDirectorySettings,
+    handleSaveDirectorySettings
+  } = useFavorecidosWorkflowValidation({
     workflow
   });
 
   // Processing
   const {
     handleSubmitWorkflow,
-    handleGenerateOnlyReport,
-    handleOpenDirectorySettings
+    handleGenerateOnlyReport
   } = useFavorecidosWorkflowProcessing({
     workflow,
     setShowWorkflowDialog,
     selectedFavorecidos,
-    favorecidos
+    favorecidos: favorecidos.filter(fav => fav.id && selectedFavorecidos.includes(fav.id)) as (FavorecidoData & { id: string })[],
+    setCnabFileGenerated: () => {},
+    setCnabFileName: () => {},
+    handleGenerateReport: async () => {}
   });
 
   // Company management
   const {
-    convenentes,
-    carregandoConvenentes,
     hasSelectedCompany,
     selectedCompany
-  } = useFavorecidosWorkflowCompany({ workflow });
+  } = useFavorecidosWorkflowCompany();
+
+  // Convenentes data
+  const {
+    convenentes,
+    carregandoConvenentes
+  } = useConvenentesData();
 
   // Initialize workflow when selectedFavorecidos changes
   useEffect(() => {
     if (selectedFavorecidos.length > 0) {
-      updateWorkflow({
-        ...workflow,
-        favorecidos: selectedFavorecidos
-      });
+      updateWorkflow('favorecidos', selectedFavorecidos);
     }
-  }, [selectedFavorecidos]);
+  }, [selectedFavorecidos, updateWorkflow]);
 
   return {
     showWorkflowDialog,
@@ -83,7 +91,7 @@ export const useFavorecidosWorkflow = ({ selectedFavorecidos, favorecidos }: Use
     getTotalSteps,
     getDisplayStepNumber,
     getStepTitle,
-    isCurrentStepValid: isCurrentStepValid(), // Call the function here to return boolean
+    isCurrentStepValid,
     handleSubmitWorkflow,
     handleGenerateOnlyReport,
     handleOpenDirectorySettings,

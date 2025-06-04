@@ -9,6 +9,8 @@ export const useFavorecidosWorkflowValidation = ({
   
   const handleOpenDirectorySettings = () => {
     console.log("Opening directory settings");
+    // Dispatch custom event for StepFour component
+    document.dispatchEvent(new CustomEvent('openDirectorySettings'));
   };
 
   const handleSaveDirectorySettings = (settings: any) => {

@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { useFavorecidos } from '@/hooks/favorecidos/useFavorecidos';
 import { useFavorecidosWorkflow } from '@/hooks/favorecidos/useFavorecidosWorkflow';
@@ -54,7 +55,7 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
     setSelectedFavorecidos
   } = useLancamentoFavorecidosState();
 
-  // Workflow functionality
+  // Workflow functionality - pass selectedFavorecidos as string[] and filteredFavorecidos as FavorecidoData[]
   const workflowData = useFavorecidosWorkflow({
     selectedFavorecidos,
     favorecidos: filteredFavorecidos
@@ -106,7 +107,7 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
     console.log("Workflow state changed:", {
       currentStep: workflowData.currentStep,
       workflow: workflowData.workflow,
-      isCurrentStepValid: workflowData.isCurrentStepValid()
+      isCurrentStepValid: workflowData.isCurrentStepValid
     });
   }, [workflowData.currentStep, workflowData.workflow]);
 
