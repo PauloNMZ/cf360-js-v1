@@ -25,14 +25,7 @@ export const useFavorecidosWorkflow = ({ selectedFavorecidos, favorecidos }: Use
   } = useFavorecidosWorkflowState();
 
   // Navigation
-  const {
-    goToNextStep,
-    goToPreviousStep,
-    getTotalSteps,
-    getDisplayStepNumber,
-    getStepTitle,
-    isCurrentStepValid
-  } = useFavorecidosWorkflowNavigation({
+  const navigationData = useFavorecidosWorkflowNavigation({
     currentStep,
     setCurrentStep,
     setShowWorkflowDialog,
@@ -86,12 +79,12 @@ export const useFavorecidosWorkflow = ({ selectedFavorecidos, favorecidos }: Use
     workflow,
     updateWorkflow,
     currentStep,
-    goToNextStep,
-    goToPreviousStep,
-    getTotalSteps,
-    getDisplayStepNumber,
-    getStepTitle,
-    isCurrentStepValid,
+    goToNextStep: navigationData.goToNextStep,
+    goToPreviousStep: navigationData.goToPreviousStep,
+    getTotalSteps: navigationData.getTotalSteps,
+    getDisplayStepNumber: navigationData.getDisplayStepNumber,
+    getStepTitle: navigationData.getStepTitle,
+    isCurrentStepValid: navigationData.isCurrentStepValid,
     handleSubmitWorkflow,
     handleGenerateOnlyReport,
     handleOpenDirectorySettings,

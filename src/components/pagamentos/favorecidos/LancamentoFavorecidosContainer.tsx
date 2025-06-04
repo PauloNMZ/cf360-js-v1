@@ -92,7 +92,7 @@ const LancamentoFavorecidosContainer: React.FC<LancamentoFavorecidosContainerPro
           workflow={workflowData.workflow}
           updateWorkflow={workflowData.updateWorkflow}
           currentStep={workflowData.currentStep}
-          getTotalSteps={() => workflowData.getTotalSteps()}
+          getTotalSteps={workflowData.getTotalSteps}
           getDisplayStepNumber={() => workflowData.getDisplayStepNumber(workflowData.currentStep)}
           getStepTitle={() => workflowData.getStepTitle(workflowData.currentStep)}
           goToNextStep={workflowData.goToNextStep}
