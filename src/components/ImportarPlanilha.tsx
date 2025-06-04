@@ -124,7 +124,7 @@ const ImportarPlanilha = () => {
         goToNextStep={goToNextStep}
         goToPreviousStep={goToPreviousStep}
         handleSubmit={handleSubmitWorkflow}
-        isCurrentStepValid={isCurrentStepValid}
+        isCurrentStepValid={isCurrentStepValid()}
         convenentes={convenentes}
         carregandoConvenentes={carregandoConvenentes}
         getTotalSteps={getTotalSteps}

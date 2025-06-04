@@ -149,17 +149,18 @@ const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
           {renderStepContent()}
         </div>
         
-        {/* Step Navigation */}
-        <DialogFooter className="flex justify-between items-center mt-4">
-          <div className="flex items-center text-sm text-gray-500">
+        {/* Step Navigation with better button positioning */}
+        <DialogFooter className="flex justify-between items-center mt-4 px-2">
+          <div className="text-sm text-gray-500">
             Passo {displayStepNumber} de {actualTotalSteps}
           </div>
-          <div className="space-x-2">
+          
+          <div className="flex items-center gap-3">
             {currentStep > minStep && (
               <Button 
                 variant="outline" 
                 onClick={goToPreviousStep}
-                className="flex items-center"
+                className="flex items-center px-4"
               >
                 <ChevronLeft className="mr-1 h-4 w-4" />
                 Voltar
@@ -170,7 +171,7 @@ const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
               <Button 
                 onClick={goToNextStep}
                 disabled={!isCurrentStepValid}
-                className="flex items-center"
+                className="flex items-center px-4"
               >
                 Avançar
                 <ChevronRight className="ml-1 h-4 w-4" />
@@ -178,9 +179,9 @@ const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
             ) : (
               <Button 
                 onClick={handleSubmit}
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-green-600 hover:bg-green-700 px-6"
               >
-                Enviar
+                Finalizar
               </Button>
             )}
           </div>
