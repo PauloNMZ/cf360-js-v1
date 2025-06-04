@@ -88,7 +88,7 @@ const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
     }
   }
 
-  // Render step content with correct mapping
+  // Render step content with correct mapping - LIMITADO A APENAS 4 PASSOS
   const renderStepContent = () => {
     console.log("renderStepContent - currentStep:", currentStep, "hasSelectedCompany:", hasSelectedCompany);
     
@@ -105,9 +105,15 @@ const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
       );
     }
 
-    // Mapear steps considerando se há empresa ou não
-    const effectiveStep = hasSelectedCompany ? currentStep : currentStep - 1;
+    // Mapear steps considerando se há empresa ou não - MÁXIMO 3 para effectiveStep
+    const effectiveStep = hasSelectedCompany ? currentStep - 1 : currentStep - 1;
     console.log("Effective step:", effectiveStep);
+    
+    // IMPORTANTE: Limitar effectiveStep a máximo 3 (que corresponde ao passo 4)
+    if (effectiveStep > 3) {
+      console.log("effectiveStep beyond limit, not rendering");
+      return null;
+    }
     
     switch (effectiveStep) {
       case 0: // Data de Pagamento
@@ -144,7 +150,7 @@ const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
           <DialogTitle>{stepTitle}</DialogTitle>
         </DialogHeader>
         
-        {/* Step Content - removida barra de rolagem desnecessária */}
+        {/* Step Content */}
         <div className="py-4">
           {renderStepContent()}
         </div>

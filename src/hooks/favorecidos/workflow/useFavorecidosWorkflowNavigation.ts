@@ -18,7 +18,7 @@ export const useFavorecidosWorkflowNavigation = ({
   const { hasSelectedCompany } = useFavorecidosWorkflowCompany();
   
   const getTotalSteps = () => {
-    // Sempre retorna 4 - fazendo o Passo 4 ser o último
+    // SEMPRE retorna 4 - garantindo que o Passo 4 seja o último
     return 4;
   };
 
@@ -129,6 +129,7 @@ export const useFavorecidosWorkflowNavigation = ({
     
     console.log("goToNextStep called - isValid:", isValid, "currentStep:", currentStep, "maxStep:", maxStep);
     
+    // IMPORTANTE: Nunca permitir ir além do step 4
     if (isValid && currentStep < maxStep) {
       console.log("Moving to next step:", currentStep + 1);
       setCurrentStep(currentStep + 1);
