@@ -59,7 +59,7 @@ const ModularSidebarLayout = () => {
               <div className="flex items-center gap-2 ml-[-8px]">
                 <AppLogo size={40} customLogoUrl={companySettings?.logoUrl} className="flex-shrink-0" />
                 <span className="text-2xl font-semibold tracking-tight">
-                  ConnectPag
+                  Cash Flow 360
                 </span>
                 {/* Exibir nome e CNPJ da empresa, se houver */}
                 {currentConvenenteId && formData?.razaoSocial && formData?.cnpj && (

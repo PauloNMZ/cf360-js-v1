@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { SidebarProvider, Sidebar, useSidebar } from "@/components/ui/sidebar";
@@ -67,7 +68,7 @@ const SidebarLayout = () => {
               <div className="flex items-center gap-2 ml-[-8px]">
                 <AppLogo size={40} customLogoUrl={companySettings?.logoUrl} className="flex-shrink-0" />
                 <span className="text-2xl font-semibold tracking-tight">
-                  ConnectPag
+                  Cash Flow 360
                 </span>
                 {/* Exibir nome e CNPJ da empresa, se houver */}
                 {currentConvenenteId && formData?.razaoSocial && formData?.cnpj && <span className="ml-12 flex flex-col items-start text-base font-semibold whitespace-nowrap max-w-md sm:max-w-xl truncate">
@@ -79,7 +80,7 @@ const SidebarLayout = () => {
                     </span>
                   </span>}
               </div>
-              {/* Nome e CNPJ da Empresa Selecionada - mover daqui, pois agora aparece ao lado do ConnectPag */}
+              {/* Nome e CNPJ da Empresa Selecionada - mover daqui, pois agora aparece ao lado do Cash Flow 360 */}
 
               {/* Email, Avatar e Sair */}
               <div className="flex items-center gap-4">

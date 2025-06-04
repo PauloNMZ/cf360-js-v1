@@ -40,7 +40,7 @@ const DynamicHeader: React.FC<DynamicHeaderProps> = ({ company }) => {
             className="flex-shrink-0"
           />
           <span className="text-2xl font-semibold tracking-tight">
-            ConnectPag
+            Cash Flow 360
           </span>
           {/* Display company info if present */}
           {company && (

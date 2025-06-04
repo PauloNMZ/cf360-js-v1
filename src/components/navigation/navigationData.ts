@@ -96,7 +96,7 @@ export const modularNavigationConfig: SidebarModule[] = [
   },
   {
     name: "Gestão de Pix",
-    icon: "PIX_ICON", // Mudando para um identificador específico
+    icon: "PIX_ICON",
     children: [
       {
         name: "Cobranças Pix",

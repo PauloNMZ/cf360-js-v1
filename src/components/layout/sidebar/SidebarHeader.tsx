@@ -1,3 +1,4 @@
+
 import React from "react";
 import { SidebarHeader as Header } from "@/components/ui/sidebar";
 import { AppLogo } from "@/components/ui/AppLogo";
@@ -25,7 +26,7 @@ const SidebarHeader = () => {
           {!isCollapsed && (
             <div className="flex flex-col transition-opacity duration-200">
               <h2 className="text-xl font-bold bg-gradient-to-r from-primary-blue to-primary-magenta bg-clip-text text-transparent">
-                ConnectPag
+                Cash Flow 360
               </h2>
               <span className="text-xs text-muted-foreground">Sistema de Pagamentos</span>
             </div>

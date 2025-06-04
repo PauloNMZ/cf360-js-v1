@@ -12,7 +12,7 @@ type MainLayoutProps = {
   companySettings?: CompanySettings;
 };
 
-const MainLayout = ({ children, companySettings = { logoUrl: '', companyName: 'ConnectPag' } }: MainLayoutProps) => {
+const MainLayout = ({ children, companySettings = { logoUrl: '', companyName: 'Cash Flow 360' } }: MainLayoutProps) => {
   const { user } = useAuth();
   
   // Define header and footer heights
@@ -65,7 +65,7 @@ const MainLayout = ({ children, companySettings = { logoUrl: '', companyName: 'C
             <div className="flex items-center gap-4">
               <ThemeToggle />
               <div className="text-right">
-                <p className="text-sm">ConnectPag 1.01</p>
+                <p className="text-sm">Cash Flow 360 1.01</p>
               </div>
             </div>
           </div>
