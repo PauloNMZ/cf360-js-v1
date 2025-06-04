@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import {
   Dialog,
@@ -12,14 +11,20 @@ import { PDFPreviewDialogProps } from "@/types/importacao";
 import { Button } from "@/components/ui/button";
 import { Mail, Download, Loader2 } from "lucide-react";
 import { generatePDFReport } from "@/services/reports/pdfReportService";
+import { ReportSortType } from "@/types/reportSorting";
 import { toast } from "@/components/ui/sonner";
+
+interface ExtendedPDFPreviewDialogProps extends PDFPreviewDialogProps {
+  sortType?: ReportSortType;
+}
 
 export function PDFPreviewDialog({
   isOpen,
   onOpenChange,
   reportData,
   onSendEmail,
-}: PDFPreviewDialogProps) {
+  sortType = ReportSortType.BY_NAME,
+}: ExtendedPDFPreviewDialogProps) {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [iframeKey, setIframeKey] = useState<number>(0); // Estado para forçar recarregamento do iframe
@@ -31,8 +36,8 @@ export function PDFPreviewDialog({
       if (reportData) {
         setLoading(true);
         try {
-          // Generate PDF blob
-          const pdfBlob = await generatePDFReport(reportData);
+          // Generate PDF blob with sort type
+          const pdfBlob = await generatePDFReport(reportData, sortType);
           
           // Create a URL for the blob
           url = URL.createObjectURL(pdfBlob);
@@ -59,7 +64,7 @@ export function PDFPreviewDialog({
         URL.revokeObjectURL(url);
       }
     };
-  }, [reportData]);
+  }, [reportData, sortType]);
 
   // Efeito para garantir que o iframe sempre comece na primeira página
   useEffect(() => {

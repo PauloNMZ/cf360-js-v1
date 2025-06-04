@@ -1,7 +1,7 @@
-
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import { ReportData, RowData } from '@/types/importacao';
+import { ReportSortType } from '@/types/reportSorting';
 import { formatarValorCurrency } from '@/utils/formatting/currencyUtils';
 import { formatarCpfCnpj } from '@/utils/formatting/cnabFormatters';
 
@@ -59,28 +59,66 @@ const categorizarFavorecidosPorBanco = (favorecidos: RowData[]): TotaisPorCatego
 };
 
 /**
- * Ordena favorecidos por nome + banco + tipo
+ * Ordena favorecidos de acordo com o tipo de ordenação escolhido
  */
-const ordenarFavorecidos = (favorecidos: RowData[]): RowData[] => {
+const ordenarFavorecidos = (favorecidos: RowData[], sortType: ReportSortType = ReportSortType.BY_NAME): RowData[] => {
   return [...favorecidos].sort((a, b) => {
-    // Primeiro por nome (crescente)
-    const nomeA = (a.NOME || '').toString().toUpperCase();
-    const nomeB = (b.NOME || '').toString().toUpperCase();
-    const compareNome = nomeA.localeCompare(nomeB);
-    
-    if (compareNome !== 0) return compareNome;
-    
-    // Depois por banco (crescente)
-    const bancoA = (a.BANCO || '').toString().padStart(3, '0');
-    const bancoB = (b.BANCO || '').toString().padStart(3, '0');
-    const compareBanco = bancoA.localeCompare(bancoB);
-    
-    if (compareBanco !== 0) return compareBanco;
-    
-    // Por último por tipo (crescente)
-    const tipoA = (a.TIPO || '').toString();
-    const tipoB = (b.TIPO || '').toString();
-    return tipoA.localeCompare(tipoB);
+    switch (sortType) {
+      case ReportSortType.BY_NAME:
+        // Por nome (crescente)
+        const nomeA = (a.NOME || '').toString().toUpperCase();
+        const nomeB = (b.NOME || '').toString().toUpperCase();
+        return nomeA.localeCompare(nomeB);
+
+      case ReportSortType.BY_BANK_NAME:
+        // Por banco + nome + tipo
+        const bancoA = (a.BANCO || '').toString().padStart(3, '0');
+        const bancoB = (b.BANCO || '').toString().padStart(3, '0');
+        const compareBanco = bancoA.localeCompare(bancoB);
+        
+        if (compareBanco !== 0) return compareBanco;
+        
+        const nomeA2 = (a.NOME || '').toString().toUpperCase();
+        const nomeB2 = (b.NOME || '').toString().toUpperCase();
+        const compareNome = nomeA2.localeCompare(nomeB2);
+        
+        if (compareNome !== 0) return compareNome;
+        
+        const tipoA = (a.TIPO || '').toString();
+        const tipoB = (b.TIPO || '').toString();
+        return tipoA.localeCompare(tipoB);
+
+      case ReportSortType.BY_BANK_VALUE:
+        // Por banco + valor (maior para menor)
+        const bancoA3 = (a.BANCO || '').toString().padStart(3, '0');
+        const bancoB3 = (b.BANCO || '').toString().padStart(3, '0');
+        const compareBanco3 = bancoA3.localeCompare(bancoB3);
+        
+        if (compareBanco3 !== 0) return compareBanco3;
+        
+        const valorA = typeof a.VALOR === 'number' 
+          ? a.VALOR
+          : parseFloat(a.VALOR.toString().replace(/[^\d.,]/g, '').replace(',', '.'));
+        const valorB = typeof b.VALOR === 'number' 
+          ? b.VALOR
+          : parseFloat(b.VALOR.toString().replace(/[^\d.,]/g, '').replace(',', '.'));
+        
+        return valorB - valorA; // Decrescente
+
+      case ReportSortType.BY_VALUE_DESC:
+        // Por valor (maior para menor)
+        const valorA2 = typeof a.VALOR === 'number' 
+          ? a.VALOR
+          : parseFloat(a.VALOR.toString().replace(/[^\d.,]/g, '').replace(',', '.'));
+        const valorB2 = typeof b.VALOR === 'number' 
+          ? b.VALOR
+          : parseFloat(b.VALOR.toString().replace(/[^\d.,]/g, '').replace(',', '.'));
+        
+        return valorB2 - valorA2; // Decrescente
+
+      default:
+        return 0;
+    }
   });
 };
 
@@ -118,12 +156,12 @@ const adicionarSecaoTotais = (doc: jsPDF, startY: number, totais: TotaisPorCateg
 /**
  * Generate a PDF remittance report from the selected rows
  */
-export const generatePDFReport = async (reportData: ReportData): Promise<Blob> => {
+export const generatePDFReport = async (reportData: ReportData, sortType: ReportSortType = ReportSortType.BY_NAME): Promise<Blob> => {
   // Create a new PDF document
   const doc = new jsPDF();
   
-  // Ordenar favorecidos por nome + banco + tipo
-  const favorecidosOrdenados = ordenarFavorecidos(reportData.beneficiarios);
+  // Ordenar favorecidos de acordo com o tipo escolhido
+  const favorecidosOrdenados = ordenarFavorecidos(reportData.beneficiarios, sortType);
   
   // Categorizar favorecidos por banco
   const totaisPorCategoria = categorizarFavorecidosPorBanco(favorecidosOrdenados);

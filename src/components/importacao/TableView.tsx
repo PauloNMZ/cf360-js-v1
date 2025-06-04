@@ -7,6 +7,8 @@ import { TableViewProps, RowData } from "@/types/importacao";
 import { formatarValorCurrency } from "@/utils/formatting/currencyUtils";
 import { formatCPFCNPJ } from "@/utils/formatting/stringUtils";
 import { SelectedRecordsCounter } from "./SelectedRecordsCounter";
+import { ReportSortDialog } from "./ReportSortDialog";
+import { ReportSortType } from "@/types/reportSorting";
 
 export function TableView({
   handleSelectAll,
@@ -27,6 +29,7 @@ export function TableView({
   cnabFileGenerated = false
 }: TableViewProps) {
   const [currentPage, setCurrentPage] = useState(1);
+  const [showSortDialog, setShowSortDialog] = useState(false);
   const rowsPerPage = 10;
   const startIndex = (currentPage - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
@@ -75,9 +78,20 @@ export function TableView({
   const handleGenerateReportClick = () => {
     console.log("TableView - Botão Gerar Relatório clicado");
     console.log("TableView - cnabFileGenerated:", cnabFileGenerated);
-    console.log("TableView - handleGenerateReport function:", typeof handleGenerateReport);
+    
+    if (!cnabFileGenerated) {
+      console.error("TableView - CNAB não foi gerado ainda");
+      return;
+    }
+    
+    // Abrir dialog de seleção de ordenação
+    setShowSortDialog(true);
+  };
+
+  const handleSortConfirm = (sortType: ReportSortType) => {
+    console.log("TableView - Ordenação selecionada:", sortType);
     if (handleGenerateReport) {
-      handleGenerateReport();
+      handleGenerateReport(sortType);
     } else {
       console.error("TableView - handleGenerateReport não está definido");
     }
@@ -216,6 +230,14 @@ export function TableView({
           </Button>
         </div>
       </div>
+
+      {/* Novo: Dialog de seleção de ordenação */}
+      <ReportSortDialog
+        isOpen={showSortDialog}
+        onOpenChange={setShowSortDialog}
+        onConfirm={handleSortConfirm}
+        defaultSortType={ReportSortType.BY_NAME}
+      />
     </div>
   );
 }

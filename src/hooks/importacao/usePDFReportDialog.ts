@@ -1,6 +1,6 @@
-
 import { useState } from 'react';
 import { ReportData, EmailFormValues } from '@/types/importacao';
+import { ReportSortType } from '@/types/reportSorting';
 import { generateRemittanceReport } from '@/services/reports/remittanceReportService';
 import { formatarValorCurrency } from '@/utils/formatting/currencyUtils';
 import { useNotificationModalContext } from '@/components/ui/NotificationModalProvider';
@@ -10,6 +10,7 @@ export const usePDFReportDialog = () => {
   const [reportData, setReportData] = useState<ReportData | null>(null);
   const [reportAttachment, setReportAttachment] = useState<Blob | null>(null);
   const [reportFileName, setReportFileName] = useState<string>('');
+  const [selectedSortType, setSelectedSortType] = useState<ReportSortType>(ReportSortType.BY_NAME);
   const { showSuccess, showError, showWarning } = useNotificationModalContext();
   
   // Format date for display
@@ -33,17 +34,9 @@ export const usePDFReportDialog = () => {
     validateFavorecidos: any,
     convenente: any,
     companyCnpj: string = "",
-    paymentDate: Date | undefined = undefined
+    paymentDate: Date | undefined = undefined,
+    sortType: ReportSortType = ReportSortType.BY_NAME
   ) => {
-    console.log("=== DEBUG usePDFReportDialog - generateReport ===");
-    console.log("Parameters received:");
-    console.log("  - selectedRows length:", selectedRows.length);
-    console.log("  - companyName:", companyName);
-    console.log("  - companyCnpj:", companyCnpj);
-    console.log("  - convenente:", convenente);
-    console.log("  - cnabFileGenerated:", cnabFileGenerated);
-    console.log("  - paymentDate:", paymentDate);
-    
     if (selectedRows.length === 0) {
       showError("Erro!", "Nenhum registro selecionado para gerar relatório.");
       return null;
@@ -92,28 +85,16 @@ export const usePDFReportDialog = () => {
       let finalCompanyName = "Empresa";
       let finalCompanyCnpj = "";
       
-      console.log("=== Determining final company info ===");
-      
       // Priority 1: Use convenente data if available and valid
       if (convenente && convenente.razaoSocial && convenente.razaoSocial.trim() !== "") {
         finalCompanyName = convenente.razaoSocial;
         finalCompanyCnpj = convenente.cnpj || "";
-        console.log("✅ Using convenente data:", { finalCompanyName, finalCompanyCnpj });
       }
       // Priority 2: Use passed parameters if they are not defaults
       else if (companyName && companyName !== "Empresa" && companyName.trim() !== "") {
         finalCompanyName = companyName;
         finalCompanyCnpj = companyCnpj || "";
-        console.log("✅ Using passed company parameters:", { finalCompanyName, finalCompanyCnpj });
       }
-      else {
-        console.log("❌ No valid company data, using defaults:", { finalCompanyName, finalCompanyCnpj });
-      }
-      
-      console.log("=== Final company values for report ===");
-      console.log("finalCompanyName:", finalCompanyName);
-      console.log("finalCompanyCnpj:", finalCompanyCnpj);
-      console.log("formattedPaymentDate:", formattedPaymentDate);
       
       // Create report data with only valid records including payment date
       const pdfReportData: ReportData = {
@@ -127,13 +108,9 @@ export const usePDFReportDialog = () => {
         valorTotal: totalValue
       };
       
-      console.log("=== Created reportData ===");
-      console.log("reportData.empresaNome:", pdfReportData.empresaNome);
-      console.log("reportData.empresaCnpj:", pdfReportData.empresaCnpj);
-      console.log("reportData.dataPagamento:", pdfReportData.dataPagamento);
-      
-      // Store report data
+      // Store report data and sort type
       setReportData(pdfReportData);
+      setSelectedSortType(sortType);
       
       // For Excel report backup - use only valid records
       try {
@@ -176,6 +153,8 @@ export const usePDFReportDialog = () => {
     setReportData,
     reportAttachment,
     reportFileName,
+    selectedSortType,
+    setSelectedSortType,
     generateReport,
     formatCurrentDateTime
   };

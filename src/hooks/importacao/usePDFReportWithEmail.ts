@@ -1,6 +1,6 @@
-
 import { useState } from 'react';
 import { ReportData, EmailFormValues } from '@/types/importacao';
+import { ReportSortType } from '@/types/reportSorting';
 import { usePDFReportDialog } from './usePDFReportDialog';
 import { useEmailConfigDialog } from './useEmailConfigDialog';
 import { useNotificationModalContext } from '@/components/ui/NotificationModalProvider';
@@ -23,7 +23,8 @@ export const usePDFReportWithEmail = () => {
     validateFavorecidos: any,
     convenente: any = null,
     companyCnpj: string = "",
-    paymentDate: Date | undefined = undefined
+    paymentDate: Date | undefined = undefined,
+    sortType: ReportSortType = ReportSortType.BY_NAME // ADDED: Sort type parameter
   ) => {
     if (selectedRows.length === 0) {
       showError("Erro!", "Nenhum registro selecionado para gerar relatório.");
@@ -46,7 +47,7 @@ export const usePDFReportWithEmail = () => {
     
     setOriginalPaymentDate(formattedPaymentDate);
 
-    // Generate report - pass the actual cnabFileGenerated or true for report-only mode
+    // Generate report with sort type - pass the sort type to generateReport
     const reportResult = await pdfReportDialog.generateReport(
       selectedRows,
       isReportOnlyMode ? true : cnabFileGenerated, // Force true for report-only mode
@@ -55,7 +56,8 @@ export const usePDFReportWithEmail = () => {
       validateFavorecidos,
       convenente,
       companyCnpj,
-      paymentDate
+      paymentDate,
+      sortType // ADDED: Pass sort type to generateReport
     );
     
     if (reportResult) {
@@ -119,6 +121,8 @@ export const usePDFReportWithEmail = () => {
     handleGenerateReport,
     handleSendEmailReport,
     handleSendEmailReportWithParams, // Export the parameterized version as well
-    handleEmailSubmit
+    handleEmailSubmit,
+    selectedSortType: pdfReportDialog.selectedSortType, // ADDED: Expose sort type
+    setSelectedSortType: pdfReportDialog.setSelectedSortType, // ADDED: Expose sort type setter
   };
 };

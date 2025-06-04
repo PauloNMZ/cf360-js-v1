@@ -1,5 +1,5 @@
-
 import { CNABWorkflowData, Favorecido } from "@/types/cnab240";
+import { ReportSortType } from "@/types/reportSorting";
 
 // Define the expected column headers
 export const EXPECTED_HEADERS = [
@@ -55,11 +55,11 @@ export interface TableViewProps {
   handleSelectRow: (id: number, checked: boolean) => void;
   handleDeleteRow: (id: number) => void;
   handleProcessSelected: () => void;
-  handleClearSelection: () => void; // NOVO: Função para limpar seleção
-  selectedCount: number; // NOVO: Contagem de registros selecionados
+  handleClearSelection: () => void;
+  selectedCount: number;
   handleVerifyErrors: () => void;
   handleExportErrors: () => void;
-  handleGenerateReport: () => void;
+  handleGenerateReport: (sortType?: ReportSortType) => void; // UPDATED: Added optional sortType parameter
   total: number;
   setShowTable: (show: boolean) => void;
   validationPerformed: boolean;
@@ -80,7 +80,8 @@ export interface PDFPreviewDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   reportData: ReportData | null;
-  onSendEmail: () => void; // Updated to match the function signature
+  onSendEmail: () => void;
+  sortType?: ReportSortType; // ADDED: Optional sort type parameter
 }
 
 export interface EmailFormValues {
