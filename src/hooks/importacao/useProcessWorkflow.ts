@@ -8,7 +8,9 @@ interface UseProcessWorkflowProps {
   hasSelectedConvenente: boolean;
 }
 
-export const useProcessWorkflow = ({ selectedConvenente, hasSelectedConvenente }: UseProcessWorkflowProps) => {
+export const useProcessWorkflow = (props: UseProcessWorkflowProps) => {
+  const { selectedConvenente, hasSelectedConvenente } = props;
+  
   const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
   const [showDirectoryDialog, setShowDirectoryDialog] = useState(false);
   
@@ -24,7 +26,8 @@ export const useProcessWorkflow = ({ selectedConvenente, hasSelectedConvenente }
     convenente: selectedConvenente,
     paymentDate: null,
     serviceType: "Pagamentos Diversos",
-    sendMethod: "cnab"
+    sendMethod: "cnab",
+    outputDirectory: ''
   });
 
   // Reset workflow when convenente changes

@@ -16,7 +16,7 @@ export const useImportacaoState = (selectedConvenente: any, hasSelectedConvenent
   const convenentesData = useConvenentesData();
   const validationDialog = useValidationDialog();
   const pdfReportWithEmail = usePDFReportWithEmail();
-  const processWorkflow = useProcessWorkflow(tableOps.getSelectedRows, {
+  const processWorkflow = useProcessWorkflow({
     selectedConvenente,
     hasSelectedConvenente
   });
