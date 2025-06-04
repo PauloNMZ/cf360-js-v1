@@ -169,7 +169,7 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
         setNotificationModalOpen={setNotificationModalOpen}
         notificationConfig={notificationConfig}
         onCloseNotificationModal={handleCloseNotificationModal}
-        // Workflow props - passing function instead of boolean result
+        // Workflow props - corrigindo o tipo boolean error
         showWorkflowDialog={workflowData.showWorkflowDialog}
         setShowWorkflowDialog={workflowData.setShowWorkflowDialog}
         workflow={workflowData.workflow}

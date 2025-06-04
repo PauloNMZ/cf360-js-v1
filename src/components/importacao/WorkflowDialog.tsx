@@ -1,7 +1,5 @@
 
 import React from 'react';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import { 
   Dialog, 
   DialogContent, 
@@ -10,38 +8,14 @@ import {
   DialogFooter 
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
-import { 
-  Popover, 
-  PopoverContent, 
-  PopoverTrigger 
-} from '@/components/ui/popover';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
   ChevronLeft, 
-  ChevronRight, 
-  CalendarIcon,
-  Banknote,
-  CreditCard,
-  Coins,
-  PiggyBank,
-  QrCode,
-  Download,
-  Settings
+  ChevronRight
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { WorkflowDialogProps } from '@/types/importacao';
 
 // Individual step components
+import StepZero from './workflow-steps/StepZero';
 import StepOne from './workflow-steps/StepOne';
 import StepTwo from './workflow-steps/StepTwo';
 import StepThree from './workflow-steps/StepThree';
@@ -81,37 +55,47 @@ const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
 
   // Default step title function
   function getDefaultStepTitle() {
-    switch (currentStep) {
-      case 0:
-        return "Selecionar Empresa";
-      case 1:
-        return "Data de Pagamento";
-      case 2:
-        return "Tipo de Serviço";
-      case 3:
-        return "Revisar Dados";
-      case 4:
-        return "Finalizar";
-      default:
-        return "";
+    if (hasSelectedCompany) {
+      switch (currentStep) {
+        case 1:
+          return "Data de Pagamento";
+        case 2:
+          return "Tipo de Serviço";
+        case 3:
+          return "Revisar Dados";
+        case 4:
+          return "Finalizar";
+        default:
+          return "";
+      }
+    } else {
+      switch (currentStep) {
+        case 0:
+          return "Selecionar Empresa";
+        case 1:
+          return "Data de Pagamento";
+        case 2:
+          return "Tipo de Serviço";
+        case 3:
+          return "Revisar Dados";
+        case 4:
+          return "Finalizar";
+        default:
+          return "";
+      }
     }
   }
-
-  // Log current state for debugging
-  console.log("WorkflowDialog - currentStep:", currentStep, "workflow:", workflow, "isValid:", isCurrentStepValid());
 
   // Render step content with correct mapping
   const renderStepContent = () => {
     // Se não há empresa selecionada, step 0 é seleção de empresa
     if (!hasSelectedCompany && currentStep === 0) {
       return (
-        <StepThree 
+        <StepZero 
           workflow={workflow} 
           updateWorkflow={updateWorkflow} 
           convenentes={convenentes}
           carregandoConvenentes={carregandoConvenentes}
-          hasSelectedCompany={hasSelectedCompany}
-          selectedCompany={selectedCompany}
         />
       );
     }
@@ -125,7 +109,14 @@ const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
       case 1: // Tipo de Serviço  
         return <StepTwo workflow={workflow} updateWorkflow={updateWorkflow} />;
       case 2: // Revisar Dados
-        return <StepOne workflow={workflow} updateWorkflow={updateWorkflow} />;
+        return (
+          <StepThree 
+            workflow={workflow} 
+            updateWorkflow={updateWorkflow}
+            hasSelectedCompany={hasSelectedCompany}
+            selectedCompany={selectedCompany}
+          />
+        );
       case 3: // Finalizar
         return (
           <StepFour 

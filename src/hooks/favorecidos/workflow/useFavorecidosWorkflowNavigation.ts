@@ -22,19 +22,18 @@ export const useFavorecidosWorkflowNavigation = ({
     return hasSelectedCompany() ? 4 : 5;
   };
 
-  const getDisplayStepNumber = (step: number) => {
-    // Se há empresa no header, pula o step 0
+  const getDisplayStepNumber = () => {
+    // Se há empresa no header, mostra o step atual
     if (hasSelectedCompany()) {
-      return step;
+      return currentStep;
     }
-    // Se não há empresa, step 0 é hidden na UI, então mostra step 1, 2, 3, 4
-    return step;
+    // Se não há empresa, step 0 é oculto na contagem visual, então mostra step atual
+    return currentStep + 1;
   };
 
   const getStepTitle = () => {
     const hasCompany = hasSelectedCompany();
     
-    // Ajustar títulos baseado se há empresa ou não
     if (!hasCompany) {
       switch (currentStep) {
         case 0:
@@ -73,10 +72,10 @@ export const useFavorecidosWorkflowNavigation = ({
     if (!hasCompany) {
       switch (currentStep) {
         case 0:
-          // Step 0: Seleção de empresa (quando não há empresa no header)
-          // Permitir avançar mesmo sem empresa selecionada para que o usuário possa selecionar no próximo step
-          console.log("Step 0 validation - allowing progression to select company");
-          return true;
+          // Step 0: Seleção de empresa - deve ter empresa selecionada
+          const hasWorkflowConvenente = !!workflow.convenente;
+          console.log("Step 0 validation - hasWorkflowConvenente:", hasWorkflowConvenente);
+          return hasWorkflowConvenente;
         case 1:
           // Step 1: Data de Pagamento
           const hasPaymentDate = !!workflow.paymentDate;
