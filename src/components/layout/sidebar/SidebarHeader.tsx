@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { SidebarHeader as Header } from "@/components/ui/sidebar";
 import { AppLogo } from "@/components/ui/AppLogo";
 import { getCompanySettings } from "@/services/companySettings";
@@ -7,9 +7,20 @@ import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 
 const SidebarHeader = () => {
-  const companySettings = getCompanySettings();
+  const [companySettings, setCompanySettings] = useState(() => getCompanySettings());
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
+
+  // Refresh company settings when component mounts to ensure latest settings
+  useEffect(() => {
+    const refreshSettings = () => {
+      const settings = getCompanySettings();
+      console.log("SidebarHeader: Loading company settings", settings);
+      setCompanySettings(settings);
+    };
+    
+    refreshSettings();
+  }, []);
 
   return (
     <Header className="py-4">
