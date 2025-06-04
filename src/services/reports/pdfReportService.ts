@@ -5,12 +5,128 @@ import { ReportData, RowData } from '@/types/importacao';
 import { formatarValorCurrency } from '@/utils/formatting/currencyUtils';
 import { formatarCpfCnpj } from '@/utils/formatting/cnabFormatters';
 
+// Tipos para categorização dos favorecidos
+interface TotaisPorCategoria {
+  bancoBrasil: {
+    quantidade: number;
+    valor: number;
+  };
+  demaisIF: {
+    quantidade: number;
+    valor: number;
+  };
+  total: {
+    quantidade: number;
+    valor: number;
+  };
+}
+
+/**
+ * Categoriza favorecidos entre Banco do Brasil e demais instituições
+ */
+const categorizarFavorecidosPorBanco = (favorecidos: RowData[]): TotaisPorCategoria => {
+  const totais: TotaisPorCategoria = {
+    bancoBrasil: { quantidade: 0, valor: 0 },
+    demaisIF: { quantidade: 0, valor: 0 },
+    total: { quantidade: 0, valor: 0 }
+  };
+
+  favorecidos.forEach(favorecido => {
+    const valor = typeof favorecido.VALOR === 'number' 
+      ? favorecido.VALOR
+      : parseFloat(favorecido.VALOR.toString().replace(/[^\d.,]/g, '').replace(',', '.'));
+    
+    if (!isNaN(valor)) {
+      const banco = favorecido.BANCO.toString().padStart(3, '0');
+      
+      if (banco === '001') {
+        // Banco do Brasil
+        totais.bancoBrasil.quantidade++;
+        totais.bancoBrasil.valor += valor;
+      } else {
+        // Demais Instituições Financeiras
+        totais.demaisIF.quantidade++;
+        totais.demaisIF.valor += valor;
+      }
+    }
+  });
+
+  // Calcular totais gerais
+  totais.total.quantidade = totais.bancoBrasil.quantidade + totais.demaisIF.quantidade;
+  totais.total.valor = totais.bancoBrasil.valor + totais.demaisIF.valor;
+
+  return totais;
+};
+
+/**
+ * Ordena favorecidos por nome + banco + tipo
+ */
+const ordenarFavorecidos = (favorecidos: RowData[]): RowData[] => {
+  return [...favorecidos].sort((a, b) => {
+    // Primeiro por nome (crescente)
+    const nomeA = (a.NOME || '').toString().toUpperCase();
+    const nomeB = (b.NOME || '').toString().toUpperCase();
+    const compareNome = nomeA.localeCompare(nomeB);
+    
+    if (compareNome !== 0) return compareNome;
+    
+    // Depois por banco (crescente)
+    const bancoA = (a.BANCO || '').toString().padStart(3, '0');
+    const bancoB = (b.BANCO || '').toString().padStart(3, '0');
+    const compareBanco = bancoA.localeCompare(bancoB);
+    
+    if (compareBanco !== 0) return compareBanco;
+    
+    // Por último por tipo (crescente)
+    const tipoA = (a.TIPO || '').toString();
+    const tipoB = (b.TIPO || '').toString();
+    return tipoA.localeCompare(tipoB);
+  });
+};
+
+/**
+ * Adiciona seção de totais por categoria ao PDF
+ */
+const adicionarSecaoTotais = (doc: jsPDF, startY: number, totais: TotaisPorCategoria): void => {
+  // Título da seção
+  doc.setFontSize(12);
+  doc.setFont(undefined, 'bold');
+  doc.text("TOTAIS POR INSTITUIÇÃO FINANCEIRA:", 15, startY);
+  
+  // Linha superior
+  doc.line(15, startY + 5, 195, startY + 5);
+  
+  // Banco do Brasil
+  doc.setFontSize(10);
+  doc.setFont(undefined, 'normal');
+  const textoBB = `Banco do Brasil (001):     ${totais.bancoBrasil.quantidade} favorecido${totais.bancoBrasil.quantidade !== 1 ? 's' : ''} - ${formatarValorCurrency(totais.bancoBrasil.valor)}`;
+  doc.text(textoBB, 15, startY + 15);
+  
+  // Demais Instituições Financeiras
+  const textoDemais = `Demais Inst. Financeiras:  ${totais.demaisIF.quantidade} favorecido${totais.demaisIF.quantidade !== 1 ? 's' : ''} - ${formatarValorCurrency(totais.demaisIF.valor)}`;
+  doc.text(textoDemais, 15, startY + 25);
+  
+  // Linha separadora
+  doc.line(15, startY + 30, 195, startY + 30);
+  
+  // Total geral
+  doc.setFont(undefined, 'bold');
+  const textoTotal = `TOTAL REMESSA:             ${totais.total.quantidade} favorecido${totais.total.quantidade !== 1 ? 's' : ''} - ${formatarValorCurrency(totais.total.valor)}`;
+  doc.text(textoTotal, 15, startY + 40);
+};
+
 /**
  * Generate a PDF remittance report from the selected rows
  */
 export const generatePDFReport = async (reportData: ReportData): Promise<Blob> => {
   // Create a new PDF document
   const doc = new jsPDF();
+  
+  // Ordenar favorecidos por nome + banco + tipo
+  const favorecidosOrdenados = ordenarFavorecidos(reportData.beneficiarios);
+  
+  // Categorizar favorecidos por banco
+  const totaisPorCategoria = categorizarFavorecidosPorBanco(favorecidosOrdenados);
   
   // Add title
   doc.setFontSize(18);
@@ -53,10 +169,10 @@ export const generatePDFReport = async (reportData: ReportData): Promise<Blob> =
     { header: 'Valor (R$)', dataKey: 'VALOR' }
   ];
   
-  // Format data for the table - Ensure names are in uppercase
-  const tableData = reportData.beneficiarios.map(row => ({
+  // Format data for the table using ordered beneficiaries
+  const tableData = favorecidosOrdenados.map(row => ({
     NOME: typeof row.NOME === 'string' ? row.NOME.toUpperCase() : String(row.NOME).toUpperCase(),
-    INSCRICAO: formatarCpfCnpj(row.INSCRICAO), // Formatando CPF/CNPJ
+    INSCRICAO: formatarCpfCnpj(row.INSCRICAO),
     BANCO: row.BANCO.toString().padStart(3, '0'),
     AGENCIA: row.AGENCIA,
     CONTA: row.CONTA,
@@ -68,7 +184,7 @@ export const generatePDFReport = async (reportData: ReportData): Promise<Blob> =
   
   // Create the table with improved styling - adjusted starting position
   (doc as any).autoTable({
-    startY: 91, // Adjusted to fit after the new payment date line
+    startY: 91,
     head: [tableColumns.map(col => col.header)],
     body: tableData.map(row => tableColumns.map(col => row[col.dataKey])),
     theme: 'grid',
@@ -113,8 +229,12 @@ export const generatePDFReport = async (reportData: ReportData): Promise<Blob> =
   
   doc.line(15, finalY + 17, 195, finalY + 17);
   
-  // Add observations
-  const obsY = finalY + 30;
+  // Adicionar seção de totais por categoria
+  const secaoTotaisY = finalY + 30;
+  adicionarSecaoTotais(doc, secaoTotaisY, totaisPorCategoria);
+  
+  // Add observations - adjusted position to account for new totals section
+  const obsY = secaoTotaisY + 55;
   doc.setFontSize(10);
   doc.setFont(undefined, 'italic');
   doc.text("Observações:", 15, obsY);
