@@ -17,10 +17,11 @@ export const useImportacaoState = (selectedConvenente: any, hasSelectedConvenent
   const validationDialog = useValidationDialog();
   const pdfReportWithEmail = usePDFReportWithEmail();
   
-  // UPDATED: Passando as opções corretamente
+  // UPDATED: Passando as opções corretamente incluindo selectedRows
   const processWorkflow = useProcessWorkflow({
     selectedConvenente,
-    hasSelectedConvenente
+    hasSelectedConvenente,
+    selectedRows: tableOps.getSelectedRows() // NOVO: Passar selectedRows
   });
 
   // Sync tableData with the fileImport tableData when it changes

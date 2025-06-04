@@ -10,10 +10,11 @@ import { toast } from '@/components/ui/sonner';
 interface UseWorkflowDialogOptions {
   selectedConvenente?: any;
   hasSelectedConvenente?: boolean;
+  selectedRows?: RowData[]; // NOVO: Adicionar selectedRows
 }
 
 export const useWorkflowDialog = (options: UseWorkflowDialogOptions = {}) => {
-  const { selectedConvenente, hasSelectedConvenente = false } = options;
+  const { selectedConvenente, hasSelectedConvenente = false, selectedRows = [] } = options;
   const { showSuccess, showInfo } = useNotificationModalContext();
   const { selectedHeaderCompany } = useIndexPageContext();
   
@@ -187,8 +188,8 @@ export const useWorkflowDialog = (options: UseWorkflowDialogOptions = {}) => {
     }
   };
 
-  // Handle workflow submission - ATUALIZADO: Agora gera CNAB e habilita relatório
-  const handleSubmitWorkflow = async (selectedRows: RowData[]): Promise<{ success: boolean; fileName?: string }> => {
+  // CORRIGIDO: Handle workflow submission sem parâmetros, como no módulo "Por Favorecidos"
+  const handleSubmitWorkflow = async (): Promise<{ success: boolean; fileName?: string }> => {
     try {
       console.log("🚀 handleSubmitWorkflow iniciado com:", { 
         selectedRows: selectedRows.length, 

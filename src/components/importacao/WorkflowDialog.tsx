@@ -78,11 +78,17 @@ const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
     }
   }
 
-  // UPDATED: Criar wrapper que seja compatível com a interface original
-  const handleSubmitWrapper = () => {
-    // TODO: Aqui precisamos passar os selectedRows corretos
-    // Por ora, passamos um array vazio para manter compatibilidade
-    handleSubmit([]);
+  // CORRIGIDO: Criar wrapper que não passe parâmetros, como no módulo "Por Favorecidos"
+  const handleSubmitWrapper = async () => {
+    try {
+      console.log("🎯 WorkflowDialog - handleSubmitWrapper chamado");
+      const result = await handleSubmit([]);
+      console.log("✅ handleSubmit result:", result);
+      return result;
+    } catch (error) {
+      console.error("❌ Erro no handleSubmitWrapper:", error);
+      return { success: false };
+    }
   };
 
   const minStep = hasSelectedCompany ? 1 : 0;

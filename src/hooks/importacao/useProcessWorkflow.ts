@@ -2,21 +2,24 @@
 import { useWorkflowDialog } from './useWorkflowDialog';
 import { useDirectoryDialog } from './useDirectoryDialog';
 import { useCNABGeneration } from './useCNABGeneration';
+import { RowData } from '@/types/importacao';
 
 // UPDATED: Interface para as opções
 interface UseProcessWorkflowOptions {
   selectedConvenente?: any;
   hasSelectedConvenente?: boolean;
+  selectedRows?: RowData[]; // NOVO: Adicionar selectedRows
 }
 
 // UPDATED: Agora aceita um objeto de opções com tipagem correta
 export const useProcessWorkflow = (options: UseProcessWorkflowOptions = {}) => {
-  const { selectedConvenente, hasSelectedConvenente = false } = options;
+  const { selectedConvenente, hasSelectedConvenente = false, selectedRows = [] } = options;
 
-  // Use workflow dialog hook with convenente options
+  // Use workflow dialog hook with convenente options - CORRIGIDO: Passar selectedRows
   const workflowDialog = useWorkflowDialog({
     selectedConvenente,
-    hasSelectedConvenente
+    hasSelectedConvenente,
+    selectedRows
   });
 
   // Use directory dialog hook - CORRIGIDO: sem passar parâmetros
