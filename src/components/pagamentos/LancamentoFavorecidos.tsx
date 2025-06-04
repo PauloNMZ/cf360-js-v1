@@ -10,6 +10,8 @@ import SelectedFavorecidoView from "./favorecidos/SelectedFavorecidoView";
 import FavorecidosListView from "./favorecidos/FavorecidosListView";
 import SelectedFavorecidosActions from "./favorecidos/SelectedFavorecidosActions";
 import LancamentoFavorecidosDialogs from "./favorecidos/LancamentoFavorecidosDialogs";
+import ErrorBoundary from '@/components/ui/ErrorBoundary';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
 
 interface LancamentoFavorecidosProps {
   hidePixColumn?: boolean;
@@ -22,6 +24,8 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
   hideBankColumn = false,
   hideTipoColumn = false
 }) => {
+  const { handleError } = useErrorHandler();
+
   // Favorecidos management
   const {
     modalOpen,
@@ -88,7 +92,15 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
   // Listen for custom events from StepFour component
   useEffect(() => {
     const handleOpenSettings = () => {
-      workflowData.handleOpenDirectorySettings();
+      try {
+        workflowData.handleOpenDirectorySettings();
+      } catch (error) {
+        handleError(error, {
+          component: 'LancamentoFavorecidos',
+          file: 'LancamentoFavorecidos.tsx',
+          action: 'handleOpenSettings'
+        });
+      }
     };
 
     document.addEventListener('openDirectorySettings', handleOpenSettings);
@@ -96,7 +108,7 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
     return () => {
       document.removeEventListener('openDirectorySettings', handleOpenSettings);
     };
-  }, [workflowData.handleOpenDirectorySettings]);
+  }, [workflowData.handleOpenDirectorySettings, handleError]);
 
   const handleCloseNotificationModal = () => {
     setNotificationModalOpen();
@@ -104,12 +116,20 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
 
   // Debug: log workflow state changes
   useEffect(() => {
-    console.log("Workflow state changed:", {
-      currentStep: workflowData.currentStep,
-      workflow: workflowData.workflow,
-      isCurrentStepValid: workflowData.isCurrentStepValid
-    });
-  }, [workflowData.currentStep, workflowData.workflow]);
+    try {
+      console.log("Workflow state changed:", {
+        currentStep: workflowData.currentStep,
+        workflow: workflowData.workflow,
+        isCurrentStepValid: workflowData.isCurrentStepValid
+      });
+    } catch (error) {
+      handleError(error, {
+        component: 'LancamentoFavorecidos',
+        file: 'LancamentoFavorecidos.tsx',
+        action: 'logWorkflowState'
+      });
+    }
+  }, [workflowData.currentStep, workflowData.workflow, workflowData.isCurrentStepValid, handleError]);
 
   // Debug: log selected favorecidos
   useEffect(() => {
@@ -117,82 +137,84 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
   }, [selectedFavorecidos]);
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <FavorecidosHeader onCreateNew={handleCreateNew} />
+    <ErrorBoundary>
+      <div className="space-y-6">
+        {/* Header */}
+        <FavorecidosHeader onCreateNew={handleCreateNew} />
 
-      {selectedFavorecido ? (
-        // Selected Favorecido View
-        <SelectedFavorecidoView
-          selectedFavorecido={selectedFavorecido}
-          onCancelSelection={handleCancelSelection}
+        {selectedFavorecido ? (
+          // Selected Favorecido View
+          <SelectedFavorecidoView
+            selectedFavorecido={selectedFavorecido}
+            onCancelSelection={handleCancelSelection}
+          />
+        ) : (
+          <>
+            {/* List View */}
+            <FavorecidosListView
+              searchTerm={searchTerm}
+              onSearchChange={handleSearchChange}
+              isLoading={isLoading}
+              filteredFavorecidos={filteredFavorecidos}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onSelectFavorecido={handleSelectFavorecido}
+              selectedFavorecidos={selectedFavorecidos}
+              onSelectionChange={handleSelectionChange}
+              hidePixColumn={hidePixColumn}
+              hideBankColumn={hideBankColumn}
+              hideTipoColumn={hideTipoColumn}
+            />
+
+            {/* Actions */}
+            <SelectedFavorecidosActions
+              selectedFavorecidos={selectedFavorecidos}
+              hasConvenente={hasConvenente}
+              onClearSelection={() => setSelectedFavorecidos([])}
+              onGenerateReport={handleGenerateReportOnly}
+              onProcessSelected={handleProcessSelected}
+            />
+          </>
+        )}
+
+        {/* Dialogs */}
+        <LancamentoFavorecidosDialogs
+          modalOpen={modalOpen}
+          setModalOpen={setModalOpen}
+          currentFavorecido={currentFavorecido}
+          grupos={grupos}
+          handleInputChange={handleInputChange}
+          handleSelectChange={handleSelectChange}
+          handleSave={handleSave}
+          formMode={formMode}
+          isLoading={isLoading}
+          deleteDialogOpen={deleteDialogOpen}
+          setDeleteDialogOpen={setDeleteDialogOpen}
+          confirmDelete={confirmDelete}
+          notificationModalOpen={notificationModalOpen}
+          setNotificationModalOpen={setNotificationModalOpen}
+          notificationConfig={notificationConfig}
+          onCloseNotificationModal={handleCloseNotificationModal}
+          // Workflow props
+          showWorkflowDialog={workflowData.showWorkflowDialog}
+          setShowWorkflowDialog={workflowData.setShowWorkflowDialog}
+          workflow={workflowData.workflow}
+          updateWorkflow={workflowData.updateWorkflow}
+          currentStep={workflowData.currentStep}
+          getTotalSteps={workflowData.getTotalSteps}
+          getDisplayStepNumber={workflowData.getDisplayStepNumber}
+          getStepTitle={workflowData.getStepTitle}
+          goToNextStep={workflowData.goToNextStep}
+          goToPreviousStep={workflowData.goToPreviousStep}
+          isCurrentStepValid={workflowData.isCurrentStepValid}
+          handleSubmitWorkflow={workflowData.handleSubmitWorkflow}
+          convenentes={workflowData.convenentes}
+          carregandoConvenentes={workflowData.carregandoConvenentes}
+          hasSelectedCompany={workflowData.hasSelectedCompany}
+          selectedCompany={workflowData.selectedCompany}
         />
-      ) : (
-        <>
-          {/* List View */}
-          <FavorecidosListView
-            searchTerm={searchTerm}
-            onSearchChange={handleSearchChange}
-            isLoading={isLoading}
-            filteredFavorecidos={filteredFavorecidos}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onSelectFavorecido={handleSelectFavorecido}
-            selectedFavorecidos={selectedFavorecidos}
-            onSelectionChange={handleSelectionChange}
-            hidePixColumn={hidePixColumn}
-            hideBankColumn={hideBankColumn}
-            hideTipoColumn={hideTipoColumn}
-          />
-
-          {/* Actions */}
-          <SelectedFavorecidosActions
-            selectedFavorecidos={selectedFavorecidos}
-            hasConvenente={hasConvenente}
-            onClearSelection={() => setSelectedFavorecidos([])}
-            onGenerateReport={handleGenerateReportOnly}
-            onProcessSelected={handleProcessSelected}
-          />
-        </>
-      )}
-
-      {/* Dialogs */}
-      <LancamentoFavorecidosDialogs
-        modalOpen={modalOpen}
-        setModalOpen={setModalOpen}
-        currentFavorecido={currentFavorecido}
-        grupos={grupos}
-        handleInputChange={handleInputChange}
-        handleSelectChange={handleSelectChange}
-        handleSave={handleSave}
-        formMode={formMode}
-        isLoading={isLoading}
-        deleteDialogOpen={deleteDialogOpen}
-        setDeleteDialogOpen={setDeleteDialogOpen}
-        confirmDelete={confirmDelete}
-        notificationModalOpen={notificationModalOpen}
-        setNotificationModalOpen={setNotificationModalOpen}
-        notificationConfig={notificationConfig}
-        onCloseNotificationModal={handleCloseNotificationModal}
-        // Workflow props
-        showWorkflowDialog={workflowData.showWorkflowDialog}
-        setShowWorkflowDialog={workflowData.setShowWorkflowDialog}
-        workflow={workflowData.workflow}
-        updateWorkflow={workflowData.updateWorkflow}
-        currentStep={workflowData.currentStep}
-        getTotalSteps={workflowData.getTotalSteps}
-        getDisplayStepNumber={workflowData.getDisplayStepNumber}
-        getStepTitle={workflowData.getStepTitle}
-        goToNextStep={workflowData.goToNextStep}
-        goToPreviousStep={workflowData.goToPreviousStep}
-        isCurrentStepValid={workflowData.isCurrentStepValid}
-        handleSubmitWorkflow={workflowData.handleSubmitWorkflow}
-        convenentes={workflowData.convenentes}
-        carregandoConvenentes={workflowData.carregandoConvenentes}
-        hasSelectedCompany={workflowData.hasSelectedCompany}
-        selectedCompany={workflowData.selectedCompany}
-      />
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 };
 

@@ -1,5 +1,5 @@
 
-import { useFavorecidosWorkflowCompany } from './useFavorecidosWorkflowCompany';
+import { useCallback } from 'react';
 
 interface UseFavorecidosWorkflowNavigationProps {
   currentStep: number;
@@ -15,148 +15,57 @@ export const useFavorecidosWorkflowNavigation = ({
   workflow
 }: UseFavorecidosWorkflowNavigationProps) => {
   
-  const { hasSelectedCompany } = useFavorecidosWorkflowCompany();
-  
-  const getTotalSteps = () => {
-    // SEMPRE retorna 4 - garantindo que o Passo 4 seja o último
-    return 4;
-  };
+  const getTotalSteps = useCallback(() => {
+    return 4; // Total steps in the workflow
+  }, []);
 
-  const getDisplayStepNumber = () => {
-    // Se há empresa no header, mostra o step atual
-    if (hasSelectedCompany()) {
-      return currentStep;
-    }
-    // Se não há empresa, step 0 é mostrado como step 1 na UI
-    return currentStep === 0 ? 1 : currentStep;
-  };
+  const getDisplayStepNumber = useCallback((step: number) => {
+    return step + 1; // Display step numbers starting from 1
+  }, []);
 
-  const getStepTitle = () => {
-    const hasCompany = hasSelectedCompany();
-    
-    if (!hasCompany) {
-      switch (currentStep) {
-        case 0:
-          return "Selecionar Empresa";
-        case 1:
-          return "Data de Pagamento";
-        case 2:
-          return "Tipo de Serviço";
-        case 3:
-          return "Método de Envio";
-        case 4:
-          return "Revisar Dados";
-        default:
-          return "";
-      }
-    } else {
-      switch (currentStep) {
-        case 1:
-          return "Data de Pagamento";
-        case 2:
-          return "Tipo de Serviço";
-        case 3:
-          return "Método de Envio";
-        case 4:
-          return "Revisar Dados";
-        default:
-          return "";
-      }
-    }
-  };
-  
-  const isCurrentStepValid = () => {
-    const hasCompany = hasSelectedCompany();
-    console.log("Validating step:", currentStep, "hasCompany:", hasCompany, "workflow:", workflow);
-    
-    if (!hasCompany) {
-      switch (currentStep) {
-        case 0:
-          // Step 0: Seleção de empresa - deve ter empresa selecionada
-          const hasWorkflowConvenente = !!workflow.convenente;
-          console.log("Step 0 validation - hasWorkflowConvenente:", hasWorkflowConvenente);
-          return hasWorkflowConvenente;
-        case 1:
-          // Step 1: Data de Pagamento
-          const hasPaymentDate = !!workflow.paymentDate;
-          console.log("Step 1 validation - hasPaymentDate:", hasPaymentDate, "paymentDate:", workflow.paymentDate);
-          return hasPaymentDate;
-        case 2:
-          // Step 2: Tipo de Serviço
-          const hasServiceType = !!workflow.serviceType;
-          console.log("Step 2 validation - hasServiceType:", hasServiceType);
-          return hasServiceType;
-        case 3:
-          // Step 3: Método de Envio
-          const hasSendMethod = !!workflow.sendMethod;
-          console.log("Step 3 validation - hasSendMethod:", hasSendMethod);
-          return hasSendMethod;
-        case 4:
-          // Step 4: Revisar Dados
-          return true;
-        default:
-          return true;
-      }
-    } else {
-      switch (currentStep) {
-        case 1:
-          // Step 1: Data de Pagamento (empresa já selecionada no header)
-          const hasPaymentDate = !!workflow.paymentDate;
-          console.log("Step 1 validation (with company) - hasPaymentDate:", hasPaymentDate, "paymentDate:", workflow.paymentDate);
-          return hasPaymentDate;
-        case 2:
-          // Step 2: Tipo de Serviço
-          const hasServiceType = !!workflow.serviceType;
-          console.log("Step 2 validation (with company) - hasServiceType:", hasServiceType);
-          return hasServiceType;
-        case 3:
-          // Step 3: Método de Envio
-          const hasSendMethod = !!workflow.sendMethod;
-          console.log("Step 3 validation (with company) - hasSendMethod:", hasSendMethod);
-          return hasSendMethod;
-        case 4:
-          // Step 4: Revisar Dados
-          return true;
-        default:
-          return true;
-      }
-    }
-  };
+  const getStepTitle = useCallback((step: number) => {
+    const titles = [
+      'Selecionar Convenente',
+      'Configurar Pagamento', 
+      'Revisar Dados',
+      'Configurações'
+    ];
+    return titles[step] || 'Etapa Desconhecida';
+  }, []);
 
-  const goToNextStep = () => {
-    const isValid = isCurrentStepValid();
-    const maxStep = getTotalSteps();
-    
-    console.log("goToNextStep called - isValid:", isValid, "currentStep:", currentStep, "maxStep:", maxStep);
-    
-    // IMPORTANTE: Nunca permitir ir além do step 4
-    if (isValid && currentStep < maxStep) {
-      console.log("Moving to next step:", currentStep + 1);
+  const isCurrentStepValid = useCallback(() => {
+    switch (currentStep) {
+      case 0:
+        return !!workflow.convenente;
+      case 1:
+        return !!workflow.paymentDate && !!workflow.serviceType;
+      case 2:
+        return true; // Review step is always valid
+      case 3:
+        return true; // Settings step is always valid
+      default:
+        return false;
+    }
+  }, [currentStep, workflow]);
+
+  const goToNextStep = useCallback(() => {
+    if (currentStep < getTotalSteps() - 1 && isCurrentStepValid()) {
       setCurrentStep(currentStep + 1);
-    } else {
-      console.log("Cannot go to next step - validation failed or at max step");
-      if (!isValid) {
-        console.log("Validation details - workflow:", workflow);
-      }
     }
-  };
+  }, [currentStep, setCurrentStep, getTotalSteps, isCurrentStepValid]);
 
-  const goToPreviousStep = () => {
-    const hasCompany = hasSelectedCompany();
-    const minStep = hasCompany ? 1 : 0;
-    
-    if (currentStep > minStep) {
-      console.log("Going to previous step:", currentStep - 1);
+  const goToPreviousStep = useCallback(() => {
+    if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
     }
-  };
+  }, [currentStep, setCurrentStep]);
 
   return {
-    isCurrentStepValid,
     goToNextStep,
     goToPreviousStep,
     getTotalSteps,
     getDisplayStepNumber,
-    getStepTitle
+    getStepTitle,
+    isCurrentStepValid: isCurrentStepValid()
   };
 };
