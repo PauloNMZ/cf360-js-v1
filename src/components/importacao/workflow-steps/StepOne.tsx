@@ -95,7 +95,7 @@ const StepOne: React.FC<StepOneProps> = ({ workflow, updateWorkflow }) => {
   return (
     <div className="py-6 space-y-4">
       <p className="text-sm text-gray-500">
-        Selecione a data em que os pagamentos serão processados.
+        Selecione a data em que os pagamentos serão processados. A data não pode ser inferior a data atual.
       </p>
       <div className="flex flex-col items-center space-y-4">
         <div className="w-full relative">

@@ -43,8 +43,9 @@ export const useWorkflowDialog = (options: UseWorkflowDialogOptions = {}) => {
   }, [selectedConvenente, hasSelectedConvenente]);
 
   // Determine total steps based on whether convenente is pre-selected or company is in header
+  // ATUALIZADO: Agora são 5 steps total
   const getTotalSteps = () => {
-    return (hasCompanyInHeader || hasSelectedConvenente) ? 4 : 5;
+    return (hasCompanyInHeader || hasSelectedConvenente) ? 5 : 6;
   };
 
   // Get the actual step number for display
@@ -52,7 +53,7 @@ export const useWorkflowDialog = (options: UseWorkflowDialogOptions = {}) => {
     if (hasCompanyInHeader || hasSelectedConvenente) {
       return step;
     }
-    return step + 1; // When step 0 exists, display as 1, 2, 3, 4, 5
+    return step + 1; // When step 0 exists, display as 1, 2, 3, 4, 5, 6
   };
 
   // Navigation functions with conditional logic
@@ -103,6 +104,7 @@ export const useWorkflowDialog = (options: UseWorkflowDialogOptions = {}) => {
   }, [workflow]);
 
   // Function to check if the current step is valid
+  // ATUALIZADO: Adicionado validation para step 4 (novo step de revisão)
   const isCurrentStepValid = () => {
     console.log("useWorkflowDialog - isCurrentStepValid chamado para step:", currentStep);
     
@@ -117,10 +119,10 @@ export const useWorkflowDialog = (options: UseWorkflowDialogOptions = {}) => {
           const hasServiceType = workflow.serviceType !== "";
           console.log("Step 2 válido?", hasServiceType, "serviceType:", workflow.serviceType);
           return hasServiceType;
-        case 3: // Revisar Dados
-          return true;
-        case 4: // Método de Envio
+        case 3: // Método de Envio
           return workflow.sendMethod !== "";
+        case 4: // Revisão de Dados
+          return true;
         default:
           return false;
       }
@@ -139,10 +141,10 @@ export const useWorkflowDialog = (options: UseWorkflowDialogOptions = {}) => {
           const hasServiceType = workflow.serviceType !== "";
           console.log("Step 2 válido?", hasServiceType, "serviceType:", workflow.serviceType);
           return hasServiceType;
-        case 3: // Revisar Dados
-          return true;
-        case 4: // Método de Envio
+        case 3: // Método de Envio
           return workflow.sendMethod !== "";
+        case 4: // Revisão de Dados
+          return true;
         default:
           return false;
       }
@@ -150,17 +152,18 @@ export const useWorkflowDialog = (options: UseWorkflowDialogOptions = {}) => {
   };
 
   // Get step title based on current step and whether convenente is pre-selected
+  // ATUALIZADO: Novos títulos
   const getStepTitle = () => {
     if (hasCompanyInHeader || hasSelectedConvenente) {
       switch (currentStep) {
         case 1:
-          return "Data de Pagamento";
+          return "Configurar data de Pagamento";
         case 2:
-          return "Tipo de Serviço";
+          return "Tipo de serviço";
         case 3:
-          return "Revisar Dados";
-        case 4:
           return "Método de Envio";
+        case 4:
+          return "Revisão de Dados";
         default:
           return "";
       }
@@ -169,13 +172,13 @@ export const useWorkflowDialog = (options: UseWorkflowDialogOptions = {}) => {
         case 0:
           return "Selecionar Empresa";
         case 1:
-          return "Data de Pagamento";
+          return "Configurar data de Pagamento";
         case 2:
-          return "Tipo de Serviço";
+          return "Tipo de serviço";
         case 3:
-          return "Revisar Dados";
-        case 4:
           return "Método de Envio";
+        case 4:
+          return "Revisão de Dados";
         default:
           return "";
       }

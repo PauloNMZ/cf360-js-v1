@@ -45,18 +45,18 @@ const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
 
   console.log("WorkflowDialog render - currentStep:", currentStep, "hasSelectedCompany:", hasSelectedCompany, "displayStepNumber:", displayStepNumber);
 
-  // Default step title function
+  // Default step title function - ATUALIZADO com novos títulos
   function getDefaultStepTitle() {
     if (hasSelectedCompany) {
       switch (currentStep) {
         case 1:
-          return "Data de Pagamento";
+          return "Configurar data de Pagamento";
         case 2:
-          return "Tipo de Serviço";
+          return "Tipo de serviço";
         case 3:
           return "Método de Envio";
         case 4:
-          return "Revisar Dados";
+          return "Revisão de Dados";
         default:
           return "";
       }
@@ -65,13 +65,13 @@ const WorkflowDialog: React.FC<ExtendedWorkflowDialogProps> = ({
         case 0:
           return "Selecionar Empresa";
         case 1:
-          return "Data de Pagamento";
+          return "Configurar data de Pagamento";
         case 2:
-          return "Tipo de Serviço";
+          return "Tipo de serviço";
         case 3:
           return "Método de Envio";
         case 4:
-          return "Revisar Dados";
+          return "Revisão de Dados";
         default:
           return "";
       }

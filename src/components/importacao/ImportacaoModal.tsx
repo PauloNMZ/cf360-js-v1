@@ -145,7 +145,7 @@ export default function ImportacaoModal({ isOpen, onOpenChange }: ImportacaoModa
         workflow={workflow}
         updateWorkflow={updateWorkflow}
         currentStep={currentStep}
-        totalSteps={5}
+        totalSteps={getTotalSteps()}
         goToNextStep={goToNextStep}
         goToPreviousStep={goToPreviousStep}
         handleSubmit={handleSubmitWorkflow}

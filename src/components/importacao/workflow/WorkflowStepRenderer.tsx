@@ -41,12 +41,12 @@ const WorkflowStepRenderer: React.FC<WorkflowStepRendererProps> = ({
     );
   }
 
-  // Mapear steps considerando se há empresa ou não - MÁXIMO 3 para effectiveStep
+  // Mapear steps considerando se há empresa ou não - MÁXIMO 4 para effectiveStep
   const effectiveStep = hasSelectedCompany ? currentStep - 1 : currentStep - 1;
   console.log("Effective step:", effectiveStep);
   
-  // IMPORTANTE: Limitar effectiveStep a máximo 3 (que corresponde ao passo 4)
-  if (effectiveStep > 3) {
+  // IMPORTANTE: Limitar effectiveStep a máximo 4 (que corresponde ao passo 5)
+  if (effectiveStep > 4) {
     console.log("effectiveStep beyond limit, not rendering");
     return null;
   }

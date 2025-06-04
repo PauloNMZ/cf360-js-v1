@@ -113,14 +113,14 @@ const ImportarPlanilha = () => {
         )}
       </div>
 
-      {/* Multi-step workflow dialog */}
+      {/* Multi-step workflow dialog - ATUALIZADO: totalSteps agora é dinâmico */}
       <WorkflowDialog 
         isOpen={showWorkflowDialog}
         onOpenChange={setShowWorkflowDialog}
         workflow={workflow}
         updateWorkflow={updateWorkflow}
         currentStep={currentStep}
-        totalSteps={5}
+        totalSteps={getTotalSteps()}
         goToNextStep={goToNextStep}
         goToPreviousStep={goToPreviousStep}
         handleSubmit={handleSubmitWorkflow}
