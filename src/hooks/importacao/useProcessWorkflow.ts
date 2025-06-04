@@ -3,10 +3,10 @@ import { useWorkflowDialog } from './useWorkflowDialog';
 import { useDirectoryDialog } from './useDirectoryDialog';
 import { useCNABGeneration } from './useCNABGeneration';
 
-export const useProcessWorkflow = (
-  selectedConvenente: any, 
-  hasSelectedConvenente: boolean
-) => {
+// UPDATED: Agora aceita um objeto de opções
+export const useProcessWorkflow = (options = {}) => {
+  const { selectedConvenente, hasSelectedConvenente } = options;
+
   // Use workflow dialog hook with convenente options
   const workflowDialog = useWorkflowDialog({
     selectedConvenente,

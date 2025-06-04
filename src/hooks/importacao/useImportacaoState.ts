@@ -16,6 +16,8 @@ export const useImportacaoState = (selectedConvenente: any, hasSelectedConvenent
   const convenentesData = useConvenentesData();
   const validationDialog = useValidationDialog();
   const pdfReportWithEmail = usePDFReportWithEmail();
+  
+  // UPDATED: Passando as opções corretamente
   const processWorkflow = useProcessWorkflow({
     selectedConvenente,
     hasSelectedConvenente

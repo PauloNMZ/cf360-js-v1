@@ -1,3 +1,4 @@
+
 import { CNABWorkflowData, Favorecido } from "@/types/cnab240";
 
 // Define the expected column headers
@@ -33,7 +34,7 @@ export interface WorkflowDialogProps {
   totalSteps: number;
   goToNextStep: () => void;
   goToPreviousStep: () => void;
-  handleSubmit: () => void;
+  handleSubmit: (selectedRows: RowData[]) => Promise<{ success: boolean; fileName?: string }>; // UPDATED: Nova assinatura
   isCurrentStepValid: boolean;
   convenentes: Array<any>;
   carregandoConvenentes: boolean;
