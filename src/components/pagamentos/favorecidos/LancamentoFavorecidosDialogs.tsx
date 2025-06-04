@@ -112,7 +112,7 @@ const LancamentoFavorecidosDialogs: React.FC<LancamentoFavorecidosDialogsProps> 
           workflow={workflow}
           updateWorkflow={updateWorkflow}
           currentStep={currentStep}
-          totalSteps={getTotalSteps ? getTotalSteps() : 4}
+          totalSteps={getTotalSteps ? getTotalSteps() : 5}
           goToNextStep={goToNextStep || (() => {})}
           goToPreviousStep={goToPreviousStep || (() => {})}
           handleSubmit={handleSubmitWorkflow || (() => {})}

@@ -25,7 +25,7 @@ export const useFavorecidosWorkflowNavigation = ({
 }: UseFavorecidosWorkflowNavigationProps): WorkflowNavigationReturn => {
   
   const getTotalSteps = useCallback(() => {
-    return 4; // Total steps: 0(convenente), 1(data), 2(tipo), 3(revisar) = 4 steps (0-3)
+    return 5; // Total steps: 0(convenente), 1(data), 2(tipo), 3(envio), 4(revisar) = 5 steps (0-4)
   }, []);
 
   const getDisplayStepNumber = useCallback((step: number) => {
@@ -35,9 +35,10 @@ export const useFavorecidosWorkflowNavigation = ({
   const getStepTitle = useCallback((step: number) => {
     const titles = [
       'Selecionar Convenente',
-      'Configurar Pagamento', 
-      'Revisar Dados',
-      'Configurações'
+      'Configurar data de Pagamento', 
+      'Tipo de serviço',
+      'Método de Envio',
+      'Revisão de Dados'
     ];
     return titles[step] || 'Etapa Desconhecida';
   }, []);
@@ -58,16 +59,20 @@ export const useFavorecidosWorkflowNavigation = ({
         console.log("Step 0 validation - hasConvenente:", isValid, "convenente:", workflow.convenente);
         break;
       case 1:
-        isValid = !!workflow.paymentDate && !!workflow.serviceType;
-        console.log("Step 1 validation - hasPaymentData:", isValid, "paymentDate:", workflow.paymentDate, "serviceType:", workflow.serviceType);
+        isValid = !!workflow.paymentDate;
+        console.log("Step 1 validation - hasPaymentDate:", isValid, "paymentDate:", workflow.paymentDate);
         break;
       case 2:
-        isValid = true; // Review step is always valid
-        console.log("Step 2 validation - always true (review step)");
+        isValid = !!workflow.serviceType;
+        console.log("Step 2 validation - hasServiceType:", isValid, "serviceType:", workflow.serviceType);
         break;
       case 3:
-        isValid = true; // Settings step is always valid
-        console.log("Step 3 validation - always true (settings step)");
+        isValid = true; // Send method step is always valid
+        console.log("Step 3 validation - always true (send method step)");
+        break;
+      case 4:
+        isValid = true; // Review step is always valid
+        console.log("Step 4 validation - always true (review step)");
         break;
       default:
         isValid = false;
