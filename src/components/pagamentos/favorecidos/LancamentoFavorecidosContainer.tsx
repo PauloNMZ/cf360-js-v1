@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { useFavorecidos } from '@/hooks/favorecidos/useFavorecidos';
 import { useFavorecidosWorkflow } from '@/hooks/favorecidos/useFavorecidosWorkflow';
@@ -174,7 +175,7 @@ const LancamentoFavorecidosContainer: React.FC<LancamentoFavorecidosContainerPro
           setNotificationModalOpen={setNotificationModalOpen}
           notificationConfig={notificationConfig}
           onCloseNotificationModal={handleCloseNotificationModal}
-          // Workflow props - call the function to get boolean value
+          // Workflow props - pass boolean value by calling the function
           showWorkflowDialog={workflowData.showWorkflowDialog}
           setShowWorkflowDialog={workflowData.setShowWorkflowDialog}
           workflow={workflowData.workflow}
@@ -185,7 +186,7 @@ const LancamentoFavorecidosContainer: React.FC<LancamentoFavorecidosContainerPro
           getStepTitle={() => workflowData.getStepTitle(workflowData.currentStep)}
           goToNextStep={workflowData.goToNextStep}
           goToPreviousStep={workflowData.goToPreviousStep}
-          isCurrentStepValid={workflowData.isCurrentStepValid()} // Call the function to get boolean
+          isCurrentStepValid={workflowData.isCurrentStepValid()} // Call function to get boolean value
           handleSubmitWorkflow={workflowData.handleSubmitWorkflow}
           convenentes={workflowData.convenentes}
           carregandoConvenentes={workflowData.carregandoConvenentes}
