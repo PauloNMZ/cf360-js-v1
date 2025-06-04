@@ -1,4 +1,3 @@
-
 import { useIndexPageContext } from './useIndexPageContext';
 import { useImportacaoState } from './importacao/useImportacaoState';
 import { useImportacaoCompany } from './importacao/useImportacaoCompany';
@@ -59,6 +58,16 @@ export const useImportacao = () => {
     setShowTable
   );
 
+  // Handler para editar linha
+  const handleEditRow = (id: number) => {
+    console.log("useImportacao - Editando linha ID:", id);
+    const rowToEdit = tableOps.tableData.find(row => row.id === id);
+    if (rowToEdit) {
+      console.log("Dados da linha a editar:", rowToEdit);
+      // TODO: Implementar lógica de edição (abrir modal, etc.)
+    }
+  };
+
   return {
     // File related props and methods
     file: fileImport.file,
@@ -74,6 +83,7 @@ export const useImportacao = () => {
     handleSelectAll: tableOps.handleSelectAll,
     handleSelectRow: tableOps.handleSelectRow,
     handleDeleteRow: tableOps.handleDeleteRow,
+    handleEditRow, // ADDED: Handler para editar linha
     handleClearSelection: tableOps.handleClearSelection,
     getSelectedCount: tableOps.getSelectedCount,
     

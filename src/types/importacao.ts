@@ -1,3 +1,4 @@
+
 import { CNABWorkflowData, Favorecido } from "@/types/cnab240";
 import { ReportSortType } from "@/types/reportSorting";
 
@@ -54,12 +55,13 @@ export interface TableViewProps {
   tableData: RowData[];
   handleSelectRow: (id: number, checked: boolean) => void;
   handleDeleteRow: (id: number) => void;
+  handleEditRow: (id: number) => void; // ADDED: Handler para editar linha
   handleProcessSelected: () => void;
   handleClearSelection: () => void;
   selectedCount: number;
   handleVerifyErrors: () => void;
   handleExportErrors: () => void;
-  handleGenerateReport: (sortType?: ReportSortType) => void; // UPDATED: Added optional sortType parameter
+  handleGenerateReport: (sortType?: ReportSortType) => void;
   total: number;
   setShowTable: (show: boolean) => void;
   validationPerformed: boolean;

@@ -53,6 +53,7 @@ const ImportarPlanilha = () => {
     handleSelectAll,
     handleSelectRow,
     handleDeleteRow,
+    handleEditRow, // ADDED: Handler para editar linha
     handleClearSelection,
     getSelectedCount,
     handleProcessar,
@@ -110,6 +111,7 @@ const ImportarPlanilha = () => {
             tableData={tableData}
             handleSelectRow={handleSelectRow}
             handleDeleteRow={handleDeleteRow}
+            handleEditRow={handleEditRow}
             handleProcessSelected={handleProcessSelected}
             handleClearSelection={handleClearSelection}
             selectedCount={getSelectedCount()}
