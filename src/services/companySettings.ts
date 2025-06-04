@@ -5,7 +5,7 @@ const COMPANY_SETTINGS_KEY = 'gerapag_company_settings';
 
 // Default company settings
 export const DEFAULT_SETTINGS: CompanySettings = { 
-  logoUrl: '', 
+  logoUrl: '/lovable-uploads/7d888b52-31f2-4276-94b5-560eae0bdab9.png', 
   companyName: 'ConnectPag' 
 };
 
