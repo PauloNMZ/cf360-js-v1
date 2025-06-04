@@ -35,13 +35,19 @@ export const useFavorecidosWorkflowProcessing = ({
   const { showSuccess, showInfo, showError } = useNotificationModalContext();
 
   const handleSubmitWorkflow = async () => {
-    console.log("useFavorecidosWorkflowProcessing - handleSubmitWorkflow called");
+    console.log("🚀 handleSubmitWorkflow called");
+    console.log("Selected favorecidos:", selectedFavorecidos);
+    console.log("Workflow data:", workflow);
+    console.log("Available favorecidos:", favorecidos);
     
     // Validate convenente is selected
     if (!workflow.convenente) {
+      console.log("❌ No convenente selected");
       showError("Erro!", "É necessário selecionar um convenente para gerar o arquivo CNAB.");
       return;
     }
+
+    console.log("✅ Convenente found:", workflow.convenente);
 
     setShowWorkflowDialog(false);
     
@@ -51,11 +57,12 @@ export const useFavorecidosWorkflowProcessing = ({
         selectedFavorecidos.includes(fav.id)
       );
 
+      console.log("Filtered favorecidos data:", selectedFavorecidosData);
+
       if (selectedFavorecidosData.length === 0) {
+        console.log("❌ No favorecidos found after filtering");
         throw new Error("Nenhum favorecido selecionado");
       }
-
-      console.log("Selected favorecidos data:", selectedFavorecidosData);
 
       // Convert favorecidos to the format expected by processSelectedRows
       const rowData = selectedFavorecidosData.map((fav, index) => 
@@ -66,10 +73,16 @@ export const useFavorecidosWorkflowProcessing = ({
 
       showInfo("Processando...", `Processando ${selectedFavorecidosData.length} favorecidos...`);
       
+      console.log("🔄 Calling processSelectedRows...");
+      
       // Process the favorecidos using the existing service
       const result = await processSelectedRows(workflow, rowData);
       
+      console.log("processSelectedRows result:", result);
+      
       if (result.success) {
+        console.log("✅ CNAB file generated successfully:", result.fileName);
+        
         setCnabFileGenerated(true);
         setCnabFileName(result.fileName || 'arquivo.rem');
         
@@ -77,6 +90,7 @@ export const useFavorecidosWorkflowProcessing = ({
         
         // Automatically generate report after CNAB file is created
         setTimeout(async () => {
+          console.log("🔄 Generating report...");
           const companyName = workflow.convenente?.razaoSocial || "Empresa";
           const companyCnpj = workflow.convenente?.cnpj || "";
           
@@ -91,16 +105,19 @@ export const useFavorecidosWorkflowProcessing = ({
             workflow.paymentDate
           );
         }, 500);
+      } else {
+        console.log("❌ CNAB file generation failed");
+        showError("Erro!", "Falha ao gerar arquivo CNAB");
       }
       
     } catch (error) {
-      console.error("Erro ao processar favorecidos:", error);
+      console.error("❌ Error processing favorecidos:", error);
       showError("Erro!", error instanceof Error ? error.message : "Erro ao processar favorecidos");
     }
   };
 
   const handleGenerateOnlyReport = async () => {
-    console.log("useFavorecidosWorkflowProcessing - handleGenerateOnlyReport called");
+    console.log("📊 handleGenerateOnlyReport called");
     
     if (!workflow.convenente) {
       showError("Erro!", "É necessário selecionar um convenente para gerar o relatório.");

@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { useFavorecidos } from '@/hooks/favorecidos/useFavorecidos';
 import { useFavorecidosWorkflow } from '@/hooks/favorecidos/useFavorecidosWorkflow';
@@ -109,6 +110,11 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
       isCurrentStepValid: workflowData.isCurrentStepValid()
     });
   }, [workflowData.currentStep, workflowData.workflow]);
+
+  // Debug: log selected favorecidos
+  useEffect(() => {
+    console.log("Selected favorecidos changed:", selectedFavorecidos);
+  }, [selectedFavorecidos]);
 
   return (
     <div className="space-y-6">
