@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { PDFPreviewDialogProps } from "@/types/importacao";
 import { Button } from "@/components/ui/button";
-import { Mail, Download, Loader2, X } from "lucide-react";
+import { Mail, Download, Loader2 } from "lucide-react";
 import { generatePDFReport } from "@/services/reports/pdfReportService";
 import { toast } from "@/components/ui/sonner";
 
@@ -104,16 +104,11 @@ export function PDFPreviewDialog({
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[95vw] w-[95vw] max-h-[95vh] h-[95vh] p-6 overflow-hidden flex flex-col">
-        <DialogHeader className="flex flex-row justify-between items-center">
-          <div>
-            <DialogTitle className="text-xl">Visualização do Relatório PDF</DialogTitle>
-            <DialogDescription>
-              Confira o relatório antes de enviá-lo por e-mail ao diretor financeiro.
-            </DialogDescription>
-          </div>
-          <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)}>
-            <X className="h-5 w-5" />
-          </Button>
+        <DialogHeader>
+          <DialogTitle className="text-xl">Visualização do Relatório PDF</DialogTitle>
+          <DialogDescription>
+            Confira o relatório antes de enviá-lo por e-mail ao diretor financeiro.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex-1 border rounded-md overflow-hidden bg-gray-100 mt-2">

@@ -18,7 +18,7 @@ export const useLancamentoFavorecidosReport = ({
   handleGenerateOnlyReport,
   setShowWorkflowDialog
 }: UseLancamentoFavorecidosReportProps) => {
-  const { showError, showInfo } = useNotificationModalContext();
+  const { showError } = useNotificationModalContext();
   const pdfReportWithEmail = usePDFReportWithEmail();
 
   const handleGenerateReportOnly = async () => {
@@ -34,7 +34,6 @@ export const useLancamentoFavorecidosReport = ({
     }
 
     console.log("Gerando relatório para favorecidos selecionados:", selectedFavorecidos);
-    showInfo("Gerando...", "Gerando relatório de remessa...");
     
     try {
       // Get selected favorecidos data
