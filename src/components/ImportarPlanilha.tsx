@@ -36,7 +36,7 @@ const ImportarPlanilha = () => {
     showPDFPreviewDialog,
     setShowPDFPreviewDialog,
     reportData,
-    selectedSortType, // NOVO: Receber tipo de ordenação selecionado
+    selectedSortType,
     showEmailConfigDialog,
     setShowEmailConfigDialog,
     defaultEmailMessage,
@@ -45,12 +45,16 @@ const ImportarPlanilha = () => {
     workflow,
     convenentes,
     carregandoConvenentes,
+    // Search related props
+    searchTerm,
+    handleSearchChange,
+    hasSearchResults,
     handleFileChange,
     handleSelectAll,
     handleSelectRow,
     handleDeleteRow,
-    handleClearSelection, // NOVO: Importar função de limpar seleção
-    getSelectedCount, // NOVO: Importar contagem de selecionados
+    handleClearSelection,
+    getSelectedCount,
     handleProcessar,
     handleProcessSelected,
     handleVerifyErrors,
@@ -107,8 +111,8 @@ const ImportarPlanilha = () => {
             handleSelectRow={handleSelectRow}
             handleDeleteRow={handleDeleteRow}
             handleProcessSelected={handleProcessSelected}
-            handleClearSelection={handleClearSelection} // NOVO: Passar função de limpar seleção
-            selectedCount={getSelectedCount()} // NOVO: Passar contagem de selecionados
+            handleClearSelection={handleClearSelection}
+            selectedCount={getSelectedCount()}
             handleVerifyErrors={handleVerifyErrors}
             handleExportErrors={handleExportErrors}
             handleGenerateReport={handleGenerateReport}

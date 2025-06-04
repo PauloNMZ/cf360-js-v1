@@ -3,6 +3,7 @@ import { useIndexPageContext } from './useIndexPageContext';
 import { useImportacaoState } from './importacao/useImportacaoState';
 import { useImportacaoCompany } from './importacao/useImportacaoCompany';
 import { useImportacaoHandlers } from './importacao/useImportacaoHandlers';
+import { useImportacaoSearch } from './importacao/useImportacaoSearch';
 
 export const useImportacao = () => {
   // Get current selected convenente info from context
@@ -24,6 +25,14 @@ export const useImportacao = () => {
     pdfReportWithEmail,
     processWorkflow
   } = useImportacaoState(selectedConvenente, hasSelectedConvenente);
+
+  // Use the search functionality
+  const {
+    searchTerm,
+    filteredData,
+    handleSearchChange,
+    hasResults
+  } = useImportacaoSearch(tableOps.tableData);
 
   // Use the company logic hook
   const { getCompanyInfo } = useImportacaoCompany(
@@ -59,14 +68,19 @@ export const useImportacao = () => {
     handleFileChange: fileImport.handleFileChange,
     
     // Table related props and methods
-    tableData: tableOps.tableData,
+    tableData: filteredData, // Use filtered data instead of raw tableData
     selectAll: tableOps.selectAll,
     total: tableOps.total,
     handleSelectAll: tableOps.handleSelectAll,
     handleSelectRow: tableOps.handleSelectRow,
     handleDeleteRow: tableOps.handleDeleteRow,
-    handleClearSelection: tableOps.handleClearSelection, // NOVO: Exportar função de limpar seleção
-    getSelectedCount: tableOps.getSelectedCount, // NOVO: Exportar contagem de selecionados
+    handleClearSelection: tableOps.handleClearSelection,
+    getSelectedCount: tableOps.getSelectedCount,
+    
+    // Search related props and methods
+    searchTerm,
+    handleSearchChange,
+    hasSearchResults: hasResults,
     
     // UI state
     showTable,
@@ -96,7 +110,7 @@ export const useImportacao = () => {
     showPDFPreviewDialog: pdfReportWithEmail.showPDFPreviewDialog,
     setShowPDFPreviewDialog: pdfReportWithEmail.setShowPDFPreviewDialog,
     reportData: pdfReportWithEmail.reportData,
-    selectedSortType: pdfReportWithEmail.selectedSortType, // NOVO: Expor tipo de ordenação selecionado
+    selectedSortType: pdfReportWithEmail.selectedSortType,
     
     // Email and report dialog states
     showEmailConfigDialog: pdfReportWithEmail.showEmailConfigDialog,

@@ -3,13 +3,15 @@ import React, { useState } from "react";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { FileText, AlertTriangle, ChevronLeft, FileOutput, Trash2, FileCheck, Download, X } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { TableViewProps, RowData } from "@/types/importacao";
 import { formatarValorCurrency } from "@/utils/formatting/currencyUtils";
 import { formatCPFCNPJ } from "@/utils/formatting/stringUtils";
-import { SelectedRecordsCounter } from "./SelectedRecordsCounter";
 import { ReportSortDialog } from "./ReportSortDialog";
 import { ReportSortType } from "@/types/reportSorting";
+import ImportacaoSearchBar from "./ImportacaoSearchBar";
+import TableViewHeader from "./TableViewHeader";
+import TableViewPagination from "./TableViewPagination";
 
 export function TableView({
   handleSelectAll,
@@ -30,150 +32,121 @@ export function TableView({
   cnabFileGenerated = false
 }: TableViewProps) {
   const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [showSortDialog, setShowSortDialog] = useState(false);
-  const rowsPerPage = 10;
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Filter data based on search term
+  const filteredData = React.useMemo(() => {
+    if (!searchTerm.trim()) {
+      return tableData;
+    }
+    const term = searchTerm.toLowerCase().trim();
+    return tableData.filter(row => {
+      const nome = row.NOME?.toLowerCase() || '';
+      const inscricao = row.INSCRICAO?.toString().toLowerCase() || '';
+      return nome.includes(term) || inscricao.includes(term);
+    });
+  }, [tableData, searchTerm]);
+
   const startIndex = (currentPage - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
-  const currentRows = tableData.slice(startIndex, endIndex);
-  const totalPages = Math.ceil(tableData.length / rowsPerPage);
-  
+  const currentRows = filteredData.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+
   const formatarValor = (valor: string | number): string => {
     if (typeof valor === "string") {
-      // Remove caracteres não numéricos, exceto ponto e vírgula
       const numericValue = valor.replace(/[^\d.,]/g, "").replace(",", ".");
       return formatarValorCurrency(parseFloat(numericValue));
     }
     return formatarValorCurrency(valor);
   };
 
-  // Função para formatar CPF/CNPJ com máscara
   const formatarInscricao = (inscricao: string): string => {
     if (!inscricao) return "";
     return formatCPFCNPJ(inscricao);
   };
 
-  // Adicionar logs de debugging para os botões
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1); // Reset to first page when searching
+  };
+
   const handleVerifyErrorsClick = () => {
     console.log("TableView - Botão Verificar Erros clicado");
-    console.log("TableView - tableData length:", tableData.length);
-    console.log("TableView - handleVerifyErrors function:", typeof handleVerifyErrors);
     if (handleVerifyErrors) {
       handleVerifyErrors();
-    } else {
-      console.error("TableView - handleVerifyErrors não está definido");
     }
   };
 
   const handleProcessSelectedClick = () => {
     console.log("TableView - Botão Processar Selecionados clicado");
-    console.log("TableView - tableData length:", tableData.length);
-    console.log("TableView - selected rows:", selectedCount);
-    console.log("TableView - handleProcessSelected function:", typeof handleProcessSelected);
     if (handleProcessSelected) {
       handleProcessSelected();
-    } else {
-      console.error("TableView - handleProcessSelected não está definido");
     }
   };
 
   const handleGenerateReportClick = () => {
     console.log("=== DEBUG TableView - handleGenerateReportClick ===");
-    console.log("TableView - cnabFileGenerated:", cnabFileGenerated);
-    
     if (!cnabFileGenerated) {
       console.error("TableView - CNAB não foi gerado ainda");
       return;
     }
-    
-    // Abrir dialog de seleção de ordenação
-    console.log("TableView - Abrindo dialog de ordenação");
     setShowSortDialog(true);
   };
 
   const handleSortConfirm = (sortType: ReportSortType) => {
     console.log("=== DEBUG TableView - handleSortConfirm ===");
-    console.log("TableView - Ordenação selecionada:", sortType);
-    console.log("TableView - Calling handleGenerateReport with sortType:", sortType);
-    
     if (handleGenerateReport) {
       handleGenerateReport(sortType);
-    } else {
-      console.error("TableView - handleGenerateReport não está definido");
     }
   };
 
-  // NOVO: Handler para limpar seleção
   const handleClearSelectionClick = () => {
     console.log("TableView - Botão Limpar Seleção clicado");
     if (handleClearSelection) {
       handleClearSelection();
-    } else {
-      console.error("TableView - handleClearSelection não está definido");
     }
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleRowsPerPageChange = (rows: number) => {
+    setRowsPerPage(rows);
+    setCurrentPage(1); // Reset to first page when changing rows per page
   };
   
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <Button variant="ghost" onClick={() => setShowTable(false)} className="flex items-center">
-          <ChevronLeft className="mr-1 h-4 w-4" /> Voltar
-        </Button>
+      {/* Header with actions */}
+      <TableViewHeader
+        selectedCount={selectedCount}
+        validationPerformed={validationPerformed}
+        hasValidationErrors={hasValidationErrors}
+        cnabFileGenerated={cnabFileGenerated}
+        onBack={() => setShowTable(false)}
+        onVerifyErrors={handleVerifyErrorsClick}
+        onExportErrors={handleExportErrors}
+        onClearSelection={handleClearSelectionClick}
+        onProcessSelected={handleProcessSelectedClick}
+        onGenerateReport={handleGenerateReportClick}
+      />
 
-        <div className="flex gap-3 items-center">
-          {/* NOVO: Contador de registros selecionados com UI melhorada */}
-          <SelectedRecordsCounter selectedCount={selectedCount} />
+      {/* Search bar */}
+      <ImportacaoSearchBar
+        searchTerm={searchTerm}
+        onSearchChange={handleSearchChange}
+        hasResults={filteredData.length > 0}
+        resultCount={filteredData.length}
+      />
 
-          <Button variant="outline" onClick={handleVerifyErrorsClick} className="flex items-center">
-            <FileCheck className="mr-2 h-4 w-4" />
-            Verificar Erros
-          </Button>
-
-          {validationPerformed && hasValidationErrors && (
-            <Button variant="outline" onClick={handleExportErrors} className="flex items-center text-amber-600">
-              <Download className="mr-2 h-4 w-4" />
-              Exportar Erros
-            </Button>
-          )}
-
-          {/* NOVO: Botão Limpar Seleção - só aparece quando há itens selecionados */}
-          {selectedCount > 0 && (
-            <Button 
-              variant="outline" 
-              onClick={handleClearSelectionClick} 
-              className="flex items-center text-gray-600 hover:text-gray-800"
-            >
-              <X className="mr-2 h-4 w-4" />
-              Limpar Seleção
-            </Button>
-          )}
-
-          {/* ATUALIZADO: Botão Processar Selecionados agora fica desabilitado quando não há seleção */}
-          <Button 
-            onClick={handleProcessSelectedClick} 
-            className="flex items-center" 
-            disabled={selectedCount === 0}
-            title={selectedCount === 0 ? "Selecione pelo menos um registro para processar" : `Processar ${selectedCount} registro${selectedCount !== 1 ? 's' : ''} selecionado${selectedCount !== 1 ? 's' : ''}`}
-          >
-            <FileOutput className="mr-2 h-4 w-4" />
-            Processar Selecionados
-          </Button>
-          
-          <Button 
-            onClick={handleGenerateReportClick} 
-            className="flex items-center" 
-            disabled={!cnabFileGenerated} 
-            title={!cnabFileGenerated ? "Gere o arquivo CNAB antes de visualizar o relatório" : "Gerar relatório PDF dos registros válidos"}
-          >
-            <FileText className="mr-2 h-4 w-4" />
-            Gerar Relatório
-          </Button>
-        </div>
-      </div>
-
+      {/* Table */}
       <div className="rounded-md border">
         <Table>
           <TableCaption>
-            Exibindo {currentRows.length} de {tableData.length} registros |
+            Exibindo {currentRows.length} de {filteredData.length} registros |
             Página {currentPage} de {totalPages} | Total Selecionado:{" "}
             {formatarValorCurrency(total)}
           </TableCaption>
@@ -218,25 +191,19 @@ export function TableView({
         </Table>
       </div>
 
-      {/* Paginação simples */}
-      <div className="flex justify-between items-center">
-        <div>
-          <span className="text-sm text-gray-500">
-            Mostrando {startIndex + 1} até {Math.min(endIndex, tableData.length)}{" "}
-            de {tableData.length} registros
-          </span>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
-            Anterior
-          </Button>
-          <Button variant="outline" onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>
-            Próximo
-          </Button>
-        </div>
-      </div>
+      {/* Pagination */}
+      <TableViewPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        rowsPerPage={rowsPerPage}
+        totalItems={filteredData.length}
+        startIndex={startIndex}
+        endIndex={endIndex}
+        onPageChange={handlePageChange}
+        onRowsPerPageChange={handleRowsPerPageChange}
+      />
 
-      {/* Novo: Dialog de seleção de ordenação */}
+      {/* Sort dialog */}
       <ReportSortDialog
         isOpen={showSortDialog}
         onOpenChange={setShowSortDialog}

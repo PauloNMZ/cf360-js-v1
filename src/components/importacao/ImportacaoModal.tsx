@@ -37,8 +37,13 @@ export default function ImportacaoModal({ isOpen, onOpenChange }: ImportacaoModa
     handleSelectAll,
     handleSelectRow,
     handleDeleteRow,
-    handleClearSelection, // NOVO: Função de limpar seleção
-    getSelectedCount, // NOVO: Função para contar selecionados
+    handleClearSelection,
+    getSelectedCount,
+    
+    // Search props
+    searchTerm,
+    handleSearchChange,
+    hasSearchResults,
     
     // UI state
     showTable,
@@ -56,7 +61,7 @@ export default function ImportacaoModal({ isOpen, onOpenChange }: ImportacaoModa
     showPDFPreviewDialog,
     setShowPDFPreviewDialog,
     reportData,
-    selectedSortType, // NOVO: Tipo de ordenação selecionado
+    selectedSortType,
     
     // Email and report dialog states
     showEmailConfigDialog,
@@ -70,7 +75,7 @@ export default function ImportacaoModal({ isOpen, onOpenChange }: ImportacaoModa
     handleVerifyErrors,
     handleExportErrors,
     handleGenerateReport,
-    handleSendEmailReport, // This now uses the no-parameter version
+    handleSendEmailReport,
     handleEmailSubmit,
     
     // Directory dialog props
@@ -123,8 +128,8 @@ export default function ImportacaoModal({ isOpen, onOpenChange }: ImportacaoModa
               handleSelectRow={handleSelectRow}
               handleDeleteRow={handleDeleteRow}
               handleProcessSelected={handleProcessSelected}
-              handleClearSelection={handleClearSelection} // NOVO: Função de limpar seleção
-              selectedCount={getSelectedCount()} // NOVO: Contagem de selecionados
+              handleClearSelection={handleClearSelection}
+              selectedCount={getSelectedCount()}
               handleVerifyErrors={handleVerifyErrors}
               handleExportErrors={handleExportErrors}
               handleGenerateReport={handleGenerateReport}
@@ -188,7 +193,6 @@ export default function ImportacaoModal({ isOpen, onOpenChange }: ImportacaoModa
         reportDate={reportDate}
       />
       
-      {/* ATUALIZADO: Passar sortType selecionado */}
       <PDFPreviewDialog
         isOpen={showPDFPreviewDialog}
         onOpenChange={setShowPDFPreviewDialog}
