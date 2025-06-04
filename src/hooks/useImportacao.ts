@@ -96,6 +96,7 @@ export const useImportacao = () => {
     showPDFPreviewDialog: pdfReportWithEmail.showPDFPreviewDialog,
     setShowPDFPreviewDialog: pdfReportWithEmail.setShowPDFPreviewDialog,
     reportData: pdfReportWithEmail.reportData,
+    selectedSortType: pdfReportWithEmail.selectedSortType, // NOVO: Expor tipo de ordenação selecionado
     
     // Email and report dialog states
     showEmailConfigDialog: pdfReportWithEmail.showEmailConfigDialog,

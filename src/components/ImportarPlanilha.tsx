@@ -36,6 +36,7 @@ const ImportarPlanilha = () => {
     showPDFPreviewDialog,
     setShowPDFPreviewDialog,
     reportData,
+    selectedSortType, // NOVO: Receber tipo de ordenação selecionado
     showEmailConfigDialog,
     setShowEmailConfigDialog,
     defaultEmailMessage,
@@ -165,12 +166,13 @@ const ImportarPlanilha = () => {
         reportDate={reportDate}
       />
       
-      {/* PDF Preview dialog - using no-parameter version of the handler */}
+      {/* PDF Preview dialog - ATUALIZADO: Passar sortType selecionado */}
       <PDFPreviewDialog
         isOpen={showPDFPreviewDialog}
         onOpenChange={setShowPDFPreviewDialog}
         reportData={reportData}
         onSendEmail={handleSendEmailReport}
+        sortType={selectedSortType}
       />
     </ScrollArea>
   );

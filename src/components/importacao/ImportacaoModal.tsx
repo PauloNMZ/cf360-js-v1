@@ -1,3 +1,4 @@
+
 import React from "react";
 import {
   Dialog,
@@ -55,6 +56,7 @@ export default function ImportacaoModal({ isOpen, onOpenChange }: ImportacaoModa
     showPDFPreviewDialog,
     setShowPDFPreviewDialog,
     reportData,
+    selectedSortType, // NOVO: Tipo de ordenação selecionado
     
     // Email and report dialog states
     showEmailConfigDialog,
@@ -186,11 +188,13 @@ export default function ImportacaoModal({ isOpen, onOpenChange }: ImportacaoModa
         reportDate={reportDate}
       />
       
+      {/* ATUALIZADO: Passar sortType selecionado */}
       <PDFPreviewDialog
         isOpen={showPDFPreviewDialog}
         onOpenChange={setShowPDFPreviewDialog}
         reportData={reportData}
         onSendEmail={handleSendEmailReport}
+        sortType={selectedSortType}
       />
     </>
   );
