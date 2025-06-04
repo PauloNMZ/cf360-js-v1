@@ -180,7 +180,7 @@ const LancamentoFavorecidos: React.FC<LancamentoFavorecidosProps> = ({
         getStepTitle={workflowData.getStepTitle}
         goToNextStep={workflowData.goToNextStep}
         goToPreviousStep={workflowData.goToPreviousStep}
-        isCurrentStepValid={workflowData.isCurrentStepValid}
+        isCurrentStepValid={() => workflowData.isCurrentStepValid()}
         handleSubmitWorkflow={workflowData.handleSubmitWorkflow}
         convenentes={workflowData.convenentes}
         carregandoConvenentes={workflowData.carregandoConvenentes}

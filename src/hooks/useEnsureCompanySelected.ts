@@ -12,7 +12,9 @@ export const useEnsureCompanySelected = () => {
     setModalOpen,
     convenentes,
     handleSelectConvenente,
-    setFormMode 
+    setFormMode,
+    currentConvenenteId,
+    formData
   } = useIndexPageContext();
   
   const [isEnsuring, setIsEnsuring] = useState(false);
@@ -20,15 +22,35 @@ export const useEnsureCompanySelected = () => {
 
   console.log("=== DEBUG useEnsureCompanySelected ===");
   console.log("selectedHeaderCompany:", selectedHeaderCompany);
+  console.log("currentConvenenteId:", currentConvenenteId);
+  console.log("formData:", formData);
   console.log("convenentes:", convenentes);
+
+  // Função para verificar se há empresa selecionada (verificando ambas as fontes)
+  const hasActiveCompany = () => {
+    // Verifica se há empresa no header
+    if (selectedHeaderCompany && selectedHeaderCompany.razaoSocial) {
+      console.log("✅ Company found in header:", selectedHeaderCompany.razaoSocial);
+      return true;
+    }
+
+    // Verifica se há empresa via currentConvenenteId + formData
+    if (currentConvenenteId && formData && formData.razaoSocial) {
+      console.log("✅ Company found via currentConvenenteId + formData:", formData.razaoSocial);
+      return true;
+    }
+
+    console.log("❌ No active company found");
+    return false;
+  };
 
   // Função para verificar e garantir que há empresa selecionada
   const ensureCompanySelected = () => {
-    console.log("ensureCompanySelected called - selectedHeaderCompany:", selectedHeaderCompany);
+    console.log("ensureCompanySelected called");
     
     // Se já há empresa selecionada, não precisa fazer nada
-    if (selectedHeaderCompany && selectedHeaderCompany.razaoSocial) {
-      console.log("✅ Company already selected:", selectedHeaderCompany.razaoSocial);
+    if (hasActiveCompany()) {
+      console.log("✅ Company already active");
       setHasCompanyGuaranteed(true);
       setIsEnsuring(false);
       return true;
@@ -65,22 +87,22 @@ export const useEnsureCompanySelected = () => {
     if (convenentes && convenentes.length >= 0) {
       ensureCompanySelected();
     }
-  }, [convenentes, selectedHeaderCompany]);
+  }, [convenentes, selectedHeaderCompany, currentConvenenteId, formData]);
 
   // Efeito para detectar quando uma empresa foi selecionada após abrir o modal
   useEffect(() => {
-    if (isEnsuring && selectedHeaderCompany && selectedHeaderCompany.razaoSocial) {
-      console.log("✅ Company selected after modal:", selectedHeaderCompany.razaoSocial);
+    if (isEnsuring && hasActiveCompany()) {
+      console.log("✅ Company selected after modal");
       setHasCompanyGuaranteed(true);
       setIsEnsuring(false);
     }
-  }, [selectedHeaderCompany, isEnsuring]);
+  }, [selectedHeaderCompany, currentConvenenteId, formData, isEnsuring]);
 
   return {
-    hasCompanySelected: !!(selectedHeaderCompany && selectedHeaderCompany.razaoSocial),
+    hasCompanySelected: hasActiveCompany(),
     hasCompanyGuaranteed,
     isEnsuring,
     ensureCompanySelected,
-    selectedCompany: selectedHeaderCompany
+    selectedCompany: selectedHeaderCompany || (currentConvenenteId && formData ? { ...formData, id: currentConvenenteId } : null)
   };
 };
