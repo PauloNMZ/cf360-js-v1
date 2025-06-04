@@ -121,6 +121,11 @@ export const useProcessWorkflow = (props: UseProcessWorkflowProps) => {
     setShowDirectoryDialog(false);
   };
 
+  // Função para abrir o workflow dialog - esta era a função que estava faltando
+  const handleProcessSelected = () => {
+    setShowWorkflowDialog(true);
+  };
+
   // Reset step when dialog opens
   const setShowWorkflowDialogWithReset = (show: boolean) => {
     if (show) {
@@ -148,6 +153,7 @@ export const useProcessWorkflow = (props: UseProcessWorkflowProps) => {
     handleSubmitWorkflow,
     handleOpenDirectorySettings,
     handleSaveDirectorySettings,
+    handleProcessSelected,
     hasSelectedConvenente
   };
 };
