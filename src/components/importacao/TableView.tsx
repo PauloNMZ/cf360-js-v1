@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -7,6 +6,7 @@ import { FileText, AlertTriangle, ChevronLeft, FileOutput, Trash2, FileCheck, Do
 import { TableViewProps, RowData } from "@/types/importacao";
 import { formatarValorCurrency } from "@/utils/formatting/currencyUtils";
 import { formatCPFCNPJ } from "@/utils/formatting/stringUtils";
+import { SelectedRecordsCounter } from "./SelectedRecordsCounter";
 
 export function TableView({
   handleSelectAll,
@@ -15,8 +15,8 @@ export function TableView({
   handleSelectRow,
   handleDeleteRow,
   handleProcessSelected,
-  handleClearSelection, // NOVO: Função para limpar seleção
-  selectedCount, // NOVO: Contagem de registros selecionados
+  handleClearSelection,
+  selectedCount,
   handleVerifyErrors,
   handleExportErrors,
   handleGenerateReport,
@@ -93,36 +93,35 @@ export function TableView({
     }
   };
   
-  return <div className="space-y-4">
+  return (
+    <div className="space-y-4">
       <div className="flex justify-between items-center">
         <Button variant="ghost" onClick={() => setShowTable(false)} className="flex items-center">
           <ChevronLeft className="mr-1 h-4 w-4" /> Voltar
         </Button>
 
-        <div className="flex gap-2 items-center">
-          {/* NOVO: Mostrar contador de selecionados */}
-          {selectedCount > 0 && (
-            <span className="text-sm text-muted-foreground bg-blue-50 px-3 py-1 rounded-md">
-              {selectedCount} registro{selectedCount !== 1 ? 's' : ''} selecionado{selectedCount !== 1 ? 's' : ''}
-            </span>
-          )}
+        <div className="flex gap-3 items-center">
+          {/* NOVO: Contador de registros selecionados com UI melhorada */}
+          <SelectedRecordsCounter selectedCount={selectedCount} />
 
           <Button variant="outline" onClick={handleVerifyErrorsClick} className="flex items-center">
             <FileCheck className="mr-2 h-4 w-4" />
             Verificar Erros
           </Button>
 
-          {validationPerformed && hasValidationErrors && <Button variant="outline" onClick={handleExportErrors} className="flex items-center text-amber-600">
+          {validationPerformed && hasValidationErrors && (
+            <Button variant="outline" onClick={handleExportErrors} className="flex items-center text-amber-600">
               <Download className="mr-2 h-4 w-4" />
               Exportar Erros
-            </Button>}
+            </Button>
+          )}
 
           {/* NOVO: Botão Limpar Seleção - só aparece quando há itens selecionados */}
           {selectedCount > 0 && (
             <Button 
               variant="outline" 
               onClick={handleClearSelectionClick} 
-              className="flex items-center text-gray-600"
+              className="flex items-center text-gray-600 hover:text-gray-800"
             >
               <X className="mr-2 h-4 w-4" />
               Limpar Seleção
@@ -140,7 +139,12 @@ export function TableView({
             Processar Selecionados
           </Button>
           
-          <Button onClick={handleGenerateReportClick} className="flex items-center" disabled={!cnabFileGenerated} title={!cnabFileGenerated ? "Gere o arquivo CNAB antes de visualizar o relatório" : "Gerar relatório PDF dos registros válidos"}>
+          <Button 
+            onClick={handleGenerateReportClick} 
+            className="flex items-center" 
+            disabled={!cnabFileGenerated} 
+            title={!cnabFileGenerated ? "Gere o arquivo CNAB antes de visualizar o relatório" : "Gerar relatório PDF dos registros válidos"}
+          >
             <FileText className="mr-2 h-4 w-4" />
             Gerar Relatório
           </Button>
@@ -170,7 +174,8 @@ export function TableView({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {currentRows.map(row => <TableRow key={row.id}>
+            {currentRows.map(row => (
+              <TableRow key={row.id}>
                 <TableCell>
                   <Checkbox checked={row.selected || false} onCheckedChange={checked => handleSelectRow(row.id, !!checked)} aria-label={`Selecionar ${row.NOME}`} />
                 </TableCell>
@@ -188,7 +193,8 @@ export function TableView({
                     <Trash2 className="h-4 w-4 text-red-500" />
                   </Button>
                 </TableCell>
-              </TableRow>)}
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </div>
@@ -210,5 +216,6 @@ export function TableView({
           </Button>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 }

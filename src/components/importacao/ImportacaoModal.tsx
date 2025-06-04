@@ -1,4 +1,3 @@
-
 import React from "react";
 import {
   Dialog,
@@ -37,6 +36,8 @@ export default function ImportacaoModal({ isOpen, onOpenChange }: ImportacaoModa
     handleSelectAll,
     handleSelectRow,
     handleDeleteRow,
+    handleClearSelection, // NOVO: Função de limpar seleção
+    getSelectedCount, // NOVO: Função para contar selecionados
     
     // UI state
     showTable,
@@ -120,6 +121,8 @@ export default function ImportacaoModal({ isOpen, onOpenChange }: ImportacaoModa
               handleSelectRow={handleSelectRow}
               handleDeleteRow={handleDeleteRow}
               handleProcessSelected={handleProcessSelected}
+              handleClearSelection={handleClearSelection} // NOVO: Função de limpar seleção
+              selectedCount={getSelectedCount()} // NOVO: Contagem de selecionados
               handleVerifyErrors={handleVerifyErrors}
               handleExportErrors={handleExportErrors}
               handleGenerateReport={handleGenerateReport}
