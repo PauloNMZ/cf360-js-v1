@@ -66,6 +66,6 @@ export const useFavorecidosWorkflowNavigation = ({
     getTotalSteps,
     getDisplayStepNumber,
     getStepTitle,
-    isCurrentStepValid: isCurrentStepValid() // Return the boolean value directly
+    isCurrentStepValid // Return the function itself, not the result
   };
 };

@@ -116,7 +116,7 @@ const LancamentoFavorecidosContainer: React.FC<LancamentoFavorecidosContainerPro
       console.log("Workflow state changed:", {
         currentStep: workflowData.currentStep,
         workflow: workflowData.workflow,
-        isCurrentStepValid: workflowData.isCurrentStepValid
+        isCurrentStepValid: workflowData.isCurrentStepValid()
       });
     } catch (error) {
       handleError(error, {
@@ -174,7 +174,7 @@ const LancamentoFavorecidosContainer: React.FC<LancamentoFavorecidosContainerPro
           setNotificationModalOpen={setNotificationModalOpen}
           notificationConfig={notificationConfig}
           onCloseNotificationModal={handleCloseNotificationModal}
-          // Workflow props - pass boolean value directly
+          // Workflow props - call the function to get boolean value
           showWorkflowDialog={workflowData.showWorkflowDialog}
           setShowWorkflowDialog={workflowData.setShowWorkflowDialog}
           workflow={workflowData.workflow}
@@ -185,7 +185,7 @@ const LancamentoFavorecidosContainer: React.FC<LancamentoFavorecidosContainerPro
           getStepTitle={() => workflowData.getStepTitle(workflowData.currentStep)}
           goToNextStep={workflowData.goToNextStep}
           goToPreviousStep={workflowData.goToPreviousStep}
-          isCurrentStepValid={workflowData.isCurrentStepValid} // Now correctly returns boolean
+          isCurrentStepValid={workflowData.isCurrentStepValid()} // Call the function to get boolean
           handleSubmitWorkflow={workflowData.handleSubmitWorkflow}
           convenentes={workflowData.convenentes}
           carregandoConvenentes={workflowData.carregandoConvenentes}
