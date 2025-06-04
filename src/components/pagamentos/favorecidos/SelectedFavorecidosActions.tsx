@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
+import { FileText, Settings, Trash2 } from "lucide-react";
 
 interface SelectedFavorecidosActionsProps {
   selectedFavorecidos: string[];
@@ -17,39 +18,51 @@ const SelectedFavorecidosActions: React.FC<SelectedFavorecidosActionsProps> = ({
   onGenerateReport,
   onProcessSelected
 }) => {
+  if (selectedFavorecidos.length === 0) return null;
+
   return (
-    <div className="flex gap-4 items-center p-4 border rounded-md bg-muted/50">
-      <span className="text-sm text-muted-foreground">
-        {selectedFavorecidos.length} favorecido(s) selecionado(s)
-      </span>
-      
-      <div className="flex gap-2 ml-auto">
-        {selectedFavorecidos.length > 0 && (
+    <div className="sticky bottom-0 bg-background border-t border-border p-4 shadow-lg">
+      <div className="flex items-center justify-between max-w-6xl mx-auto">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-primary rounded-full"></div>
+            <span className="font-medium">
+              {selectedFavorecidos.length} favorecido(s) selecionado(s)
+            </span>
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-3">
           <Button 
             variant="outline" 
             onClick={onClearSelection}
             size="sm"
+            className="gap-2"
           >
+            <Trash2 size={16} />
             Limpar Seleção
           </Button>
-        )}
-        
-        <Button 
-          onClick={onGenerateReport}
-          disabled={selectedFavorecidos.length === 0 || !hasConvenente}
-          variant="outline"
-          size="sm"
-        >
-          Gerar Relatório
-        </Button>
-        
-        <Button 
-          onClick={onProcessSelected}
-          disabled={selectedFavorecidos.length === 0}
-          size="sm"
-        >
-          Processar Selecionados
-        </Button>
+          
+          <Button 
+            onClick={onGenerateReport}
+            disabled={!hasConvenente}
+            variant="outline"
+            size="sm"
+            className="gap-2"
+          >
+            <FileText size={16} />
+            Gerar Relatório
+          </Button>
+          
+          <Button 
+            onClick={onProcessSelected}
+            size="sm"
+            className="gap-2"
+          >
+            <Settings size={16} />
+            Processar Selecionados
+          </Button>
+        </div>
       </div>
     </div>
   );

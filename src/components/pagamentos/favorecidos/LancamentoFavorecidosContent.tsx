@@ -49,7 +49,7 @@ const LancamentoFavorecidosContent: React.FC<LancamentoFavorecidosContentProps> 
   onProcessSelected
 }) => {
   return (
-    <>
+    <div className="space-y-6">
       {/* Header */}
       <FavorecidosHeader onCreateNew={onCreateNew} />
 
@@ -87,7 +87,7 @@ const LancamentoFavorecidosContent: React.FC<LancamentoFavorecidosContentProps> 
           />
         </>
       )}
-    </>
+    </div>
   );
 };
 

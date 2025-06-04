@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
 import FavorecidosTable from "@/components/favorecidos/FavorecidosTable";
+import FavorecidosSearchBar, { EmptyState } from "./FavorecidosSearchBar";
 
 interface FavorecidosListViewProps {
   searchTerm: string;
@@ -33,35 +33,41 @@ const FavorecidosListView: React.FC<FavorecidosListViewProps> = ({
   hideBankColumn = false,
   hideTipoColumn = false
 }) => {
+  const hasResults = filteredFavorecidos.length > 0;
+
   return (
-    <div className="space-y-4">
-      <div className="flex gap-4">
-        <Input
-          placeholder="Buscar favorecidos..."
-          value={searchTerm}
-          onChange={onSearchChange}
-          className="max-w-md"
-        />
-      </div>
+    <div className="space-y-6">
+      <FavorecidosSearchBar
+        searchTerm={searchTerm}
+        onSearchChange={onSearchChange}
+        hasResults={hasResults}
+        resultCount={filteredFavorecidos.length}
+      />
 
       {isLoading ? (
         <div className="flex justify-center items-center h-64">
           <Loader2 className="h-8 w-8 animate-spin" />
         </div>
+      ) : hasResults ? (
+        <div className="bg-background border rounded-lg p-4">
+          <FavorecidosTable
+            favorecidos={filteredFavorecidos}
+            onEdit={onEdit}
+            onDelete={onDelete}
+            onSelectFavorecido={onSelectFavorecido}
+            selectedFavorecidos={selectedFavorecidos}
+            onSelectionChange={onSelectionChange}
+            showActions={true}
+            hidePixColumn={hidePixColumn}
+            hideBankColumn={hideBankColumn}
+            hideTipoColumn={hideTipoColumn}
+            itemsPerPage={10}
+          />
+        </div>
       ) : (
-        <FavorecidosTable
-          favorecidos={filteredFavorecidos}
-          onEdit={onEdit}
-          onDelete={onDelete}
-          onSelectFavorecido={onSelectFavorecido}
-          selectedFavorecidos={selectedFavorecidos}
-          onSelectionChange={onSelectionChange}
-          showActions={true}
-          hidePixColumn={hidePixColumn}
-          hideBankColumn={hideBankColumn}
-          hideTipoColumn={hideTipoColumn}
-          itemsPerPage={10}
-        />
+        <div className="bg-background border rounded-lg">
+          <EmptyState searchTerm={searchTerm} />
+        </div>
       )}
     </div>
   );
