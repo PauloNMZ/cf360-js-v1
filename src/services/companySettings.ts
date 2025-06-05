@@ -1,4 +1,3 @@
-
 import { CompanySettings } from "@/types/companySettings";
 
 const COMPANY_SETTINGS_KEY = 'gerapag_company_settings';
@@ -6,7 +5,7 @@ const COMPANY_SETTINGS_KEY = 'gerapag_company_settings';
 // Default company settings
 export const DEFAULT_SETTINGS: CompanySettings = { 
   logoUrl: '', 
-  companyName: 'ConnectPag' 
+  companyName: 'Cash Flow 360' 
 };
 
 // Get company settings from localStorage
