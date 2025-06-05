@@ -8,6 +8,7 @@ import DebugLogger from './DebugLogger';
 import ErrorBoundary from '@/components/ui/ErrorBoundary';
 import { PDFPreviewDialog } from '@/components/importacao/PDFPreviewDialog';
 import { EmailConfigDialog } from '@/components/importacao/EmailConfigDialog';
+import { ReportSortDialog } from '@/components/importacao/ReportSortDialog';
 
 interface LancamentoFavorecidosContainerProps {
   hidePixColumn?: boolean;
@@ -105,6 +106,13 @@ const LancamentoFavorecidosContainer: React.FC<LancamentoFavorecidosContainerPro
           carregandoConvenentes={workflowData.carregandoConvenentes}
           hasSelectedCompany={workflowData.hasSelectedCompany}
           selectedCompany={workflowData.selectedCompany}
+        />
+
+        {/* Report Sort Dialog */}
+        <ReportSortDialog
+          isOpen={reportData.showSortDialog}
+          onOpenChange={reportData.setShowSortDialog}
+          onConfirm={reportData.handleSortConfirm}
         />
 
         {/* PDF Preview Dialog */}

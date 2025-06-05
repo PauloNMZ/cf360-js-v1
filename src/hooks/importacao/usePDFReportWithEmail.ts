@@ -1,137 +1,180 @@
 
 import { useState } from 'react';
-import { ReportData, EmailFormValues } from '@/types/importacao';
-import { ReportSortType } from '@/types/reportSorting';
-import { usePDFReportDialog } from './usePDFReportDialog';
-import { useEmailConfigDialog } from './useEmailConfigDialog';
 import { useNotificationModalContext } from '@/components/ui/NotificationModalProvider';
+import { generatePDFReport } from '@/services/reports/pdfReportService';
+import { sendEmailWithAttachment } from '@/services/emailService';
+import { ReportData, RowData } from '@/types/importacao';
+import { ReportSortType } from '@/types/reportSorting';
+import { formatDateForFilename } from '@/utils/formatting/dateUtils';
 
 export const usePDFReportWithEmail = () => {
-  // Import smaller hooks
-  const pdfReportDialog = usePDFReportDialog();
-  const emailConfigDialog = useEmailConfigDialog();
-  const { showError } = useNotificationModalContext();
+  const { showSuccess, showError } = useNotificationModalContext();
+  
+  const [showPDFPreviewDialog, setShowPDFPreviewDialog] = useState(false);
+  const [reportData, setReportData] = useState<ReportData | null>(null);
+  const [showEmailConfigDialog, setShowEmailConfigDialog] = useState(false);
+  const [defaultEmailMessage, setDefaultEmailMessage] = useState('');
+  const [reportDate, setReportDate] = useState('');
+  const [currentPDFBlob, setCurrentPDFBlob] = useState<Blob | null>(null);
 
-  // Store the original payment date for email flow
-  const [originalPaymentDate, setOriginalPaymentDate] = useState<string>('');
-
-  // Generate PDF report and prepare for email
   const handleGenerateReport = async (
-    selectedRows: any[],
+    selectedRows: RowData[],
     cnabFileGenerated: boolean,
     cnabFileName: string,
     companyName: string,
     validateFavorecidos: any,
-    convenente: any = null,
-    companyCnpj: string = "",
-    paymentDate: Date | undefined = undefined,
-    sortType: ReportSortType = ReportSortType.BY_NAME // ADDED: Sort type parameter
+    convenente: any,
+    companyCnpj: string,
+    paymentDate: Date
   ) => {
-    console.log("=== DEBUG usePDFReportWithEmail - handleGenerateReport ===");
-    console.log("Received sortType:", sortType);
-    console.log("selectedRows count:", selectedRows.length);
-    console.log("cnabFileGenerated:", cnabFileGenerated);
-    
-    if (selectedRows.length === 0) {
-      showError("Erro!", "Nenhum registro selecionado para gerar relatório.");
-      return;
-    }
-    
-    // Check if this is report-only mode (bypass CNAB validation)
-    const isReportOnlyMode = cnabFileName === 'relatorio_remessa.pdf';
-    
-    // Only check CNAB file generation if NOT in report-only mode
-    if (!isReportOnlyMode && !cnabFileGenerated) {
-      // This validation only applies to the normal workflow where CNAB is required
-      console.log("CNAB validation skipped - report-only mode");
-    }
-
-    // Store the formatted payment date for email flow
-    const formattedPaymentDate = paymentDate 
-      ? paymentDate.toLocaleDateString('pt-BR') 
-      : "Não definida";
-    
-    setOriginalPaymentDate(formattedPaymentDate);
-
-    console.log("=== DEBUG usePDFReportWithEmail - Calling pdfReportDialog.generateReport ===");
-    console.log("Passing sortType to generateReport:", sortType);
-
-    // Generate report with sort type - pass the sort type to generateReport
-    const reportResult = await pdfReportDialog.generateReport(
+    await handleGenerateReportWithSorting(
       selectedRows,
-      isReportOnlyMode ? true : cnabFileGenerated, // Force true for report-only mode
+      cnabFileGenerated,
       cnabFileName,
       companyName,
       validateFavorecidos,
       convenente,
       companyCnpj,
       paymentDate,
-      sortType // ADDED: Pass sort type to generateReport
+      ReportSortType.BY_NAME // Default sorting
     );
+  };
+
+  const handleGenerateReportWithSorting = async (
+    selectedRows: RowData[],
+    cnabFileGenerated: boolean,
+    cnabFileName: string,
+    companyName: string,
+    validateFavorecidos: any,
+    convenente: any,
+    companyCnpj: string,
+    paymentDate: Date,
+    sortType: ReportSortType = ReportSortType.BY_NAME
+  ) => {
+    console.log("=== DEBUG handleGenerateReportWithSorting ===");
+    console.log("selectedRows count:", selectedRows.length);
+    console.log("sortType:", sortType);
+    console.log("cnabFileGenerated:", cnabFileGenerated);
+    console.log("companyName:", companyName);
+    console.log("convenente:", convenente);
     
-    if (reportResult) {
-      // Set date for email
-      const formattedDateForEmail = emailConfigDialog.createDefaultEmailMessage(
-        reportResult.formattedDate, 
-        reportResult.totalValue
-      );
-      emailConfigDialog.setReportDate(formattedDateForEmail);
+    if (selectedRows.length === 0) {
+      showError("Erro!", "Nenhum registro selecionado para gerar relatório.");
+      return;
+    }
+
+    try {
+      // Validate favorecidos if validation function is provided
+      if (validateFavorecidos) {
+        const validationResult = validateFavorecidos(selectedRows);
+        if (!validationResult.valid) {
+          showError("Erro!", `Erro na validação dos dados: ${validationResult.errors.join(', ')}`);
+          return;
+        }
+      }
+
+      // Calculate total value
+      const valorTotal = selectedRows.reduce((total, row) => {
+        const valor = typeof row.VALOR === 'number' 
+          ? row.VALOR
+          : parseFloat(row.VALOR.toString().replace(/[^\d.,]/g, '').replace(',', '.'));
+        return total + (isNaN(valor) ? 0 : valor);
+      }, 0);
+
+      // Create report data
+      const reportData: ReportData = {
+        beneficiarios: selectedRows,
+        empresaNome: companyName,
+        empresaCnpj: companyCnpj,
+        dataGeracao: new Date().toLocaleDateString('pt-BR'),
+        dataPagamento: paymentDate ? paymentDate.toLocaleDateString('pt-BR') : new Date().toLocaleDateString('pt-BR'),
+        referencia: `REF${formatDateForFilename(new Date())}`,
+        valorTotal: valorTotal,
+        totalRegistros: selectedRows.length
+      };
+
+      console.log("=== Calling generatePDFReport with sortType ===");
+      console.log("reportData:", reportData);
+      console.log("sortType:", sortType);
+      
+      // Generate PDF with sorting
+      const pdfBlob = await generatePDFReport(reportData, sortType);
+      
+      console.log("=== PDF generated successfully ===");
+      setCurrentPDFBlob(pdfBlob);
+      setReportData(reportData);
+      setReportDate(reportData.dataGeracao);
+      setShowPDFPreviewDialog(true);
+
+    } catch (error) {
+      console.error("Erro ao gerar relatório PDF:", error);
+      showError("Erro!", "Erro ao gerar relatório PDF.");
     }
   };
 
-  // Handle sending the report via email after preview
-  // Modified to accept no parameters and handle the closure internally
   const handleSendEmailReport = () => {
-    emailConfigDialog.handleSendEmailReport(
-      (open: boolean) => pdfReportDialog.setShowPDFPreviewDialog(open),
-      [], // Empty array for convenentes since we'll get it from the hook below
-      null // No convenente ID
-    );
+    if (!reportData) {
+      showError("Erro!", "Nenhum relatório disponível para envio.");
+      return;
+    }
+
+    const defaultMessage = `Segue em anexo o relatório de remessa bancária.
+
+Empresa: ${reportData.empresaNome}
+Data de Geração: ${reportData.dataGeracao}
+Data de Pagamento: ${reportData.dataPagamento}
+Total de Favorecidos: ${reportData.totalRegistros}
+Valor Total: R$ ${reportData.valorTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+
+Atenciosamente,
+Equipe Financeira`;
+
+    setDefaultEmailMessage(defaultMessage);
+    setShowEmailConfigDialog(true);
+    setShowPDFPreviewDialog(false);
   };
 
-  // This overload function is for places that need to pass specific parameters
-  // Like in useImportacao.ts where we have access to convenentes and convenenteId
-  const handleSendEmailReportWithParams = (
-    onClosePDFPreview: (open: boolean) => void,
-    convenentes: any[],
-    convenenteId: string | null
-  ) => {
-    emailConfigDialog.handleSendEmailReport(
-      onClosePDFPreview,
-      convenentes,
-      convenenteId
-    );
-  };
+  const handleEmailSubmit = async (emailData: { 
+    recipients: string; 
+    subject: string; 
+    message: string; 
+  }) => {
+    if (!currentPDFBlob || !reportData) {
+      showError("Erro!", "Relatório não disponível para envio.");
+      return;
+    }
 
-  // Handle email form submission with original payment date
-  const handleEmailSubmit = async (emailFormValues: EmailFormValues) => {
-    return emailConfigDialog.handleEmailSubmit(
-      emailFormValues,
-      pdfReportDialog.reportData,
-      pdfReportDialog.reportAttachment,
-      pdfReportDialog.reportFileName,
-      originalPaymentDate // Pass the original payment date
-    );
+    try {
+      const fileName = `relatorio_remessa_${formatDateForFilename(new Date())}.pdf`;
+      
+      await sendEmailWithAttachment(
+        emailData.recipients.split(',').map(email => email.trim()),
+        emailData.subject,
+        emailData.message,
+        currentPDFBlob,
+        fileName
+      );
+
+      showSuccess("Sucesso!", "E-mail enviado com sucesso!");
+      setShowEmailConfigDialog(false);
+      
+    } catch (error) {
+      console.error("Erro ao enviar e-mail:", error);
+      showError("Erro!", "Erro ao enviar e-mail com o relatório.");
+    }
   };
 
   return {
-    // PDF preview state
-    showPDFPreviewDialog: pdfReportDialog.showPDFPreviewDialog,
-    setShowPDFPreviewDialog: pdfReportDialog.setShowPDFPreviewDialog,
-    reportData: pdfReportDialog.reportData,
-    
-    // Email dialog states
-    showEmailConfigDialog: emailConfigDialog.showEmailConfigDialog,
-    setShowEmailConfigDialog: emailConfigDialog.setShowEmailConfigDialog,
-    defaultEmailMessage: emailConfigDialog.defaultEmailMessage,
-    reportDate: emailConfigDialog.reportDate,
-    
-    // Handler functions
+    showPDFPreviewDialog,
+    setShowPDFPreviewDialog,
+    reportData,
+    showEmailConfigDialog,
+    setShowEmailConfigDialog,
+    defaultEmailMessage,
+    reportDate,
     handleGenerateReport,
-    handleSendEmailReport, // Use our local function
-    handleSendEmailReportWithParams, // Use our local function
-    handleEmailSubmit, // Use our local function
-    selectedSortType: pdfReportDialog.selectedSortType, // ADDED: Expose sort type
-    setSelectedSortType: pdfReportDialog.setSelectedSortType, // ADDED: Expose sort type setter
+    handleGenerateReportWithSorting,
+    handleSendEmailReport,
+    handleEmailSubmit
   };
 };

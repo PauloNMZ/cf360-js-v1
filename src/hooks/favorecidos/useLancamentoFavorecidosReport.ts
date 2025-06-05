@@ -1,7 +1,9 @@
 
+import { useState } from 'react';
 import { useNotificationModalContext } from "@/components/ui/NotificationModalProvider";
 import { usePDFReportWithEmail } from '@/hooks/importacao/usePDFReportWithEmail';
 import { mapFavorecidoToRowData, validateFavorecidos } from './workflow/favorecidosWorkflowUtils';
+import { ReportSortType } from '@/types/reportSorting';
 
 interface UseLancamentoFavorecidosReportProps {
   selectedFavorecidos: string[];
@@ -20,8 +22,21 @@ export const useLancamentoFavorecidosReport = ({
 }: UseLancamentoFavorecidosReportProps) => {
   const { showError } = useNotificationModalContext();
   const pdfReportWithEmail = usePDFReportWithEmail();
+  
+  // Add state for sort dialog
+  const [showSortDialog, setShowSortDialog] = useState(false);
 
-  const handleGenerateReportOnly = async () => {
+  // Function to handle the sort dialog confirmation
+  const handleSortConfirm = async (sortType: ReportSortType) => {
+    console.log("=== DEBUG handleSortConfirm ===");
+    console.log("sortType received:", sortType);
+    
+    await generateReportWithSorting(sortType);
+    setShowSortDialog(false);
+  };
+
+  // Function to generate report with specific sorting
+  const generateReportWithSorting = async (sortType: ReportSortType = ReportSortType.BY_NAME) => {
     if (selectedFavorecidos.length === 0) {
       showError("Erro!", "Nenhum favorecido selecionado para gerar relatório.");
       return;
@@ -34,6 +49,7 @@ export const useLancamentoFavorecidosReport = ({
     }
 
     console.log("Gerando relatório para favorecidos selecionados:", selectedFavorecidos);
+    console.log("Tipo de ordenação:", sortType);
     
     try {
       // Get selected favorecidos data
@@ -53,8 +69,8 @@ export const useLancamentoFavorecidosReport = ({
       const companyName = workflow.convenente?.razaoSocial || "Empresa";
       const companyCnpj = workflow.convenente?.cnpj || "";
       
-      // Generate report using the PDF system - bypassing CNAB validation
-      await pdfReportWithEmail.handleGenerateReport(
+      // Generate report using the PDF system with sorting
+      await pdfReportWithEmail.handleGenerateReportWithSorting(
         rowData,
         false, // cnabFileGenerated = false for report-only mode
         'relatorio_remessa.pdf',
@@ -62,7 +78,8 @@ export const useLancamentoFavorecidosReport = ({
         validateFavorecidos,
         workflow.convenente,
         companyCnpj,
-        workflow.paymentDate
+        workflow.paymentDate,
+        sortType // Pass the sort type
       );
       
     } catch (error) {
@@ -71,9 +88,19 @@ export const useLancamentoFavorecidosReport = ({
     }
   };
 
+  const handleGenerateReportOnly = async () => {
+    // Open sort dialog instead of generating directly
+    console.log("Opening sort dialog for report generation");
+    setShowSortDialog(true);
+  };
+
   return {
     handleGenerateReportOnly,
     hasConvenente: !!workflow.convenente,
+    // Expose sort dialog state
+    showSortDialog,
+    setShowSortDialog,
+    handleSortConfirm,
     // Expose PDF report states and handlers
     showPDFPreviewDialog: pdfReportWithEmail.showPDFPreviewDialog,
     setShowPDFPreviewDialog: pdfReportWithEmail.setShowPDFPreviewDialog,
