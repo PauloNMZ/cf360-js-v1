@@ -55,6 +55,41 @@ export const sendEmail = async (emailData: EmailData): Promise<EmailResponse> =>
 };
 
 /**
+ * Send email with attachment - simplified interface
+ */
+export const sendEmailWithAttachment = async (
+  recipients: string[],
+  subject: string,
+  message: string,
+  attachmentBlob: Blob,
+  attachmentFileName: string
+): Promise<void> => {
+  const currentUserEmail = getCurrentUserEmail();
+  
+  for (const recipient of recipients) {
+    const emailData: EmailData = {
+      recipientEmail: recipient,
+      senderName: "Sistema Financeiro",
+      senderEmail: currentUserEmail,
+      senderDepartment: "Financeiro",
+      subject,
+      message,
+      attachmentFile: attachmentBlob,
+      attachmentFileName
+    };
+    
+    const response = await sendEmail(emailData);
+    
+    if (!response.success) {
+      throw new Error(response.error || "Erro ao enviar e-mail");
+    }
+    
+    // Log the activity
+    logEmailActivity(emailData, response);
+  }
+};
+
+/**
  * Log email sending activity for audit purposes
  */
 export const logEmailActivity = (emailData: EmailData, response: EmailResponse) => {

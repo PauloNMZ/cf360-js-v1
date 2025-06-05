@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useNotificationModalContext } from '@/components/ui/NotificationModalProvider';
 import { generatePDFReport } from '@/services/reports/pdfReportService';
 import { sendEmailWithAttachment } from '@/services/emailService';
-import { ReportData, RowData } from '@/types/importacao';
+import { ReportData, RowData, EmailFormValues } from '@/types/importacao';
 import { ReportSortType } from '@/types/reportSorting';
 import { formatDateForFilename } from '@/utils/formatting/dateUtils';
 
@@ -16,6 +16,7 @@ export const usePDFReportWithEmail = () => {
   const [defaultEmailMessage, setDefaultEmailMessage] = useState('');
   const [reportDate, setReportDate] = useState('');
   const [currentPDFBlob, setCurrentPDFBlob] = useState<Blob | null>(null);
+  const [selectedSortType, setSelectedSortType] = useState<ReportSortType>(ReportSortType.BY_NAME);
 
   const handleGenerateReport = async (
     selectedRows: RowData[],
@@ -104,6 +105,7 @@ export const usePDFReportWithEmail = () => {
       setCurrentPDFBlob(pdfBlob);
       setReportData(reportData);
       setReportDate(reportData.dataGeracao);
+      setSelectedSortType(sortType);
       setShowPDFPreviewDialog(true);
 
     } catch (error) {
@@ -134,11 +136,7 @@ Equipe Financeira`;
     setShowPDFPreviewDialog(false);
   };
 
-  const handleEmailSubmit = async (emailData: { 
-    recipients: string; 
-    subject: string; 
-    message: string; 
-  }) => {
+  const handleEmailSubmit = async (values: EmailFormValues) => {
     if (!currentPDFBlob || !reportData) {
       showError("Erro!", "Relatório não disponível para envio.");
       return;
@@ -147,10 +145,15 @@ Equipe Financeira`;
     try {
       const fileName = `relatorio_remessa_${formatDateForFilename(new Date())}.pdf`;
       
+      // Convert EmailFormValues to the expected format
+      const recipients = values.recipients || values.recipientEmail || '';
+      const subject = values.subject || `Relatório de Remessa Bancária - ${reportData.empresaNome}`;
+      const message = values.message || defaultEmailMessage;
+      
       await sendEmailWithAttachment(
-        emailData.recipients.split(',').map(email => email.trim()),
-        emailData.subject,
-        emailData.message,
+        recipients.split(',').map(email => email.trim()),
+        subject,
+        message,
         currentPDFBlob,
         fileName
       );
@@ -172,6 +175,7 @@ Equipe Financeira`;
     setShowEmailConfigDialog,
     defaultEmailMessage,
     reportDate,
+    selectedSortType,
     handleGenerateReport,
     handleGenerateReportWithSorting,
     handleSendEmailReport,

@@ -1,3 +1,4 @@
+
 import { useIndexPageContext } from './useIndexPageContext';
 import { useImportacaoState } from './importacao/useImportacaoState';
 import { useImportacaoCompany } from './importacao/useImportacaoCompany';
@@ -111,8 +112,6 @@ export const useImportacao = () => {
     handleGenerateReport,
     // Use the simpler version for PDFPreviewDialog
     handleSendEmailReport: pdfReportWithEmail.handleSendEmailReport,
-    // Keep the parameterized version for other usages
-    handleSendEmailReportWithParams: pdfReportWithEmail.handleSendEmailReportWithParams,
     handleEmailSubmit: pdfReportWithEmail.handleEmailSubmit,
     handleSubmitWorkflow: processWorkflow.handleSubmitWorkflow,
     
