@@ -145,9 +145,9 @@ Equipe Financeira`;
     try {
       const fileName = `relatorio_remessa_${formatDateForFilename(new Date())}.pdf`;
       
-      // Convert EmailFormValues to the expected format
-      const recipients = values.recipients || values.recipientEmail || '';
-      const subject = values.subject || `Relatório de Remessa Bancária - ${reportData.empresaNome}`;
+      // Convert EmailFormValues to the expected format - use correct property names
+      const recipients = values.recipientEmail || '';
+      const subject = `Relatório de Remessa Bancária - ${reportData.empresaNome}`;
       const message = values.message || defaultEmailMessage;
       
       await sendEmailWithAttachment(
