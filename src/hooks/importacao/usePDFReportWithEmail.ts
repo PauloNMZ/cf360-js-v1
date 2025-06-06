@@ -53,7 +53,10 @@ export const usePDFReportWithEmail = () => {
   ) => {
     console.log("=== DEBUG handleGenerateReportWithSorting ===");
     console.log("selectedRows count:", selectedRows.length);
-    console.log("sortType:", sortType);
+    console.log("sortType received:", sortType);
+    console.log("sortType type:", typeof sortType);
+    console.log("Is valid enum value?", Object.values(ReportSortType).includes(sortType));
+    console.log("ReportSortType enum values:", Object.values(ReportSortType));
     console.log("cnabFileGenerated:", cnabFileGenerated);
     console.log("companyName:", companyName);
     console.log("convenente:", convenente);
@@ -114,7 +117,8 @@ export const usePDFReportWithEmail = () => {
 
       console.log("=== Calling generatePDFReport with sortType ===");
       console.log("reportData:", reportData);
-      console.log("sortType:", sortType);
+      console.log("sortType being passed to generatePDFReport:", sortType);
+      console.log("sortType type being passed:", typeof sortType);
       
       // Generate PDF with sorting
       const pdfBlob = await generatePDFReport(reportData, sortType);

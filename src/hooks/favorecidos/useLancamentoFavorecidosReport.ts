@@ -30,6 +30,8 @@ export const useLancamentoFavorecidosReport = ({
   const handleSortConfirm = async (sortType: ReportSortType) => {
     console.log("=== DEBUG handleSortConfirm ===");
     console.log("sortType received:", sortType);
+    console.log("sortType type:", typeof sortType);
+    console.log("Is sortType a valid enum value?", Object.values(ReportSortType).includes(sortType));
     
     await generateReportWithSorting(sortType);
     setShowSortDialog(false);
@@ -48,8 +50,11 @@ export const useLancamentoFavorecidosReport = ({
       return;
     }
 
+    console.log("=== DEBUG generateReportWithSorting ===");
     console.log("Gerando relatório para favorecidos selecionados:", selectedFavorecidos);
-    console.log("Tipo de ordenação:", sortType);
+    console.log("Tipo de ordenação recebido:", sortType);
+    console.log("Tipo de ordenação type:", typeof sortType);
+    console.log("Enum comparison - sortType === ReportSortType.BY_NAME:", sortType === ReportSortType.BY_NAME);
     
     try {
       // Get selected favorecidos data
@@ -68,6 +73,10 @@ export const useLancamentoFavorecidosReport = ({
 
       const companyName = workflow.convenente?.razaoSocial || "Empresa";
       const companyCnpj = workflow.convenente?.cnpj || "";
+      
+      console.log("=== Calling handleGenerateReportWithSorting ===");
+      console.log("About to call with sortType:", sortType);
+      console.log("About to call with sortType type:", typeof sortType);
       
       // Generate report using the PDF system with sorting
       await pdfReportWithEmail.handleGenerateReportWithSorting(

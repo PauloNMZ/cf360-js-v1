@@ -65,23 +65,36 @@ const ordenarFavorecidos = (favorecidos: RowData[], sortType: ReportSortType = R
   console.log("=== DEBUG ordenarFavorecidos ===");
   console.log("Input favorecidos count:", favorecidos.length);
   console.log("Input sortType:", sortType);
+  console.log("Input sortType type:", typeof sortType);
+  console.log("ReportSortType.BY_NAME:", ReportSortType.BY_NAME);
+  console.log("ReportSortType.BY_BANK_NAME:", ReportSortType.BY_BANK_NAME);
+  console.log("ReportSortType.BY_BANK_VALUE:", ReportSortType.BY_BANK_VALUE);
+  console.log("ReportSortType.BY_VALUE_DESC:", ReportSortType.BY_VALUE_DESC);
+  console.log("Exact comparison - sortType === ReportSortType.BY_NAME:", sortType === ReportSortType.BY_NAME);
+  console.log("String comparison - sortType === 'BY_NAME':", sortType === 'BY_NAME');
+  
   console.log("Sample of first 3 favorecidos:");
   favorecidos.slice(0, 3).forEach((fav, index) => {
     console.log(`  [${index}] NOME: ${fav.NOME}, BANCO: ${fav.BANCO}, VALOR: ${fav.VALOR}`);
   });
 
   const sortedFavorecidos = [...favorecidos].sort((a, b) => {
+    console.log("=== Sorting comparison ===");
+    console.log("Current sortType in sort function:", sortType);
+    
     switch (sortType) {
       case ReportSortType.BY_NAME:
-        console.log("Applying BY_NAME sorting");
-        // Por nome (crescente)
+      case 'BY_NAME': // Adding string comparison as fallback
+        console.log("✅ Applying BY_NAME sorting");
         const nomeA = (a.NOME || '').toString().toUpperCase();
         const nomeB = (b.NOME || '').toString().toUpperCase();
-        return nomeA.localeCompare(nomeB);
+        const result = nomeA.localeCompare(nomeB);
+        console.log(`Comparing: "${nomeA}" vs "${nomeB}" = ${result}`);
+        return result;
 
       case ReportSortType.BY_BANK_NAME:
-        console.log("Applying BY_BANK_NAME sorting");
-        // Por banco + nome + tipo
+      case 'BY_BANK_NAME':
+        console.log("✅ Applying BY_BANK_NAME sorting");
         const bancoA = (a.BANCO || '').toString().padStart(3, '0');
         const bancoB = (b.BANCO || '').toString().padStart(3, '0');
         const compareBanco = bancoA.localeCompare(bancoB);
@@ -99,8 +112,8 @@ const ordenarFavorecidos = (favorecidos: RowData[], sortType: ReportSortType = R
         return tipoA.localeCompare(tipoB);
 
       case ReportSortType.BY_BANK_VALUE:
-        console.log("Applying BY_BANK_VALUE sorting");
-        // Por banco + valor (maior para menor)
+      case 'BY_BANK_VALUE':
+        console.log("✅ Applying BY_BANK_VALUE sorting");
         const bancoA3 = (a.BANCO || '').toString().padStart(3, '0');
         const bancoB3 = (b.BANCO || '').toString().padStart(3, '0');
         const compareBanco3 = bancoA3.localeCompare(bancoB3);
@@ -117,8 +130,8 @@ const ordenarFavorecidos = (favorecidos: RowData[], sortType: ReportSortType = R
         return valorB - valorA; // Decrescente
 
       case ReportSortType.BY_VALUE_DESC:
-        console.log("Applying BY_VALUE_DESC sorting");
-        // Por valor (maior para menor)
+      case 'BY_VALUE_DESC':
+        console.log("✅ Applying BY_VALUE_DESC sorting");
         const valorA2 = typeof a.VALOR === 'number' 
           ? a.VALOR
           : parseFloat(a.VALOR.toString().replace(/[^\d.,]/g, '').replace(',', '.'));
@@ -126,10 +139,11 @@ const ordenarFavorecidos = (favorecidos: RowData[], sortType: ReportSortType = R
           ? b.VALOR
           : parseFloat(b.VALOR.toString().replace(/[^\d.,]/g, '').replace(',', '.'));
         
+        console.log(`Comparing values: ${valorA2} vs ${valorB2} = ${valorB2 - valorA2}`);
         return valorB2 - valorA2; // Decrescente
 
       default:
-        console.log("Using default sorting (no sort)");
+        console.log("❌ Using default sorting (no sort) - sortType not matched:", sortType);
         return 0;
     }
   });
@@ -180,12 +194,14 @@ export const generatePDFReport = async (reportData: ReportData, sortType: Report
   console.log("=== DEBUG generatePDFReport ===");
   console.log("Received reportData with", reportData.beneficiarios.length, "beneficiarios");
   console.log("Received sortType:", sortType);
+  console.log("Received sortType type:", typeof sortType);
   
   // Create a new PDF document
   const doc = new jsPDF();
   
   // Ordenar favorecidos de acordo com o tipo escolhido
   console.log("=== Calling ordenarFavorecidos ===");
+  console.log("Before calling ordenarFavorecidos - sortType:", sortType);
   const favorecidosOrdenados = ordenarFavorecidos(reportData.beneficiarios, sortType);
   console.log("=== After ordenarFavorecidos ===");
   console.log("favorecidosOrdenados count:", favorecidosOrdenados.length);
