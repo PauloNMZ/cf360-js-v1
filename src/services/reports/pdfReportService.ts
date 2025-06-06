@@ -62,16 +62,14 @@ const categorizarFavorecidosPorBanco = (favorecidos: RowData[]): TotaisPorCatego
  * Ordena favorecidos de acordo com o tipo de ordenação escolhido
  */
 const ordenarFavorecidos = (favorecidos: RowData[], sortType: ReportSortType = ReportSortType.BY_NAME): RowData[] => {
-  console.log("=== DEBUG ordenarFavorecidos ===");
+  console.log("=== DEBUG ordenarFavorecidos - FIXED VERSION ===");
   console.log("Input favorecidos count:", favorecidos.length);
   console.log("Input sortType:", sortType);
   console.log("Input sortType type:", typeof sortType);
-  console.log("ReportSortType.BY_NAME:", ReportSortType.BY_NAME);
-  console.log("ReportSortType.BY_BANK_NAME:", ReportSortType.BY_BANK_NAME);
-  console.log("ReportSortType.BY_BANK_VALUE:", ReportSortType.BY_BANK_VALUE);
-  console.log("ReportSortType.BY_VALUE_DESC:", ReportSortType.BY_VALUE_DESC);
-  console.log("Exact comparison - sortType === ReportSortType.BY_NAME:", sortType === ReportSortType.BY_NAME);
-  console.log("String comparison - sortType === 'BY_NAME':", sortType === 'BY_NAME');
+  
+  // Normalize sortType to ensure we're working with the correct value
+  const normalizedSortType = sortType.toString().toUpperCase();
+  console.log("Normalized sortType:", normalizedSortType);
   
   console.log("Sample of first 3 favorecidos:");
   favorecidos.slice(0, 3).forEach((fav, index) => {
@@ -79,73 +77,84 @@ const ordenarFavorecidos = (favorecidos: RowData[], sortType: ReportSortType = R
   });
 
   const sortedFavorecidos = [...favorecidos].sort((a, b) => {
-    console.log("=== Sorting comparison ===");
-    console.log("Current sortType in sort function:", sortType);
+    console.log("=== Sorting comparison with normalized type ===");
+    console.log("Current normalizedSortType in sort function:", normalizedSortType);
     
-    switch (sortType) {
-      case ReportSortType.BY_NAME:
-      case 'BY_NAME': // Adding string comparison as fallback
-        console.log("✅ Applying BY_NAME sorting");
-        const nomeA = (a.NOME || '').toString().toUpperCase();
-        const nomeB = (b.NOME || '').toString().toUpperCase();
-        const result = nomeA.localeCompare(nomeB);
-        console.log(`Comparing: "${nomeA}" vs "${nomeB}" = ${result}`);
-        return result;
-
-      case ReportSortType.BY_BANK_NAME:
-      case 'BY_BANK_NAME':
-        console.log("✅ Applying BY_BANK_NAME sorting");
-        const bancoA = (a.BANCO || '').toString().padStart(3, '0');
-        const bancoB = (b.BANCO || '').toString().padStart(3, '0');
-        const compareBanco = bancoA.localeCompare(bancoB);
-        
-        if (compareBanco !== 0) return compareBanco;
-        
-        const nomeA2 = (a.NOME || '').toString().toUpperCase();
-        const nomeB2 = (b.NOME || '').toString().toUpperCase();
-        const compareNome = nomeA2.localeCompare(nomeB2);
-        
-        if (compareNome !== 0) return compareNome;
-        
-        const tipoA = (a.TIPO || '').toString();
-        const tipoB = (b.TIPO || '').toString();
-        return tipoA.localeCompare(tipoB);
-
-      case ReportSortType.BY_BANK_VALUE:
-      case 'BY_BANK_VALUE':
-        console.log("✅ Applying BY_BANK_VALUE sorting");
-        const bancoA3 = (a.BANCO || '').toString().padStart(3, '0');
-        const bancoB3 = (b.BANCO || '').toString().padStart(3, '0');
-        const compareBanco3 = bancoA3.localeCompare(bancoB3);
-        
-        if (compareBanco3 !== 0) return compareBanco3;
-        
-        const valorA = typeof a.VALOR === 'number' 
-          ? a.VALOR
-          : parseFloat(a.VALOR.toString().replace(/[^\d.,]/g, '').replace(',', '.'));
-        const valorB = typeof b.VALOR === 'number' 
-          ? b.VALOR
-          : parseFloat(b.VALOR.toString().replace(/[^\d.,]/g, '').replace(',', '.'));
-        
-        return valorB - valorA; // Decrescente
-
-      case ReportSortType.BY_VALUE_DESC:
-      case 'BY_VALUE_DESC':
-        console.log("✅ Applying BY_VALUE_DESC sorting");
-        const valorA2 = typeof a.VALOR === 'number' 
-          ? a.VALOR
-          : parseFloat(a.VALOR.toString().replace(/[^\d.,]/g, '').replace(',', '.'));
-        const valorB2 = typeof b.VALOR === 'number' 
-          ? b.VALOR
-          : parseFloat(b.VALOR.toString().replace(/[^\d.,]/g, '').replace(',', '.'));
-        
-        console.log(`Comparing values: ${valorA2} vs ${valorB2} = ${valorB2 - valorA2}`);
-        return valorB2 - valorA2; // Decrescente
-
-      default:
-        console.log("❌ Using default sorting (no sort) - sortType not matched:", sortType);
-        return 0;
+    // Use normalized string comparison to avoid enum issues
+    if (normalizedSortType === 'BY_NAME') {
+      console.log("✅ Applying BY_NAME sorting");
+      const nomeA = (a.NOME || '').toString().toUpperCase();
+      const nomeB = (b.NOME || '').toString().toUpperCase();
+      const result = nomeA.localeCompare(nomeB);
+      console.log(`Comparing: "${nomeA}" vs "${nomeB}" = ${result}`);
+      return result;
     }
+    
+    if (normalizedSortType === 'BY_BANK_NAME') {
+      console.log("✅ Applying BY_BANK_NAME sorting");
+      const bancoA = (a.BANCO || '').toString().padStart(3, '0');
+      const bancoB = (b.BANCO || '').toString().padStart(3, '0');
+      const compareBanco = bancoA.localeCompare(bancoB);
+      
+      if (compareBanco !== 0) {
+        console.log(`Bank comparison: ${bancoA} vs ${bancoB} = ${compareBanco}`);
+        return compareBanco;
+      }
+      
+      const nomeA = (a.NOME || '').toString().toUpperCase();
+      const nomeB = (b.NOME || '').toString().toUpperCase();
+      const compareNome = nomeA.localeCompare(nomeB);
+      
+      if (compareNome !== 0) {
+        console.log(`Name comparison within same bank: ${nomeA} vs ${nomeB} = ${compareNome}`);
+        return compareNome;
+      }
+      
+      const tipoA = (a.TIPO || '').toString();
+      const tipoB = (b.TIPO || '').toString();
+      console.log(`Type comparison: ${tipoA} vs ${tipoB}`);
+      return tipoA.localeCompare(tipoB);
+    }
+    
+    if (normalizedSortType === 'BY_BANK_VALUE') {
+      console.log("✅ Applying BY_BANK_VALUE sorting");
+      const bancoA = (a.BANCO || '').toString().padStart(3, '0');
+      const bancoB = (b.BANCO || '').toString().padStart(3, '0');
+      const compareBanco = bancoA.localeCompare(bancoB);
+      
+      if (compareBanco !== 0) {
+        console.log(`Bank comparison: ${bancoA} vs ${bancoB} = ${compareBanco}`);
+        return compareBanco;
+      }
+      
+      const valorA = typeof a.VALOR === 'number' 
+        ? a.VALOR
+        : parseFloat(a.VALOR.toString().replace(/[^\d.,]/g, '').replace(',', '.'));
+      const valorB = typeof b.VALOR === 'number' 
+        ? b.VALOR
+        : parseFloat(b.VALOR.toString().replace(/[^\d.,]/g, '').replace(',', '.'));
+      
+      const valueComparison = valorB - valorA; // Decrescente
+      console.log(`Value comparison within same bank: ${valorA} vs ${valorB} = ${valueComparison}`);
+      return valueComparison;
+    }
+    
+    if (normalizedSortType === 'BY_VALUE_DESC') {
+      console.log("✅ Applying BY_VALUE_DESC sorting");
+      const valorA = typeof a.VALOR === 'number' 
+        ? a.VALOR
+        : parseFloat(a.VALOR.toString().replace(/[^\d.,]/g, '').replace(',', '.'));
+      const valorB = typeof b.VALOR === 'number' 
+        ? b.VALOR
+        : parseFloat(b.VALOR.toString().replace(/[^\d.,]/g, '').replace(',', '.'));
+      
+      const result = valorB - valorA; // Decrescente
+      console.log(`Comparing values: ${valorA} vs ${valorB} = ${result}`);
+      return result;
+    }
+    
+    console.log("❌ No matching sort type found, using default sorting - sortType not matched:", normalizedSortType);
+    return 0;
   });
 
   console.log("After sorting - first 3 favorecidos:");
@@ -191,7 +200,7 @@ const adicionarSecaoTotais = (doc: jsPDF, startY: number, totais: TotaisPorCateg
  * Generate a PDF remittance report from the selected rows
  */
 export const generatePDFReport = async (reportData: ReportData, sortType: ReportSortType = ReportSortType.BY_NAME): Promise<Blob> => {
-  console.log("=== DEBUG generatePDFReport ===");
+  console.log("=== DEBUG generatePDFReport - FIXED VERSION ===");
   console.log("Received reportData with", reportData.beneficiarios.length, "beneficiarios");
   console.log("Received sortType:", sortType);
   console.log("Received sortType type:", typeof sortType);
@@ -200,10 +209,10 @@ export const generatePDFReport = async (reportData: ReportData, sortType: Report
   const doc = new jsPDF();
   
   // Ordenar favorecidos de acordo com o tipo escolhido
-  console.log("=== Calling ordenarFavorecidos ===");
+  console.log("=== Calling ordenarFavorecidos - FIXED VERSION ===");
   console.log("Before calling ordenarFavorecidos - sortType:", sortType);
   const favorecidosOrdenados = ordenarFavorecidos(reportData.beneficiarios, sortType);
-  console.log("=== After ordenarFavorecidos ===");
+  console.log("=== After ordenarFavorecidos - FIXED VERSION ===");
   console.log("favorecidosOrdenados count:", favorecidosOrdenados.length);
   
   // Categorizar favorecidos por banco
@@ -334,6 +343,6 @@ export const generatePDFReport = async (reportData: ReportData, sortType: Report
   
   // Generate the PDF as a Blob
   const pdfBlob = doc.output('blob');
-  console.log("=== PDF generation completed ===");
+  console.log("=== PDF generation completed - FIXED VERSION ===");
   return pdfBlob;
 };
