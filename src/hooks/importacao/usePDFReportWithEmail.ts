@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNotificationModalContext } from '@/components/ui/NotificationModalProvider';
 import { generatePDFReport } from '@/services/reports/pdfReportService';
@@ -67,10 +66,29 @@ export const usePDFReportWithEmail = () => {
     try {
       // Validate favorecidos if validation function is provided
       if (validateFavorecidos) {
+        console.log("=== Executing validation ===");
         const validationResult = validateFavorecidos(selectedRows);
-        if (!validationResult.valid) {
-          showError("Erro!", `Erro na validação dos dados: ${validationResult.errors.join(', ')}`);
-          return;
+        console.log("Validation result:", validationResult);
+        
+        // Fix: Check for errors array length instead of .valid property
+        if (validationResult.errors && validationResult.errors.length > 0) {
+          console.log("Validation errors found:", validationResult.errors);
+          
+          // Format error messages properly
+          const errorMessages = validationResult.errors.map((errorRecord: any) => {
+            const favorecidoName = errorRecord.favorecido?.nome || errorRecord.favorecido?.NOME || 'Favorecido';
+            const fieldErrors = errorRecord.errors?.map((err: any) => err.message || err).join(', ') || 'Erro de validação';
+            return `${favorecidoName}: ${fieldErrors}`;
+          });
+          
+          // Show warning but allow report generation if there are valid records
+          if (validationResult.validRecordsCount > 0) {
+            console.log(`⚠️ Warning: ${validationResult.errors.length} errors found, but ${validationResult.validRecordsCount} valid records exist. Proceeding with report generation.`);
+            // Could show a warning toast here if needed
+          } else {
+            showError("Erro!", `Todos os registros possuem erros de validação: ${errorMessages.slice(0, 3).join('; ')}${errorMessages.length > 3 ? '...' : ''}`);
+            return;
+          }
         }
       }
 
