@@ -51,15 +51,9 @@ export const usePDFReportWithEmail = () => {
     paymentDate: Date,
     sortType: ReportSortType = ReportSortType.BY_NAME
   ) => {
-    console.log("=== DEBUG handleGenerateReportWithSorting ===");
-    console.log("selectedRows count:", selectedRows.length);
-    console.log("sortType received:", sortType);
-    console.log("sortType type:", typeof sortType);
-    console.log("Is valid enum value?", Object.values(ReportSortType).includes(sortType));
-    console.log("ReportSortType enum values:", Object.values(ReportSortType));
-    console.log("cnabFileGenerated:", cnabFileGenerated);
-    console.log("companyName:", companyName);
-    console.log("convenente:", convenente);
+    console.log("=== Generating Report with Sorting ===");
+    console.log("Sort type:", sortType);
+    console.log("Selected rows count:", selectedRows.length);
     
     if (selectedRows.length === 0) {
       showError("Erro!", "Nenhum registro selecionado para gerar relatório.");
@@ -69,14 +63,10 @@ export const usePDFReportWithEmail = () => {
     try {
       // Validate favorecidos if validation function is provided
       if (validateFavorecidos) {
-        console.log("=== Executing validation ===");
         const validationResult = validateFavorecidos(selectedRows);
-        console.log("Validation result:", validationResult);
         
         // Fix: Check for errors array length instead of .valid property
         if (validationResult.errors && validationResult.errors.length > 0) {
-          console.log("Validation errors found:", validationResult.errors);
-          
           // Format error messages properly
           const errorMessages = validationResult.errors.map((errorRecord: any) => {
             const favorecidoName = errorRecord.favorecido?.nome || errorRecord.favorecido?.NOME || 'Favorecido';
@@ -87,7 +77,6 @@ export const usePDFReportWithEmail = () => {
           // Show warning but allow report generation if there are valid records
           if (validationResult.validRecordsCount > 0) {
             console.log(`⚠️ Warning: ${validationResult.errors.length} errors found, but ${validationResult.validRecordsCount} valid records exist. Proceeding with report generation.`);
-            // Could show a warning toast here if needed
           } else {
             showError("Erro!", `Todos os registros possuem erros de validação: ${errorMessages.slice(0, 3).join('; ')}${errorMessages.length > 3 ? '...' : ''}`);
             return;
@@ -115,15 +104,12 @@ export const usePDFReportWithEmail = () => {
         totalRegistros: selectedRows.length
       };
 
-      console.log("=== Calling generatePDFReport with sortType ===");
-      console.log("reportData:", reportData);
-      console.log("sortType being passed to generatePDFReport:", sortType);
-      console.log("sortType type being passed:", typeof sortType);
+      console.log("=== Calling generatePDFReport ===");
+      console.log("Final sort type being passed:", sortType);
       
       // Generate PDF with sorting
       const pdfBlob = await generatePDFReport(reportData, sortType);
       
-      console.log("=== PDF generated successfully ===");
       setCurrentPDFBlob(pdfBlob);
       setReportData(reportData);
       setReportDate(reportData.dataGeracao);

@@ -26,18 +26,17 @@ export const useLancamentoFavorecidosReport = ({
   // Add state for sort dialog
   const [showSortDialog, setShowSortDialog] = useState(false);
 
-  // Function to handle the sort dialog confirmation
+  // Function to handle the sort dialog confirmation - FIXED: Following Importar Planilha pattern
   const handleSortConfirm = async (sortType: ReportSortType) => {
-    console.log("=== DEBUG handleSortConfirm ===");
+    console.log("=== DEBUG handleSortConfirm - FIXED ===");
     console.log("sortType received:", sortType);
     console.log("sortType type:", typeof sortType);
-    console.log("Is sortType a valid enum value?", Object.values(ReportSortType).includes(sortType));
     
     await generateReportWithSorting(sortType);
     setShowSortDialog(false);
   };
 
-  // Function to generate report with specific sorting
+  // Function to generate report with specific sorting - FIXED: Direct call to pdfReportWithEmail
   const generateReportWithSorting = async (sortType: ReportSortType = ReportSortType.BY_NAME) => {
     if (selectedFavorecidos.length === 0) {
       showError("Erro!", "Nenhum favorecido selecionado para gerar relatório.");
@@ -50,11 +49,9 @@ export const useLancamentoFavorecidosReport = ({
       return;
     }
 
-    console.log("=== DEBUG generateReportWithSorting ===");
+    console.log("=== DEBUG generateReportWithSorting - FIXED ===");
     console.log("Gerando relatório para favorecidos selecionados:", selectedFavorecidos);
     console.log("Tipo de ordenação recebido:", sortType);
-    console.log("Tipo de ordenação type:", typeof sortType);
-    console.log("Enum comparison - sortType === ReportSortType.BY_NAME:", sortType === ReportSortType.BY_NAME);
     
     try {
       // Get selected favorecidos data
@@ -74,11 +71,10 @@ export const useLancamentoFavorecidosReport = ({
       const companyName = workflow.convenente?.razaoSocial || "Empresa";
       const companyCnpj = workflow.convenente?.cnpj || "";
       
-      console.log("=== Calling handleGenerateReportWithSorting ===");
+      console.log("=== Calling handleGenerateReportWithSorting - FIXED ===");
       console.log("About to call with sortType:", sortType);
-      console.log("About to call with sortType type:", typeof sortType);
       
-      // Generate report using the PDF system with sorting
+      // FIXED: Use the same pattern as Importar Planilha module
       await pdfReportWithEmail.handleGenerateReportWithSorting(
         rowData,
         false, // cnabFileGenerated = false for report-only mode
@@ -88,7 +84,7 @@ export const useLancamentoFavorecidosReport = ({
         workflow.convenente,
         companyCnpj,
         workflow.paymentDate,
-        sortType // Pass the sort type
+        sortType // Pass the sort type directly
       );
       
     } catch (error) {
@@ -97,9 +93,9 @@ export const useLancamentoFavorecidosReport = ({
     }
   };
 
+  // FIXED: Open sort dialog directly like in Importar Planilha
   const handleGenerateReportOnly = async () => {
-    // Open sort dialog instead of generating directly
-    console.log("Opening sort dialog for report generation");
+    console.log("Opening sort dialog for report generation - FIXED");
     setShowSortDialog(true);
   };
 
