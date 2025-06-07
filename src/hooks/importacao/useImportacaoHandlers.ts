@@ -39,7 +39,7 @@ export const useImportacaoHandlers = (
     processWorkflow.handleProcessSelected();
   };
   
-  // Handle PDF report generation - UPDATED: Added sortType parameter
+  // CORRIGIDO: Handle PDF report generation with sortType parameter
   const handleGenerateReport = async (sortType: ReportSortType = ReportSortType.BY_NAME) => {
     console.log("=== DEBUG useImportacaoHandlers - handleGenerateReport ===");
     console.log("cnabFileGenerated:", processWorkflow.cnabFileGenerated);
@@ -67,6 +67,7 @@ export const useImportacaoHandlers = (
     console.log("Final convenente to use:", convenenteToUse);
     console.log("Payment date to use:", processWorkflow.workflow.paymentDate);
     
+    // CORRIGIDO: Passar sortType como último parâmetro
     await pdfReportWithEmail.handleGenerateReport(
       tableOps.getSelectedRows(),
       processWorkflow.cnabFileGenerated,
@@ -76,7 +77,7 @@ export const useImportacaoHandlers = (
       convenenteToUse,
       companyCnpj,
       processWorkflow.workflow.paymentDate,
-      sortType // ADDED: Pass the sortType parameter
+      sortType // CORRIGIDO: Passar o sortType como parâmetro
     );
   };
 

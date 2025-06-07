@@ -17,6 +17,7 @@ export const usePDFReportWithEmail = () => {
   const [currentPDFBlob, setCurrentPDFBlob] = useState<Blob | null>(null);
   const [selectedSortType, setSelectedSortType] = useState<ReportSortType>(ReportSortType.BY_NAME);
 
+  // CORRIGIDO: Aceitar sortType como parâmetro opcional
   const handleGenerateReport = async (
     selectedRows: RowData[],
     cnabFileGenerated: boolean,
@@ -25,7 +26,8 @@ export const usePDFReportWithEmail = () => {
     validateFavorecidos: any,
     convenente: any,
     companyCnpj: string,
-    paymentDate: Date
+    paymentDate: Date,
+    sortType: ReportSortType = ReportSortType.BY_NAME // ADICIONADO: parâmetro sortType
   ) => {
     await handleGenerateReportWithSorting(
       selectedRows,
@@ -36,7 +38,7 @@ export const usePDFReportWithEmail = () => {
       convenente,
       companyCnpj,
       paymentDate,
-      ReportSortType.BY_NAME // Default sorting
+      sortType // CORRIGIDO: Passar o sortType recebido
     );
   };
 
@@ -107,7 +109,7 @@ export const usePDFReportWithEmail = () => {
       console.log("=== Calling generatePDFReport ===");
       console.log("Final sort type being passed:", sortType);
       
-      // Generate PDF with sorting
+      // CORRIGIDO: Passar sortType para generatePDFReport
       const pdfBlob = await generatePDFReport(reportData, sortType);
       
       setCurrentPDFBlob(pdfBlob);
