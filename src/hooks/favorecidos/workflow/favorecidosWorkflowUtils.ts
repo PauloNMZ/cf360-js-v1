@@ -2,8 +2,12 @@
 import { FavorecidoData } from '@/types/favorecido';
 import { RowData } from '@/types/importacao';
 
-export const mapFavorecidoToRowData = (favorecido: FavorecidoData, index: number): RowData => {
+export const mapFavorecidoToRowData = (favorecido: FavorecidoData, index: number, valorWorkflow?: number): RowData => {
   console.log("🔄 Mapping favorecido to RowData:", favorecido);
+  console.log("🔄 Valor from workflow:", valorWorkflow);
+  
+  // CORRIGIDO: Usar valor do workflow se disponível, senão usar valorPadrao, senão usar 100 como padrão
+  const valor = valorWorkflow || favorecido.valorPadrao || 100;
   
   const rowData: RowData = {
     id: index,
@@ -14,10 +18,10 @@ export const mapFavorecidoToRowData = (favorecido: FavorecidoData, index: number
     AGENCIA: favorecido.agencia,
     CONTA: favorecido.conta,
     TIPO: favorecido.tipoConta, // CC, PP, TD
-    VALOR: favorecido.valorPadrao || 0
+    VALOR: valor // CORRIGIDO: Usar valor calculado adequadamente
   };
   
-  console.log("✅ Mapped RowData:", rowData);
+  console.log("✅ Mapped RowData with valor:", rowData.VALOR);
   return rowData;
 };
 

@@ -52,6 +52,7 @@ export const useLancamentoFavorecidosReport = ({
     console.log("=== DEBUG generateReportWithSorting - FIXED ===");
     console.log("Gerando relatório para favorecidos selecionados:", selectedFavorecidos);
     console.log("Tipo de ordenação recebido:", sortType);
+    console.log("Workflow valor disponível:", workflow.valorPagamento);
     
     try {
       // Get selected favorecidos data
@@ -63,10 +64,15 @@ export const useLancamentoFavorecidosReport = ({
         throw new Error("Nenhum favorecido encontrado");
       }
 
-      // Convert favorecidos to the format expected by report generation
+      // CORRIGIDO: Convert favorecidos to the format expected by report generation, passando valor do workflow
       const rowData = selectedFavorecidosData.map((fav, index) => 
-        mapFavorecidoToRowData(fav, index)
+        mapFavorecidoToRowData(fav, index, workflow.valorPagamento)
       );
+
+      console.log("=== DEBUG: RowData with corrected values ===");
+      rowData.forEach((row, idx) => {
+        console.log(`Favorecido ${idx}: ${row.NOME} - Valor: ${row.VALOR}`);
+      });
 
       const companyName = workflow.convenente?.razaoSocial || "Empresa";
       const companyCnpj = workflow.convenente?.cnpj || "";
