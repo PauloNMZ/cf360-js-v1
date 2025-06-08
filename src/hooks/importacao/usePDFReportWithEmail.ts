@@ -53,8 +53,10 @@ export const usePDFReportWithEmail = () => {
     paymentDate: Date,
     sortType: ReportSortType = ReportSortType.BY_NAME
   ) => {
-    console.log("=== Generating Report with Sorting ===");
-    console.log("Sort type:", sortType);
+    console.log("=== 🎯 usePDFReportWithEmail - handleGenerateReportWithSorting ===");
+    console.log("sortType received:", sortType);
+    console.log("sortType type:", typeof sortType);
+    console.log("sortType stringified:", JSON.stringify(sortType));
     console.log("Selected rows count:", selectedRows.length);
     
     if (selectedRows.length === 0) {
@@ -106,8 +108,9 @@ export const usePDFReportWithEmail = () => {
         totalRegistros: selectedRows.length
       };
 
-      console.log("=== Calling generatePDFReport ===");
-      console.log("Final sort type being passed:", sortType);
+      console.log("=== 📤 About to call generatePDFReport ===");
+      console.log("Final sortType being passed to generatePDFReport:", sortType);
+      console.log("Final sortType stringified:", JSON.stringify(sortType));
       
       // CORRIGIDO: Passar sortType para generatePDFReport
       const pdfBlob = await generatePDFReport(reportData, sortType);

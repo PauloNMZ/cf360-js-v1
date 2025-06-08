@@ -18,11 +18,23 @@ import {
  * Generate a PDF remittance report from the selected rows
  */
 export const generatePDFReport = async (reportData: ReportData, sortType: ReportSortType = ReportSortType.BY_NAME): Promise<Blob> => {
+  console.log("=== 📄 DEBUG generatePDFReport ===");
+  console.log("sortType received in generatePDFReport:", sortType);
+  console.log("sortType type:", typeof sortType);
+  console.log("sortType stringified:", JSON.stringify(sortType));
+  console.log("reportData.beneficiarios count:", reportData.beneficiarios.length);
+  
   // Create a new PDF document
   const doc = new jsPDF();
   
+  console.log("=== 🔄 About to call ordenarFavorecidos ===");
+  console.log("Passing sortType to ordenarFavorecidos:", sortType);
+  
   // Ordenar favorecidos de acordo com o tipo escolhido
   const favorecidosOrdenados = ordenarFavorecidos(reportData.beneficiarios, sortType);
+  
+  console.log("=== ✅ Got ordenarFavorecidos result ===");
+  console.log("favorecidosOrdenados count:", favorecidosOrdenados.length);
   
   // Categorizar favorecidos por banco
   const totaisPorCategoria = categorizarFavorecidosPorBanco(favorecidosOrdenados);
@@ -50,5 +62,7 @@ export const generatePDFReport = async (reportData: ReportData, sortType: Report
   
   // Generate the PDF as a Blob
   const pdfBlob = doc.output('blob');
+  
+  console.log("=== 📄 PDF generated successfully ===");
   return pdfBlob;
 };
