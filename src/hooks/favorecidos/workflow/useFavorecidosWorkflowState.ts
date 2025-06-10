@@ -21,12 +21,13 @@ export const useFavorecidosWorkflowState = () => {
   const [cnabFileGenerated, setCnabFileGenerated] = useState(false);
   const [cnabFileName, setCnabFileName] = useState('');
   
-  // UPDATED: Inicializar paymentDate com a data atual
+  // UPDATED: Inicializar workflow com valorPagamento incluído
   const [workflow, setWorkflow] = useState({
     convenente: null,
     paymentDate: new Date(), // Data atual como padrão
     serviceType: "Pagamentos Diversos", // Valor padrão
-    sendMethod: "cnab" // Valor padrão para método de envio
+    sendMethod: "cnab", // Valor padrão para método de envio
+    valorPagamento: 100 // NOVO: Valor padrão para pagamentos
   });
 
   const updateWorkflow = (field: string, value: any) => {
