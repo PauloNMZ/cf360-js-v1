@@ -234,7 +234,6 @@ export function TableView({
         isOpen={showSortDialog} 
         onOpenChange={setShowSortDialog} 
         onConfirm={handleSortConfirm} 
-        defaultSortType={ReportSortType.BY_NAME} 
       />
     </div>
   );
