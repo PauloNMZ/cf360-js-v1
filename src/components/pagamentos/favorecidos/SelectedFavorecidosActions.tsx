@@ -20,6 +20,12 @@ const SelectedFavorecidosActions: React.FC<SelectedFavorecidosActionsProps> = ({
 }) => {
   if (selectedFavorecidos.length === 0) return null;
 
+  const handleGenerateReportClick = () => {
+    console.log("=== 📊 SelectedFavorecidosActions - handleGenerateReportClick ===");
+    console.log("Chamando onGenerateReport que deve abrir o dialog de ordenação");
+    onGenerateReport();
+  };
+
   return (
     <div className="sticky bottom-0 bg-background border-t border-border p-4 shadow-lg">
       <div className="flex items-center justify-between max-w-6xl mx-auto">
@@ -44,7 +50,7 @@ const SelectedFavorecidosActions: React.FC<SelectedFavorecidosActionsProps> = ({
           </Button>
           
           <Button 
-            onClick={onGenerateReport}
+            onClick={handleGenerateReportClick}
             disabled={!hasConvenente}
             variant="outline"
             size="sm"

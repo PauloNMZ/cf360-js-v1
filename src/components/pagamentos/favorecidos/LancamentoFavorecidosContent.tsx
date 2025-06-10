@@ -48,6 +48,11 @@ const LancamentoFavorecidosContent: React.FC<LancamentoFavorecidosContentProps> 
   onGenerateReport,
   onProcessSelected
 }) => {
+  console.log("=== 📋 LancamentoFavorecidosContent - Debug Props ===");
+  console.log("onGenerateReport function:", typeof onGenerateReport);
+  console.log("hasConvenente:", hasConvenente);
+  console.log("selectedFavorecidos count:", selectedFavorecidos.length);
+
   return (
     <div className="space-y-6">
       {/* Header */}

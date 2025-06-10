@@ -35,6 +35,10 @@ export const useLancamentoFavorecidosContainer = () => {
     setShowWorkflowDialog: workflowData.setShowWorkflowDialog
   });
 
+  console.log("=== 🔧 useLancamentoFavorecidosContainer - Debug ===");
+  console.log("reportData.handleGenerateReportOnly:", typeof reportData.handleGenerateReportOnly);
+  console.log("reportData.hasConvenente:", reportData.hasConvenente);
+
   return {
     favorecidosData,
     stateData,
