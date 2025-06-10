@@ -26,12 +26,7 @@ export const useLancamentoFavorecidosReport = ({
   // Add state for sort dialog
   const [showSortDialog, setShowSortDialog] = useState(false);
 
-  console.log("=== 📊 useLancamentoFavorecidosReport INITIALIZED ===");
-  console.log("selectedFavorecidos:", selectedFavorecidos);
-  console.log("favorecidos count:", favorecidos.length);
-  console.log("workflow:", workflow);
-
-  // Function to handle the sort dialog confirmation
+  // Function to handle the sort dialog confirmation - FIXED: Following Importar Planilha pattern
   const handleSortConfirm = async (sortType: ReportSortType) => {
     console.log("=== 🎯 DEBUG handleSortConfirm - Por Favorecidos Module ===");
     console.log("sortType received:", sortType);
@@ -43,22 +38,14 @@ export const useLancamentoFavorecidosReport = ({
     setShowSortDialog(false);
   };
 
-  // Function to generate report with specific sorting
+  // Function to generate report with specific sorting - FIXED: Direct call to pdfReportWithEmail
   const generateReportWithSorting = async (sortType: ReportSortType = ReportSortType.BY_NAME) => {
-    console.log("=== 🚀 generateReportWithSorting START - Por Favorecidos ===");
-    console.log("sortType received:", sortType);
-    console.log("selectedFavorecidos:", selectedFavorecidos);
-    console.log("favorecidos available:", favorecidos.length);
-    console.log("workflow convenente:", workflow.convenente);
-    
     if (selectedFavorecidos.length === 0) {
-      console.log("❌ No favorecidos selected");
       showError("Erro!", "Nenhum favorecido selecionado para gerar relatório.");
       return;
     }
 
     if (!workflow.convenente) {
-      console.log("❌ No convenente selected");
       showError("Erro!", "É necessário selecionar um convenente antes de gerar o relatório.");
       setShowWorkflowDialog(true);
       return;
@@ -76,13 +63,11 @@ export const useLancamentoFavorecidosReport = ({
         selectedFavorecidos.includes(fav.id)
       );
 
-      console.log("Selected favorecidos data:", selectedFavorecidosData);
-
       if (selectedFavorecidosData.length === 0) {
         throw new Error("Nenhum favorecido encontrado");
       }
 
-      // Convert favorecidos to the format expected by report generation
+      // CORRIGIDO: Convert favorecidos to the format expected by report generation, passando valor do workflow
       const rowData = selectedFavorecidosData.map((fav, index) => 
         mapFavorecidoToRowData(fav, index, workflow.valorPagamento)
       );
@@ -98,11 +83,8 @@ export const useLancamentoFavorecidosReport = ({
       console.log("=== 📤 Calling handleGenerateReportWithSorting - Por Favorecidos ===");
       console.log("About to call with sortType:", sortType);
       console.log("sortType before call:", JSON.stringify(sortType));
-      console.log("rowData count:", rowData.length);
-      console.log("companyName:", companyName);
-      console.log("paymentDate:", workflow.paymentDate);
       
-      // Use the same pattern as Importar Planilha module
+      // FIXED: Use the same pattern as Importar Planilha module
       await pdfReportWithEmail.handleGenerateReportWithSorting(
         rowData,
         false, // cnabFileGenerated = false for report-only mode
@@ -115,39 +97,16 @@ export const useLancamentoFavorecidosReport = ({
         sortType // Pass the sort type directly
       );
       
-      console.log("=== ✅ Report generation completed successfully ===");
-      
     } catch (error) {
-      console.error("❌ Erro ao gerar relatório:", error);
+      console.error("Erro ao gerar relatório:", error);
       showError("Erro!", "Erro ao gerar relatório de remessa.");
     }
   };
 
-  // Open sort dialog directly like in Importar Planilha
+  // FIXED: Open sort dialog directly like in Importar Planilha
   const handleGenerateReportOnly = async () => {
-    console.log("=== 🎪 handleGenerateReportOnly CALLED - Por Favorecidos ===");
-    console.log("About to open sort dialog");
-    console.log("selectedFavorecidos:", selectedFavorecidos);
-    console.log("favorecidos available:", favorecidos.length);
-    console.log("workflow state:", workflow);
-    
-    // Validation before opening sort dialog
-    if (selectedFavorecidos.length === 0) {
-      console.log("❌ No favorecidos selected - showing error");
-      showError("Erro!", "Nenhum favorecido selecionado para gerar relatório.");
-      return;
-    }
-
-    if (!workflow.convenente) {
-      console.log("❌ No convenente selected - showing error and workflow dialog");
-      showError("Erro!", "É necessário selecionar um convenente antes de gerar o relatório.");
-      setShowWorkflowDialog(true);
-      return;
-    }
-
-    console.log("✅ All validations passed - opening sort dialog");
+    console.log("=== 🎪 Opening sort dialog for report generation - Por Favorecidos ===");
     setShowSortDialog(true);
-    console.log("Sort dialog should now be open");
   };
 
   return {
