@@ -28,7 +28,7 @@ export function PDFPreviewDialog({
 }: ExtendedPDFPreviewDialogProps) {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [iframeKey, setIframeKey] = useState<number>(0); // Estado para forçar recarregamento do iframe
+  const [iframeKey, setIframeKey] = useState<number>(0);
 
   useEffect(() => {
     let url: string | null = null;
@@ -41,15 +41,14 @@ export function PDFPreviewDialog({
         
         setLoading(true);
         try {
-          // Generate PDF blob with sort type
           console.log("=== Calling generatePDFReport with sortType:", sortType, "===");
           const pdfBlob = await generatePDFReport(reportData, sortType);
           
-          // Create a URL for the blob
-          url = URL.createObjectURL(pdfBlob);
+          // Create a URL for the blob - FIXED: Add #page=1 to always start at first page
+          url = URL.createObjectURL(pdfBlob) + "#page=1";
           setPdfUrl(url);
           
-          // Forçar o recarregamento do iframe quando os dados mudarem
+          // Force iframe reload when data changes
           setIframeKey(prev => prev + 1);
           
           console.log("=== PDF preview generated successfully ===");
@@ -74,36 +73,12 @@ export function PDFPreviewDialog({
     };
   }, [reportData, sortType]);
 
-  // Efeito para garantir que o iframe sempre comece na primeira página
-  useEffect(() => {
-    if (isOpen && pdfUrl && !loading) {
-      // Pequeno atraso para garantir que o iframe esteja pronto
-      const timer = setTimeout(() => {
-        const iframe = document.querySelector('iframe');
-        if (iframe) {
-          // Tentar rolar para o topo
-          try {
-            iframe.contentWindow?.scrollTo(0, 0);
-            
-            // Se o iframe tiver um body, também rolamos ele para o topo
-            const iframeBody = iframe.contentDocument?.body;
-            if (iframeBody) {
-              iframeBody.scrollTop = 0;
-            }
-          } catch (e) {
-            console.log("Não foi possível rolar o iframe para o topo:", e);
-          }
-        }
-      }, 100);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen, pdfUrl, loading, iframeKey]);
+  // REMOVED: The problematic iframe manipulation code that was causing SecurityError
 
   const handleDownload = async () => {
     if (pdfUrl) {
       const link = document.createElement('a');
-      link.href = pdfUrl;
+      link.href = pdfUrl.replace('#page=1', ''); // Remove the page parameter for download
       link.download = `Remessa_Bancaria_${reportData?.referencia || new Date().toISOString().slice(0, 10).replace(/-/g, '')}.pdf`;
       document.body.appendChild(link);
       link.click();
@@ -136,6 +111,7 @@ export function PDFPreviewDialog({
               src={pdfUrl} 
               className="w-full h-full" 
               title="Relatório de Remessa Bancária"
+              sandbox="allow-same-origin allow-scripts"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
