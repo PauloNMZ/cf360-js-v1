@@ -9,19 +9,26 @@ export const mapFavorecidoToRowData = (favorecido: FavorecidoData, index: number
   // CORRIGIDO: Usar valor do workflow se disponível, senão usar valorPadrao, senão usar 100 como padrão
   const valor = valorWorkflow || favorecido.valorPadrao || 100;
   
+  // ADDED: Validação básica dos campos obrigatórios
+  if (!favorecido.nome || !favorecido.inscricao || !favorecido.banco || !favorecido.agencia || !favorecido.conta) {
+    console.error("❌ Favorecido com campos obrigatórios ausentes:", favorecido);
+    throw new Error(`Favorecido ${favorecido.nome || 'sem nome'} possui campos obrigatórios ausentes`);
+  }
+  
   const rowData: RowData = {
     id: index,
     selected: true,
-    NOME: favorecido.nome,
-    INSCRICAO: favorecido.inscricao,
-    BANCO: favorecido.banco,
-    AGENCIA: favorecido.agencia,
-    CONTA: favorecido.conta,
-    TIPO: favorecido.tipoConta, // CC, PP, TD
-    VALOR: valor // CORRIGIDO: Usar valor calculado adequadamente
+    NOME: favorecido.nome.toString().trim(),
+    INSCRICAO: favorecido.inscricao.toString().trim(),
+    BANCO: favorecido.banco.toString().trim(),
+    AGENCIA: favorecido.agencia.toString().trim(),
+    CONTA: favorecido.conta.toString().trim(),
+    TIPO: favorecido.tipoConta || 'CC', // CC, PP, TD - fallback para CC
+    VALOR: Number(valor) // CORRIGIDO: Garantir que é sempre um número
   };
   
   console.log("✅ Mapped RowData with valor:", rowData.VALOR);
+  console.log("✅ Complete mapped data:", rowData);
   return rowData;
 };
 
@@ -35,11 +42,11 @@ export const validateFavorecidos = (tableData: RowData[]) => {
     const rowErrors: any[] = [];
     
     // Validate required fields
-    if (!row.NOME || row.NOME.trim() === '') {
+    if (!row.NOME || row.NOME.toString().trim() === '') {
       rowErrors.push({ field: 'NOME', message: 'Nome é obrigatório' });
     }
     
-    if (!row.INSCRICAO || row.INSCRICAO.trim() === '') {
+    if (!row.INSCRICAO || row.INSCRICAO.toString().trim() === '') {
       rowErrors.push({ field: 'INSCRICAO', message: 'CPF/CNPJ é obrigatório' });
     }
     
@@ -59,8 +66,10 @@ export const validateFavorecidos = (tableData: RowData[]) => {
       rowErrors.push({ field: 'TIPO', message: 'Tipo de conta deve ser CC, PP ou TD' });
     }
     
-    if (!row.VALOR || row.VALOR <= 0) {
-      rowErrors.push({ field: 'VALOR', message: 'Valor deve ser maior que zero' });
+    // CORRIGIDO: Validação mais robusta do valor
+    const valor = Number(row.VALOR);
+    if (isNaN(valor) || valor <= 0) {
+      rowErrors.push({ field: 'VALOR', message: `Valor deve ser maior que zero, recebido: ${row.VALOR}` });
     }
     
     if (rowErrors.length > 0) {

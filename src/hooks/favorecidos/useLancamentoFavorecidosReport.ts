@@ -40,6 +40,12 @@ export const useLancamentoFavorecidosReport = ({
 
   // Function to generate report with specific sorting - FIXED: Direct call to pdfReportWithEmail
   const generateReportWithSorting = async (sortType: ReportSortType = ReportSortType.BY_NAME) => {
+    console.log("=== 🚀 DEBUG generateReportWithSorting - INÍCIO ===");
+    console.log("selectedFavorecidos:", selectedFavorecidos);
+    console.log("favorecidos disponíveis:", favorecidos.length);
+    console.log("workflow:", workflow);
+    console.log("sortType:", sortType);
+
     if (selectedFavorecidos.length === 0) {
       showError("Erro!", "Nenhum favorecido selecionado para gerar relatório.");
       return;
@@ -51,38 +57,65 @@ export const useLancamentoFavorecidosReport = ({
       return;
     }
 
-    console.log("=== 🚀 DEBUG generateReportWithSorting - Por Favorecidos ===");
-    console.log("Gerando relatório para favorecidos selecionados:", selectedFavorecidos);
-    console.log("Tipo de ordenação recebido:", sortType);
-    console.log("sortType stringified:", JSON.stringify(sortType));
-    console.log("Workflow valor disponível:", workflow.valorPagamento);
-    
     try {
       // Get selected favorecidos data
       const selectedFavorecidosData = favorecidos.filter(fav => 
         selectedFavorecidos.includes(fav.id)
       );
 
+      console.log("=== 📊 DEBUG selectedFavorecidosData ===");
+      console.log("Favorecidos filtrados:", selectedFavorecidosData.length);
+      selectedFavorecidosData.forEach((fav, idx) => {
+        console.log(`Favorecido ${idx}:`, {
+          id: fav.id,
+          nome: fav.nome,
+          valorPadrao: fav.valorPadrao,
+          banco: fav.banco,
+          agencia: fav.agencia,
+          conta: fav.conta
+        });
+      });
+
       if (selectedFavorecidosData.length === 0) {
-        throw new Error("Nenhum favorecido encontrado");
+        throw new Error("Nenhum favorecido encontrado após filtro");
       }
 
       // CORRIGIDO: Convert favorecidos to the format expected by report generation, passando valor do workflow
-      const rowData = selectedFavorecidosData.map((fav, index) => 
-        mapFavorecidoToRowData(fav, index, workflow.valorPagamento)
-      );
+      console.log("=== 🔄 DEBUG Mapeando favorecidos ===");
+      console.log("Valor do workflow.valorPagamento:", workflow.valorPagamento);
+      
+      const rowData = selectedFavorecidosData.map((fav, index) => {
+        try {
+          return mapFavorecidoToRowData(fav, index, workflow.valorPagamento);
+        } catch (error) {
+          console.error(`Erro ao mapear favorecido ${fav.nome}:`, error);
+          throw error;
+        }
+      });
 
       console.log("=== 📊 DEBUG: RowData with corrected values ===");
       rowData.forEach((row, idx) => {
-        console.log(`Favorecido ${idx}: ${row.NOME} - Valor: ${row.VALOR}`);
+        console.log(`Favorecido ${idx}: ${row.NOME} - Valor: ${row.VALOR} (tipo: ${typeof row.VALOR})`);
       });
+
+      // ADDED: Validação antes de gerar o relatório
+      console.log("=== ✅ DEBUG Validando dados ===");
+      const validationResult = validateFavorecidos(rowData);
+      if (validationResult.errors.length > 0) {
+        console.error("Erros de validação encontrados:", validationResult.errors);
+        // Continuar apenas se houver registros válidos
+        if (validationResult.validRecordsCount === 0) {
+          throw new Error("Todos os favorecidos possuem erros de validação");
+        }
+      }
 
       const companyName = workflow.convenente?.razaoSocial || "Empresa";
       const companyCnpj = workflow.convenente?.cnpj || "";
       
       console.log("=== 📤 Calling handleGenerateReportWithSorting - Por Favorecidos ===");
       console.log("About to call with sortType:", sortType);
-      console.log("sortType before call:", JSON.stringify(sortType));
+      console.log("Company info:", { companyName, companyCnpj });
+      console.log("Payment date:", workflow.paymentDate);
       
       // FIXED: Use the same pattern as Importar Planilha module
       await pdfReportWithEmail.handleGenerateReportWithSorting(
@@ -97,9 +130,12 @@ export const useLancamentoFavorecidosReport = ({
         sortType // Pass the sort type directly
       );
       
+      console.log("=== ✅ DEBUG generateReportWithSorting - CONCLUÍDO ===");
+      
     } catch (error) {
-      console.error("Erro ao gerar relatório:", error);
-      showError("Erro!", "Erro ao gerar relatório de remessa.");
+      console.error("❌ Erro ao gerar relatório:", error);
+      console.error("Stack trace:", error.stack);
+      showError("Erro!", `Erro ao gerar relatório de remessa: ${error.message}`);
     }
   };
 
