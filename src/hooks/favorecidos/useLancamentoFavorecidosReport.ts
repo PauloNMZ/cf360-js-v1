@@ -65,14 +65,21 @@ export const useLancamentoFavorecidosReport = ({
 
       console.log("=== 📊 DEBUG selectedFavorecidosData ===");
       console.log("Favorecidos filtrados:", selectedFavorecidosData.length);
+      console.log("Primeiro favorecido da lista:", selectedFavorecidosData[0]);
+      
+      // ENHANCED DEBUG: Log each selected favorecido in detail
       selectedFavorecidosData.forEach((fav, idx) => {
         console.log(`Favorecido ${idx}:`, {
           id: fav.id,
           nome: fav.nome,
-          valorPadrao: fav.valorPadrao,
+          inscricao: fav.inscricao,
           banco: fav.banco,
           agencia: fav.agencia,
-          conta: fav.conta
+          conta: fav.conta,
+          tipoConta: fav.tipoConta,
+          valorPadrao: fav.valorPadrao,
+          // Log all properties to see what's available
+          allProperties: Object.keys(fav)
         });
       });
 
@@ -80,44 +87,69 @@ export const useLancamentoFavorecidosReport = ({
         throw new Error("Nenhum favorecido encontrado após filtro");
       }
 
-      // CORRIGIDO: Convert favorecidos to the format expected by report generation, passando valor do workflow
-      console.log("=== 🔄 DEBUG Mapeando favorecidos ===");
-      console.log("Valor do workflow.valorPagamento:", workflow.valorPagamento);
+      // ENHANCED DEBUG: Log workflow details
+      console.log("=== 🔄 DEBUG Workflow Details ===");
+      console.log("workflow.valorPagamento:", workflow.valorPagamento);
+      console.log("workflow.valorPagamento type:", typeof workflow.valorPagamento);
+      console.log("workflow.convenente:", workflow.convenente);
+      console.log("workflow.paymentDate:", workflow.paymentDate);
+      
+      // Convert favorecidos to the format expected by report generation
+      console.log("=== 🔄 DEBUG Starting Favorecidos Mapping ===");
       
       const rowData = selectedFavorecidosData.map((fav, index) => {
+        console.log(`=== Mapping favorecido ${index}: ${fav.nome} ===`);
         try {
-          return mapFavorecidoToRowData(fav, index, workflow.valorPagamento);
+          const mappedData = mapFavorecidoToRowData(fav, index, workflow.valorPagamento);
+          console.log(`✅ Successfully mapped favorecido ${index}:`, mappedData);
+          return mappedData;
         } catch (error) {
-          console.error(`Erro ao mapear favorecido ${fav.nome}:`, error);
-          throw error;
+          console.error(`❌ Erro ao mapear favorecido ${index} (${fav.nome}):`, error);
+          console.error("Favorecido data:", fav);
+          throw new Error(`Erro ao mapear favorecido ${fav.nome}: ${error.message}`);
         }
       });
 
-      console.log("=== 📊 DEBUG: RowData with corrected values ===");
+      console.log("=== 📊 DEBUG: Final RowData ===");
+      console.log("Total mapped rows:", rowData.length);
       rowData.forEach((row, idx) => {
-        console.log(`Favorecido ${idx}: ${row.NOME} - Valor: ${row.VALOR} (tipo: ${typeof row.VALOR})`);
+        console.log(`Row ${idx}:`, {
+          NOME: row.NOME,
+          INSCRICAO: row.INSCRICAO,
+          BANCO: row.BANCO,
+          AGENCIA: row.AGENCIA,
+          CONTA: row.CONTA,
+          TIPO: row.TIPO,
+          VALOR: row.VALOR,
+          valorType: typeof row.VALOR
+        });
       });
 
-      // ADDED: Validação antes de gerar o relatório
-      console.log("=== ✅ DEBUG Validando dados ===");
+      // Validate data before generating report
+      console.log("=== ✅ DEBUG Validating data ===");
       const validationResult = validateFavorecidos(rowData);
+      console.log("Validation result:", validationResult);
+      
       if (validationResult.errors.length > 0) {
-        console.error("Erros de validação encontrados:", validationResult.errors);
-        // Continuar apenas se houver registros válidos
+        console.error("❌ Validation errors found:", validationResult.errors);
+        // Continue only if there are valid records
         if (validationResult.validRecordsCount === 0) {
           throw new Error("Todos os favorecidos possuem erros de validação");
         }
+        console.log(`⚠️ Continuing with ${validationResult.validRecordsCount} valid records out of ${validationResult.totalRecords}`);
       }
 
       const companyName = workflow.convenente?.razaoSocial || "Empresa";
       const companyCnpj = workflow.convenente?.cnpj || "";
       
-      console.log("=== 📤 Calling handleGenerateReportWithSorting - Por Favorecidos ===");
-      console.log("About to call with sortType:", sortType);
+      console.log("=== 📤 Final call to handleGenerateReportWithSorting ===");
       console.log("Company info:", { companyName, companyCnpj });
       console.log("Payment date:", workflow.paymentDate);
+      console.log("Sort type:", sortType);
+      console.log("Row data count:", rowData.length);
+      console.log("About to call pdfReportWithEmail.handleGenerateReportWithSorting...");
       
-      // FIXED: Use the same pattern as Importar Planilha module
+      // Call the PDF generation service
       await pdfReportWithEmail.handleGenerateReportWithSorting(
         rowData,
         false, // cnabFileGenerated = false for report-only mode
@@ -130,10 +162,12 @@ export const useLancamentoFavorecidosReport = ({
         sortType // Pass the sort type directly
       );
       
-      console.log("=== ✅ DEBUG generateReportWithSorting - CONCLUÍDO ===");
+      console.log("=== ✅ PDF generation call completed successfully ===");
       
     } catch (error) {
       console.error("❌ Erro ao gerar relatório:", error);
+      console.error("Error name:", error.name);
+      console.error("Error message:", error.message);
       console.error("Stack trace:", error.stack);
       showError("Erro!", `Erro ao gerar relatório de remessa: ${error.message}`);
     }
